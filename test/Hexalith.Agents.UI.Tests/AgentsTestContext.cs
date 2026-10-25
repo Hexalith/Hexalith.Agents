@@ -92,6 +92,7 @@ public abstract class AgentsTestContext : FrontComposerTestBase
         LaunchReadinessGateway.GetLaunchReadinessAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(LaunchReadinessResult.NotAuthorized()));
 
+        Services.AddScoped<AgentSetupAttemptStore>();
         Services.AddSingleton(SetupGateway);
         Services.AddSingleton(CatalogGateway);
         Services.AddSingleton<IPendingProviderCommandStore>(PendingCommandStore);

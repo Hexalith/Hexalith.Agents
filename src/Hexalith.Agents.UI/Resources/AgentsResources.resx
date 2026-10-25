@@ -746,4 +746,9 @@
   <data name="Agents.ProviderCatalog.Enablement.Enabled" xml:space="preserve"><value>Enabled for tenant</value></data>
   <data name="Agents.ProviderCatalog.Enablement.Load" xml:space="preserve"><value>Load tenant state</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.DeclareTightening" xml:space="preserve"><value>Declare this change as stricter data handling terms</value></data>
+  <data name="Agents.Config.Write.Lifetime" xml:space="preserve"><value>This unresolved attempt is kept while you navigate in this signed-in session. Leaving does not cancel the server command. Reloading or losing the session cannot recover an unacknowledged submission.</value></data>
+  <data name="Agents.Config.Write.Abandoned" xml:space="preserve"><value>The local attempt was abandoned. This does not cancel the server command.</value></data>
+  <data name="Agents.Config.Draft.Diverged" xml:space="preserve"><value>Saved values have changed. Your edits are preserved. Load saved values to replace the name, description and response mode; your instruction text will stay unchanged.</value></data>
+  <data name="Agents.Config.Draft.LoadSaved" xml:space="preserve"><value>Load saved values</value></data>
+  <data name="Agents.Config.Write.AuthorityPending" xml:space="preserve"><value>A command is pending in the authoritative setup. New changes stay blocked. Refresh the projected setup to check its status.</value></data>
 </root>

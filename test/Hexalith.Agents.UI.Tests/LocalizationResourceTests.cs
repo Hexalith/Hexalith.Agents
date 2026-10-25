@@ -122,6 +122,11 @@ public sealed class LocalizationResourceTests
         yield return "Agents.Config.Write.Refresh";
         yield return "Agents.Config.Write.Retry";
         yield return "Agents.Config.Write.Abandon";
+        yield return "Agents.Config.Write.Abandoned";
+        yield return "Agents.Config.Write.Lifetime";
+        yield return "Agents.Config.Write.AuthorityPending";
+        yield return "Agents.Config.Draft.Diverged";
+        yield return "Agents.Config.Draft.LoadSaved";
         yield return "Agents.Config.Write.Confirmed";
         yield return "Agents.Config.Write.Refreshing";
         yield return "Agents.Config.Write.RefreshIncomplete";

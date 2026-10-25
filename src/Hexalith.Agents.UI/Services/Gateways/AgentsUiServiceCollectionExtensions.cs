@@ -29,6 +29,7 @@ public static class AgentsUiServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddSingleton<TimeProvider>(TimeProvider.System);
+        services.TryAddScoped<AgentSetupAttemptStore>();
         services.TryAddScoped<IPendingProviderCommandStore, BrowserSessionPendingProviderCommandStore>();
         services.TryAddScoped<IAgentSetupGateway, DeferredAgentSetupGateway>();
         services.TryAddScoped<IProviderCatalogGateway, DeferredProviderCatalogGateway>();

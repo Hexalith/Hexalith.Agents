@@ -5,6 +5,8 @@
 @inject IAgentSetupGateway Gateway
 @inject TimeProvider TimeProvider
 @inject IUlidFactory UlidFactory
+@inject AgentSetupAttemptStore AttemptStore
+@inject AuthenticationStateProvider Authentication
 
 @* hexa configuration (AC4, AC5, AC6; Story 5.2): a constrained Fluent form (UX-DR15). Identity/instructions/
    provider/content-safety surface presence/validity/version only — never the instruction text or policy content
@@ -24,6 +26,12 @@
                       Description="@Localizer["Agents.Config.Description"]"
                       TestId="agents-config-header" />
 
+        @if (_authenticationPending)
+        {
+            <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-config-state" />
+        }
+        else
+        {
         <FluentStack Orientation="Orientation.Vertical"
                      VerticalGap="8px"
                      role="status"
@@ -43,6 +51,10 @@
                 </FluentText>
             }
         </FluentStack>
+        @if (HasUnresolvedAttempt)
+        {
+            <FluentText data-testid="agents-config-write-lifetime">@Localizer["Agents.Config.Write.Lifetime"]</FluentText>
+        }
         @if (_pendingWrite is { } pending && _activeAttempt is not null)
         {
             <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px" data-testid="agents-config-write-recovery">
@@ -71,6 +83,26 @@
             </FluentStack>
         }
 
+        @if (!HasUnresolvedAttempt && !_draftReadRecovery && _result is { Status: AgentInspectionStatus.Success,
+            Setup.TruthState: AgentSetupTruthState.AuthoritativePending })
+        {
+            <FluentText data-testid="agents-config-authority-pending">@Localizer["Agents.Config.Write.AuthorityPending"]</FluentText>
+            <FluentButton Appearance="ButtonAppearance.Outline" Disabled="@_busy"
+                          OnClick="RefreshAuthorityAsync" data-testid="agents-config-authority-refresh">
+                @Localizer["Agents.Config.Write.Refresh"]
+            </FluentButton>
+        }
+
+        @if (_draftReadRecovery && AttemptStore.IsCurrent(_scope))
+        {
+            <FluentButton Appearance="ButtonAppearance.Outline"
+                          Disabled="@(_busy || HasUnresolvedAttempt)"
+                          OnClick="RefreshAuthorityAsync"
+                          data-testid="agents-config-draft-refresh">
+                @Localizer["Agents.Config.Write.Refresh"]
+            </FluentButton>
+        }
+
         @if (_result is null)
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.Loading" TestId="agents-config-state" />
@@ -94,6 +126,18 @@
             AgentSetupView setup = _result.Setup;
             AgentStatusView agent = setup.Agent;
 
+            @if (HasDivergentDraft)
+            {
+                <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px" data-testid="agents-config-draft-divergence">
+                    <FluentText role="status">@Localizer["Agents.Config.Draft.Diverged"]</FluentText>
+                    <FluentButton Appearance="ButtonAppearance.Outline"
+                                  Disabled="@(_busy || HasUnresolvedAttempt)"
+                                  OnClick="LoadSavedValuesAsync"
+                                  data-testid="agents-config-load-saved">
+                        @Localizer["Agents.Config.Draft.LoadSaved"]
+                    </FluentButton>
+                </FluentStack>
+            }
             <FluentAccordion HeadingLevel="2" data-testid="agents-config-sections">
                 <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Identity"]" @bind-Expanded="_expandedSections[0]">
                     <dl>
@@ -116,7 +160,7 @@
                 </FluentAccordionItem>
 
                 <FluentAccordionItem Header="@Localizer["Agents.Config.Section.Edit"]" @bind-Expanded="_expandedSections[2]">
-                    @* The only write surface for identity and instructions. The instructions field always starts empty
+                    @* The only write surface for identity and instructions. The instructions field starts empty on a cold load
                        and is cleared while a submit is owned by the retained attempt; terminal failure or abandonment
                        restores that exact draft. The current instruction text is never read back into the page, so a
                        save reports presence/validity/version and nothing else (AD-14). *@
@@ -257,6 +301,7 @@
                 </p>
             </section>
         }
+        }
     </FluentStack>
 </FcPageLayout>
 
@@ -272,6 +317,12 @@
     private AgentSetupWriteResult? _pendingWrite;
     private string? _writeAnnouncementKey;
     private AgentSetupAttempt? _activeAttempt;
+    private AgentSetupScope? _scope;
+    private AgentSetupEditableValues? _draftBaseline;
+    private int _latestConfigurationVersion;
+    private bool _draftReadRecovery;
+    private bool _authenticationPending;
+    private int _authenticationNotification;
     private AgentResponseMode _responseMode = AgentResponseMode.Unknown;
     private string _displayNameDraft = string.Empty;
     private string _descriptionDraft = string.Empty;
@@ -282,18 +333,48 @@
 
     private bool HasUnresolvedAttempt => _activeAttempt is not null;
 
-    private bool CanStartAttempt => Gateway is not DeferredAgentSetupGateway
-        && _result is { Status: AgentInspectionStatus.Success, Setup.TruthState:
-            AgentSetupTruthState.AuthoritativePending or AgentSetupTruthState.ProjectionConfirmed };
+    private AgentSetupEditableValues CurrentDraft => new(_displayNameDraft, _descriptionDraft, _responseMode);
+
+    private bool HasDivergentDraft => _draftBaseline is { } baseline
+        && _result is { Status: AgentInspectionStatus.Success, Setup.TruthState: AgentSetupTruthState.ProjectionConfirmed }
+        && AgentSetupEditableValues.From(_result.Setup.Agent).DivergesFrom(baseline, CurrentDraft);
+
+    private bool CanStartAttempt => _scope is { } scope && AttemptStore.IsCurrent(scope)
+        && _result?.Setup?.Agent.AgentId == scope.AgentId
+        && _result.Setup.Agent.TenantId == scope.TenantId
+        && Gateway is not DeferredAgentSetupGateway
+        && _result is { Status: AgentInspectionStatus.Success, Setup.TruthState: AgentSetupTruthState.ProjectionConfirmed };
 
     protected override async Task OnInitializedAsync()
     {
+        Authentication.AuthenticationStateChanged += OnAuthenticationChanged;
+        _busy = true;
         try
         {
-            await LoadAsync(
-                expectedConfigurationVersion: null,
-                _lifetimeCancellation.Token,
-                applyAuthoritativeDrafts: true).ConfigureAwait(false);
+            CancellationToken cancellationToken = _lifetimeCancellation.Token;
+            _scope = await AttemptStore.GetScopeAsync().WaitAsync(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            RetainedAgentSetupAttempt? retained = AttemptStore.Load(_scope);
+            if (retained is not null)
+            {
+                _activeAttempt = retained.Attempt;
+                _pendingWrite = retained.PendingWrite?.Acceptance is { } acceptance
+                    ? AgentSetupWriteResult.AwaitingProjection(acceptance)
+                    : retained.PendingWrite ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
+                ApplyDraft(retained.Draft);
+                _instructionsDraft = retained.InstructionsDraft;
+                _draftBaseline = retained.Baseline;
+            }
+
+            // Returning to this route performs one authorized read, never an automatic submission.
+            await LoadAsync(_pendingWrite?.TargetConfigurationVersion, cancellationToken,
+                applyAuthoritativeDrafts: retained is null);
+            if (retained?.PendingWrite?.Acceptance is not null && IsAcceptedProjectionConfirmed())
+            {
+                _pendingWrite = null;
+                _writeAnnouncementKey = "Agents.Config.Write.Confirmed";
+                ReleaseAttempt(restoreInstructionsDraft: false);
+            }
         }
         catch (OperationCanceledException) when (_disposed)
         {
@@ -306,6 +387,13 @@
                 _result = AgentSetupResult.Unavailable();
             }
         }
+        finally
+        {
+            if (!_disposed)
+            {
+                _busy = false;
+            }
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -313,7 +401,7 @@
         if (_focusHeadingPending && _header is not null)
         {
             _focusHeadingPending = false;
-            await _header.FocusHeadingAsync().ConfigureAwait(false);
+            await _header.FocusHeadingAsync();
         }
     }
 
@@ -334,31 +422,23 @@
             _displayNameDraft,
             string.IsNullOrWhiteSpace(_descriptionDraft) ? null : _descriptionDraft,
             _instructionsDraft);
-        await SubmitAsync(
-            (options, ct) => Gateway.UpdateConfigurationAsync(command, options, ct),
-            instructionsDraft: _instructionsDraft).ConfigureAwait(false);
+        await SubmitAsync(AgentSetupAttemptKind.Configuration, configuration: command);
     }
 
     private Task SubmitResponseModeAsync()
-    {
-        AgentResponseMode mode = _responseMode;
-        return SubmitAsync((options, ct) => Gateway.ConfigureResponseModeAsync(mode, options, ct));
-    }
+        => SubmitAsync(AgentSetupAttemptKind.ResponseMode, responseMode: _responseMode);
 
     private Task ActivateAsync()
         => _result?.Setup?.ConfigurationVersion is > 0 and int version
-            ? SubmitAsync(Gateway.ActivateAsync, expectedConfigurationVersion: version)
+            ? SubmitAsync(AgentSetupAttemptKind.Activate, expectedConfigurationVersion: version)
             : Task.CompletedTask;
 
-    private Task DisableAsync()
-        => SubmitAsync(Gateway.DisableAsync);
+    private Task DisableAsync() => SubmitAsync(AgentSetupAttemptKind.Disable);
 
-    // Every write follows the same truth flow: submit, record the accepted identity as Submitted, then re-read at
-    // the version that write is expected to produce. The re-read is what decides whether the page shows
-    // authoritative-pending or projection-confirmed — the write itself never claims durable truth.
     private Task SubmitAsync(
-        Func<AgentOperationOptions, CancellationToken, Task<AgentSetupWriteResult>> write,
-        string? instructionsDraft = null,
+        AgentSetupAttemptKind kind,
+        UpdateAgentConfiguration? configuration = null,
+        AgentResponseMode responseMode = AgentResponseMode.Unknown,
         int? expectedConfigurationVersion = null)
     {
         if (_busy || _activeAttempt is not null || !CanStartAttempt)
@@ -372,11 +452,18 @@
         {
             ExpectedConfigurationVersion = expectedConfigurationVersion,
         };
-        var attempt = new AgentSetupAttempt(options, write, instructionsDraft);
+        var attempt = new AgentSetupAttempt(options, kind, configuration, responseMode);
+        var retained = new RetainedAgentSetupAttempt(attempt, null, CurrentDraft,
+            configuration is not null ? string.Empty : _instructionsDraft, _draftBaseline);
+        if (!AttemptStore.TryBegin(_scope, retained))
+        {
+            return Task.CompletedTask;
+        }
+
         _pendingWrite = null;
         _writeAnnouncementKey = null;
         _activeAttempt = attempt;
-        if (instructionsDraft is not null)
+        if (configuration is not null)
         {
             _instructionsDraft = string.Empty;
         }
@@ -386,16 +473,24 @@
 
     private async Task ExecuteAttemptAsync(AgentSetupAttempt attempt)
     {
+        if (!EnsureCurrentScope())
+        {
+            return;
+        }
+
         _busy = true;
         try
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
 
             AgentCommandAcceptance? retainedAcceptance = _pendingWrite?.Acceptance;
-            AgentSetupWriteResult writeResult = await attempt.Submit(attempt.Options, cancellationToken)
-                .WaitAsync(cancellationToken)
-                .ConfigureAwait(false);
+            AgentSetupWriteResult writeResult = await attempt.SubmitAsync(Gateway, cancellationToken)
+                .WaitAsync(cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
+            if (!await ConfirmCurrentScopeAsync(cancellationToken))
+            {
+                return;
+            }
 
             if (retainedAcceptance is not null
                 && (writeResult.Status != AgentSetupWriteStatus.Submitted || writeResult.Acceptance != retainedAcceptance)
@@ -424,13 +519,18 @@
                 && writeResult.Acceptance is { } acceptance
                 && writeResult.TargetConfigurationVersion is int targetVersion)
             {
-                await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
+                SaveRetainedAttempt();
+                await RequestRenderAsync(cancellationToken);
                 AgentSetupTruthState refreshState = await RefreshAfterWriteAsync(
                         targetVersion,
-                        cancellationToken)
-                    .ConfigureAwait(false);
+                        cancellationToken);
 
-                if (refreshState == AgentSetupTruthState.ProjectionConfirmed)
+                if (!EnsureCurrentScope())
+                {
+                    return;
+                }
+
+                if (refreshState == AgentSetupTruthState.ProjectionConfirmed && IsAcceptedProjectionConfirmed())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     _pendingWrite = null;
@@ -451,19 +551,19 @@
                 ReleaseAttempt(restoreInstructionsDraft: true);
                 if (writeResult.Status == AgentSetupWriteStatus.Rejected)
                 {
-                    await RefreshAfterRejectionAsync(cancellationToken).ConfigureAwait(false);
+                    await RefreshAfterRejectionAsync(cancellationToken);
                 }
             }
         }
         catch (OperationCanceledException) when (_disposed)
         {
-            // Navigation/disposal cancels the write, read, delay, or non-cooperative awaited task and exits quietly.
+            // Navigation stops local observation; it does not cancel a command already submitted to the server.
         }
         catch (Exception)
         {
             // A gateway that throws is a failed write, not a silent one: report the fail-closed status instead of
             // leaving the page on its pre-write state with no outcome (AD-12), and never surface the raw error.
-            if (!_disposed)
+            if (!_disposed && EnsureCurrentScope())
             {
                 _pendingWrite = RetainedAwaitingProjection()
                     ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
@@ -479,6 +579,7 @@
             if (!_disposed)
             {
                 _busy = false;
+                SaveRetainedAttempt();
             }
         }
     }
@@ -490,7 +591,7 @@
         _result = AgentSetupResult.Unavailable();
         try
         {
-            await LoadAsync(null, cancellationToken, applyAuthoritativeDrafts: false).ConfigureAwait(false);
+            await LoadAsync(null, cancellationToken, applyAuthoritativeDrafts: false);
         }
         catch (Exception)
         {
@@ -507,6 +608,7 @@
     private async Task RefreshPendingAsync()
     {
         if (_busy
+            || !EnsureCurrentScope()
             || _activeAttempt is null
             || _pendingWrite?.Acceptance is not { } acceptance
             || _pendingWrite.TargetConfigurationVersion is not int targetVersion)
@@ -519,10 +621,14 @@
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
             _writeAnnouncementKey = "Agents.Config.Write.Refreshing";
-            await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
-            await LoadAsync(targetVersion, cancellationToken, applyAuthoritativeDrafts: false).ConfigureAwait(false);
+            await RequestRenderAsync(cancellationToken);
+            await LoadAsync(targetVersion, cancellationToken, applyAuthoritativeDrafts: false);
+            if (!EnsureCurrentScope())
+            {
+                return;
+            }
             AgentSetupTruthState refreshState = _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
-            if (refreshState == AgentSetupTruthState.ProjectionConfirmed)
+            if (refreshState == AgentSetupTruthState.ProjectionConfirmed && IsAcceptedProjectionConfirmed())
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 _pendingWrite = null;
@@ -541,7 +647,7 @@
         }
         catch (Exception)
         {
-            if (!_disposed)
+            if (!_disposed && EnsureCurrentScope())
             {
                 _pendingWrite = RetainedAwaitingProjection()
                     ?? AgentSetupWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
@@ -555,6 +661,7 @@
             if (!_disposed)
             {
                 _busy = false;
+                SaveRetainedAttempt();
             }
         }
     }
@@ -570,22 +677,23 @@
 
     private void AbandonAttempt()
     {
-        if (_busy)
+        if (_busy || !EnsureCurrentScope())
         {
             return;
         }
 
         ReleaseAttempt(restoreInstructionsDraft: true);
         _pendingWrite = null;
-        _writeAnnouncementKey = null;
+        _writeAnnouncementKey = "Agents.Config.Write.Abandoned";
     }
 
     private void ReleaseAttempt(bool restoreInstructionsDraft)
     {
         AgentSetupAttempt? attempt = _activeAttempt;
+        AttemptStore.Release(_scope, attempt);
         _activeAttempt = null;
         if (restoreInstructionsDraft
-            && attempt?.InstructionsDraft is { } draft
+            && attempt?.Configuration?.Instructions is { } draft
             && string.IsNullOrEmpty(_instructionsDraft))
         {
             _instructionsDraft = draft;
@@ -613,20 +721,20 @@
             await LoadAsync(
                 expectedConfigurationVersion,
                 pollingCancellation.Token,
-                applyAuthoritativeDrafts: false).ConfigureAwait(false);
+                applyAuthoritativeDrafts: false);
             if (_result?.Setup is not { TruthState: AgentSetupTruthState.AuthoritativePending })
             {
                 return _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
             }
 
-            await RequestRenderAsync(pollingCancellation.Token).ConfigureAwait(false);
+            await RequestRenderAsync(pollingCancellation.Token);
             while (_result?.Setup is { TruthState: AgentSetupTruthState.AuthoritativePending })
             {
-                await Task.Delay(ProjectionPollingInterval, TimeProvider, pollingCancellation.Token).ConfigureAwait(false);
+                await Task.Delay(ProjectionPollingInterval, TimeProvider, pollingCancellation.Token);
                 await LoadAsync(
                     expectedConfigurationVersion,
                     pollingCancellation.Token,
-                    applyAuthoritativeDrafts: false).ConfigureAwait(false);
+                    applyAuthoritativeDrafts: false);
             }
 
             return _result?.Setup?.TruthState ?? AgentSetupTruthState.Unknown;
@@ -645,18 +753,232 @@
         CancellationToken cancellationToken,
         bool applyAuthoritativeDrafts)
     {
-        AgentSetupResult result = await Gateway
-            .GetSetupAsync(expectedConfigurationVersion, cancellationToken)
-            .WaitAsync(cancellationToken)
-            .ConfigureAwait(false);
+        if (_disposed || !await ConfirmCurrentScopeAsync(cancellationToken))
+        {
+            return;
+        }
+
+        AgentSetupResult result;
+        try
+        {
+            result = await Gateway.GetSetupAsync(expectedConfigurationVersion, cancellationToken)
+                .WaitAsync(cancellationToken);
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            // The pending command receipt is independent from the setup read; disclose no stale setup on failure.
+            if (!_disposed && EnsureCurrentScope())
+            {
+                _result = AgentSetupResult.Unavailable();
+            }
+            throw;
+        }
 
         cancellationToken.ThrowIfCancellationRequested();
-        _result = result;
-        if (applyAuthoritativeDrafts && _result.Setup is { } setup)
+        if (!await ConfirmCurrentScopeAsync(cancellationToken))
         {
-            _responseMode = setup.Agent.ResponseMode;
-            _displayNameDraft = setup.Agent.DisplayName;
-            _descriptionDraft = setup.Agent.Description ?? string.Empty;
+            return;
+        }
+
+        // A malformed result must not disclose a setup carried alongside a failure status.
+        _result = result.Status == AgentInspectionStatus.Success ? result : result with { Setup = null };
+        if (_result.Setup is { } scopedSetup
+            && (scopedSetup.Agent.AgentId != _scope!.AgentId || scopedSetup.Agent.TenantId != _scope.TenantId))
+        {
+            _result = AgentSetupResult.Unavailable();
+        }
+
+        if (_result is { Status: AgentInspectionStatus.Success,
+            Setup.TruthState: AgentSetupTruthState.AuthoritativePending or AgentSetupTruthState.ProjectionConfirmed })
+        {
+            AgentSetupEditableValues saved = AgentSetupEditableValues.From(_result.Setup.Agent);
+            if (applyAuthoritativeDrafts)
+            {
+                _draftBaseline = saved;
+                ApplyDraft(saved);
+            }
+            else if (_result.Setup.TruthState == AgentSetupTruthState.ProjectionConfirmed
+                && _result.Setup.ConfigurationVersion >= _latestConfigurationVersion && _draftBaseline is not null)
+            {
+                _draftBaseline = _draftBaseline.AdvanceConfirmedFields(saved, CurrentDraft);
+            }
+
+            _latestConfigurationVersion = Math.Max(_latestConfigurationVersion, _result.Setup.ConfigurationVersion);
+        }
+    }
+
+    private Task LoadSavedValuesAsync() => RefreshValuesAsync(replaceDraft: true);
+
+    private Task RefreshAuthorityAsync() => RefreshValuesAsync(replaceDraft: false);
+
+    private async Task RefreshValuesAsync(bool replaceDraft)
+    {
+        if (_busy || HasUnresolvedAttempt || !EnsureCurrentScope())
+        {
+            return;
+        }
+
+        _busy = true;
+        _draftReadRecovery = true;
+        int minimumVersion = _latestConfigurationVersion;
+        try
+        {
+            // An explicit replacement cannot roll back a version already observed on this page. A failed read
+            // leaves a separate read-only refresh available so the editor can be recovered without losing drafts.
+            await LoadAsync(minimumVersion > 0 ? minimumVersion : null, _lifetimeCancellation.Token,
+                applyAuthoritativeDrafts: false);
+            if (!EnsureCurrentScope())
+            {
+                return;
+            }
+
+            if (_result is { Status: AgentInspectionStatus.Success, Setup.TruthState: AgentSetupTruthState.ProjectionConfirmed })
+            {
+                if (_result.Setup.ConfigurationVersion < minimumVersion)
+                {
+                    _result = AgentSetupResult.Unavailable();
+                    return;
+                }
+
+                _draftReadRecovery = false;
+                if (replaceDraft)
+                {
+                    _draftBaseline = AgentSetupEditableValues.From(_result.Setup.Agent);
+                    ApplyDraft(_draftBaseline);
+                }
+            }
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+            // Local observation ended on navigation.
+        }
+        catch (Exception)
+        {
+            if (!_disposed && EnsureCurrentScope())
+            {
+                _result = AgentSetupResult.Unavailable();
+            }
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                _busy = false;
+            }
+        }
+    }
+
+    private void ApplyDraft(AgentSetupEditableValues values)
+    {
+        _displayNameDraft = values.DisplayName;
+        _descriptionDraft = values.Description;
+        _responseMode = values.ResponseMode;
+    }
+
+    private bool IsAcceptedProjectionConfirmed()
+        => _pendingWrite?.TargetConfigurationVersion is int target
+            && _result is { Status: AgentInspectionStatus.Success,
+                Setup.TruthState: AgentSetupTruthState.ProjectionConfirmed }
+            && _result.Setup.ConfigurationVersion >= target;
+
+    private void SaveRetainedAttempt()
+    {
+        if (_activeAttempt is { } attempt)
+        {
+            AttemptStore.Save(_scope, new(attempt, _pendingWrite, CurrentDraft, _instructionsDraft, _draftBaseline));
+        }
+    }
+
+    private bool EnsureCurrentScope()
+    {
+        if (AttemptStore.IsCurrent(_scope))
+        {
+            return true;
+        }
+
+        if (!_authenticationPending)
+        {
+            ClearScopePresentation();
+        }
+        return false;
+    }
+
+    private async Task<bool> ConfirmCurrentScopeAsync(CancellationToken cancellationToken)
+    {
+        AgentSetupScope? current = await AttemptStore.GetScopeAsync().WaitAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_scope is not null && ReferenceEquals(_scope, current) && AttemptStore.IsCurrent(_scope))
+        {
+            return true;
+        }
+
+        ClearScopePresentation();
+        return false;
+    }
+
+    private void ClearScopePresentation()
+    {
+        _activeAttempt = null;
+        _pendingWrite = null;
+        _writeAnnouncementKey = null;
+        _draftBaseline = null;
+        _latestConfigurationVersion = 0;
+        _draftReadRecovery = false;
+        _displayNameDraft = _descriptionDraft = _instructionsDraft = string.Empty;
+        _responseMode = AgentResponseMode.Unknown;
+        _result = AgentSetupResult.NotAuthorized();
+    }
+
+    private void OnAuthenticationChanged(Task<AuthenticationState> state)
+        => _ = InvokeAsync(() => ObserveAuthenticationChangeAsync(state));
+
+    private async Task ObserveAuthenticationChangeAsync(Task<AuthenticationState> state)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        int notification = ++_authenticationNotification;
+        if (AttemptStore.IsCurrent(_scope))
+        {
+            _authenticationPending = false;
+            StateHasChanged();
+            return;
+        }
+
+        // Hide the whole previous-user surface immediately, but do not discard its drafts while an unchanged
+        // binding is still possible. The store also blocks every operation during this interval.
+        _authenticationPending = true;
+        StateHasChanged();
+        CancellationToken cancellationToken = _lifetimeCancellation.Token;
+        try
+        {
+            try
+            {
+                await state.WaitAsync(cancellationToken);
+            }
+            catch (Exception) when (!cancellationToken.IsCancellationRequested)
+            {
+                // The store turns a faulted authentication result into an invalid binding.
+            }
+
+            AgentSetupScope? current = await AttemptStore.GetScopeAsync().WaitAsync(cancellationToken);
+            if (_disposed || notification != _authenticationNotification)
+            {
+                return;
+            }
+
+            _authenticationPending = false;
+            if (_scope is null || !ReferenceEquals(_scope, current) || !AttemptStore.IsCurrent(_scope))
+            {
+                ClearScopePresentation();
+            }
+            StateHasChanged();
+        }
+        catch (OperationCanceledException) when (_disposed)
+        {
+            // Disposal ends observation without retaining the page until the authentication task completes.
         }
     }
 
@@ -675,6 +997,8 @@
             return;
         }
 
+        SaveRetainedAttempt();
+        Authentication.AuthenticationStateChanged -= OnAuthenticationChanged;
         _disposed = true;
         _lifetimeCancellation.Cancel();
         _lifetimeCancellation.Dispose();

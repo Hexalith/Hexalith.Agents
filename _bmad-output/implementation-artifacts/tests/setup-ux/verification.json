@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "scope": "Local Debug/source verification; no live readiness or deployment qualification",
+  "baselineCommit": "a624d25cc0c8a7c5a4ebd8c2fc0e0ffb1731ae1e",
+  "reports": [
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/setup-ux/configuration.xml.gz",
+      "sha256": "0d6af895c7584bc22e5dd3f5b5ad88abba9bbe0aa53e19c1ce074ae1269fb03b",
+      "xmlSha256": "940203668c3ef59916a5f56d960d78fd46d6b531f554aadeed40ea04177d6d95",
+      "summary": {
+        "total": 115,
+        "passed": 115,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "command": [
+        "dotnet",
+        "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+        "-class",
+        "Hexalith.Agents.UI.Tests.AgentConfigurationTests",
+        "-failSkips",
+        "-xml",
+        "_bmad-output/implementation-artifacts/tests/setup-ux/configuration.xml"
+      ],
+      "exitCode": 0,
+      "assemblySha256": "b46db4946c7c6f10f7d83f570695d7a7d50822ef22083c514cf5e0ec7493ffa3"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/setup-ux/store.xml.gz",
+      "sha256": "49b3f44911d0c6e5f45457ef524bcf6d769e41da425f60e83a9df448c2d172ea",
+      "xmlSha256": "d64f9f43fdd6cd6a0d7ac48ece54928431099ef910983679fbf3ea9c204e3a54",
+      "summary": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "command": [
+        "dotnet",
+        "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+        "-class",
+        "Hexalith.Agents.UI.Tests.AgentSetupAttemptStoreTests",
+        "-failSkips",
+        "-xml",
+        "_bmad-output/implementation-artifacts/tests/setup-ux/store.xml"
+      ],
+      "exitCode": 0,
+      "assemblySha256": "b46db4946c7c6f10f7d83f570695d7a7d50822ef22083c514cf5e0ec7493ffa3"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/tests/setup-ux/ui-full.xml.gz",
+      "sha256": "5339fe14add2ffcf42aaefcf061ace4a2e6e9a7549a324b1d67622ab22ad2094",
+      "xmlSha256": "a2a0fc5bec7ad359bb78a9a85ab4e4eee7af5e0c458a69bfcce3452d852499e4",
+      "summary": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "command": [
+        "dotnet",
+        "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+        "-failSkips",
+        "-xml",
+        "_bmad-output/implementation-artifacts/tests/setup-ux/ui-full.xml"
+      ],
+      "exitCode": 0,
+      "assemblySha256": "b46db4946c7c6f10f7d83f570695d7a7d50822ef22083c514cf5e0ec7493ffa3"
+    }
+  ],
+  "commands": [
+    {
+      "command": "dotnet build test/Hexalith.Agents.UI.Tests/Hexalith.Agents.UI.Tests.csproj -c Debug -p:UseHexalithProjectReferences=true -m:1 -nr:false",
+      "exitCode": 0,
+      "log": "_bmad-output/implementation-artifacts/tests/setup-ux/ui-build.log.gz",
+      "sha256": "12746c689c269bb66208ec1ebb7243083e7eb7d0b445980ccf00a5d7896d6d2f"
+    },
+    {
+      "command": "pwsh -NoProfile -File eng/verify-story-5.2.ps1",
+      "exitCode": 0,
+      "log": "_bmad-output/implementation-artifacts/tests/setup-ux/story-5.2.log.gz",
+      "sha256": "e481a653b21e08c973ac85d9cf1d4612f947f0294e924bb9772e851f6bf566eb"
+    }
+  ],
+  "sourceSha256": {
+    "src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor": "f885a1d97eda789710fac29e064ef90648a96c0333bb7d7d2376dacdab98e5ba",
+    "src/Hexalith.Agents.UI/Resources/AgentsResources.fr.resx": "6607bc65f4e89099ca6a1fd4803badd9ae256132e5737a870003b7d9f36f6ed4",
+    "src/Hexalith.Agents.UI/Resources/AgentsResources.resx": "b8bd80779a8fc12173f4f925db3c921b45c039ba7a6839f7324b1f8bd2857c71",
+    "src/Hexalith.Agents.UI/Services/Gateways/AgentsUiServiceCollectionExtensions.cs": "d7608fe7bc3b27ad820463df5c1215f40a962013ee81b666c4ddba2b521b3da6",
+    "src/Hexalith.Agents.UI/State/AgentSetupAttempt.cs": "d20866f52b4fad8bd474d23a3c9ed58c9d90499967bdbd24f0c6502a4980179c",
+    "src/Hexalith.Agents.UI/State/AgentSetupAttemptKind.cs": "32829a7bc642ad29bb2936da8d705a6a3d1c0df15bd8879565ff63f320840b80",
+    "src/Hexalith.Agents.UI/State/AgentSetupAttemptStore.cs": "a740e6eb831d240015741fb98af863561b43ff491bc38fa69b85f6b187702bcb",
+    "src/Hexalith.Agents.UI/State/AgentSetupEditableValues.cs": "66d1d6834bbe7df323b2bd24f02dfa2a7c815caff5b391eb9de2a36689f3d34c",
+    "src/Hexalith.Agents.UI/State/AgentSetupScope.cs": "007a8449e2af101640ecc33f0b9ecf1228411372e5ca0410dc45316480748428",
+    "src/Hexalith.Agents.UI/State/RetainedAgentSetupAttempt.cs": "e2690c12d9984b1f9101501e373a45f00e3e11fdc4d94047bc2ac563014f0889",
+    "test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs": "e43e6cd05fce54208b5f3d774fb7fd911d7136bc448a77bc27a23dfbdc05a932",
+    "test/Hexalith.Agents.UI.Tests/AgentSetupAttemptStoreTests.cs": "43d98ae51cf06d933eed0f13b9822f799f79f1e7bc5f00f34c4a73adc7054dca",
+    "test/Hexalith.Agents.UI.Tests/AgentsTestContext.cs": "3ee0b0d6ffca89423ed9090e5e47888ebd5cbcd3a2da57d46354a98bbfe76a7a",
+    "test/Hexalith.Agents.UI.Tests/AgentsUiCompositionTests.cs": "ef24ebe20c10e8e34bc19187fbf22e4e16c941d12d302bd51dfb145de92649b1",
+    "test/Hexalith.Agents.UI.Tests/ControlledSetupAuthenticationStateProvider.cs": "654fad4fc01e3f65bee3092f360a8cc48171183b706005af8c18a1c8d4cf3216",
+    "test/Hexalith.Agents.UI.Tests/LocalizationResourceTests.cs": "bff7ae336c282f7249f36ec1d00b4a0f6a28095fef8448e737eb7d30f6fd780d"
+  }
+}

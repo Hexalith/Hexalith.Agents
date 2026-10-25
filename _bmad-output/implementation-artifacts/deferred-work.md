@@ -41,7 +41,9 @@ origin: spec-deferred 333d98453824
 location: src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor:375
 source_spec: `spec-setup-projection-polling.md`
 reason: The phrase "preserving the truthful pending state" admits a strong reading, but the existing single-result UI contract replaces setup content with denied, missing, malformed, or unavailable surfaces. A product decision about whether prior pending truth must remain visible beside those terminal outcomes would settle the ambiguity.
-status: open
+status: done 2026-10-25
+resolution: `spec-five-deferred-setup-ux-and-review-items.md` — The approved policy preserves accepted-write truth alongside every typed terminal read failure while hiding old setup details. Fresh configuration/navigation regressions prove retained receipts, exact recovery targets, stopped polling and no stale disclosure. Throwing reads also retain the receipt with an unavailable surface.
+evidence_record: [Setup UX and review reconciliation](deferred-setup-ux-review-2026-10-25.md#pending-truth-after-terminal-reads--dw-5)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Reconcile AD-30 with the Hexalith.Tenants authority for non-tenant-scoped Platform Operator role freshness.
@@ -81,6 +83,9 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Adjudicate the concurrent v7 Architecture findings and the already-triggered .NET `10.0.3xx` advisory escalation.
   evidence: Critical/high review findings remain outside the final Spine's source/triage record, including evidence that ARCH-A-4's advisory condition has fired without an accepted upgrade date or risk decision (BH-15, EC-16).
+  status: done 2026-10-25
+  resolution: `spec-five-deferred-setup-ux-and-review-items.md` — The reconciliation accounts for all 16 v7 findings across four lenses using subsequent September decisions, current Spine clauses and Story 5.1 retirement evidence. The SDK upgrade is implemented, currently 10.0.402; ARCH-A-11/ARCH-A-12 and owner qualification remain governed. This closes the missing adjudication record, not a new vulnerability audit or production-readiness gate.
+  evidence_record: [Setup UX and review reconciliation](deferred-setup-ux-review-2026-10-25.md#historical-v7-architecture-adjudication)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-synchronize-second-2026-09-09-prd-downstream-planning.md`
   summary: Resolve the blocked/unavailable-call metric's reason-dimensional numerator against its pair-only denominator.
@@ -135,7 +140,9 @@ status: open
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Decide whether unresolved setup-write identity and payload must survive route navigation or browser reload.
   evidence: The component retains an exact attempt only for its lifetime; whether leaving and returning may create a new attempt while the first outcome is unresolved requires an explicit Product/UX state-lifetime decision.
-  status: open
+  status: done 2026-10-25
+  resolution: `spec-five-deferred-setup-ux-and-review-items.md` — The user approved same-circuit in-memory retention of exact command data, identities, drafts and receipts, scoped to user/tenant/Agent, without automatic resubmission. Navigation/isolation regressions pass. Unacknowledged reload/circuit-loss recovery is explicitly unsupported; accepted-pending host rediscovery remains separately qualified.
+  evidence_record: [Setup UX and review reconciliation](deferred-setup-ux-review-2026-10-25.md#unresolved-attempt-lifetime)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Prove exact setup result payload replay and projection through the production-like EventStore topology.
@@ -244,7 +251,9 @@ location: src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 severity: medium
 reason: Post-write reads deliberately preserve local display-name and description drafts; Product/UX must decide whether divergence needs a signal.
-status: open
+status: done 2026-10-25
+resolution: `spec-five-deferred-setup-ux-and-review-items.md` — The approved draft policy preserves local edits, signals relevant changed saved fields and provides a fresh authorized Load saved values action for name, description and response mode. Instructions remain untouched; failed reads replace no draft and unresolved writes disable replacement. The concurrent-projection entry shares this implementation.
+evidence_record: [Setup UX and review reconciliation](deferred-setup-ux-review-2026-10-25.md#draft-reconciliation--dw-17-and-concurrent-projection-entry)
 
 ### DW-18: Group the configuration page's sibling titled sections into a FluentAccordion.
 
@@ -453,6 +462,9 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Define how confirmed setup writes reconcile editable drafts with a newer concurrent projection.
   evidence: Post-write polling deliberately preserves local drafts even when the projection advances beyond the accepted target; deciding whether to replace, merge, or flag those drafts requires a product/UX draft-versus-authority rule.
+  status: done 2026-10-25
+  resolution: `spec-five-deferred-setup-ux-and-review-items.md` — The same approved policy and implementation as DW-17 now compares saved baseline, current draft and confirmed fields, preserves edits and offers explicit fresh loading without touching instructions. Normal typing, matching values and unrelated lifecycle revisions do not trigger a conflict. This is a second ledger record for the same behavior.
+  evidence_record: [Setup UX and review reconciliation](deferred-setup-ux-review-2026-10-25.md#draft-reconciliation--dw-17-and-concurrent-projection-entry)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Add a negative regression test proving release source verification rejects non-main dispatch refs.

@@ -34,6 +34,14 @@ namespace Hexalith.Agents.UI.Tests;
 /// </summary>
 public sealed class AgentConfigurationTests : AgentsTestContext
 {
+    public AgentConfigurationTests()
+    {
+        Authorization.SetAuthorized("administrator");
+        Authorization.SetClaims(new System.Security.Claims.Claim("sub", "administrator"),
+            new System.Security.Claims.Claim("tenantId", "tenant-1"));
+        Services.Configure<AgentSetupTargetOptions>(options => options.AgentId = "agent-1");
+    }
+
     [Theory]
     [InlineData("unavailable")]
     [InlineData("missing")]
@@ -1348,6 +1356,9 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         readsAtTerminalOutcome.ShouldBe(2);
         ExpectedVersionReadCount(4).ShouldBe(readsAtTerminalOutcome);
         cut.Markup.ShouldContain(expectedSurface);
+        cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        var retainedStore = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+        retainedStore.Load(await retainedStore.GetScopeAsync()).ShouldNotBeNull().PendingWrite!.TargetConfigurationVersion.ShouldBe(4);
         cut.Find("[data-testid='agents-config-write-state']").TextContent
             .ShouldContain("Agents.Config.Write.AwaitingProjection");
         cut.Find("[data-testid='agents-config-write-refresh']");
@@ -1392,12 +1403,9 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         Clock.Advance(TimeSpan.FromMilliseconds(250));
         await submission;
 
-        cut.Find("[data-testid='agents-config-truth-stage']").TextContent
-            .ShouldContain("Agents.Config.Truth.Stage.AuthoritativePending");
-        cut.Find("[data-testid='agents-config-freshness']").TextContent
-            .ShouldContain("Agents.Config.Truth.Freshness.Stale");
-        // The read failed, but the write was already accepted: reporting it as a service outage would be wrong,
-        // and would drop the Refresh action that is gated on the still-known target version.
+        cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        cut.Markup.ShouldContain("Agents.Surface.Unavailable.Title");
+        // Read unavailability does not erase the accepted write or its exact target-based recovery.
         cut.Find("[data-testid='agents-config-write-state']").TextContent
             .ShouldContain("Agents.Config.Write.AwaitingProjection");
         cut.Find("[data-testid='agents-config-write-refresh']");
@@ -1440,7 +1448,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
         {
-            cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+            cut.Find("[data-testid='agents-config-write-state']").TextContent.ShouldContain("Agents.Config.Write.Abandoned");
             cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
             cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeFalse();
             cut.Find("[data-testid='agents-config-submit']").HasAttribute("disabled").ShouldBeFalse();
@@ -1725,7 +1733,7 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
         {
-            cut.FindAll("[data-testid='agents-config-write-state']").ShouldBeEmpty();
+            cut.Find("[data-testid='agents-config-write-state']").TextContent.ShouldContain("Agents.Config.Write.Abandoned");
             cut.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value")
                 .ShouldBe("exact unverifiable payload");
             cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
@@ -1847,9 +1855,8 @@ public sealed class AgentConfigurationTests : AgentsTestContext
     [Fact]
     public async Task A_throwing_refresh_keeps_the_retained_attempt_and_its_recovery_actions()
     {
-        // The Refresh action is gated on a known target version, so collapsing a throwing read to Unavailable
-        // would both relabel an accepted write as a service outage and remove the only read-only recovery the
-        // retained attempt has. A transient read failure must leave the attempt exactly where it was.
+        // A throwing read removes stale setup details while the accepted write retains its exact target
+        // and read-only recovery action independently of the unavailable surface.
         AgentSetupView initial = AgentUiTestData.Setup(
             AgentUiTestData.Status(AgentLifecycleStatus.Draft, responseMode: AgentResponseMode.Automatic),
             configurationVersion: 3);
@@ -1899,10 +1906,9 @@ public sealed class AgentConfigurationTests : AgentsTestContext
         cut.Find("[data-testid='agents-config-write-retry']");
         cut.Find("[data-testid='agents-config-write-abandon']");
 
-        // An unresolved attempt still blocks a competing write, and the page is not left busy.
-        cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
-        cut.Find("[data-testid='agents-config-disable']").HasAttribute("disabled").ShouldBeTrue();
-        cut.Find("[data-testid='agents-config-response-mode-submit']").HasAttribute("disabled").ShouldBeTrue();
+        // The failed read removes all mutable setup controls, while recovery remains available.
+        cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        cut.Markup.ShouldContain("Agents.Surface.Unavailable.Title");
         cut.Find("[data-testid='agents-config-write-refresh']").HasAttribute("disabled").ShouldBeFalse();
         cut.Find("[data-testid='agents-config-write-abandon']").HasAttribute("disabled").ShouldBeFalse();
 
@@ -1922,6 +1928,527 @@ public sealed class AgentConfigurationTests : AgentsTestContext
 
         cut.WaitForAssertion(() =>
             cut.Find("[data-testid='agents-config-submit']").HasAttribute("disabled").ShouldBeTrue());
+    }
+
+    [Fact]
+    public async Task NavigationDuringUnacknowledgedSubmissionRestoresExactIntentWithoutAutomaticRetry()
+    {
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 3));
+        var stalled = new TaskCompletionSource<AgentSetupWriteResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var commands = new List<UpdateAgentConfiguration>();
+        var options = new List<AgentOperationOptions>();
+        SetupGateway.UpdateConfigurationAsync(Arg.Any<UpdateAgentConfiguration>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                commands.Add(call.ArgAt<UpdateAgentConfiguration>(0));
+                options.Add(call.ArgAt<AgentOperationOptions>(1));
+                return commands.Count == 1 ? stalled.Task : Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+            });
+        IRenderedComponent<AgentConfiguration> first = RenderPage<AgentConfiguration>();
+        first.Find("[data-testid='agents-config-display-name-input']").Change("retained name");
+        first.Find("[data-testid='agents-config-description-input']").Change("retained description");
+        first.Find("[data-testid='agents-config-instructions-input']").Change("private exact instructions");
+        await first.InvokeAsync(() => first.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(AgentResponseMode.Confirmation));
+        Task submission = first.Find("[data-testid='agents-config-submit']").ClickAsync(new MouseEventArgs());
+        first.WaitForAssertion(() => commands.Count.ShouldBe(1));
+        first.Instance.Dispose();
+        first.Dispose();
+        await submission;
+
+        IRenderedComponent<AgentConfiguration> reopened = RenderPage<AgentConfiguration>();
+        reopened.WaitForAssertion(() => reopened.Find("[data-testid='agents-config-write-retry']"));
+        commands.Count.ShouldBe(1);
+        reopened.Find("[data-testid='agents-config-write-lifetime']").TextContent.ShouldContain("Agents.Config.Write.Lifetime");
+        reopened.Find("[data-testid='agents-config-write-state']").TextContent.ShouldContain("Agents.Config.Write.UnableToVerify");
+        reopened.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("retained name");
+        reopened.Find("[data-testid='agents-config-description-input']").GetAttribute("value").ShouldBe("retained description");
+        reopened.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
+        reopened.Find("[data-testid='agents-config-submit']").HasAttribute("disabled").ShouldBeTrue();
+        reopened.Markup.ShouldNotContain("private exact instructions");
+        // A late outcome of the disposed observer cannot resolve or replace the reopened attempt.
+        stalled.SetResult(Accepted(4));
+        await reopened.InvokeAsync(() => Task.CompletedTask);
+        await reopened.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+        commands.Count.ShouldBe(2);
+        commands[1].ShouldBeSameAs(commands[0]);
+        options[1].ShouldBeSameAs(options[0]);
+        await reopened.Find("[data-testid='agents-config-write-abandon']").ClickAsync(new MouseEventArgs());
+        reopened.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("private exact instructions");
+        var store = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+        store.Load(await store.GetScopeAsync()).ShouldBeNull();
+    }
+
+    [Theory]
+    [InlineData(AgentInspectionStatus.Unavailable, "Agents.Surface.Unavailable.Title")]
+    [InlineData(AgentInspectionStatus.NotAuthorized, "Agents.Surface.PermissionDenied.Title")]
+    [InlineData(AgentInspectionStatus.AgentNotFound, "Agents.Surface.Empty.Title")]
+    [InlineData(AgentInspectionStatus.Success, "Agents.Surface.Empty.Title")]
+    public async Task ReopeningAcceptedAttemptRetainsExactReceiptAndTargetAcrossTypedFailures(
+        AgentInspectionStatus failure, string expectedSurface)
+    {
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(call => Task.FromResult(
+            call.ArgAt<int?>(0) is null ? AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: 3))
+                : new AgentSetupResult(failure, null)));
+        AgentSetupWriteResult accepted = Accepted(9);
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(accepted));
+        IRenderedComponent<AgentConfiguration> first = RenderPage<AgentConfiguration>();
+        first.Find("[data-testid='agents-config-instructions-input']").Change("unsubmitted private draft");
+        await first.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        first.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        first.Instance.Dispose();
+        first.Dispose();
+
+        IRenderedComponent<AgentConfiguration> reopened = RenderPage<AgentConfiguration>();
+        reopened.WaitForAssertion(() => reopened.Markup.ShouldContain(expectedSurface));
+        reopened.Find("[data-testid='agents-config-write-state']").TextContent.ShouldContain("Agents.Config.Write.AwaitingProjection");
+        reopened.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        reopened.Markup.ShouldNotContain("unsubmitted private draft");
+        var store = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+        var retained = store.Load(await store.GetScopeAsync()).ShouldNotBeNull();
+        retained.PendingWrite!.Acceptance.ShouldBeSameAs(accepted.Acceptance);
+        retained.PendingWrite.TargetConfigurationVersion.ShouldBe(9);
+        await reopened.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
+        await SetupGateway.Received(3).GetSetupAsync(9, Arg.Any<CancellationToken>());
+        await SetupGateway.Received(1).ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>());
+
+        SetupGateway.GetSetupAsync(9, Arg.Any<CancellationToken>()).Returns(Task.FromResult(
+            AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: 9))));
+        await reopened.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
+        reopened.Find("[data-testid='agents-config-write-state']").TextContent.ShouldContain("Agents.Config.Write.Confirmed");
+        store.Load(await store.GetScopeAsync()).ShouldBeNull();
+        reopened.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("unsubmitted private draft");
+    }
+
+    [Theory]
+    [InlineData("name")]
+    [InlineData("description")]
+    [InlineData("mode")]
+    public async Task ConfirmedConcurrentValuesRequireExplicitFreshLoadAndKeepInstructionDraft(string changedField)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(configurationVersion: 3);
+        AgentSetupView concurrent = AgentUiTestData.Setup(initial.Agent with
+        {
+            DisplayName = changedField == "name" ? "concurrent saved" : initial.Agent.DisplayName,
+            Description = changedField == "description" ? "concurrent description" : initial.Agent.Description,
+            ResponseMode = changedField == "mode" ? AgentResponseMode.Confirmation : initial.Agent.ResponseMode,
+        }, configurationVersion: 8);
+        AgentSetupView fresh = AgentUiTestData.Setup(initial.Agent with { DisplayName = "fresh saved", Description = "fresh description", ResponseMode = AgentResponseMode.Confirmation }, configurationVersion: 10);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)), Task.FromResult(AgentSetupResult.Success(concurrent)),
+            Task.FromResult(AgentSetupResult.Success(fresh)));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Accepted(4)));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("my name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("my description");
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("my private draft");
+        cut.FindAll("[data-testid='agents-config-draft-divergence']").ShouldBeEmpty();
+        await cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-config-draft-divergence']");
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("my name");
+        await cut.Find("[data-testid='agents-config-load-saved']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("fresh saved");
+        cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value").ShouldBe("fresh description");
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
+        cut.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("my private draft");
+        cut.FindAll("[data-testid='agents-config-draft-divergence']").ShouldBeEmpty();
+        await SetupGateway.Received(1).GetSetupAsync(null, Arg.Any<CancellationToken>());
+        await SetupGateway.Received(1).GetSetupAsync(8, Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("older")]
+    [InlineData("denied")]
+    [InlineData("missing")]
+    [InlineData("unavailable")]
+    [InlineData("malformed")]
+    [InlineData("throws")]
+    [InlineData("pending")]
+    public async Task FailedExplicitLoadPreservesEveryDraft(string failure)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(configurationVersion: 3);
+        AgentSetupView newer = AgentUiTestData.Setup(initial.Agent with { DisplayName = "new saved" }, configurationVersion: 4);
+        Task<AgentSetupResult> failedRead = failure switch
+        {
+            "older" => Task.FromResult(AgentSetupResult.Success(initial with { Agent = initial.Agent with { DisplayName = "obsolete saved value" } })),
+            "denied" => Task.FromResult(AgentSetupResult.NotAuthorized()),
+            "missing" => Task.FromResult(AgentSetupResult.NotFound()),
+            "malformed" => Task.FromResult(new AgentSetupResult(AgentInspectionStatus.Success, null)),
+            "throws" => Task.FromException<AgentSetupResult>(new HttpRequestException("private load error")),
+            "pending" => Task.FromResult(AgentSetupResult.Success(newer with { TruthState = AgentSetupTruthState.AuthoritativePending })),
+            _ => Task.FromResult(AgentSetupResult.Unavailable()),
+        };
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)), Task.FromResult(AgentSetupResult.Success(newer)), failedRead,
+            Task.FromResult(AgentSetupResult.Success(newer)),
+            Task.FromResult(AgentSetupResult.Success(AgentUiTestData.Setup(newer.Agent with
+            {
+                DisplayName = "fresh saved name", Description = "fresh saved description", ResponseMode = AgentResponseMode.Automatic,
+            }, configurationVersion: 5))));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Accepted(4)));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("my name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("my description");
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("private instructions");
+        await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(AgentResponseMode.Confirmation));
+        await cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        await cut.Find("[data-testid='agents-config-load-saved']").ClickAsync(new MouseEventArgs());
+        cut.Markup.ShouldNotContain("private load error");
+        ExpectedVersionReadCount(4).ShouldBe(2);
+        if (failure != "pending")
+        {
+            cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+            cut.Markup.ShouldNotContain("private instructions");
+            cut.Markup.ShouldNotContain("obsolete saved value");
+        }
+
+        // Recover authorized visibility with a read-only refresh; all editable values remain the local draft.
+        await cut.Find("[data-testid='agents-config-draft-refresh']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("my name");
+        cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value").ShouldBe("my description");
+        cut.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("private instructions");
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Confirmation);
+        await cut.Find("[data-testid='agents-config-load-saved']").ClickAsync(new MouseEventArgs());
+        cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("fresh saved name");
+        cut.Find("[data-testid='agents-config-description-input']").GetAttribute("value").ShouldBe("fresh saved description");
+        cut.FindComponent<ResponseModeToggle>().Instance.Value.ShouldBe(AgentResponseMode.Automatic);
+        cut.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("private instructions");
+        ExpectedVersionReadCount(4).ShouldBe(4);
+    }
+
+    [Fact]
+    public async Task UnresolvedReturnedAttemptDisablesSavedValueLoadingEvenWhenProjectionChanged()
+    {
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 3));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify)));
+        IRenderedComponent<AgentConfiguration> first = RenderPage<AgentConfiguration>();
+        first.Find("[data-testid='agents-config-display-name-input']").Change("my draft");
+        await first.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        first.Instance.Dispose();
+        first.Dispose();
+        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status() with { DisplayName = "another writer" }, configurationVersion: 99));
+        IRenderedComponent<AgentConfiguration> reopened = RenderPage<AgentConfiguration>();
+        reopened.Find("[data-testid='agents-config-load-saved']").HasAttribute("disabled").ShouldBeTrue();
+        reopened.Find("[data-testid='agents-config-write-retry']");
+        int reads = SetupGateway.ReceivedCalls().Count(call => call.GetMethodInfo().Name == nameof(IAgentSetupGateway.GetSetupAsync));
+        await reopened.InvokeAsync(async () => await (Task)typeof(AgentConfiguration)
+            .GetMethod("LoadSavedValuesAsync", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(reopened.Instance, null)!);
+        SetupGateway.ReceivedCalls().Count(call => call.GetMethodInfo().Name == nameof(IAgentSetupGateway.GetSetupAsync)).ShouldBe(reads);
+        reopened.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("my draft");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TypingOrUnrelatedLifecycleRevisionDoesNotSignalDraftDivergence(bool matchesChangedField)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(configurationVersion: 3);
+        AgentSetupView confirmed = AgentUiTestData.Setup(initial.Agent with
+        {
+            Lifecycle = AgentLifecycleStatus.Active,
+            DisplayName = matchesChangedField ? "my name" : initial.Agent.DisplayName,
+        }, configurationVersion: 4);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)), Task.FromResult(AgentSetupResult.Success(confirmed)));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Accepted(4)));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("my name");
+        cut.Find("[data-testid='agents-config-description-input']").Change("my unrelated description");
+        cut.FindAll("[data-testid='agents-config-draft-divergence']").ShouldBeEmpty();
+        await cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        cut.FindAll("[data-testid='agents-config-draft-divergence']").ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task AuthenticationChangeRemovesMountedContentAndStaleAbandonCannotRestoreInstructions()
+    {
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 3));
+        SetupGateway.UpdateConfigurationAsync(Arg.Any<UpdateAgentConfiguration>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify)));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("private prior user name");
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("private prior user instructions");
+        await cut.Find("[data-testid='agents-config-submit']").ClickAsync(new MouseEventArgs());
+        Authorization.SetNotAuthorized();
+        cut.WaitForAssertion(() => cut.Markup.ShouldContain("Agents.Surface.PermissionDenied.Title"));
+        await cut.InvokeAsync(() => typeof(AgentConfiguration)
+            .GetMethod("AbandonAttempt", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(cut.Instance, null));
+        cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+        cut.Markup.ShouldNotContain("private prior user");
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        typeof(AgentConfiguration).GetField("_instructionsDraft", flags)!.GetValue(cut.Instance).ShouldBe(string.Empty);
+        var store = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+        store.Load(await store.GetScopeAsync()).ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task ColdAcceptedPendingReadRearmsWriteBlockUntilAuthorityConfirms()
+    {
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 3, truthState: AgentSetupTruthState.AuthoritativePending));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-authority-pending']");
+        cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
+        cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 4));
+        await cut.Find("[data-testid='agents-config-authority-refresh']").ClickAsync(new MouseEventArgs());
+        cut.FindAll("[data-testid='agents-config-authority-pending']").ShouldBeEmpty();
+        cut.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
+        SetupGateway.ReceivedCalls().ShouldAllBe(call => call.GetMethodInfo().Name == nameof(IAgentSetupGateway.GetSetupAsync));
+    }
+
+    [Theory]
+    [InlineData("name")]
+    [InlineData("description")]
+    [InlineData("mode")]
+    public async Task ConfirmedDraftFieldsBecomeTheBaselineForFurtherTyping(string field)
+    {
+        AgentSetupView initial = AgentUiTestData.Setup(configurationVersion: 3);
+        AgentSetupView confirmed = AgentUiTestData.Setup(initial.Agent with
+        {
+            DisplayName = field == "name" ? "saved B" : initial.Agent.DisplayName,
+            Description = field == "description" ? "saved B" : initial.Agent.Description,
+            ResponseMode = field == "mode" ? AgentResponseMode.Confirmation : initial.Agent.ResponseMode,
+        }, configurationVersion: 4);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(initial)), Task.FromResult(AgentSetupResult.Success(confirmed)));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Accepted(4)));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        if (field == "mode")
+        {
+            await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(AgentResponseMode.Confirmation));
+        }
+        else
+        {
+            cut.Find(field == "name" ? "[data-testid='agents-config-display-name-input']" : "[data-testid='agents-config-description-input']").Change("saved B");
+        }
+        await cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        cut.FindAll("[data-testid='agents-config-draft-divergence']").ShouldBeEmpty();
+        if (field == "mode")
+        {
+            await cut.InvokeAsync(() => cut.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(AgentResponseMode.Automatic));
+        }
+        else
+        {
+            cut.Find(field == "name" ? "[data-testid='agents-config-display-name-input']" : "[data-testid='agents-config-description-input']").Change("new local C");
+        }
+        cut.FindAll("[data-testid='agents-config-draft-divergence']").ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData("mode")]
+    [InlineData("activate")]
+    [InlineData("disable")]
+    public async Task NavigationReplaysTheOriginalOperationPayloadAndIdentity(string operation)
+    {
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 3));
+        var attempts = new List<AgentOperationOptions>();
+        var modes = new List<AgentResponseMode>();
+        SetupGateway.ConfigureResponseModeAsync(Arg.Any<AgentResponseMode>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                modes.Add(call.ArgAt<AgentResponseMode>(0));
+                attempts.Add(call.ArgAt<AgentOperationOptions>(1));
+                return Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+            });
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            attempts.Add(call.ArgAt<AgentOperationOptions>(0));
+            return Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+        });
+        SetupGateway.DisableAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            attempts.Add(call.ArgAt<AgentOperationOptions>(0));
+            return Task.FromResult(AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+        });
+        IRenderedComponent<AgentConfiguration> first = RenderPage<AgentConfiguration>();
+        if (operation == "mode")
+        {
+            await first.InvokeAsync(() => first.FindComponent<ResponseModeToggle>().Instance.ValueChanged.InvokeAsync(AgentResponseMode.Confirmation));
+        }
+        string control = operation == "mode" ? "response-mode-submit" : operation;
+        await first.Find($"[data-testid='agents-config-{control}']").ClickAsync(new MouseEventArgs());
+        first.Instance.Dispose();
+        first.Dispose();
+        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status(responseMode: AgentResponseMode.Automatic), configurationVersion: 20));
+        IRenderedComponent<AgentConfiguration> reopened = RenderPage<AgentConfiguration>();
+        attempts.Count.ShouldBe(1);
+        await reopened.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+        attempts.Count.ShouldBe(2);
+        attempts[1].ShouldBeSameAs(attempts[0]);
+        attempts[0].ExpectedConfigurationVersion.ShouldBe(operation == "activate" ? 3 : null);
+        if (operation == "mode")
+        {
+            modes.ShouldBe([AgentResponseMode.Confirmation, AgentResponseMode.Confirmation]);
+        }
+        string expectedMethod = operation switch
+        {
+            "mode" => nameof(IAgentSetupGateway.ConfigureResponseModeAsync),
+            "activate" => nameof(IAgentSetupGateway.ActivateAsync),
+            _ => nameof(IAgentSetupGateway.DisableAsync),
+        };
+        SetupGateway.ReceivedCalls().Where(call => call.GetMethodInfo().Name != nameof(IAgentSetupGateway.GetSetupAsync))
+            .Select(call => call.GetMethodInfo().Name).ShouldBe([expectedMethod, expectedMethod]);
+    }
+
+    [Theory]
+    [InlineData(9)]
+    [InlineData(12)]
+    public async Task ReopeningImmediatelyConfirmedAcceptanceReleasesRetentionWithoutSubmitting(int observedVersion)
+    {
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: 3))),
+            Task.FromResult(AgentSetupResult.Unavailable()),
+            Task.FromResult(AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: observedVersion))));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Accepted(9)));
+        IRenderedComponent<AgentConfiguration> first = RenderPage<AgentConfiguration>();
+        first.Find("[data-testid='agents-config-instructions-input']").Change("unsent instructions");
+        await first.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        first.Instance.Dispose();
+        first.Dispose();
+        IRenderedComponent<AgentConfiguration> reopened = RenderPage<AgentConfiguration>();
+        reopened.Find("[data-testid='agents-config-write-state']").TextContent.ShouldContain("Agents.Config.Write.Confirmed");
+        reopened.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+        reopened.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeFalse();
+        reopened.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("unsent instructions");
+        var store = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+        store.Load(await store.GetScopeAsync()).ShouldBeNull();
+        await SetupGateway.Received(2).GetSetupAsync(9, Arg.Any<CancellationToken>());
+        await SetupGateway.Received(1).ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DelayedReopeningReadDisablesAndGuardsAllRecoveryActions(bool accepted)
+    {
+        GivenSetup(AgentUiTestData.Setup(configurationVersion: 3));
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(accepted ? Accepted(9) : AgentSetupWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify)));
+        IRenderedComponent<AgentConfiguration> first = RenderPage<AgentConfiguration>();
+        await first.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        first.Instance.Dispose();
+        first.Dispose();
+        var delayed = new TaskCompletionSource<AgentSetupResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(delayed.Task);
+        IRenderedComponent<AgentConfiguration> reopened = RenderPage<AgentConfiguration>();
+        reopened.Find("[data-testid='agents-config-write-retry']").HasAttribute("disabled").ShouldBeTrue();
+        reopened.Find("[data-testid='agents-config-write-abandon']").HasAttribute("disabled").ShouldBeTrue();
+        int readsBeforeActions = SetupGateway.ReceivedCalls().Count(call => call.GetMethodInfo().Name == nameof(IAgentSetupGateway.GetSetupAsync));
+        if (accepted)
+        {
+            reopened.Find("[data-testid='agents-config-write-refresh']").HasAttribute("disabled").ShouldBeTrue();
+            await reopened.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
+        }
+        await reopened.Find("[data-testid='agents-config-write-retry']").ClickAsync(new MouseEventArgs());
+        await reopened.Find("[data-testid='agents-config-write-abandon']").ClickAsync(new MouseEventArgs());
+        await SetupGateway.Received(1).ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>());
+        SetupGateway.ReceivedCalls().Count(call => call.GetMethodInfo().Name == nameof(IAgentSetupGateway.GetSetupAsync)).ShouldBe(readsBeforeActions);
+        var store = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+        store.Load(await store.GetScopeAsync()).ShouldNotBeNull();
+        delayed.SetResult(AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: 4)));
+        reopened.WaitForAssertion(() => reopened.Find("[data-testid='agents-config-write-retry']").HasAttribute("disabled").ShouldBeFalse());
+        reopened.Find("[data-testid='agents-config-activate']").HasAttribute("disabled").ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DelayedReadCannotRestoreContentAfterAuthenticationChanges(bool initialRead)
+    {
+        var delayed = new TaskCompletionSource<AgentSetupResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        if (initialRead)
+        {
+            SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(delayed.Task);
+        }
+        else
+        {
+            SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+                Task.FromResult(AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: 3))), delayed.Task);
+            SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Accepted(4)));
+        }
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        Task? write = initialRead ? null : cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        Authorization.SetClaims(new System.Security.Claims.Claim("sub", "another-user"),
+            new System.Security.Claims.Claim("tenantId", "tenant-1"));
+        cut.WaitForAssertion(() => cut.Markup.ShouldContain("Agents.Surface.PermissionDenied.Title"));
+        int renderBeforeCompletion = cut.RenderCount;
+        delayed.SetResult(AgentSetupResult.Success(AgentUiTestData.Setup(AgentUiTestData.Status() with
+        {
+            DisplayName = "old private name", Description = "old private description",
+        }, configurationVersion: 4)));
+        if (write is not null)
+        {
+            await write;
+        }
+        if (initialRead)
+        {
+            cut.WaitForAssertion(() => cut.RenderCount.ShouldBeGreaterThan(renderBeforeCompletion));
+        }
+        cut.WaitForAssertion(() => cut.Markup.ShouldContain("Agents.Surface.PermissionDenied.Title"));
+        cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        cut.Markup.ShouldNotContain("old private");
+        cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task MissingScopeCannotReadOrRecoverIntoAnotherAuthentication()
+    {
+        Authorization.SetNotAuthorized();
+        GivenSetup(AgentUiTestData.Setup(AgentUiTestData.Status() with { DisplayName = "must not load" }));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Markup.ShouldContain("Agents.Surface.PermissionDenied.Title");
+        await SetupGateway.DidNotReceive().GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>());
+        Authorization.SetAuthorized("another-user");
+        Authorization.SetClaims(new System.Security.Claims.Claim("sub", "another-user"),
+            new System.Security.Claims.Claim("tenantId", "tenant-1"));
+        await cut.InvokeAsync(() => Task.CompletedTask);
+        cut.Markup.ShouldNotContain("must not load");
+        await SetupGateway.DidNotReceive().GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task PendingMountedAuthenticationHidesContentAndPreservesOnlyAnUnchangedBinding(bool changesUser)
+    {
+        var authentication = new ControlledSetupAuthenticationStateProvider();
+        authentication.Publish(Task.FromResult(ControlledSetupAuthenticationStateProvider.State("administrator", "tenant-1")));
+        Services.AddSingleton<Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider>(authentication);
+        SetupGateway.GetSetupAsync(Arg.Any<int?>(), Arg.Any<CancellationToken>()).Returns(
+            Task.FromResult(AgentSetupResult.Success(AgentUiTestData.Setup(configurationVersion: 3))),
+            Task.FromResult(AgentSetupResult.Unavailable()));
+        AgentSetupWriteResult accepted = Accepted(9);
+        SetupGateway.ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(accepted));
+        IRenderedComponent<AgentConfiguration> cut = RenderPage<AgentConfiguration>();
+        cut.Find("[data-testid='agents-config-display-name-input']").Change("private local name");
+        cut.Find("[data-testid='agents-config-instructions-input']").Change("private local instructions");
+        await cut.Find("[data-testid='agents-config-activate']").ClickAsync(new MouseEventArgs());
+        var pending = new TaskCompletionSource<Microsoft.AspNetCore.Components.Authorization.AuthenticationState>(TaskCreationOptions.RunContinuationsAsynchronously);
+        authentication.Publish(pending.Task);
+        cut.WaitForAssertion(() => cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty());
+        cut.FindAll("[data-testid='agents-config-sections']").ShouldBeEmpty();
+        cut.Markup.ShouldNotContain("private local");
+        pending.SetResult(ControlledSetupAuthenticationStateProvider.State(changesUser ? "another-user" : "administrator", "tenant-1"));
+        if (changesUser)
+        {
+            cut.WaitForAssertion(() => cut.Markup.ShouldContain("Agents.Surface.PermissionDenied.Title"));
+            cut.FindAll("[data-testid='agents-config-write-retry']").ShouldBeEmpty();
+            cut.Markup.ShouldNotContain("private local");
+        }
+        else
+        {
+            cut.WaitForAssertion(() => cut.Find("[data-testid='agents-config-write-refresh']"));
+            var store = Services.GetRequiredService<Hexalith.Agents.UI.State.AgentSetupAttemptStore>();
+            store.Load(await store.GetScopeAsync()).ShouldNotBeNull().PendingWrite!.Acceptance.ShouldBeSameAs(accepted.Acceptance);
+            GivenSetup(AgentUiTestData.Setup(configurationVersion: 9));
+            await cut.Find("[data-testid='agents-config-write-refresh']").ClickAsync(new MouseEventArgs());
+            cut.Find("[data-testid='agents-config-display-name-input']").GetAttribute("value").ShouldBe("private local name");
+            cut.Find("[data-testid='agents-config-instructions-input']").GetAttribute("value").ShouldBe("private local instructions");
+            await SetupGateway.Received(1).ActivateAsync(Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>());
+        }
     }
 
     private static AgentSetupWriteResult Accepted(int targetConfigurationVersion = 4)

@@ -746,4 +746,9 @@
   <data name="Agents.ProviderCatalog.Enablement.Enabled" xml:space="preserve"><value>Activé pour le locataire</value></data>
   <data name="Agents.ProviderCatalog.Enablement.Load" xml:space="preserve"><value>Charger l’état du locataire</value></data>
   <data name="Agents.ProviderCatalog.DataHandling.DeclareTightening" xml:space="preserve"><value>Déclarer ce changement comme des conditions de traitement des données plus strictes</value></data>
+  <data name="Agents.Config.Write.Lifetime" xml:space="preserve"><value>Cette tentative non résolue est conservée pendant la navigation dans cette session authentifiée. Quitter la page n’annule pas la commande serveur. Un rechargement ou la perte de session ne permet pas de récupérer un envoi sans accusé de réception.</value></data>
+  <data name="Agents.Config.Write.Abandoned" xml:space="preserve"><value>La tentative locale a été abandonnée. Cela n’annule pas la commande serveur.</value></data>
+  <data name="Agents.Config.Draft.Diverged" xml:space="preserve"><value>Les valeurs enregistrées ont changé. Vos modifications sont conservées. Chargez les valeurs enregistrées pour remplacer le nom, la description et le mode de réponse ; votre texte d’instructions restera inchangé.</value></data>
+  <data name="Agents.Config.Draft.LoadSaved" xml:space="preserve"><value>Charger les valeurs enregistrées</value></data>
+  <data name="Agents.Config.Write.AuthorityPending" xml:space="preserve"><value>Une commande est en attente dans la configuration faisant autorité. Les nouvelles modifications restent bloquées. Actualisez la configuration projetée pour vérifier son état.</value></data>
 </root>

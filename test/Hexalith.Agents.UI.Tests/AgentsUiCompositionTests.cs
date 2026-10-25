@@ -28,6 +28,7 @@ public sealed class AgentsUiCompositionTests
         services.AddAgentsUi();
 
         services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(AgentSetupAttemptStore)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
         ServiceDescriptor pendingStore = services.Single(d => d.ServiceType == typeof(IPendingProviderCommandStore));
         pendingStore.Lifetime.ShouldBe(ServiceLifetime.Scoped);
