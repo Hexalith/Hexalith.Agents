@@ -6,10 +6,10 @@ status: 'draft'
 route: 'dispatch'
 review_loop_iteration: 0
 qualification_blocked: true
+last_reconciled: '2026-10-25'
 context:
   - '_bmad-output/planning-artifacts/external-dependency-register.md'
-  - '_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-18.md'
-  - '_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-22.md'
+  - '_bmad-output/implementation-artifacts/story-5-4-dependency-reconciliation-2026-10-25.md'
 ---
 
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
@@ -39,29 +39,30 @@ context:
 
 ## Code Map
 
-- `external-dependency-register.md` in planning artifacts — authoritative contracts and OQ-5.4-1; proposal documents do not amend it.
-- `story-5-4-dependency-reconciliation-2026-10-22.md` — candidate disposition, dates, exact command references and ordered completion requirements.
-- `tests/story-5-4-reconciliation-2026-10-22/` — durable owner reports, source/hash inventory and static verification; no runtime evidence claim.
-- Sibling Platform `eng/ext-{secrets,host}-1/prepare_acceptance.py`, `qualify.py`, `verify_full.py` — reuse accepted packet semantics; the joint Live runner remains absent.
-- Sibling Conversations owner packet and Parties `eng/verify-ext-parties-1.ps1` — incomplete installed qualification; preserve receiver separation and complete P-01–P-10 scope.
-- Sibling EventStore `docs/implementation/ext-protection-1-owner-acceptance.md` — G1–G7 and proposed date; preserve retained negative restore evidence.
-- `spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md` and `eng/verify-story-5.4.ps1` — existing approved implementation; do not mark complete or start consumer qualification during reconciliation.
+- `external-dependency-register.md` in planning artifacts — complete contracts and OQ-5.4-1; preserve accepted bytes.
+- `story-5-4-dependency-reconciliation-2026-10-25.md` and `tests/story-5-4-reconciliation-2026-10-25/` — all fields, commands, source/installed hashes, blockers and preservation evidence. Earlier reports remain historical.
+- Sibling Platform `eng/ext-{secrets,host}-1/` — packet/hash semantics; joint Live runner and installations remain missing despite October 25 component delivery.
+- Sibling Parties `eng/verify-ext-parties-1.ps1` — uncommitted coordination, null date, refusal-only Live. Conversations October 22 packet remains NotSubmitted with absent installed manifest/trust/receiver.
+- Sibling EventStore `docs/implementation/ext-protection-1-delivery-2026-10-25.json` — BlockedNotSubmitted, G1–G7 open, proposed 2026-11-02 date.
+- `spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md` and `eng/verify-story-5.4.ps1` — approved consumer work; resume after exact-target availability.
 
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `story-5-4-dependency-reconciliation-2026-10-22.md` and supporting reports — reconcile all owner packets and make missing prerequisites reviewable.
-- [ ] `_bmad-output/planning-artifacts/external-dependency-register.md` — apply only complete explicitly accepted replacements; retain historical acceptance evidence.
-- [ ] Accepted owner checkout/configuration locations — install exact targets and independently enrolled inputs after acceptance; preserve unrelated owner work.
-- [ ] Accepted evidence/attempt locations — execute the permitted sequence once and retain commands, persisted outcomes and recovery journals; advance availability only on complete passes.
-- [ ] Existing Story 5.4 spec — resume its build workflow after exact-target availability, then complete its own acceptance and review.
+- [x] `story-5-4-dependency-reconciliation-2026-10-25.md` and reports — reconcile current packets; zero complete replacements.
+- [ ] `_bmad-output/planning-artifacts/external-dependency-register.md` — apply only complete explicitly accepted replacements; preserve historical acceptance.
+- [ ] Owner checkout/configuration paths in the reports — install accepted exact targets and independently enrolled inputs.
+- [ ] Accepted attempt paths in the reports — run the ordered sequence once; retain commands, persisted outcomes and journals; advance only on complete passes.
+- [ ] Existing Story 5.4 spec — resume its build after availability; finish production bindings, signed replay, durable denial recovery, persisted acceptance and full review.
 
 **Acceptance Criteria:**
-- Given new packets, when reconciled, then every proposed commitment has verifiable canonical targets, executable commands, actual installed hashes and explicit dates, or a precise blocked disposition with no acceptance claim.
-- Given incomplete prerequisites, when this run ends, then register statuses, prior attempts, recovery journals and consuming runtime remain unchanged.
-- Given a passing complete accepted owner sequence, when records advance, then installed targets and required persisted evidence match every accepted binding; Story 5.4 completion still requires its own verification.
+- Given new packets, when reconciled, then every commitment has canonical targets, executable commands, actual installed hashes and explicit dates, or precise blockers without acceptance.
+- Given incomplete prerequisites, when this run ends, then accepted records, original attempts/journals and consuming runtime remain unchanged.
+- Given complete accepted passing qualification, when availability advances, then installed targets and persisted evidence match every binding; Story 5.4 still needs its own verification.
 
 ## Implementation Notes
+
+2026-10-25: Static reconciliation completed. No intent gap; missing owner deliveries block readiness. Footprint: this spec and new reports. Irreversible qualification stays conditional on acceptance and installation. No runtime, installation, owner command or attempt ran. Retain draft and blocked status.
 
 ## Spec Change Log
 
@@ -69,4 +70,4 @@ context:
 
 ## Verification
 
-Validate packet hashes, canonical ancestry, raw versus canonical hash semantics, exact command text, unchanged register and historical attempt bytes. Inspect the full required-field blocker lists. These are static reconciliation checks, not owner qualification. Do not run application tests for documentation-only preparation.
+Compare packet/raw/canonical hashes, exact commands, local canonical ancestry, exhaustive missing-field lists and original evidence bytes. Preserve register, sprint/story gates and frozen intent. Reports and verification receipt distinguish static inspection from qualification; no application tests for documentation-only work.

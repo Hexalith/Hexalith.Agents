@@ -1,0 +1,133 @@
+{
+  "schema": "story-5-4-static-verification/v1",
+  "observedAtUtc": "2026-10-25T11:00:02.000155+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "check": "historical-evidence-and-records-preserved",
+      "passed": true,
+      "filesChecked": 10917,
+      "drift": [],
+      "expectedSpecUpdates": [
+        {
+          "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-reconcile-owner-deliveries.md",
+          "before": "e868c08405c5f9dd145e5258d19f08bcb99a549a737c75f5924edf9a092da574",
+          "after": "4a25b85a23d03fb3e84b000bd2cd6534d98f1985476cbd179572e8e9a80b2795"
+        }
+      ]
+    },
+    {
+      "check": "frozen-intent-verbatim",
+      "passed": true
+    },
+    {
+      "check": "register-sha256-unchanged",
+      "passed": true,
+      "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+    },
+    {
+      "check": "EXT-PARTIES-1-complete-accepted-section",
+      "passed": true
+    },
+    {
+      "check": "EXT-CONV-AI-1-complete-accepted-section",
+      "passed": true
+    },
+    {
+      "check": "EXT-SECRETS-1-complete-accepted-section",
+      "passed": true
+    },
+    {
+      "check": "EXT-HOST-1-complete-accepted-section",
+      "passed": true
+    },
+    {
+      "check": "EXT-PROTECTION-1-complete-accepted-section",
+      "passed": true
+    },
+    {
+      "check": "platform-inspected-public-files-stable",
+      "passed": true,
+      "filesRechecked": 38,
+      "drift": []
+    },
+    {
+      "check": "identity-inspected-public-files-stable",
+      "passed": true,
+      "filesRechecked": 28,
+      "drift": []
+    },
+    {
+      "check": "protection-inspected-public-files-stable",
+      "passed": true,
+      "filesRechecked": 24,
+      "drift": []
+    },
+    {
+      "check": "indexed:accepted-records.json",
+      "passed": true
+    },
+    {
+      "check": "indexed:source-inventory.json",
+      "passed": true
+    },
+    {
+      "check": "indexed:preservation-before.json",
+      "passed": true
+    },
+    {
+      "check": "indexed:platform-owner-packets.md",
+      "passed": true
+    },
+    {
+      "check": "indexed:platform-owner-packets.json",
+      "passed": true
+    },
+    {
+      "check": "indexed:identity-owner-packets.md",
+      "passed": true
+    },
+    {
+      "check": "indexed:identity-owner-packets.json",
+      "passed": true
+    },
+    {
+      "check": "indexed:protection-owner-packets.md",
+      "passed": true
+    },
+    {
+      "check": "indexed:protection-owner-packets.json",
+      "passed": true
+    },
+    {
+      "check": "no-complete-replacement-or-availability-claim",
+      "passed": true
+    },
+    {
+      "check": "draft-stays-blocked",
+      "passed": true
+    },
+    {
+      "check": "report-local-links-resolve",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "execution": {
+    "ownerCommandsRun": 0,
+    "ownerCohortAttemptsReserved": 0,
+    "ownerCohortPhasesRun": 0,
+    "consumingAgentsPathsRun": 0,
+    "targetInstallations": 0,
+    "registerMutations": 0,
+    "journalMutations": 0,
+    "story54BuildResumed": false
+  },
+  "reconciliationSha256": "0b8df32f081d664b21a75f7ba9dd39a1798e0c80fbdf530fb83512a988ff0285",
+  "limitations": [
+    "Static evidence only; no Live/Full/component tests rerun.",
+    "Preservation covers exactly the baseline scope/exclusions; it is not a remote host or entire 83GB secrets evidence inventory.",
+    "Mutable component binary/source-graph drift predating reconciliation is recorded in owner reports, not erased.",
+    "Git ancestry is against local origin/main without a fetch."
+  ]
+}

@@ -1,0 +1,213 @@
+{
+  "observedAtUtc": "2026-10-25T10:55:28.427277+00:00",
+  "fetchPerformed": false,
+  "repositories": {
+    ".": {
+      "path": "/home/administrator/projects/hexalith/agents",
+      "head": {
+        "exitCode": 0,
+        "stdout": "28d0c413107275c9ab1590fb2f64376445c89280",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "28d0c413107275c9ab1590fb2f64376445c89280",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "?? _bmad-output/implementation-artifacts/tests/story-5-4-reconciliation-2026-10-25/",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.Platform": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform",
+      "head": {
+        "exitCode": 0,
+        "stdout": "90f33a59164d0dcfc21fb688f28651afa4d3df4b",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "90f33a59164d0dcfc21fb688f28651afa4d3df4b",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.EventStore": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "head": {
+        "exitCode": 0,
+        "stdout": "d41a3c55a684491d02f61c5ea98e0f74332b5d4d",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "d41a3c55a684491d02f61c5ea98e0f74332b5d4d",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.Parties": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "references/Hexalith.Conversations": {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+      "head": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "../platform": {
+      "path": "/home/administrator/projects/hexalith/platform",
+      "head": {
+        "exitCode": 0,
+        "stdout": "7c56ad6352a74edec62450668e106ec8d6011e40",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "7c56ad6352a74edec62450668e106ec8d6011e40",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/audit-verification.py\n M _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/commands.json\n M _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/pdb-audit-source.cs.txt\n?? _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/final2-builds-tests.xml\n?? _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/implementation-resume.diff\n?? _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/pdb-source-bindings.json\n?? _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/runtime-assembly-attributes.json\n?? _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/runtime-content-identities.json\n?? _bmad-output/implementation-artifacts/evidence/2-5/committed-review-fixes-20261025/verification.json",
+        "stderr": "warning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files\nwarning: unable to find all commit-graph files"
+      }
+    },
+    "../eventstore": {
+      "path": "/home/administrator/projects/hexalith/eventstore",
+      "head": {
+        "exitCode": 0,
+        "stdout": "d41a3c55a684491d02f61c5ea98e0f74332b5d4d",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "d41a3c55a684491d02f61c5ea98e0f74332b5d4d",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M _bmad-output/implementation-artifacts/2-13-dapr-notification-distribution-qualification.md\n M _bmad-output/implementation-artifacts/spec-2-13-dapr-notification-distribution-qualification.md",
+        "stderr": ""
+      }
+    },
+    "../parties": {
+      "path": "/home/administrator/projects/hexalith/parties",
+      "head": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "9c116910f9d712b82ae27ceb1946605d76c8a451",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "MM _bmad-output/implementation-artifacts/deferred-work.md\n M _bmad-output/implementation-artifacts/spec-five-processing-and-memories-erasure-deferred-items.md\n M _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/README.md\nA  _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/review1-owned-files.json\n M docs/gdpr-processing-activity-records.md\n M eng/verify-ext-parties-1.ps1\n M references/Hexalith.EventStore\n M references/Hexalith.Memories\n M src/Hexalith.Parties.Client/AdminPortal/HttpAdminPortalGdprClient.cs\n M src/Hexalith.Parties.Projections/Handlers/PartyDetailSdkProjectionHandler.ProcessingBuckets.cs\n M src/Hexalith.Parties.Projections/Handlers/PartyDetailSdkProjectionHandler.cs\n M src/Hexalith.Parties.Projections/Services/PartySdkReadModelEraser.cs\n M src/Hexalith.Parties/Extensions/PartiesServiceCollectionExtensions.cs\n M src/Hexalith.Parties/Queries/PartySdkQueryService.ProcessingBuckets.cs\n M tests/Hexalith.Parties.Client.Tests/AdminPortal/AdminPortalGdprOperationContractTests.cs\nMM tests/Hexalith.Parties.Tests/Gateway/PartySdkQueryHandlerTests.cs\n M tests/Hexalith.Parties.Tests/Projections/PartyProcessingGenerationRecoveryTests.cs\n?? _bmad-output/implementation-artifacts/spec-ext-parties-1-owner-delivery.md\n?? _bmad-output/implementation-artifacts/tests/ext-parties-1-owner-delivery-2026-10-25/\n?? _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/rerun-affected.sh\n?? _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/rerun-environment.md\n?? _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/review2-owned-files.json\n?? _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/review2-rerun.sh\n?? _bmad-output/implementation-artifacts/tests/five-processing-and-memories-erasure-2026-10-25/review2-verification.json\n?? src/Hexalith.Parties.Projections/Models/PartyProcessingBucketValidation.cs\n?? tests/Hexalith.Parties.IntegrationTests/Identity/",
+        "stderr": ""
+      }
+    },
+    "../conversations": {
+      "path": "/home/administrator/projects/hexalith/conversations",
+      "head": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "originMain": {
+        "exitCode": 0,
+        "stdout": "8444207001d6ad3cd197c2ffba519317effa8b37",
+        "stderr": ""
+      },
+      "canonicalAgainstLocalOriginMain": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      "status": {
+        "exitCode": 0,
+        "stdout": "M _bmad-output/implementation-artifacts/spec-release-corrected-module-cli.md\n M references/Hexalith.Builds",
+        "stderr": ""
+      }
+    }
+  }
+}
