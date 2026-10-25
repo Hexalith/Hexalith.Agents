@@ -648,7 +648,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
             });
         _statusReader
-            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<bool?>(true));
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().ActivateAsync(
@@ -658,6 +658,10 @@ public sealed class EventStoreAgentAdministrationOperationsTests
 
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.Rejected);
         result.Value.ShouldBeNull();
+        SubmitCommandRequest submitted = _gateway.ReceivedCalls()
+            .Where(call => call.GetMethodInfo().Name == nameof(IEventStoreGatewayClient.SubmitCommandAsync))
+            .Select(call => (SubmitCommandRequest)call.GetArguments()[0]!).Single();
+        await _statusReader.Received(1).WasRejectedAsync(TenantId, "agent", submitted.MessageId!, submitted.CorrelationId!, Arg.Any<CancellationToken>());
 
         // Prior setup is preserved.
         _store.Snapshot<AgentSetupReadModel>(StoreName, AgentSetupReadModelAddresses.Detail(TenantId, AgentId))
@@ -677,7 +681,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
             });
         _statusReader
-            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(scenario == "not-rejected" ? false : (bool?)null));
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
@@ -696,7 +700,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
                 return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
             });
         _statusReader
-            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task<bool?>>(_ => throw new InvalidOperationException("status unavailable"));
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
@@ -718,7 +722,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
 
         // A transport timeout surfaces as a cancellation the caller never requested.
         _statusReader
-            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .WasRejectedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task<bool?>>(_ => throw new TaskCanceledException("status read timed out"));
 
         AgentOperationResult<AgentCommandAcceptance> result = await Operations().DisableAsync(AgentId, new DisableAgent());
@@ -743,7 +747,7 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             new AgentOperationOptions(IdempotencyKey: MessageId));
 
         result.Status.ShouldBe(AgentOperationStatus.UnableToVerify);
-        await _statusReader.DidNotReceiveWithAnyArgs().WasRejectedAsync(default!, default);
+        await _statusReader.DidNotReceiveWithAnyArgs().WasRejectedAsync(default!, default!, default!, default!, default);
     }
 
     [Theory]

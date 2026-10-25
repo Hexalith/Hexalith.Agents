@@ -79,7 +79,9 @@
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.PermissionDenied" TestId="agents-config-state" />
         }
-        else if (_result.Status is AgentInspectionStatus.Unavailable)
+        else if (_result.Status is AgentInspectionStatus.Unavailable
+            || Gateway is DeferredAgentSetupGateway
+            || _result.Setup is { TruthState: AgentSetupTruthState.Unknown or AgentSetupTruthState.Submitted })
         {
             <AgentSurfaceState Kind="AgentSurfaceKind.Unavailable" TestId="agents-config-state" />
         }
@@ -119,17 +121,17 @@
                        restores that exact draft. The current instruction text is never read back into the page, so a
                        save reports presence/validity/version and nothing else (AD-14). *@
                     <FluentTextInput @bind-Value="_displayNameDraft"
-                                     Disabled="@(_busy || HasUnresolvedAttempt)"
+                                     Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt)"
                                      Label="@Localizer["Agents.Config.DisplayName.Label"]"
                                      AriaLabel="@Localizer["Agents.Config.DisplayName.Label"]"
                                      data-testid="agents-config-display-name-input" />
                     <FluentTextInput @bind-Value="_descriptionDraft"
-                                     Disabled="@(_busy || HasUnresolvedAttempt)"
+                                     Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt)"
                                      Label="@Localizer["Agents.Config.Description.Label"]"
                                      AriaLabel="@Localizer["Agents.Config.Description.Label"]"
                                      data-testid="agents-config-description-input" />
                     <FluentTextArea @bind-Value="_instructionsDraft"
-                                    Disabled="@(_busy || HasUnresolvedAttempt)"
+                                    Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt)"
                                     Label="@Localizer["Agents.Config.Instructions.Label"]"
                                     AriaLabel="@Localizer["Agents.Config.Instructions.Label"]"
                                     Required="true"
@@ -138,7 +140,7 @@
                         @Localizer["Agents.Config.Instructions.ReplaceNote"]
                     </p>
                     <FluentButton Appearance="ButtonAppearance.Primary"
-                                  Disabled="@(_busy || HasUnresolvedAttempt || string.IsNullOrWhiteSpace(_instructionsDraft))"
+                                  Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt || string.IsNullOrWhiteSpace(_instructionsDraft))"
                                   OnClick="SubmitConfigurationAsync"
                                   data-testid="agents-config-submit">
                         @Localizer["Agents.Config.Edit.Submit"]
@@ -172,10 +174,10 @@
                 </FluentAccordionItem>
 
                 <FluentAccordionItem Header="@Localizer["Agents.Config.Section.ResponseMode"]" @bind-Expanded="_expandedSections[5]">
-                    <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" Disabled="@(_busy || HasUnresolvedAttempt)" />
+                    <ResponseModeToggle Value="@_responseMode" ValueChanged="OnResponseModeChanged" Name="agents-config-response-mode" Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt)" />
                     <p class="agents-config__note">@Localizer["Agents.Config.ResponseMode.FutureOnlyNote"]</p>
                     <FluentButton Appearance="ButtonAppearance.Primary"
-                                  Disabled="@(_busy || HasUnresolvedAttempt || _responseMode == agent.ResponseMode)"
+                                  Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt || _responseMode == agent.ResponseMode)"
                                   OnClick="SubmitResponseModeAsync"
                                   data-testid="agents-config-response-mode-submit">
                         @Localizer["Agents.Config.ResponseMode.Submit"]
@@ -239,13 +241,13 @@
                 @* Activation is a distinct action shown after validity is visible. Activating sets a lifecycle
                    flag; it never means the Agent can be called, and the note says so on every render. *@
                 <FluentButton Appearance="ButtonAppearance.Primary"
-                              Disabled="@(_busy || HasUnresolvedAttempt || setup.ConfigurationVersion <= 0 || agent.Lifecycle == AgentLifecycleStatus.Active)"
+                              Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt || setup.ConfigurationVersion <= 0 || agent.Lifecycle == AgentLifecycleStatus.Active)"
                               OnClick="ActivateAsync"
                               data-testid="agents-config-activate">
                     @Localizer["Agents.Config.Activation.Label"]
                 </FluentButton>
                 <FluentButton Appearance="ButtonAppearance.Outline"
-                              Disabled="@(_busy || HasUnresolvedAttempt || agent.Lifecycle == AgentLifecycleStatus.Disabled)"
+                              Disabled="@(_busy || HasUnresolvedAttempt || !CanStartAttempt || agent.Lifecycle == AgentLifecycleStatus.Disabled)"
                               OnClick="DisableAsync"
                               data-testid="agents-config-disable">
                     @Localizer["Agents.Config.Disable.Label"]
@@ -279,6 +281,10 @@
     private bool _disposed;
 
     private bool HasUnresolvedAttempt => _activeAttempt is not null;
+
+    private bool CanStartAttempt => Gateway is not DeferredAgentSetupGateway
+        && _result is { Status: AgentInspectionStatus.Success, Setup.TruthState:
+            AgentSetupTruthState.AuthoritativePending or AgentSetupTruthState.ProjectionConfirmed };
 
     protected override async Task OnInitializedAsync()
     {
@@ -355,7 +361,7 @@
         string? instructionsDraft = null,
         int? expectedConfigurationVersion = null)
     {
-        if (_busy || _activeAttempt is not null)
+        if (_busy || _activeAttempt is not null || !CanStartAttempt)
         {
             return Task.CompletedTask;
         }
@@ -392,14 +398,14 @@
             cancellationToken.ThrowIfCancellationRequested();
 
             if (retainedAcceptance is not null
-                && writeResult.Status != AgentSetupWriteStatus.Submitted
+                && (writeResult.Status != AgentSetupWriteStatus.Submitted || writeResult.Acceptance != retainedAcceptance)
                 && writeResult.Status != AgentSetupWriteStatus.NotAuthorized
                 && writeResult.Status != AgentSetupWriteStatus.NotFound)
             {
                 // Once EventStore has accepted an attempt, a later retry response cannot erase that evidence.
                 // In particular, an AlreadyApplied replay is not a new no-op: the original eventful receipt still
                 // needs its target projection confirmed before this attempt can be released. This only holds for
-                // replay-consistency outcomes (Conflict/ValidationFailed/AlreadyApplied/Unavailable/UnableToVerify):
+                // replay-consistency outcomes and a changed receipt (including a later rejection):
                 // NotAuthorized and NotFound are decided by the authorization/dispatch check before the idempotency
                 // key is even considered, so a fresh denial there is new, trustworthy evidence — not a replay
                 // artifact — and must surface immediately instead of masking it as still-pending.
@@ -443,6 +449,10 @@
             else if (IsTerminalWriteFailure(writeResult.Status))
             {
                 ReleaseAttempt(restoreInstructionsDraft: true);
+                if (writeResult.Status == AgentSetupWriteStatus.Rejected)
+                {
+                    await RefreshAfterRejectionAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
         }
         catch (OperationCanceledException) when (_disposed)
@@ -470,6 +480,22 @@
             {
                 _busy = false;
             }
+        }
+    }
+
+    private async Task RefreshAfterRejectionAsync(CancellationToken cancellationToken)
+    {
+        // A rejected activation may name an outdated version. Invalidate it before reading current setup,
+        // preserving the rejection and all drafts even if the refresh cannot establish new authority.
+        _result = AgentSetupResult.Unavailable();
+        try
+        {
+            await LoadAsync(null, cancellationToken, applyAuthoritativeDrafts: false).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            _result = AgentSetupResult.Unavailable();
         }
     }
 
@@ -570,7 +596,8 @@
         => status is AgentSetupWriteStatus.NotAuthorized
             or AgentSetupWriteStatus.NotFound
             or AgentSetupWriteStatus.ValidationFailed
-            or AgentSetupWriteStatus.Conflict;
+            or AgentSetupWriteStatus.Conflict
+            or AgentSetupWriteStatus.Rejected;
 
     private async Task<AgentSetupTruthState> RefreshAfterWriteAsync(
         int? expectedConfigurationVersion,

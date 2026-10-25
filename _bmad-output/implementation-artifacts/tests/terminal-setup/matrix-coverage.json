@@ -1,0 +1,337 @@
+{
+  "exact-rejection": [
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ExactDomainRejectionUsesWorkloadRouteAndExplicitDomainDelegation",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests.A_domain_rejection_is_reported_as_rejected_rather_than_retryable_unverifiable",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: NotAuthorized, expected: NotAuthorized)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: NotFound, expected: NotFound)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: ValidationFailed, expected: ValidationFailed)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: Conflict, expected: Conflict)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: Stale, expected: Conflict)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: Unavailable, expected: Unavailable)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: UnableToVerify, expected: UnableToVerify)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: Rejected, expected: Rejected)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests.A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(code: Blocked, expected: Rejected)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.A_terminal_configuration_failure_restores_the_exact_draft_and_reenables_editing(failureStatus: ValidationFailed)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.A_terminal_configuration_failure_restores_the_exact_draft_and_reenables_editing(failureStatus: Conflict)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.A_terminal_configuration_failure_restores_the_exact_draft_and_reenables_editing(failureStatus: Rejected)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.FreshRejectionReleasesTheAttemptAndTheNextSubmitUsesNewIdentities",
+      "result": "Pass"
+    }
+  ],
+  "uncertainty": [
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"tenant\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"domain\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"message\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"correlation\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"legacy-domain\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"status-name\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"status-code\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"unknown\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"infrastructure\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"retryable\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"completed\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ForeignUnknownAndInfrastructureEvidenceCannotClaimRejection(scenario: \\\"absent-rejection\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"missing-source\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"missing-credential\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"credential-failure\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"transport\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"timeout\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"forbidden\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.CredentialAndTransportFailuresRemainUnverifiable(failure: \\\"missing-status\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Unable_to_verify_retains_and_blocks_the_exact_attempt_until_retry_or_abandon",
+      "result": "Pass"
+    }
+  ],
+  "isolation": [
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.MessageOnlyReadsAndUndeclaredDelegateOperationsCannotObtainCredentials",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreProviderCatalogOperationsTests.Tenant_administrator_cannot_read_platform_or_other_tenant_command_outcomes(targetTenantId: \\\"system\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreProviderCatalogOperationsTests.Tenant_administrator_cannot_read_platform_or_other_tenant_command_outcomes(targetTenantId: \\\"another-tenant\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-domain.xml.gz",
+      "name": "Hexalith.EventStore.DomainService.Tests.EventStoreGatewayWorkloadTransportTests.StatusGrantsRequireIndependentIssuerCredentials",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-domain.xml.gz",
+      "name": "Hexalith.EventStore.DomainService.Tests.EventStoreGatewayWorkloadTransportTests.StatusGrantsUseTheRealIssuerAndOneDeclaredDomain(multipleDomains: False)",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-domain.xml.gz",
+      "name": "Hexalith.EventStore.DomainService.Tests.EventStoreGatewayWorkloadTransportTests.StatusGrantsUseTheRealIssuerAndOneDeclaredDomain(multipleDomains: True)",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Submit_stamps_verified_workload_and_bound_actor",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Status_uses_bound_tenant_and_message_primary_record_only",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Stream_read_accepts_only_signed_exact_second_proof_when_oidc_cannot_bind_resources",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Stream_read_requires_bound_tenant_and_skips_human_tenant_and_rbac_checks",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Submit_rejects_cross_tenant_or_caller_supplied_origin_before_dispatch",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Bound_command_requires_exact_signed_requester_and_domain",
+      "result": "Pass"
+    },
+    {
+      "file": "owner-server.xml.gz",
+      "name": "Hexalith.EventStore.Server.Tests.Controllers.WorkloadGatewayControllerTests.Workload_routes_require_distinct_signed_operation_policies",
+      "result": "Pass"
+    }
+  ],
+  "unbound": [
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.AgentSetupCompositionTests.An_unconfigured_gateway_leaves_the_administration_path_fail_closed",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.AgentSetupCompositionTests.HostStatusReaderOverridesSurviveConfiguredAndDeferredCompositions(configured: True)",
+      "result": "Pass"
+    },
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.AgentSetupCompositionTests.HostStatusReaderOverridesSurviveConfiguredAndDeferredCompositions(configured: False)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.MissingAuthoritativeSetupRefusesStaleSubmitEventsWithoutStartingAnAttempt(state: \\\"unavailable\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.MissingAuthoritativeSetupRefusesStaleSubmitEventsWithoutStartingAnAttempt(state: \\\"missing\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.MissingAuthoritativeSetupRefusesStaleSubmitEventsWithoutStartingAnAttempt(state: \\\"unknown\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.MissingAuthoritativeSetupRefusesStaleSubmitEventsWithoutStartingAnAttempt(state: \\\"loading\\\")",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.MissingAuthoritativeSetupRefusesStaleSubmitEventsWithoutStartingAnAttempt(state: \\\"deferred\\\")",
+      "result": "Pass"
+    }
+  ],
+  "accepted": [
+    {
+      "file": "server-focused.xml.gz",
+      "name": "Hexalith.Agents.Server.Tests.EventStoreProviderCatalogOperationsTests.A_valid_submission_receipt_can_report_submitted_before_its_status_record_exists",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Response_mode_retry_reuses_the_original_mode_and_options_after_the_visible_selection_changes",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: Conflict)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: ValidationFailed)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: AlreadyApplied)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: Unavailable)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: UnableToVerify)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: Rejected)",
+      "result": "Pass"
+    },
+    {
+      "file": "ui-focused.xml.gz",
+      "name": "Hexalith.Agents.UI.Tests.AgentConfigurationTests.Retrying_an_accepted_pending_attempt_never_erases_its_acceptance(retryOutcome: Submitted)",
+      "result": "Pass"
+    }
+  ]
+}

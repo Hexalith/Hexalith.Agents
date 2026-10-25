@@ -249,6 +249,8 @@ public sealed class AgentsClientSetupGatewayTests
     [InlineData(AgentOperationErrorCode.Stale, AgentSetupWriteStatus.Conflict)]
     [InlineData(AgentOperationErrorCode.Unavailable, AgentSetupWriteStatus.Unavailable)]
     [InlineData(AgentOperationErrorCode.UnableToVerify, AgentSetupWriteStatus.UnableToVerify)]
+    [InlineData(AgentOperationErrorCode.Rejected, AgentSetupWriteStatus.Rejected)]
+    [InlineData(AgentOperationErrorCode.Blocked, AgentSetupWriteStatus.Rejected)]
     public async Task A_failed_write_keeps_its_typed_status_and_carries_no_acceptance(
         AgentOperationErrorCode code,
         AgentSetupWriteStatus expected)

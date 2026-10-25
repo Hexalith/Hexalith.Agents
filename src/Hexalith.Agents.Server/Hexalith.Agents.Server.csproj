@@ -64,4 +64,10 @@
   <PropertyGroup Condition="'$(HexalithPartiesFromSource)' == 'true'">
     <DefineConstants>$(DefineConstants);HEXALITH_PARTIES_SOURCE</DefineConstants>
   </PropertyGroup>
+
+  <!-- Published Client 3.127.0 lacks exact-domain assertion delegation. Package mode refuses status credentials
+       until a compatible SDK is pinned; source mode binds only the declared domain through the owner API. -->
+  <PropertyGroup Condition="'$(HexalithEventStoreFromSource)' == 'true'">
+    <DefineConstants>$(DefineConstants);HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS</DefineConstants>
+  </PropertyGroup>
 </Project>

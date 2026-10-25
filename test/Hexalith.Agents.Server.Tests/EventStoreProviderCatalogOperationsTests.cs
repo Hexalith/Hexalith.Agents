@@ -55,14 +55,15 @@ public sealed class EventStoreProviderCatalogOperationsTests
                 _submitted.Add(request);
                 return new SubmitCommandResponse(request.CorrelationId!, null, request.MessageId);
             });
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
-                SubmitCommandRequest? request = _submitted.FirstOrDefault(item => item.MessageId == call.Arg<string>());
+                SubmitCommandRequest? request = _submitted.FirstOrDefault(item => item.MessageId == call.ArgAt<string>(1));
                 return request is null ? null : new CommandStatusQueryResponse(request.CorrelationId!,
                     nameof(CommandStatus.Received), (int)CommandStatus.Received, MessageId: request.MessageId)
                 {
                     TenantId = request.Tenant,
+                    Domain = request.Domain,
                 };
             });
         _gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
@@ -97,11 +98,11 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.CorrelationId.ShouldBe(correlation == CorrelationId ? CorrelationId : null);
         if (expected == AgentOperationStatus.Succeeded)
         {
-            await _gateway.Received(1).GetCommandStatusAsync(MessageId, Arg.Any<CancellationToken>());
+            await _gateway.Received(1).GetWorkloadCommandStatusAsync(Arg.Any<string>(), MessageId, Arg.Any<CancellationToken>());
         }
         else
         {
-            await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+            await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
         }
     }
 
@@ -115,7 +116,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
 #pragma warning restore CS0618
         result.Status.ShouldBe(AgentOperationStatus.Rejected);
         result.CorrelationId.ShouldBeNull();
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Fact]
@@ -168,7 +169,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.CorrelationId.ShouldBe(correlation ? null : CorrelationId);
         _submitted.ShouldBeEmpty();
         await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Theory]
@@ -204,7 +205,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
         result.CorrelationId.ShouldBeNull();
         await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Theory]
@@ -221,7 +222,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
 
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.ValidationFailed);
         await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Theory]
@@ -245,7 +246,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
 
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
         result.Value.ShouldBeNull();
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     private ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> WriteProviderAsync(string write, AgentOperationOptions options)
@@ -266,6 +267,40 @@ public sealed class EventStoreProviderCatalogOperationsTests
     }
 
     [Fact]
+    public async Task CallerCancellationWinsWhenAStatusOverrideCancelsThenThrowsAnotherFailure()
+    {
+        using var cancellation = new CancellationTokenSource();
+        IAgentCommandStatusReader reader = Substitute.For<IAgentCommandStatusReader>();
+        reader.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns<Task<CommandStatusQueryResponse?>>(_ =>
+            {
+                cancellation.Cancel();
+                throw new InvalidOperationException("unrelated transport failure after cancellation");
+            });
+        OperationCanceledException failure = await Should.ThrowAsync<OperationCanceledException>(async () =>
+            await Operations(statusReader: reader).GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, MessageId,
+                cancellationToken: cancellation.Token));
+        failure.CancellationToken.ShouldBe(cancellation.Token);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" \t ")]
+    public async Task StandaloneStatusCannotUseBlankReturnedCorrelationWithoutAnExpectedCorrelation(string? correlation)
+    {
+        _gateway.GetWorkloadCommandStatusAsync(ProviderCatalogIdentity.PlatformTenantId, MessageId, Arg.Any<CancellationToken>())
+            .Returns(new CommandStatusQueryResponse(correlation!, nameof(CommandStatus.Completed), (int)CommandStatus.Completed,
+                MessageId: MessageId) { TenantId = ProviderCatalogIdentity.PlatformTenantId, Domain = ProviderCatalogAggregate.Domain, EventCount = 0 });
+        var reader = new EventStoreAgentCommandStatusReader(_ => _gateway);
+        AgentOperationResult<AgentSetupWriteOutcome> result = await Operations(statusReader: reader)
+            .GetCommandWriteOutcomeAsync(ProviderCatalogIdentity.PlatformTenantId, MessageId);
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldBe(AgentSetupWriteOutcome.UnableToVerify);
+        await _gateway.Received(1).GetWorkloadCommandStatusAsync(ProviderCatalogIdentity.PlatformTenantId, MessageId, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Missing_command_status_without_a_receipt_is_unverifiable()
     {
         AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
@@ -281,11 +316,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task Stored_publish_failure_keeps_pending_truth_but_timeout_is_terminal(
         CommandStatus status, AgentSetupWriteOutcome expected)
     {
-        _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), "msg-outcome", Arg.Any<CancellationToken>())
             .Returns(new CommandStatusQueryResponse("corr", status.ToString(), (int)status,
                 MessageId: "msg-outcome")
             {
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                Domain = ProviderCatalogAggregate.Domain,
             });
 
         AgentOperationResult<AgentSetupWriteOutcome> result = await Operations()
@@ -298,7 +334,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     [Fact]
     public async Task A_valid_submission_receipt_can_report_submitted_before_its_status_record_exists()
     {
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<CommandStatusQueryResponse?>(null));
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> write = await Operations().CreateEntryAsync(CreateCommand());
@@ -312,7 +348,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     [Fact]
     public async Task Failed_immediate_status_lookup_preserves_the_valid_receipt_identity()
     {
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<CommandStatusQueryResponse?>(new InvalidOperationException("status unavailable")));
 
         AgentOperationResult<ProviderCatalogCommandAcceptance> write = await Operations().CreateEntryAsync(CreateCommand());
@@ -408,11 +444,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     [Fact]
     public async Task Completed_platform_no_op_confirms_the_submitted_message_without_a_new_projection()
     {
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(call => new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed),
-                (int)CommandStatus.Completed, MessageId: call.Arg<string>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => new CommandStatusQueryResponse(_submitted.Single(item => item.MessageId == call.ArgAt<string>(1)).CorrelationId!, nameof(CommandStatus.Completed),
+                (int)CommandStatus.Completed, MessageId: call.ArgAt<string>(1))
             {
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                Domain = ProviderCatalogAggregate.Domain,
                 EventCount = 0,
             });
 
@@ -443,7 +480,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldNotBeNull().TruthState.ShouldBe(expectedTruth);
         result.Value.MessageId.ShouldBe(_submitted.ShouldHaveSingleItem().MessageId);
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Fact]
@@ -461,7 +498,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
 
         result.IsSuccess.ShouldBeFalse();
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.UnableToVerify);
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Fact]
@@ -481,11 +518,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task Rejected_platform_command_is_terminal_even_if_another_writer_advances_the_projection()
     {
         SeedProjectedEntry(2);
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(call => new CommandStatusQueryResponse("corr", nameof(CommandStatus.Rejected),
-                (int)CommandStatus.Rejected, "InvalidProviderModelMetadataRejection", call.Arg<string>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => new CommandStatusQueryResponse(_submitted.Single(item => item.MessageId == call.ArgAt<string>(1)).CorrelationId!, nameof(CommandStatus.Rejected),
+                (int)CommandStatus.Rejected, "InvalidProviderModelMetadataRejection", call.ArgAt<string>(1))
             {
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                Domain = ProviderCatalogAggregate.Domain,
                 EventCount = null,
             });
 
@@ -504,12 +542,13 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task Only_canonical_domain_rejections_are_reported_as_rejected(
         string scenario, AgentSetupWriteOutcome expected)
     {
-        _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), "msg-outcome", Arg.Any<CancellationToken>())
             .Returns(new CommandStatusQueryResponse("corr",
                 scenario == "mismatched-status" ? nameof(CommandStatus.Completed) : nameof(CommandStatus.Rejected),
                 (int)CommandStatus.Rejected, MessageId: "msg-outcome")
             {
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                Domain = ProviderCatalogAggregate.Domain,
                 FailureReason = scenario == "infrastructure" ? "ConcurrencyConflict" : null,
                 Retryable = scenario == "retryable",
             });
@@ -526,11 +565,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     public async Task Completed_tenant_no_op_and_cross_tenant_status_are_scoped_to_the_command_target()
     {
         SeedProjectedEntry(1);
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(call => new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed),
-                (int)CommandStatus.Completed, MessageId: call.Arg<string>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => new CommandStatusQueryResponse(_submitted.Single(item => item.MessageId == call.ArgAt<string>(1)).CorrelationId!, nameof(CommandStatus.Completed),
+                (int)CommandStatus.Completed, MessageId: call.ArgAt<string>(1))
             {
                 TenantId = TenantId,
+                Domain = TenantProviderEnablementAggregate.Domain,
                 EventCount = 0,
             });
 
@@ -546,7 +586,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
         // Story 5.4 AC4: a foreign status is indistinguishable from an absent one and discloses nothing.
         otherTenant.IsSuccess.ShouldBeTrue();
         otherTenant.Value.ShouldBe(AgentSetupWriteOutcome.UnableToVerify);
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((CommandStatusQueryResponse?)null);
         AgentOperationResult<AgentSetupWriteOutcome> absent = await Operations()
             .GetCommandWriteOutcomeAsync("another-tenant", "absent-message");
@@ -1028,7 +1068,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
             .GetCommandWriteOutcomeAsync(targetTenantId, "msg-outcome");
 
         result.Error.ShouldNotBeNull().Code.ShouldBe(AgentOperationErrorCode.NotAuthorized);
-        await _gateway.DidNotReceiveWithAnyArgs().GetCommandStatusAsync(default!, default);
+        await _gateway.DidNotReceiveWithAnyArgs().GetWorkloadCommandStatusAsync(default!, default!, default);
     }
 
     [Fact]
@@ -1078,11 +1118,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     [InlineData(null, AgentSetupWriteOutcome.UnableToVerify)]
     public async Task Completed_command_outcome_depends_on_its_event_count(int? eventCount, AgentSetupWriteOutcome expected)
     {
-        _gateway.GetCommandStatusAsync("msg-outcome", Arg.Any<CancellationToken>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), "msg-outcome", Arg.Any<CancellationToken>())
             .Returns(new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed), (int)CommandStatus.Completed,
                 MessageId: "msg-outcome")
             {
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                Domain = ProviderCatalogAggregate.Domain,
                 EventCount = eventCount,
             });
 
@@ -1095,11 +1136,12 @@ public sealed class EventStoreProviderCatalogOperationsTests
     [Fact]
     public async Task Committed_platform_write_with_events_is_authoritatively_pending()
     {
-        _gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(call => new CommandStatusQueryResponse("corr", nameof(CommandStatus.Completed),
-                (int)CommandStatus.Completed, MessageId: call.Arg<string>())
+        _gateway.GetWorkloadCommandStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => new CommandStatusQueryResponse(_submitted.Single(item => item.MessageId == call.ArgAt<string>(1)).CorrelationId!, nameof(CommandStatus.Completed),
+                (int)CommandStatus.Completed, MessageId: call.ArgAt<string>(1))
             {
                 TenantId = ProviderCatalogIdentity.PlatformTenantId,
+                Domain = ProviderCatalogAggregate.Domain,
                 EventCount = 1,
             });
 
@@ -1189,7 +1231,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
     }
 
     private IProviderCatalogOperations Operations(IReadModelStore? store = null, TimeProvider? clock = null,
-        IAgentCommandIdentityFactory? identityFactory = null)
+        IAgentCommandIdentityFactory? identityFactory = null, IAgentCommandStatusReader? statusReader = null)
     {
         var dispatcher = new EventStoreAgentCommandDispatcher(_gateway, new FixtureTrustedCommandAdmission());
         return new EventStoreProviderCatalogOperations(
@@ -1197,7 +1239,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
             new ProviderCatalogAdministrationOrchestrator(dispatcher),
             store ?? _store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }),
-            identityFactory ?? new AgentCommandIdentityFactory(), clock, _gateway);
+            identityFactory ?? new AgentCommandIdentityFactory(), clock, _gateway, statusReader);
     }
 
     private void SeedProjectedEntry(int capabilityVersion)

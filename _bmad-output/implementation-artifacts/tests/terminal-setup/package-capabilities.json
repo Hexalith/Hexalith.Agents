@@ -1,0 +1,75 @@
+{
+  "Properties": {
+    "UseHexalithProjectReferences": "false",
+    "HexalithEventStoreFromSource": "",
+    "HexalithEventStoreVersion": "3.127.0",
+    "DefineConstants": "TRACE;RELEASE"
+  },
+  "Items": {
+    "ProjectReference": [
+      {
+        "Identity": "../Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj",
+        "Targets": "",
+        "OutputItemType": "",
+        "ReferenceSourceTarget": "ProjectReference",
+        "GlobalPropertiesToRemove": ";WebPublishProfileFile",
+        "FullPath": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj",
+        "RootDir": "/",
+        "Filename": "Hexalith.Agents.Contracts",
+        "Extension": ".csproj",
+        "RelativeDir": "../Hexalith.Agents.Contracts/",
+        "Directory": "home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Contracts/",
+        "RecursiveDir": "",
+        "ModifiedTime": "",
+        "CreatedTime": "",
+        "AccessedTime": "",
+        "DefiningProjectFullPath": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj",
+        "DefiningProjectDirectory": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/",
+        "DefiningProjectName": "Hexalith.Agents.Server",
+        "DefiningProjectExtension": ".csproj"
+      },
+      {
+        "Identity": "../Hexalith.Agents.Client/Hexalith.Agents.Client.csproj",
+        "Targets": "",
+        "OutputItemType": "",
+        "ReferenceSourceTarget": "ProjectReference",
+        "GlobalPropertiesToRemove": ";WebPublishProfileFile",
+        "FullPath": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj",
+        "RootDir": "/",
+        "Filename": "Hexalith.Agents.Client",
+        "Extension": ".csproj",
+        "RelativeDir": "../Hexalith.Agents.Client/",
+        "Directory": "home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Client/",
+        "RecursiveDir": "",
+        "ModifiedTime": "",
+        "CreatedTime": "",
+        "AccessedTime": "",
+        "DefiningProjectFullPath": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj",
+        "DefiningProjectDirectory": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/",
+        "DefiningProjectName": "Hexalith.Agents.Server",
+        "DefiningProjectExtension": ".csproj"
+      },
+      {
+        "Identity": "../Hexalith.Agents/Hexalith.Agents.csproj",
+        "Targets": "",
+        "OutputItemType": "",
+        "ReferenceSourceTarget": "ProjectReference",
+        "GlobalPropertiesToRemove": ";WebPublishProfileFile",
+        "FullPath": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents/Hexalith.Agents.csproj",
+        "RootDir": "/",
+        "Filename": "Hexalith.Agents",
+        "Extension": ".csproj",
+        "RelativeDir": "../Hexalith.Agents/",
+        "Directory": "home/administrator/projects/hexalith/agents/src/Hexalith.Agents/",
+        "RecursiveDir": "",
+        "ModifiedTime": "",
+        "CreatedTime": "",
+        "AccessedTime": "",
+        "DefiningProjectFullPath": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj",
+        "DefiningProjectDirectory": "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/",
+        "DefiningProjectName": "Hexalith.Agents.Server",
+        "DefiningProjectExtension": ".csproj"
+      }
+    ]
+  }
+}

@@ -142,6 +142,7 @@ public sealed class AgentsClientSetupGateway(
             AgentOperationStatus.NotFound => AgentSetupWriteStatus.NotFound,
             AgentOperationStatus.ValidationFailed => AgentSetupWriteStatus.ValidationFailed,
             AgentOperationStatus.Conflict or AgentOperationStatus.Stale => AgentSetupWriteStatus.Conflict,
+            AgentOperationStatus.Rejected or AgentOperationStatus.Blocked => AgentSetupWriteStatus.Rejected,
             AgentOperationStatus.UnableToVerify => AgentSetupWriteStatus.UnableToVerify,
             _ => AgentSetupWriteStatus.Unavailable,
         };

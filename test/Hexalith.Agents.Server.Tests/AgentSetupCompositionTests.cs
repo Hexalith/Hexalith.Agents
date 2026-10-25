@@ -49,6 +49,8 @@ public sealed class AgentSetupCompositionTests
             ("Agents:EventStore:AppId", "eventstore"));
         using IServiceScope scope = provider.CreateScope();
 
+        scope.ServiceProvider.GetRequiredService<IAgentCommandStatusReader>()
+            .ShouldBeOfType<EventStoreAgentCommandStatusReader>();
         scope.ServiceProvider.GetRequiredService<IAgentCommandDispatcher>()
             .ShouldBeOfType<EventStoreAgentCommandDispatcher>();
         scope.ServiceProvider.GetRequiredService<IAgentAdministrationOperations>()
@@ -134,6 +136,8 @@ public sealed class AgentSetupCompositionTests
         using ServiceProvider provider = Build();
         using IServiceScope scope = provider.CreateScope();
 
+        scope.ServiceProvider.GetRequiredService<IAgentCommandStatusReader>()
+            .ShouldBeOfType<DeferredAgentCommandStatusReader>();
         scope.ServiceProvider.GetRequiredService<IAgentCommandDispatcher>()
             .ShouldBeOfType<DeferredAgentCommandDispatcher>();
         scope.ServiceProvider.GetService<IAgentAdministrationOperations>().ShouldBeNull();
@@ -266,6 +270,80 @@ public sealed class AgentSetupCompositionTests
         HttpMessageHandler handler,
         params (string Key, string Value)[] settings)
         => BuildCore(handler, null, settings);
+
+    [Theory]
+    [InlineData("tenant", "agent", "correlation-agent")]
+    [InlineData(ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain, "correlation-provider")]
+    [InlineData("tenant", TenantProviderEnablementAggregate.Domain, "correlation-enablement")]
+    public async Task ComposedStatusReaderPreservesExactScopeAndSdkCapability(string tenant, string domain, string correlation)
+    {
+        var services = new ServiceCollection();
+        var handler = new CommandStatusResponseHandler
+        {
+            Status = new CommandStatusQueryResponse(correlation, nameof(CommandStatus.Rejected), (int)CommandStatus.Rejected,
+                "InvalidSetupRejection", "message") { TenantId = tenant, Domain = domain },
+        };
+        IEventStoreGatewayWorkloadAssertionSource source = Substitute.For<IEventStoreGatewayWorkloadAssertionSource>();
+#if HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS
+        source.IssueAsync(EventStoreGatewayWorkloadOperations.CommandStatus, tenant, domain, Arg.Any<CancellationToken>())
+            .Returns(ValueTask.FromResult<string?>("host-assertion"));
+#endif
+        int sourceResolutions = 0;
+        services.AddScoped<IEventStoreGatewayWorkloadAssertionSource>(_ =>
+        {
+            sourceResolutions++;
+            return source;
+        });
+        IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Agents:EventStore:BaseUrl"] = "https://gateway.example",
+            ["Agents:EventStore:AppId"] = "eventstore-runtime",
+        }).Build();
+        services.AddAgentSetupServices(configuration);
+        services.AddHttpClient<IEventStoreGatewayClient, EventStoreGatewayClient>().ConfigurePrimaryHttpMessageHandler(() => handler);
+        using ServiceProvider provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        using IServiceScope operation = provider.CreateScope();
+        IAgentCommandStatusReader reader = operation.ServiceProvider.GetRequiredService<IAgentCommandStatusReader>();
+        CommandStatusQueryResponse? status = await reader.ReadAsync(tenant, domain, "message", correlation, TestContext.Current.CancellationToken);
+        (await reader.ReadAsync(tenant, domain, "message", "different-correlation", TestContext.Current.CancellationToken)).ShouldBeNull();
+        sourceResolutions.ShouldBe(1);
+#if HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS
+        status.ShouldNotBeNull().CorrelationId.ShouldBe(correlation);
+        status.Domain.ShouldBe(domain);
+        status.TenantId.ShouldBe(tenant);
+        status.IsRejected.ShouldBeTrue();
+        handler.Path.ShouldBe($"/api/v1/commands/status/workload/{tenant}/message");
+        handler.Assertion.ShouldBe("host-assertion");
+        handler.DaprAppId.ShouldBe("eventstore-runtime");
+        await source.Received(2).IssueAsync(EventStoreGatewayWorkloadOperations.CommandStatus, tenant, domain, Arg.Any<CancellationToken>());
+#else
+        status.ShouldBeNull();
+        handler.Requests.ShouldBe(0);
+        source.ReceivedCalls().ShouldBeEmpty();
+#endif
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task HostStatusReaderOverridesSurviveConfiguredAndDeferredCompositions(bool configured)
+    {
+        var services = new ServiceCollection();
+        var legacy = new LegacyMessageOnlyAgentCommandStatusReader();
+        IAgentCommandStatusReader reader = legacy;
+        services.AddSingleton(reader);
+        IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(configured
+            ? new Dictionary<string, string?> { ["Agents:EventStore:BaseUrl"] = "https://gateway.example", ["Agents:EventStore:AppId"] = "eventstore" }
+            : []).Build();
+        services.AddAgentSetupServices(configuration);
+        using ServiceProvider provider = services.BuildServiceProvider();
+        provider.GetRequiredService<IAgentCommandStatusReader>().ShouldBeSameAs(reader);
+        provider.GetServices<IAgentCommandStatusReader>().ShouldHaveSingleItem();
+        (await reader.WasRejectedAsync("message", TestContext.Current.CancellationToken)).ShouldBe(true);
+        (await reader.WasRejectedAsync("tenant", "agent", "message", "correlation", TestContext.Current.CancellationToken)).ShouldBeNull();
+        (await reader.ReadAsync("tenant", "agent", "message", "correlation", TestContext.Current.CancellationToken)).ShouldBeNull();
+        legacy.MessageReads.ShouldBe(1);
+    }
 
     private static ServiceProvider BuildCore(
         HttpMessageHandler? handler,

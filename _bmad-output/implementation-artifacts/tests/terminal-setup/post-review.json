@@ -1,0 +1,143 @@
+{
+  "captured_utc": "2026-10-25T15:19:18.731464+00:00",
+  "agents_baseline": "15fc5834d38fa1d769e3be5a77e989bf4c8dc132",
+  "eventstore_reconciled_baseline": "12784fde729a4756564ae388fb6c2217c7323446",
+  "eventstore_commit": "4e91e552be41bfba984d67d68335e6b1709917b5",
+  "scope": "local source and package verification; no deployment qualification",
+  "native_results": [
+    {
+      "file": "review-server.xml.gz",
+      "sha256": "ca0283e16f57d14021ed6f6af6953f5f93167da3794f5b976bbd3a7a412a280b",
+      "uncompressed_sha256": "9244007226ef7756d36da0ca55ca0d22b786856ec49631beefee6b2b6d1ed4af",
+      "suite": "review-server",
+      "summary": {
+        "total": "205",
+        "passed": "205",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      }
+    },
+    {
+      "file": "review-package-server.xml.gz",
+      "sha256": "6d9dcf8339f0d14bf60498802de470e597baf0cdda989d8bd33355abd4b721be",
+      "uncompressed_sha256": "8211435d1391722996599dbbb09e8df23b5516fc543f8d0753d46cd26791cc6e",
+      "suite": "review-package-server",
+      "summary": {
+        "total": "187",
+        "passed": "187",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      }
+    },
+    {
+      "file": "review-ui.xml.gz",
+      "sha256": "7332ae173a7112649e8f8597166115fc2446a9e809646962caefbd4bd3f50eac",
+      "uncompressed_sha256": "e4d3568dcabc0bb45448df83bc68936562b7b0cfcff80b7f1be2159a7466ff82",
+      "suite": "review-ui",
+      "summary": {
+        "total": "80",
+        "passed": "80",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      }
+    },
+    {
+      "file": "final-owner.xml.gz",
+      "sha256": "91f27c3c1676b4d7cc2db994313044281138c945c87390b341e7fb0e404480d0",
+      "uncompressed_sha256": "a6da2f3ee8cc18bd685ed5db1811f2984fe4106ed1476da84f7ade816690b445",
+      "suite": "final-owner",
+      "summary": {
+        "total": "81",
+        "passed": "81",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      }
+    },
+    {
+      "file": "final-package-ui.xml.gz",
+      "sha256": "0fb7261c347b7116d928264758298d7cd7cb8a22275ac7e54d161d4bbc928ac9",
+      "uncompressed_sha256": "9c0fc553de935af9200d459f5384a6482461881d0b20219125b9e84e2d6f9853",
+      "suite": "final-package-ui",
+      "summary": {
+        "total": "108",
+        "passed": "108",
+        "failed": "0",
+        "errors": "0",
+        "skipped": "0",
+        "not-run": "0"
+      }
+    }
+  ],
+  "source_gate": {
+    "command": "pwsh -NoProfile -File eng/verify-story-5.2.ps1",
+    "exit_code": 0,
+    "full_project_totals": {
+      "Hexalith.Agents.Contracts.Tests": 1997,
+      "Hexalith.Agents.Tests": 1017,
+      "Hexalith.Agents.Server.Tests": 1612,
+      "Hexalith.Agents.UI.Tests": 1188,
+      "Hexalith.Agents.Client.Tests": 7
+    },
+    "total": 5821,
+    "file": "post-review-story-5.2.log.gz",
+    "sha256": "80df52e30e35ffbb2e7c1f1e1a4dd7be068289c60267c1b7000f63353616da25",
+    "uncompressed_sha256": "2783d68b1f014810450da80c264b9152cd3c2a9ce1e0c659d7dbf5c4a42b5c26"
+  },
+  "build_logs": [
+    {
+      "file": "final-owner-build.log.gz",
+      "sha256": "34ef6dff9c86b91b7c099e7cf10a2a2029ea06b24dfb05d8f0dd311623f463e4",
+      "uncompressed_sha256": "e85a31b9b95e9995c4a23d3da33a9d966b6aec42eee8ffb9e8b0d923ab40c569"
+    },
+    {
+      "file": "final-package-ui-build.log.gz",
+      "sha256": "f90ed628915488445c2728cbecf22d1812101f70a56b897864878a4974a12fdb",
+      "uncompressed_sha256": "94ca80e3518649e8ae03b635e2e6af1a9f87d78904492943391b19d91a9b889a"
+    }
+  ],
+  "implementation_file_sha256": {
+    "references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/DomainServiceGatewayWorkloadAssertionSource.cs": "49bd03ac495dda07577e25503646bdd85f9e648ba2f40764a32836285cf5cfaa",
+    "references/Hexalith.EventStore/tests/Hexalith.EventStore.DomainService.Tests/EventStoreGatewayWorkloadTransportTests.cs": "56c908419aebfaa1233dd84d9435df3b588205c5844bd5358bb69777b29663c7",
+    "references/Hexalith.EventStore/tests/Hexalith.EventStore.Server.Tests/Authentication/DaprInternalAuthenticationHandlerTests.cs": "a00fa0056f2fe6d723749ce520fa52105c645dda67cd4197104501f41bdaa33a",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs": "5a42c48327af5c6bac273bded3a4df0c8916f722bb940b8a7b2920b121cfa570",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs": "e90137d0a62407da2e50cccb23710568d602dda7ac427fa0baa707c135a60689",
+    "src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs": "b589a314f983e9a217cd24c45024e339f6027df2ce69d648d2bab786ca0ad5ff",
+    "src/Hexalith.Agents.Server/Hexalith.Agents.Server.csproj": "a7f93b428bd3d7b31afeff6641e5d792b594d51a3bb328f7e1bf1204d8bf835a",
+    "src/Hexalith.Agents.Server/Ports/CommandStatusWorkloadAssertionSource.cs": "7f69559e2fe1abe7fe78199acdc5d92bdbd534aff3cfacf68be2ad90963a0263",
+    "src/Hexalith.Agents.Server/Ports/DeferredAgentCommandStatusReader.cs": "41f58bf3f4803a9d6ed21e795a2fb70f5433ac10b9d83d22771e96afea941277",
+    "src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandStatusReader.cs": "96765bcb78523f657903fdff68294ce6058463f217780ccf7ca4ea5f8ff6db3d",
+    "src/Hexalith.Agents.Server/Ports/IAgentCommandStatusReader.cs": "64d7099c2b6932d3e6bbfb0de9a175d87f62859503057727334013227d803d93",
+    "src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor": "202837b7c00b8c6caa08dbf85d36cdcf5daf20e29b07cea53552d47ec298cd25",
+    "src/Hexalith.Agents.UI/Services/Gateways/AgentsClientSetupGateway.cs": "ca568137cc4dd2f2251c1af539be6fc8877f380173922458d252197faa67e83e",
+    "test/Hexalith.Agents.Server.Tests/AgentSetupCompositionTests.cs": "16717bb060450540a6ecd2746fb46ec1432faf1423b56904debe13016d9c5e85",
+    "test/Hexalith.Agents.Server.Tests/CommandStatusResponseHandler.cs": "c61bcb4dabf6e5a11052547a5c699877f0861acc7fefcee00a93550440434d70",
+    "test/Hexalith.Agents.Server.Tests/EventStoreAgentAdministrationOperationsTests.cs": "ce833485fdbb2e7a20ee8d26fba7b3efa46b44c85f4e9b53b80addfde497b91d",
+    "test/Hexalith.Agents.Server.Tests/EventStoreAgentCommandStatusReaderTests.cs": "64adea27ec359bc32e66f0a68101923cff89d6f31564f0ffac1e1c9316f32e6d",
+    "test/Hexalith.Agents.Server.Tests/EventStoreProviderCatalogOperationsTests.cs": "951e3874dda5ba5f9daf78e128bf204bcff59cf857036d9d14e225ce084d34f7",
+    "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj": "269a79a49eddf8a9ab92c7b9665e04b1ba1e040390dacedaca40dcbecd36d794",
+    "test/Hexalith.Agents.Server.Tests/LegacyMessageOnlyAgentCommandStatusReader.cs": "9b15cf34e5b3977f56237c31006175fa4f97f46af9f902d6631530bee194e641",
+    "test/Hexalith.Agents.Server.Tests/SetupWriteCancellationAdmissionTests.cs": "6aeb588756e44f4c40469f750922cb81e476dd6cce2c15842031101b93e2fe2a",
+    "test/Hexalith.Agents.UI.Tests/AgentConfigurationTests.cs": "d400178fc152eb4779af53c91ad118ac71c72c51d8dae31ebc39a9303a8b33a7",
+    "test/Hexalith.Agents.UI.Tests/AgentsClientSetupGatewayTests.cs": "c7924d8776c8b481d9214c649d113f13dee55b315e46a764363aaf4508325ecf"
+  },
+  "commitlint": {
+    "agents": {
+      "version": "21.2.2",
+      "message": "fix(setup): resolve five deferred terminal status items",
+      "exit_code": 0
+    },
+    "eventstore": {
+      "version": "21.1.0",
+      "message": "fix(domain-service): authorize exact command status grants",
+      "exit_code": 0
+    }
+  }
+}

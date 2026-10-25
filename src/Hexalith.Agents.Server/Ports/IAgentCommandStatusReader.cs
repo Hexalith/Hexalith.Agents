@@ -1,3 +1,5 @@
+using Hexalith.EventStore.Contracts.Commands;
+
 namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>
@@ -17,4 +19,26 @@ public interface IAgentCommandStatusReader
     /// unverifiable rather than claiming either outcome.
     /// </returns>
     Task<bool?> WasRejectedAsync(string messageId, CancellationToken ct);
+
+    /// <summary>Reads rejection evidence for the exact authorized command and identity-verified receipt.</summary>
+    /// <param name="tenantId">The tenant from the trusted command scope.</param>
+    /// <param name="domain">The domain from the trusted command scope.</param>
+    /// <param name="messageId">The verified receipt message identity.</param>
+    /// <param name="correlationId">The verified receipt correlation identity.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <remarks>Legacy message-only registrations remain valid, but cannot establish scoped evidence. Hosts must
+    /// explicitly implement this overload and <see cref="ReadAsync"/> to supply scoped rejection and status DTO evidence.</remarks>
+    /// <returns>Whether the exact command was rejected, or null when it cannot be verified.</returns>
+    Task<bool?> WasRejectedAsync(string tenantId, string domain, string messageId, string correlationId, CancellationToken ct)
+        => Task.FromResult<bool?>(null);
+
+    /// <summary>Reads authenticated status for an authorized tenant and exact domain without a user-route fallback.</summary>
+    /// <param name="tenantId">The authorized tenant.</param>
+    /// <param name="domain">The exact command domain.</param>
+    /// <param name="messageId">The requested command identity.</param>
+    /// <param name="correlationId">The original receipt correlation when known.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The matching status, or null when evidence is unavailable.</returns>
+    Task<CommandStatusQueryResponse?> ReadAsync(string tenantId, string domain, string messageId, string? correlationId, CancellationToken ct)
+        => Task.FromResult<CommandStatusQueryResponse?>(null);
 }

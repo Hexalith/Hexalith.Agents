@@ -826,3 +826,36 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-contract-and-release-safety-items.md`
   summary: Qualify dynamically loaded helper and task dependencies of selected consumer executable assets if present.
   evidence: Unverified medium from independent review: the new baseline fingerprints selected analyzer entry assemblies and active imports, rather than every dynamically loaded dependency. The 18 current selected package imports contain no UsingTask declaration and no omitted executable helper load was demonstrated. An actual analyzer dependency-load trace or an active UsingTask/helper-byte mutation fixture would establish whether extra executable bytes need a separately reviewed policy inventory.
+
+## Terminal setup closure addendum — 2026-10-25
+
+The original entries above are retained as historical evidence. The following five records close only the scoped local defects in `spec-five-deferred-terminal-setup-items.md`; production qualification and DW-6/DW-19/DW-21 remain separate.
+
+- deferred_id: DW-7
+  status: done 2026-10-25
+  resolution: Configured setup composition binds the live SDK workload-status reader and preserves host overrides plus the deferred fallback. Reads use the trusted tenant/domain and verified receipt message/correlation, never the public user-status route. Missing credentials or evidence remain unverifiable. Source mode uses the owner exact-domain overload and issuer grant change. Published Client 3.127.0 lacks that overload, so package mode compiles through an explicit capability guard and refuses credentials before HTTP; a compatible published Client/DomainService and matching capability, or an existing host-reader override, remain prerequisites for package-mode terminal evidence.
+  evidence_record: [Terminal setup verification](deferred-terminal-setup-verification-2026-10-25.md)
+
+- deferred_id: DW-12
+  status: done 2026-10-25
+  resolution: Rejected and Blocked operation statuses map to the existing localized Rejected outcome. A fresh exact rejection releases its attempt, restores the instructions draft and permits a new identity. Previously accepted receipts and target/projection evidence survive rejected, no-op, ambiguous and inconsistent retries.
+  evidence_record: [Terminal setup verification](deferred-terminal-setup-verification-2026-10-25.md)
+
+- deferred_id: DW-24
+  status: done 2026-10-25
+  resolution: Selected setup status reads use authenticated workload transport with independently configured exact tenant/domain status grants. The EventStore issuer now grants CommandStatus only for declared domains. Actual issuer claims, missing credentials, refused domain/operation grants and existing controller tenant/domain isolation pass; public user-status tenant authorization is unchanged.
+  evidence_record: [Terminal setup verification](deferred-terminal-setup-verification-2026-10-25.md)
+
+- deferred_id: DW-25
+  status: done 2026-10-25
+  resolution: Closes the carried pointer owned by DW-12 through the same live reader and terminal Rejected/Blocked mapping. It is not a separate owner commitment or additional feature; fresh rejection and retained accepted-evidence UI cases pass.
+  evidence_record: [Terminal setup verification](deferred-terminal-setup-verification-2026-10-25.md)
+
+- deferred_id: DW-26
+  status: done 2026-10-25
+  resolution: Loading, unavailable, missing, unknown and known-deferred setup surfaces cannot allocate a new attempt, including stale submit events. Existing unavailable presentation is reused without adding a NotBound status; ambiguous attempts retain exact retry identities and accepted attempts retain their evidence.
+  evidence_record: [Terminal setup verification](deferred-terminal-setup-verification-2026-10-25.md)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-terminal-setup-items.md`
+  summary: Publish and pin an EventStore Client/DomainService pair supporting exact-domain workload status assertions, then enable and qualify the package-mode status capability.
+  evidence: Review BH-5: current published Client 3.127.0 lacks the exact-domain overload and its DomainService issuer excludes CommandStatus. This batch implements and verifies the source path and explicit package refusal, but default package-mode terminal evidence remains unavailable until compatible published dependencies are selected and the capability is exercised. Existing host-reader overrides remain supported; deployment qualification is separate.

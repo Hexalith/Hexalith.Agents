@@ -183,7 +183,7 @@ public sealed class SetupWriteCancellationAdmissionTests
                 ? Task.FromException<SubmitCommandResponse>(new InvalidOperationException("dispatch-fixture"))
                 : Task.FromResult(new SubmitCommandResponse(CorrelationId, MessageId: MessageId));
         });
-        _status.WasRejectedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(_ =>
+        _status.WasRejectedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(_ =>
         {
             CancelAt("status", "status-failure");
             return boundary == "status-failure"

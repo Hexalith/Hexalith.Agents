@@ -380,7 +380,7 @@ public sealed class EventStoreAgentAdministrationOperations(
                 try
                 {
                     wasRejected = await _statusReader
-                        .WasRejectedAsync(receipt!.MessageId!, cancellationToken)
+                        .WasRejectedAsync(context.TenantId, "agent", receipt!.MessageId!, correlationId, cancellationToken)
                         .ConfigureAwait(false);
                 }
                 catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

@@ -7,8 +7,8 @@ namespace Hexalith.Agents.Server.Ports;
 /// deferred answer is "unknown", which leaves the outcome unverifiable instead of inventing a rejection.
 /// </summary>
 /// <remarks>
-/// A future host may replace this placeholder after the production-like EventStore topology proves the status seam
-/// is reachable. Until then every composition retains this implementation and therefore cannot invent a rejection.
+/// Composition retains this placeholder when the gateway is unconfigured. A configured gateway uses authenticated
+/// workload status transport; hosts may replace either registration before setup composition.
 /// </remarks>
 public sealed class DeferredAgentCommandStatusReader : IAgentCommandStatusReader
 {

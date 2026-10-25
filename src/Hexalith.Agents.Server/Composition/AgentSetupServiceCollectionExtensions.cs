@@ -8,6 +8,9 @@ using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Client.Registration;
+using Hexalith.EventStore.Client.Gateway;
+
+using Microsoft.Extensions.Options;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,17 +62,14 @@ internal static class AgentSetupServiceCollectionExtensions
         services.AddScoped<ProviderCatalogAdministrationOrchestrator>();
         services.AddScoped<ProviderCatalogMigrationService>();
 
-        // The status-read seam must always resolve, with or without a gateway. TryAdd leaves a host that already
-        // registered a live reader untouched; the deferred reader answers "unknown", which keeps an uncorrelatable
-        // outcome unverifiable instead of claiming a rejection.
-        services.TryAddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>();
-
+        // Each branch installs a default status reader with TryAdd, preserving an existing host binding.
         string? baseUrl = configuration[$"{EventStoreSectionName}:BaseUrl"];
         string? appId = configuration[$"{EventStoreSectionName}:AppId"];
         if (string.IsNullOrWhiteSpace(baseUrl)
             || !Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri? baseAddress)
             || (baseAddress.Scheme != Uri.UriSchemeHttp && baseAddress.Scheme != Uri.UriSchemeHttps))
         {
+            services.TryAddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>();
             // No gateway: keep DeferredAgentCommandDispatcher and the Unavailable client. A host that cannot reach
             // EventStore must report unavailable rather than accept an administration command it cannot persist.
             return services;
@@ -77,15 +77,22 @@ internal static class AgentSetupServiceCollectionExtensions
 
         if (string.IsNullOrWhiteSpace(appId))
         {
+            services.TryAddSingleton<IAgentCommandStatusReader, DeferredAgentCommandStatusReader>();
             // A direct HTTP binding cannot authenticate the reserved Agents extensions. Without an exact Dapr
             // destination app id the live setup path therefore remains unavailable.
             return services;
         }
 
         string? daprApiToken = configuration[$"{EventStoreSectionName}:DaprApiToken"];
-        _ = services
+        IHttpClientBuilder gatewayBuilder = services
             .AddEventStoreGatewayClient(options => options.BaseAddress = baseAddress)
             .AddEventStoreDaprServiceInvocation(appId, daprApiToken);
+        services.TryAddScoped<IAgentCommandStatusReader>(provider => new EventStoreAgentCommandStatusReader(domain =>
+            new EventStoreGatewayClient(
+                provider.GetRequiredService<IHttpClientFactory>().CreateClient(gatewayBuilder.Name),
+                provider.GetRequiredService<IOptions<EventStoreGatewayClientOptions>>(),
+                new CommandStatusWorkloadAssertionSource(
+                    provider.GetService<IEventStoreGatewayWorkloadAssertionSource>(), domain))));
 
         // Replace the deferred dispatcher rather than TryAdd-ing beside it: for the in-scope administration
         // commands the deferred throw must no longer be reachable.

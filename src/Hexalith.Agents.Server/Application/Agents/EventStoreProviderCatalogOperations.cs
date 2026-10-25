@@ -34,7 +34,8 @@ public sealed class EventStoreProviderCatalogOperations(
     IOptions<ProviderCatalogReadModelOptions> options,
     IAgentCommandIdentityFactory identityFactory,
     TimeProvider? clock = null,
-    IEventStoreGatewayClient? gateway = null) : IProviderCatalogOperations
+    IEventStoreGatewayClient? gateway = null,
+    IAgentCommandStatusReader? statusReader = null) : IProviderCatalogOperations
 {
     private readonly IAgentAdministrationContextProvider _contextProvider = contextProvider
         ?? throw new ArgumentNullException(nameof(contextProvider));
@@ -53,6 +54,8 @@ public sealed class EventStoreProviderCatalogOperations(
 
     private readonly TimeProvider _clock = clock ?? TimeProvider.System;
     private readonly IEventStoreGatewayClient? _gateway = gateway;
+    private readonly IAgentCommandStatusReader? _statusReader = statusReader
+        ?? (gateway is null ? null : new EventStoreAgentCommandStatusReader(_ => gateway));
 
     /// <inheritdoc />
     [Obsolete("Use GetCommandWriteOutcomeAsync; the legacy operation is rejected.")]
@@ -104,7 +107,8 @@ public sealed class EventStoreProviderCatalogOperations(
             return AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.ValidationFailed);
         }
 
-        if (_gateway is null)
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_statusReader is null)
         {
             return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(hasSubmissionReceipt
                 ? AgentSetupWriteOutcome.Submitted : AgentSetupWriteOutcome.UnableToVerify);
@@ -112,14 +116,20 @@ public sealed class EventStoreProviderCatalogOperations(
 
         try
         {
-            CommandStatusQueryResponse? status = await _gateway.GetCommandStatusAsync(messageId, cancellationToken)
-                .ConfigureAwait(false);
+            string domain = targetTenantId == ProviderCatalogIdentity.PlatformTenantId
+                ? ProviderCatalogAggregate.Domain : TenantProviderEnablementAggregate.Domain;
+            CommandStatusQueryResponse? status = await _statusReader.ReadAsync(
+                targetTenantId, domain, messageId, options?.CorrelationId, cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
 
             // A status from another tenant or message is answered exactly like an absent one, so the lookup
             // cannot reveal that the identifier exists elsewhere.
             if (status is null
                 || !string.Equals(status.TenantId, targetTenantId, StringComparison.Ordinal)
-                || !string.Equals(status.MessageId, messageId, StringComparison.Ordinal))
+                || !string.Equals(status.MessageId, messageId, StringComparison.Ordinal)
+                || !string.Equals(status.Domain, domain, StringComparison.Ordinal)
+                || (options?.CorrelationId is { } expectedCorrelation
+                    && !string.Equals(status.CorrelationId, expectedCorrelation, StringComparison.Ordinal)))
             {
                 return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(hasSubmissionReceipt
                     ? AgentSetupWriteOutcome.Submitted : AgentSetupWriteOutcome.UnableToVerify);
@@ -154,6 +164,7 @@ public sealed class EventStoreProviderCatalogOperations(
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.UnableToVerify);
         }
     }
@@ -767,7 +778,7 @@ public sealed class EventStoreProviderCatalogOperations(
         else
         {
             AgentOperationResult<AgentSetupWriteOutcome> observed = await GetCommandOutcomeCoreAsync(
-                targetTenantId, messageId, hasSubmissionReceipt: true, ct).ConfigureAwait(false);
+                targetTenantId, messageId, hasSubmissionReceipt: true, ct, new AgentOperationOptions(correlationId)).ConfigureAwait(false);
             status = observed.IsSuccess && observed.Value is { } value
                 ? value == AgentSetupWriteOutcome.UnableToVerify ? AgentSetupWriteStatus.Submitted : (AgentSetupWriteStatus)((int)value - 1)
                 : AgentSetupWriteStatus.UnableToVerify;

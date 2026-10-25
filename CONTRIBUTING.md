@@ -207,6 +207,45 @@ payload conflict; the owner admission actor regressions additionally check that
 the first stored intent is retained. These are local regressions and do not
 establish production Dapr persistence or dependency acceptance.
 
+## Terminal setup command status
+
+A configured `Agents:EventStore:BaseUrl` (HTTP or HTTPS) and exact
+`Agents:EventStore:AppId` bind the live setup status reader. The optional
+`Agents:EventStore:DaprApiToken` supplies routing authentication only. Status uses
+`GET api/v1/commands/status/workload/{tenant}/{messageId}` with an independently
+provisioned `IEventStoreGatewayWorkloadAssertionSource`: its grant must authorize
+`eventstore:command-status`, the receiving gateway audience, and the exact trusted
+tenant and command domain. Dapr attribution and human bearer credentials do not
+replace that assertion. Register host overrides before setup composition. Legacy
+message-only reader registrations remain preserved, but their evidence is not used
+for scoped reads: implement the scoped rejection overload and status DTO read
+explicitly.
+
+Both dependency modes use the supported public SDK workload-status transport.
+Published Client **3.127.0** lacks the exact-domain assertion-delegation overload
+present in the owner source checkout, and the stock DomainService **3.127.0**
+issuer also excludes status grants. Debug/source mode uses the owner overload
+and the declared-domain status issuer change recorded in
+[the terminal setup evidence](_bmad-output/implementation-artifacts/deferred-terminal-setup-verification-2026-10-25.md).
+Release/package mode deliberately refuses status credentials before HTTP until
+a compatible published Client and DomainService are pinned and the corresponding
+compile-time capability is enabled. Existing host-reader overrides still work
+in either mode. A client transport update alone is insufficient. Do not enable
+the exact-domain source capability against the 3.127.0 package.
+
+Agents generates no credentials. Missing/refused credentials and unsupported
+SDK capabilities preserve `UnableToVerify` and the original retry identity;
+Dapr routing identity and human credentials cannot substitute for a workload
+grant. The public user-status route is never a fallback.
+
+Only matching tenant, domain, message and correlation evidence with a canonical
+domain rejection releases a fresh attempt. A rejected/blocked UI result uses the
+existing localized rejection message; a retry cannot erase an earlier accepted
+receipt or its projection target. Loading, unavailable, missing and unknown setup
+surfaces refuse stale submit events before allocating identities. Local unit and
+in-process evidence does not qualify a deployed Dapr topology, owner credential
+provisioning, production readiness, or DW-6/DW-19/DW-21.
+
 ## Updating the Builds dependency
 
 A Dependabot proposal that advances `references/Hexalith.Builds` must carry the
