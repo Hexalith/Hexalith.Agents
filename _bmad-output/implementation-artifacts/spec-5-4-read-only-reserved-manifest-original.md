@@ -2,7 +2,7 @@
 title: '5.4 Read-only reserved manifest original prerequisite'
 type: 'feature'
 created: '2026-10-27'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '9a3a9884fe99f4d03880f7ef5da2be6a78069532'
@@ -54,10 +54,10 @@ Owner paths below are under `references/Hexalith.EventStore/`.
 
 ## Tasks & Acceptance
 
-- [ ] Owner Contracts record/interface: expose nullable exact reservation-original read; omitted implementations remain unavailable.
-- [ ] Owner Server actor/transport: implement exact selection with current private authorization and non-recovering anchored reads; no provider or durable mutation.
-- [ ] Focused tests: assert persisted ledger unchanged across actor reconstruction, complete reserved and consumed originals, actual re-attested Current selection, wrong receipt/tenant/missing authority, output ownership, whole-call bound and adapter cancellation/default refusal. Configure a provider that would consume on ordinary lookup recovery and prove this accessor never touches it.
-- [ ] Owner delivery note: exact source/commands/results and explicit missing installed acceptance/qualification; no manifest publisher yet.
+- [x] Owner Contracts record/interface: expose nullable exact reservation-original read; omitted implementations remain unavailable.
+- [x] Owner Server actor/transport: implement exact selection with current private authorization and non-recovering anchored reads; no provider or durable mutation.
+- [x] Focused tests: assert persisted ledger unchanged across actor reconstruction, complete reserved and consumed originals, actual re-attested Current selection, wrong receipt/tenant/missing authority, output ownership, whole-call bound and adapter cancellation/default refusal. Configure a provider that would consume on ordinary lookup recovery and prove this accessor never touches it.
+- [x] Owner delivery note: exact source/commands/results and explicit missing installed acceptance/qualification; no manifest publisher yet.
 
 Acceptance: Given a genuine retained reservation, when an independently authorized verifier reads its original, then it obtains the unchanged complete request without starting physical work. Given uncertain state/authority or an unreserved batch, when queried, then it returns no usable original and makes no durable change.
 
@@ -70,6 +70,30 @@ Handoff: the additive Contracts record/optional port, actor and private adapter 
 ## Spec Change Log
 
 ## Review Triage Log
+
+All three independent layers reviewed `/tmp/story54-reserved-original-review-jenytgxb.diff`; the edge-case layer returned no findings. Individual verdicts below precede grouping.
+
+| ID | Verdict / route | Verified evidence |
+| --- | --- | --- |
+| B1 | medium / patch | The new adapter uses ReadAsync, which bounds waiting but does not cap abandoned noncooperative RPCs. The existing ReadWithAdmissionAsync holds one of sixteen shared slots until actual completion. Reuse it and verify saturation, abandonment and eventual release without starting further calls. |
+| B2 | false / reject | The delivery claims a thirty-second actor entry-method budget and a separately bounded private adapter, not bounded completion of Dapr lifecycle cleanup. Existing actor tests cover post-method/failure cleanup waiting for unfinished state I/O. That deliberate quiescence guard must remain; the adapter bounds the external caller. |
+| B3 | medium / patch | Raw runner logs are ignored and absent from the source diff. Preserve the complete local packet in the parent archive and add compact machine-readable runner summaries/hashes, explicitly identifying logs as local scratch. Respect EventStore's existing evidence/committed-file policy; no ignore/CI gate weakening or fabricated CI result. |
+| B4 | medium / patch | Binary provenance lacks dependent source revisions/worktree identities and SDK identity. Record a bounded post-verification dependency/toolchain snapshot and its timing limits; do not invent a pre-build invariance attestation. |
+| B5 | false / reject | PublishedTrustDeletionConsumptionAuthority.AuthorizeOperationAsync is a generic tenant-owner delegate, with no operation-name whitelist added by this change. The new actor tests explicitly deny this operation before/after reads. Installed permission issuance remains an explicit missing installation; a test repeating the literal through another stub would not qualify it or demonstrate a bypass. |
+| B6 | medium / patch | The new transport DTO has no executed serializer round-trip. Verify the actual transport serializer can retain complete nested request/JWS/order and reserved/consumed outcomes, with independently owned deserialized vectors. No live transport qualification is inferred. |
+| B7 | low / patch | Selection/currentness refusal returns null, while dependency/capture faults and adapter cancellation propagate under existing private-port conventions. Clarify that distinction in public documentation and cover fault/corrupt-state paths with no-effects assertions; do not introduce a new catch-all policy. |
+| B8 | medium / patch | Positive tests always provide a physical backend even though the accessor intentionally has no dependency on it. Execute reserved/consumed success with provider null and assert unchanged ledger and no transitions. |
+| V1 | medium / patch | Pre-verified exact-batch regression gap: the current missing-batch test has only an Unconsumed entry, so receipt-only selection would pass. Pair a valid reservation receipt with another batch through actor and adapter, proving refusal without effects while the matching selection succeeds. |
+
+Patch groups: B1; B3/B4 evidence identity; B6; B7; B8; V1. No intent, retention, timing or owner-acceptance change is needed. Original logs and reviewed diff are preserved under the parent's `tests/owner-prerequisite-2026-10-27/reserved-original-before-review-patches.tar.gz` before correction.
+
+All six patch groups are corrected and root-verified. The default Dapr provider's actual DataContract serializer first rejected the new record and then its owned read-only carriers. DataContract/DataMember metadata on the new result and five existing nested record types, with two KnownType annotations confined to the new result, resolve the observed failures. No public members or transport defaults changed. Reserved/consumed complete JSON fixtures are byte-identical to preserved, initially verified binaries.
+
+Root executed the 40-case focused class plus all four prior regression classes: **257/257 passed**, zero errors/failures/skips/unrun. All 12 recorded source hashes remained exact; executed binary hashes match the corrected handoff. Current Contracts/Server normal source builds pass. The full test-project source graph became blocked by concurrent Tenants routing references (10 CS0234/CS0246 errors); the focused test compilation therefore reused retained dependency assets with BuildProjectReferences=false, without warning/analyzer suppression. This limitation remains explicit and no current full-graph pass is claimed.
+
+The [parent verification receipt](../../references/Hexalith.EventStore/_bmad-output/implementation-artifacts/tests/reserved-manifest-original-2026-10-27/parent-final-verification.json) and root `tests/owner-prerequisite-2026-10-27/reserved-original-final-evidence.tar.gz` retain complete local evidence, including ignored raw logs. The EventStore ignore/CI policy is unchanged. Provenance is explicitly a post-verification snapshot, with no invented CI execution or pre-build invariance. Concurrent canonical owner commits occurred outside this build; this build created no commit and preserved their work.
+
+Done denotes this private source accessor, required serializer compatibility and reviewed local behavior. Manifest publication, installed permission/trust, complete accepted owner deliveries, physical proof and qualification remain outstanding. Parent and original Story 5.4 remain in-progress, all accepted records and gates unchanged. No cohort or consuming path ran. The explicit approved no-commit/no-push constraint overrides the workflow's generic commit step.
 
 ## Verification
 

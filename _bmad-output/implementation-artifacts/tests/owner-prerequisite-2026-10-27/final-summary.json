@@ -1,0 +1,32 @@
+{
+  "recordedAtUtc": "2026-10-27T18:48:04.850942+00:00",
+  "preservedOriginalUserFiles": {
+    "_bmad-output/planning-artifacts/external-dependency-register.md": true,
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": true,
+    "_bmad-output/implementation-artifacts/tests/story-5-4-2026-10-27/verification.json": true,
+    "_bmad-output/implementation-artifacts/tests/story-5-4-2026-10-27/verification-artifacts.tar.gz": true
+  },
+  "parentFrozenIntentUnchanged": true,
+  "acceptedStatusesUnchanged": {
+    "EXT-PARTIES-1": "Committed",
+    "EXT-CONV-AI-1": "Committed",
+    "EXT-SECRETS-1": "Committed",
+    "EXT-HOST-1": "Committed",
+    "EXT-PROTECTION-1": "Uncommitted"
+  },
+  "registerSha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+  "sourceSlices": "Registration publication and read-only reserved original locally implemented/reviewed; full owners and Story 5.4 remain in-progress.",
+  "qualificationInvocations": 0,
+  "consumingExternalCalls": 0,
+  "nativeExperiments": 0,
+  "deployments": 0,
+  "gitMutationsByThisBuild": 0,
+  "observedCanonicalHeads": {
+    "agents": "28916ef936d000c48d64c09dfcd38154c0f3ca89",
+    "Platform": "9ead86f9061695bf3e30bcb0e020c0b830ddaf7e",
+    "EventStore": "b62a5f4b376fbd5994ef811f80d652e7c6e53f54"
+  },
+  "concurrentSourceChanges": "Other sessions advanced canonical repository heads and Tenants source; preserved without reset or ownership claims.",
+  "nextInstallationInput": "Actual qualifying non-AWS custody service/appliance identity, scoped credential references and independent authority/archive targets.",
+  "otherOpenWork": "Manifest publication, remaining owner integration, current normal build gates, complete accepted owner deliveries and exact-target qualification."
+}

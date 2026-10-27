@@ -4,8 +4,31 @@
   "context": "jpiquot@local",
   "scope": "Read-only node/workload metadata only; no Secret values, logs, exec, qualification or native operations",
   "commands": [
-    "kubectl --kubeconfig /home/administrator/.kube/hexalith-production --context jpiquot@local --request-timeout=15s get nodes -o custom-columns=NAME:.metadata.name,UID:.metadata.uid,INTERNAL-IP:.status.addresses[?(@.type==InternalIP)].address,VERSION:.status.nodeInfo.kubeletVersion",
-    "kubectl --kubeconfig /home/administrator/.kube/hexalith-production --context jpiquot@local --request-timeout=15s get deployments,statefulsets -A -o custom-columns=KIND:.kind,NS:.metadata.namespace,NAME:.metadata.name,UID:.metadata.uid,READY:.status.readyReplicas"
+    [
+      "kubectl",
+      "--kubeconfig",
+      "/home/administrator/.kube/hexalith-production",
+      "--context",
+      "jpiquot@local",
+      "--request-timeout=15s",
+      "get",
+      "nodes",
+      "-o",
+      "custom-columns=NAME:.metadata.name,UID:.metadata.uid,INTERNAL-IP:.status.addresses[?(@.type==\"InternalIP\")].address,VERSION:.status.nodeInfo.kubeletVersion"
+    ],
+    [
+      "kubectl",
+      "--kubeconfig",
+      "/home/administrator/.kube/hexalith-production",
+      "--context",
+      "jpiquot@local",
+      "--request-timeout=15s",
+      "get",
+      "deployments,statefulsets",
+      "-A",
+      "-o",
+      "custom-columns=KIND:.kind,NS:.metadata.namespace,NAME:.metadata.name,UID:.metadata.uid,READY:.status.readyReplicas"
+    ]
   ],
   "artifacts": [
     {
@@ -21,5 +44,6 @@
       "exitCode": 0
     }
   ],
-  "limit": "This does not survey other clusters or external services and does not establish administrative independence or erasure qualification."
+  "limit": "This does not survey other clusters or external services and does not establish administrative independence or erasure qualification.",
+  "commandRecordClarification": "Argv arrays preserve the executed JSONPath quoting; no inspection was repeated."
 }

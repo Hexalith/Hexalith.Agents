@@ -1,0 +1,5 @@
+{
+  "archive": "_bmad-output/implementation-artifacts/tests/owner-prerequisite-2026-10-27/reserved-original-final-evidence.tar.gz",
+  "sha256": "a8bc6f12dd5cd79d21f4466662dd1d3506191f2f115fdcb1334f16067dbe289c",
+  "scope": "Complete local evidence including ignored raw logs; no EventStore ignore/CI policy changes."
+}
