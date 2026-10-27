@@ -1,0 +1,5 @@
+{
+  "archive": "_bmad-output/implementation-artifacts/tests/owner-prerequisite-2026-10-27/registration-before-review-patches.tar.gz",
+  "sha256": "03910a7c76a6b471cc8b18269d641aca2664357b7a067da859b5a3ab76fda33d",
+  "scope": "Initial registration handoff note, evidence including ignored logs, and reviewed diff. Source corrections are separate; historical owner evidence and accepted gates unchanged."
+}

@@ -1,0 +1,21 @@
+{
+  "recordedAtUtc": "2026-10-27T17:29:33.231631+00:00",
+  "rootRevision": "9a3a9884fe99f4d03880f7ef5da2be6a78069532",
+  "platformBaseline": "b117945e2ba7911fd2c47843f866487341300398",
+  "preservedFiles": {
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2",
+    "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md": "31b4a6ec1219d9f431a3edfbb670295fef17713488a0c01b6396c0172d68464b",
+    "_bmad-output/implementation-artifacts/tests/story-5-4-2026-10-27/verification.json": "3e81b9e6894cd5140e34051a1238a751a78bc2fd057bcbc028b0d19fc1714d64",
+    "_bmad-output/implementation-artifacts/tests/story-5-4-2026-10-27/verification-artifacts.tar.gz": "d4c8f09c84d806c26457e9ac1ecc52e7d819b0550705b1b56bf5018972587e4f"
+  },
+  "aspireBaseline": {
+    "startCommand": "timeout 45s aspire start --non-interactive --isolated --apphost apphost.cs --format Json",
+    "startExitCode": 124,
+    "startOutput": "Starting Aspire AppHost in the background; Stopping Aspire.",
+    "describeCommand": "timeout 20s aspire describe --apphost apphost.cs --format Json",
+    "describeExitCode": 0,
+    "describeOutput": "No AppHost is currently running for apphost.cs.",
+    "scope": "Platform root-declared submodule; no resource readiness baseline established"
+  },
+  "reuse": "Preserve existing 5882-pass Agents Local receipt; rerun only affected owner lanes after source changes."
+}

@@ -1,0 +1,25 @@
+{
+  "observedAtUtc": "2026-10-27T18:09:18.386053+00:00",
+  "kubeconfigReference": "/home/administrator/.kube/hexalith-production",
+  "context": "jpiquot@local",
+  "scope": "Read-only node/workload metadata only; no Secret values, logs, exec, qualification or native operations",
+  "commands": [
+    "kubectl --kubeconfig /home/administrator/.kube/hexalith-production --context jpiquot@local --request-timeout=15s get nodes -o custom-columns=NAME:.metadata.name,UID:.metadata.uid,INTERNAL-IP:.status.addresses[?(@.type==InternalIP)].address,VERSION:.status.nodeInfo.kubeletVersion",
+    "kubectl --kubeconfig /home/administrator/.kube/hexalith-production --context jpiquot@local --request-timeout=15s get deployments,statefulsets -A -o custom-columns=KIND:.kind,NS:.metadata.namespace,NAME:.metadata.name,UID:.metadata.uid,READY:.status.readyReplicas"
+  ],
+  "artifacts": [
+    {
+      "kind": "nodes",
+      "path": "story54-owner-current-nodes.txt",
+      "sha256": "e4462def8464074a390bb617043777353664c53f43ea4020eeb74d42fe9ed5f0",
+      "exitCode": 0
+    },
+    {
+      "kind": "workloads",
+      "path": "story54-owner-current-workloads.txt",
+      "sha256": "3b97728bf119fe02f8015d3c02c8f8b7a2a4fc9b03474ef078e32730ad775318",
+      "exitCode": 0
+    }
+  ],
+  "limit": "This does not survey other clusters or external services and does not establish administrative independence or erasure qualification."
+}

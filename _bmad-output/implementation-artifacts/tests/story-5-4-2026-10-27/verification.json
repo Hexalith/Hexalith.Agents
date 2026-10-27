@@ -1,0 +1,301 @@
+{
+  "story": "5.4",
+  "recordedAtUtc": "2026-10-27T17:14:31.917748+00:00",
+  "disposition": "in-progress; strict local verification passed; full production acceptance remains gated",
+  "canonicalRootRevision": "9a3a9884fe99f4d03880f7ef5da2be6a78069532",
+  "originalStoryBaseline": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "changes": [
+    "No implementation source, test, verifier, owner code or dependency acceptance changed.",
+    "Recorded fresh strict five-project Local verification and the consuming Live refusal.",
+    "Preserved approved frozen intent, original baseline, Branch B and every incomplete task."
+  ],
+  "preserved": {
+    "frozenIntentSha256": "a20faa6ebe5cdc5b92024d0e5bbb3644dd65e53964d2e5f8cdce4c153c1e3668",
+    "tasksAndAcceptanceSha256": "0cd92885c9ba20ca483bf0ac4a827beb882e5d9c368a358f2c5a37a555256ab2",
+    "dependencyRegister": {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "sha256": "5bf35ac2857664c0589966a10944cd66278af85242c7c1f08e31ae29aa40e8a2"
+    }
+  },
+  "localRun": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-2026-10-27/local",
+    "completionEvidence": "Verifier wrote LocalContractsVerified=true and its final success marker; the invoking tool session exit code was not retained.",
+    "totalPassed": 5882,
+    "projects": [
+      {
+        "project": "Hexalith.Agents.Contracts.Tests",
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "buildWarnings": 0,
+        "buildErrors": 0,
+        "buildLog": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Contracts.Tests.build.log",
+          "sha256": "d321c6964066da43d39a5de7721c94afa81f9ee079ef5ee9c4b309dccf03cfd3"
+        },
+        "resultXml": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Contracts.Tests.xml",
+          "sha256": "494b748a1319a23cb8ab7294ffa08a53a204e1671e2a88a2a4b7b80a73ffba27"
+        },
+        "testAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll",
+          "sha256": "890888673b450d9735ba545761e00a662d075dbaec088d57641c47ea3f8c19a9"
+        },
+        "testSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.pdb",
+          "sha256": "14d50f243e6712b506bf0e2ee6f6257b4b53495b6166a199815fe266f2e71512"
+        },
+        "productAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.dll",
+          "sha256": "2c03d86d805645a0bdec01b2e88d24f30d9e61e8544b374742aee1691c8e59be"
+        },
+        "productSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.pdb",
+          "sha256": "e13b4b0481c8b713ef201acbdd184d281bb536f1a4317656d4f6ea12968f3617"
+        }
+      },
+      {
+        "project": "Hexalith.Agents.Client.Tests",
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "buildWarnings": 0,
+        "buildErrors": 0,
+        "buildLog": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Client.Tests.build.log",
+          "sha256": "c2f03ccd276e8e9ffbc8a2559cd2f4d22d5e0b76ecdac1d883258d18bd570210"
+        },
+        "resultXml": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Client.Tests.xml",
+          "sha256": "bddd6fed35be71fe4c71d3c92debb1a3c7ff06535c92e84b322f470d44044a46"
+        },
+        "testAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll",
+          "sha256": "ce737d7825cb2808a895c48490956c3811d4ed9aaebe82c68355cee040f483d5"
+        },
+        "testSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.pdb",
+          "sha256": "94dc4523d8fdac56ae6d80bf73143324fc075e08ae327ab5c02a1e494eda4d76"
+        },
+        "productAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.dll",
+          "sha256": "75708303ae146c26b2d3dc37e8012cc3b3353f5c1e5ad0588e4da75a2e980ddc"
+        },
+        "productSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.pdb",
+          "sha256": "733829e7d4ead4a831def8da04220311dfde805e22210ca00fbd3bb7c102444a"
+        }
+      },
+      {
+        "project": "Hexalith.Agents.Tests",
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "buildWarnings": 0,
+        "buildErrors": 0,
+        "buildLog": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Tests.build.log",
+          "sha256": "bad200e3c82971806e63ae9444698f249481cde3fc58ae8e514de98a9240744e"
+        },
+        "resultXml": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Tests.xml",
+          "sha256": "0786ac467c91f0ee89b5a1318f0721741e8888afb762a511723982cbef9e99f7"
+        },
+        "testAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll",
+          "sha256": "bd14924b81ffe625fbd91e5e4950d54410fe1a6aa8e2ee3e3fb0bbc6c433b28b"
+        },
+        "testSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.pdb",
+          "sha256": "c57d15d05f56056ce38ebdb0595f15765ebd033d07d5d081248dee53974328f2"
+        },
+        "productAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.dll",
+          "sha256": "e3cf9e5438cc6d9beda5d6f44729d534abde1f10ef5ef56cf7c3345beb473917"
+        },
+        "productSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.pdb",
+          "sha256": "223bddd439b78e554093a6be13f28ddc45f7b1b2bcebbea2484d7d5613dea86e"
+        }
+      },
+      {
+        "project": "Hexalith.Agents.Server.Tests",
+        "total": 1612,
+        "passed": 1612,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "buildWarnings": 0,
+        "buildErrors": 0,
+        "buildLog": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Server.Tests.build.log",
+          "sha256": "55a144c9fe8ca68727eaaa9241e091cca1a901370b3a9c49def86dad0d49a733"
+        },
+        "resultXml": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.Server.Tests.xml",
+          "sha256": "14be0606ec0cd03cc3fe2b936c165e7841c612e2776b66b893927b1dd70c94f5"
+        },
+        "testAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+          "sha256": "0f09dc9b563f42d99e1bbbe282754bef017275b23f62f87f2b5a6bd46bc93ecc"
+        },
+        "testSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.pdb",
+          "sha256": "a266be0783c34008113b310f4e5a99706c2361aa9542bc98929d2672e7d419f8"
+        },
+        "productAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.dll",
+          "sha256": "80ec865bcbdbe4742e92a1879f3668d2e72ca7a6a09543e15ffb417fcf99cd21"
+        },
+        "productSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.pdb",
+          "sha256": "0bc015a6866cb5b7aed343216a41c62e59e9c977330637d3ec9d5a17728e6003"
+        }
+      },
+      {
+        "project": "Hexalith.Agents.UI.Tests",
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "buildWarnings": 0,
+        "buildErrors": 0,
+        "buildLog": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.UI.Tests.build.log",
+          "sha256": "c38782adb4b4bbbbba2e6d21a9039845c161d3f0262ba9929e432292d3bfe7f7"
+        },
+        "resultXml": {
+          "path": "/tmp/agents-story54-2026-10-27/local/Hexalith.Agents.UI.Tests.xml",
+          "sha256": "827af6a905f3647624df6842123c3d728b998d5073b5aa79d6130369d74fc386"
+        },
+        "testAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll",
+          "sha256": "f7ab7e84453ffea15f4ba2060c9bf7574cee992669220c0564b518ba12093ef1"
+        },
+        "testSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.pdb",
+          "sha256": "6e17018d293c1fbfad1f19540d370ab9c5d882cacff93a215f3e599dfc2879fb"
+        },
+        "productAssembly": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.dll",
+          "sha256": "5a8188dd4b1acd0c7dd2910d0b02def87275449d37adcca87ed8b5b92e429570"
+        },
+        "productSymbols": {
+          "path": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.pdb",
+          "sha256": "5a52a078442280ed48799452f8d64fe0227bd424de7e936e7bec90d76d7db68a"
+        }
+      }
+    ],
+    "resultJson": {
+      "path": "/tmp/agents-story54-2026-10-27/local/result.json",
+      "sha256": "ece92997f21a4ad7d48e045404aa6f031e2637bdf19ca3bd41eab4a59caea5ce"
+    },
+    "combinedLog": {
+      "path": "/tmp/agents-story54-2026-10-27-local.log",
+      "sha256": "ca2e760399f5fe848e6e1d6d03f499bc3b004294642ed2ec92d7813bb3630e7c"
+    }
+  },
+  "liveRefusal": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-2026-10-27/live",
+    "exitCode": 1,
+    "result": {
+      "Mode": "Live",
+      "ExternalCalls": 0,
+      "StoryComplete": false,
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ]
+    },
+    "resultJson": {
+      "path": "/tmp/agents-story54-2026-10-27/live/result.json",
+      "sha256": "d849343cf0428666e1dc98bfb474e4fc83380e92c0231f0dcccbcdb8176b8291"
+    },
+    "combinedLog": {
+      "path": "/tmp/agents-story54-2026-10-27-live.log",
+      "sha256": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a"
+    }
+  },
+  "dependencies": [
+    {
+      "recordId": "EXT-PARTIES-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "installedReference": "027a5005ebc6bae79cbeebaf27638abab26dbf96",
+      "installedMatchesAcceptedTarget": false,
+      "ownerCommandRepeated": false
+    },
+    {
+      "recordId": "EXT-CONV-AI-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "87e8b4a6ec3224b20a560b0e83de857805925572",
+      "installedReference": "8039d2abcf41bcd2c01fa3dbe618cbec2f4f6da3",
+      "installedMatchesAcceptedTarget": false,
+      "ownerCommandRepeated": false
+    },
+    {
+      "recordId": "EXT-SECRETS-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installedReference": "b117945e2ba7911fd2c47843f866487341300398",
+      "installedMatchesAcceptedTarget": false,
+      "ownerCommandRepeated": false
+    },
+    {
+      "recordId": "EXT-HOST-1",
+      "acceptedStatus": "Committed",
+      "acceptedTarget": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installedReference": "b117945e2ba7911fd2c47843f866487341300398",
+      "installedMatchesAcceptedTarget": false,
+      "ownerCommandRepeated": false
+    }
+  ],
+  "postVerificationSnapshot": {
+    "path": "/tmp/agents-story54-2026-10-27/post-verification-snapshot.json",
+    "sha256": "338499ba5d698d6d013b842a46bdea3a16c2fe678643ea898b29b06657b320b2"
+  },
+  "artifactArchive": {
+    "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-2026-10-27/verification-artifacts.tar.gz",
+    "sha256": "d4c8f09c84d806c26457e9ac1ecc52e7d819b0550705b1b56bf5018972587e4f"
+  },
+  "remainingFullAcceptance": [
+    "Available owner records with passing complete qualification at the exact accepted and installed targets.",
+    "Production contiguous Tenants evidence, current human/Party/approver bindings and immutable create-only Party provisioning.",
+    "Genuine scoped AD-30 signature verification and private reserved-system replay admission before target-command construction.",
+    "Platform-owned replicated durable denial spool, private exact-target worker and restricted credentials.",
+    "Persisted live ACL, replay, outage/restart/restore/lost-ack recovery, API/UI basis and full cross-tenant disclosure matrix."
+  ],
+  "evidenceLimits": [
+    "Local substituted-port tests establish no live external authority, state-store persistence or availability.",
+    "No owner command, consuming external seam, deployment or production host was executed.",
+    "Snapshot was captured after verification and covers selected root compiler inputs only; no before/after or complete transitive/generated-input attestation is claimed.",
+    "All four installed owner references differ from their accepted targets.",
+    "The full-story workflow remains at implementation; full-story review has not begun."
+  ]
+}

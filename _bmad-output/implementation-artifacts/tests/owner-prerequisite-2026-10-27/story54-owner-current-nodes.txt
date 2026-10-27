@@ -1,0 +1,2 @@
+NAME    UID                                    INTERNAL-IP    VERSION
+node1   46d8d528-420d-4501-a6d8-12680d8a6ac6   192.168.1.30   v1.34.9
