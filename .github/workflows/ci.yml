@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   ci:
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@4250edc94af021945fe072085f02b5122c9b21c3
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@9f85d8e66e5c16675cee8c224f1fd88430d96007
     with:
       solution: Hexalith.Agents.slnx
       test-platform: microsoft-testing-platform
@@ -47,7 +47,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git -C references/Hexalith.Builds rev-parse HEAD)" = "4250edc94af021945fe072085f02b5122c9b21c3"
+          test "$(git -C references/Hexalith.Builds rev-parse HEAD)" = "9f85d8e66e5c16675cee8c224f1fd88430d96007"
       - uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json

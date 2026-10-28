@@ -56,3 +56,9 @@ context: []
 - Exact-source GitHub CI completed the Release build, all per-project floors, exact package inventory and seven isolated consumers, then exposed ANSI-colored xUnit summary records in the focused verifier. The verifier now removes terminal formatting before its unchanged strict assembly/count/skip checks; executable colored-summary acceptance and colored-skip rejection regressions pass.
 
 - Follow-up quality checks found FrontComposer catalog-selector and McpCli workflow-coordinate drift. Their owning fixes passed three governance and 22 release checks, and 139 topology-tooling checks, respectively; the final root synchronization includes both published fixes.
+
+- Complete GitHub CI, CodeQL and commitlint passed at 07fd1e19878d7d2ad1fbf33345b97ad9a1dc47b3, including the ANSI-summary repair and all tooling contracts.
+- Final shared validation source advances to Builds 9f85d8e66e5c16675cee8c224f1fd88430d96007. Its HTTPS trust setup now covers .NET-only Aspire tests; 408 workflow assertions and 61 provenance checks pass, with the existing certificate-validation behavior retained.
+- Adopted upstream Parties scoped HTTPS preparation and its independent execution coordinates, discarding the superseded local variant. Its build and CI/documentation guards pass; flat dependency validation preserves the no-nested-checkout constraint.
+- Adopted upstream Conversations exact package-only condition handling, retaining unknown-condition rejection; the failed method and eleven direct guard checks pass.
+- Adopted upstream Memories selected-catalog assertions (twelve security checks pass) and narrowly bounded same-instance Dapr inbox read retries. Original status assertions remain intact; obsolete-run cancellation and the local nested-layout limitation are recorded in external validation logs, without treating them as passing runtime evidence.
