@@ -1,0 +1,11 @@
+# Current-authority clock-order correction
+
+The tenant-access reader and HTTP administration context now reject clock rollback between their actor and tenant/global-role reads, even when completion remains later than evaluation start. They retain the actor-read completion instant and release no authority when the next completion precedes it. Existing subject/Party/source correspondence, request-time freshness, exclusive expiry, cancellation and earliest-deadline checks remain enforced.
+
+Four new rollback cases failed against the unchanged production sources. After the guards, all **44/44** focused ordering cases pass, including eight equal/advancing-time controls. The strict five-project Local verifier passes **6,013/6,013** tests with five warning-free Debug/source builds: Contracts 1,997; Client 7; Domain 1,017; Server 1,743; UI 1,249. All cases ran with zero failures, errors, skips or not-run results.
+
+The separate Live verifier refuses all four Committed/unavailable dependencies with **zero external calls**. No owner command was repeated, production source/admission/persistence binding was enabled, or dependency acceptance changed. Full Story 5.4 remains `in-progress`; its original tasks and live persisted acceptance remain incomplete.
+
+[Verification receipt](verification.json) records commands, results, source/assembly/PDB hashes, current owner observations and remaining acceptance. [Evidence archive](evidence.tar.gz) retains red/green logs/XML, prior production source copies, the five full result sets and build logs, the generated build-scoped source mapping and launcher, and before/after manifests. All **1,045** selected root source/test/eng/config/register files match across the full run. This is a bounded root-source comparison; transitive/generated inputs and exact runtime binary execution are not fully attested. Owner revisions and dirty fingerprints were observed after verification only.
+
+The initial unmapped focused build correctly refused the installed Conversations mapping requirement. A fresh mapping from the existing Builds `SourceMappingMaterializer` enabled subsequent Debug builds. It applies only to build children; tests execute without inherited source-mapping properties. No repository build policy or verifier gate changed.

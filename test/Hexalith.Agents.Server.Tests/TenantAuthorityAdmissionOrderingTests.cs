@@ -181,6 +181,90 @@ public sealed class TenantAuthorityAdmissionOrderingTests
         await tenants.Received(1).ReadAsync(platform ? "system" : "tenant-a", platform, Arg.Any<CancellationToken>());
     }
 
+    /// <summary>Rejects rollback between completed authority reads while allowing equal and advancing completion instants.</summary>
+    [Theory]
+    [InlineData(false, 1, false)]
+    [InlineData(true, 1, false)]
+    [InlineData(false, 2, true)]
+    [InlineData(true, 2, true)]
+    [InlineData(false, 3, true)]
+    [InlineData(true, 3, true)]
+    public async Task TenantAuthorityCompletionCannotPrecedeActorCompletion(bool administration, int completedSeconds, bool expected)
+    {
+        var clock = new Story54TimeProvider();
+        DateTimeOffset started = clock.Now;
+        CurrentHumanActorEvidence actor = ValidActor(clock);
+        string callerPartyId = administration ? string.Empty : "party-a";
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        actors.ReadAsync("tenant-a", "authenticated-subject", Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = started.AddSeconds(2);
+            return actor;
+        });
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        tenants.ReadAsync("tenant-a", false, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = started.AddSeconds(completedSeconds);
+            return new TenantAuthorityEvidence("tenant-a", "tenants", 2, started, started.AddSeconds(4),
+                [new(1, string.Empty, null, "TenantActive", true),
+                 new(2, "actor-a", administration ? null : callerPartyId, administration ? "Agents.Administrator" : "User", true)],
+                SourceAggregateId: "tenant-a");
+        });
+        var reader = new ProjectedTenantAccessReader(tenants, Substitute.For<IAgentDependencyAvailability>(), clock, actors);
+
+        TenantAccessReadResult result = await reader.ReadAsync("tenant-a", "authenticated-subject", callerPartyId, CancellationToken.None);
+
+        result.Outcome.ShouldBe(expected ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized);
+        result.IsFresh.ShouldBe(expected);
+        if (expected)
+        {
+            result.CurrentActor.ShouldNotBeNull().ValidUntil.ShouldBe(started.AddSeconds(4));
+        }
+        else
+        {
+            result.CurrentActor.ShouldBeNull();
+        }
+
+        await tenants.Received(1).ReadAsync("tenant-a", false, Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>Rejects intermediate rollback for both administration principals before any role-derived authority is released.</summary>
+    [Theory]
+    [InlineData(false, 1, false)]
+    [InlineData(true, 1, false)]
+    [InlineData(false, 2, true)]
+    [InlineData(true, 2, true)]
+    [InlineData(false, 3, true)]
+    [InlineData(true, 3, true)]
+    public async Task AdministrationRoleCompletionCannotPrecedeActorCompletion(bool platform, int completedSeconds, bool expected)
+    {
+        var clock = new Story54TimeProvider();
+        DateTimeOffset started = clock.Now;
+        CurrentHumanActorEvidence actor = ValidActor(clock);
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        actors.ReadAsync("tenant-a", "authenticated-subject", Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = started.AddSeconds(2);
+            return actor;
+        });
+        TenantAuthorityEvidence authority = ValidAuthority(clock, platform);
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        tenants.ReadAsync(platform ? "system" : "tenant-a", platform, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = started.AddSeconds(completedSeconds);
+            return authority;
+        });
+
+        AgentAdministrationContext result = await AdministrationProvider(tenants, actors, clock)
+            .GetContextAsync(platform, CancellationToken.None);
+
+        result.IsAgentsAdmin.ShouldBe(expected && !platform);
+        result.IsPlatformOperator.ShouldBe(expected && platform);
+        result.ActorUserId.ShouldBe(expected ? "actor-a" : "authenticated-subject");
+        result.TenantId.ShouldBe(expected && platform ? "system" : "tenant-a");
+        await tenants.Received(1).ReadAsync(platform ? "system" : "tenant-a", platform, Arg.Any<CancellationToken>());
+    }
+
     private static HttpAgentAdministrationContextProvider AdministrationProvider(ICurrentTenantAuthoritySource tenants,
         ICurrentHumanActorSource actors, Story54TimeProvider clock)
         => new(new HttpContextAccessor

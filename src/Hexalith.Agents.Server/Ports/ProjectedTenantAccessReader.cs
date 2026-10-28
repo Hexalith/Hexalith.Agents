@@ -31,7 +31,8 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
             CurrentHumanActorEvidence? actor = await actorSource.ReadAsync(tenantId, actorUserId, ct).ConfigureAwait(false);
             bool administration = string.IsNullOrEmpty(callerPartyId);
             ct.ThrowIfCancellationRequested();
-            if (!IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, clock.GetUtcNow()))
+            DateTimeOffset actorCompletedAt = clock.GetUtcNow();
+            if (!IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, actorCompletedAt))
             {
                 return new(AgentInteractionGateOutcome.Unauthorized, false);
             }
@@ -39,7 +40,8 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
             TenantAuthorityEvidence? evidence = await source.ReadAsync(tenantId, false, ct).ConfigureAwait(false);
             ct.ThrowIfCancellationRequested();
             DateTimeOffset now = clock.GetUtcNow();
-            bool granted = IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, now)
+            bool granted = now >= actorCompletedAt
+                && IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, now)
                 && Grants(evidence, tenantId, actor.ActorId, administration ? "Agents.Administrator" : "User",
                     administration ? null : callerPartyId, false, now, started);
             return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted)

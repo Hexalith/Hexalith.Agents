@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T13:25:28.664873+00:00",
+  "scope": "Bounded Story 5.4 current-authority clock-order correction; no production seam enablement",
+  "observedRootBaseline": "7d636a66b8f65a14f907606904bb8d6c57168169",
+  "originalStoryBaselinePreserved": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "storyStatus": "in-progress",
+  "fullStoryComplete": false,
+  "liveReadinessEstablished": false,
+  "changedSourceHashes": {
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "b81c4e7e641cd3c4bb1f29c226f3836ec874ffcbfd3872c0abb6d3b5a08e151f",
+    "src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs": "cd82171c071f74840cb76db75ffa6c00a29c222566325fc4620c74ca6b953420",
+    "test/Hexalith.Agents.Server.Tests/TenantAuthorityAdmissionOrderingTests.cs": "942e2f620cbb057a2fb3c4a6def54572c1159fc552a6e862a8d3b68bfc83f0f4"
+  },
+  "commands": {
+    "red-build": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+      "--configuration",
+      "Debug",
+      "-m:1",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "-p:HexalithEventStoreFromSource=true",
+      "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "-p:HexalithCommonsFromSource=true",
+      "-p:HexalithCommonsHttpFromSource=true",
+      "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+      "-p:HexalithMcpCliFromSource=true",
+      "--nologo"
+    ],
+    "mapping": [
+      "dotnet",
+      "run",
+      "--project",
+      "/tmp/agents-caller-identity-mapping-helper/MappingHelper.csproj",
+      "--configuration",
+      "Debug",
+      "--",
+      "/home/administrator/projects/hexalith/agents",
+      "/tmp/agents-story54-authority-monotonic-2026-10-28/mapping"
+    ],
+    "red-focused": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests",
+      "-result-xml",
+      "/tmp/agents-story54-authority-monotonic-2026-10-28/red-focused.xml"
+    ],
+    "green-focused": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests",
+      "-result-xml",
+      "/tmp/agents-story54-authority-monotonic-2026-10-28/green-focused.xml"
+    ],
+    "local": {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/agents-story54-authority-monotonic-2026-10-28/local"
+      ],
+      "environmentOverride": {
+        "PATHPrefix": "/tmp/agents-story54-authority-monotonic-2026-10-28/launcher"
+      }
+    },
+    "live": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "./eng/verify-story-5.4.ps1",
+      "-Mode",
+      "Live",
+      "-ArtifactsPath",
+      "/tmp/agents-story54-authority-monotonic-2026-10-28/live"
+    ],
+    "redMappedBuild": {
+      "argv": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+        "--configuration",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+        "-p:HexalithEventStoreFromSource=true",
+        "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+        "-p:HexalithCommonsFromSource=true",
+        "-p:HexalithCommonsHttpFromSource=true",
+        "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+        "-p:HexalithMcpCliFromSource=true",
+        "--nologo"
+      ],
+      "environmentOverride": "evidence.tar.gz:mapping/environment.json (build process only)"
+    },
+    "greenBuild": {
+      "argv": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+        "--configuration",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:UseNuGetDeps=false",
+        "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+        "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+        "-p:HexalithEventStoreFromSource=true",
+        "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+        "-p:HexalithCommonsFromSource=true",
+        "-p:HexalithCommonsHttpFromSource=true",
+        "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+        "-p:HexalithMcpCliFromSource=true",
+        "--nologo"
+      ],
+      "environmentOverride": "evidence.tar.gz:mapping/environment.json (build process only)"
+    }
+  },
+  "mapping": {
+    "producer": "Hexalith.Builds.Tooling.Workspace.SourceMappingMaterializer",
+    "hash": "6a985b10a04dd9840c471bce1b5d5f0029904a2445f541258e8cfe08d79b8d53",
+    "application": "Generated mapping applies solely to dotnet build children; test runtime environment is cleared of mapping keys.",
+    "initialUnmappedBuild": {
+      "exitCode": 1,
+      "blocker": "Installed Conversations requires the Platform tool-selected source mapping.",
+      "log": "evidence.tar.gz:red-build.log"
+    }
+  },
+  "red": {
+    "exitCode": 1,
+    "total": 44,
+    "passed": 40,
+    "failed": 4,
+    "failedTests": [
+      "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationRoleCompletionCannotPrecedeActorCompletion(platform: False, completedSeconds: 1, expected: False)",
+      "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationRoleCompletionCannotPrecedeActorCompletion(platform: True, completedSeconds: 1, expected: False)",
+      "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.TenantAuthorityCompletionCannotPrecedeActorCompletion(administration: False, completedSeconds: 1, expected: False)",
+      "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.TenantAuthorityCompletionCannotPrecedeActorCompletion(administration: True, completedSeconds: 1, expected: False)"
+    ],
+    "productionSources": "evidence.tar.gz:*.prior.cs.txt"
+  },
+  "greenFocused": {
+    "exitCode": 0,
+    "total": 44,
+    "passed": 44,
+    "newCases": 12,
+    "rollbackRegressions": 4,
+    "equalOrAdvancingControls": 8
+  },
+  "local": {
+    "exitCode": 0,
+    "total": 6013,
+    "passed": 6013,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1743,
+        "passed": 1743,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "warningFreeBuilds": 5,
+    "result": {
+      "Blockers": [
+        {
+          "RecordId": "EXT-PARTIES-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-CONV-AI-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-SECRETS-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-HOST-1",
+          "Code": "DependencyNotAvailable"
+        }
+      ],
+      "LiveReadinessEstablished": false,
+      "Mode": "Local",
+      "StoryComplete": false,
+      "LocalContractsVerified": true,
+      "ExternalOwnerCalls": 0
+    }
+  },
+  "live": {
+    "exitCode": 1,
+    "expectedRefusal": true,
+    "result": {
+      "StoryComplete": false,
+      "Blockers": [
+        {
+          "RecordId": "EXT-PARTIES-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-CONV-AI-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-SECRETS-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-HOST-1",
+          "Code": "DependencyNotAvailable"
+        }
+      ],
+      "ExternalCalls": 0,
+      "Mode": "Live"
+    }
+  },
+  "rootSourceSnapshot": {
+    "selectedFiles": 1045,
+    "changedFiles": [],
+    "scope": "Root src/test/eng files excluding bin/obj, selected root build configuration and authoritative dependency register. Does not attest all transitive, generated or runtime-executed inputs.",
+    "preManifest": "evidence.tar.gz:pre-local-root-sources.json",
+    "postManifest": "evidence.tar.gz:post-local-root-sources.json"
+  },
+  "postRunDependencyObservation": {
+    "path": "evidence.tar.gz:post-run-dependencies.json",
+    "scope": "Post-run revisions and dirty fingerprints only; no before-run/in-run dependency stability claim."
+  },
+  "sdk": "10.0.402",
+  "testArtifacts": {
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll": "c9707f0f9ce4d44be904c95f44acfe8a6421af6367493c2e658ce55aed76b007",
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.pdb": "7ce236eb0eb6a708390fa1c4bfa296ab28e6478795844b16ca8376a4d1502879",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll": "f3b0c9bfe163171b4a7e510ad02824565aa9a4e50b2357570f418e1500ce1962",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.pdb": "38a0ba5f36c92ed2a0e5386d7b6caa3c64e90d89995682300400745e4a5edb7b",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll": "b98e9217070e48f677af8f2b29151a7ecbb3a98ce9cb5da18c6e83a712c36136",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.pdb": "0df1d8f1874ed7fb473aa102594d70dd7aadd9f31c68b545f96e63751c31c185",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll": "19ceeaefb5f0790fd95b18bef3713a27b10f7324f0cc9c9ba49d548d420ae344",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.pdb": "3be8ae3e97aeb6f274ebc1049941c0cde3facbfc04f19e866fe8f255d4109ae3",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll": "68acaabdaef52bcd55a76c2f908ca1593eb2822b68fef7b2a620e7d1ac5af8c0",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.pdb": "6d7f7987626706e4d6bc5f03dc43a134bf107c1686f80cbd82b28daefe3bf33d"
+  },
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "f9a010c14a63b50fe59fc12c7150f269bcccc22ac832cc73e2604fbb246188f3"
+  },
+  "remaining": [
+    "Current Tenants/Parties/Conversations production source and immutable provisioning bindings",
+    "Genuine AD-30 signature/principal/operation/scope admission and private exact-target replay credentials",
+    "Replicated durable denial spool and restricted recovery worker",
+    "Complete persisted ACL, outage/restart/restore/lost-ack and cross-tenant live matrix qualification",
+    "All four external records remain Committed/unavailable; no owner command was repeated"
+  ]
+}

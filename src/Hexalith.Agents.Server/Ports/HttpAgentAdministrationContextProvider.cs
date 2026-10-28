@@ -53,7 +53,8 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
             DateTimeOffset started = _clock.GetUtcNow();
             CurrentHumanActorEvidence? actor = await actorSource.ReadAsync(identity.TenantId, identity.ActorUserId, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
-            if (actor?.IsCurrentFor(identity.TenantId, identity.ActorUserId, null, started, _clock.GetUtcNow()) != true)
+            DateTimeOffset actorCompletedAt = _clock.GetUtcNow();
+            if (actor?.IsCurrentFor(identity.TenantId, identity.ActorUserId, null, started, actorCompletedAt) != true)
             {
                 return identity;
             }
@@ -61,7 +62,8 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
             TenantAuthorityEvidence? roles = await tenantSource.ReadAsync(platform ? "system" : identity.TenantId, platform, cancellationToken).ConfigureAwait(false);
             DateTimeOffset now = _clock.GetUtcNow();
             cancellationToken.ThrowIfCancellationRequested();
-            if (!actor.IsCurrentFor(identity.TenantId, identity.ActorUserId, null, started, now)
+            if (now < actorCompletedAt
+                || !actor.IsCurrentFor(identity.TenantId, identity.ActorUserId, null, started, now)
                 || !ProjectedTenantAccessReader.Grants(roles, platform ? "system" : identity.TenantId, actor.ActorId,
                     platform ? PlatformOperatorRole : AgentsAdministratorRole, null, platform, now, started))
             {

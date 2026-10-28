@@ -875,6 +875,9 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
   summary: Detect clock rollback between the current tenant authority reader's internal awaits even when time stays after evaluation start.
   evidence: Review BH3 traced the unchanged baseline ProjectedTenantAccessReader: actor lookup can complete at t+5 and tenant lookup at t+4, yet both compare only with t; the enclosing gate cannot observe the reader's intermediate instant. A monotonic per-await check and focused regression are needed independently of caller binding propagation.
+  status: done 2026-10-28
+  resolution: Both ProjectedTenantAccessReader and HttpAgentAdministrationContextProvider preserve the checked actor-read completion instant and reject earlier tenant/global-role completion. Four rollback regressions fail against prior production sources and pass with the guards; equal and advancing controls preserve User, Administrator and Platform authority and the earliest tenant/actor deadline. Full Local passes 6,013/6,013 with five warning-free builds; Live refuses all four unavailable records with zero calls. Production bindings and full Story 5.4 acceptance remain incomplete.
+  evidence_record: [Current-authority clock-order verification](tests/story-5-4-authority-clock-2026-10-28/README.md)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
   summary: Restore explicit Conversation denominator and dedicated enrolled service-Party constraints in the generated Epic 5 agent context.
