@@ -43,3 +43,6 @@ context: []
 - Workflow pins and contract expectations follow Builds b15dab4cc740b6fb2d2065682f76b8166a7e120a, whose audit refresh was separately validated upstream. All seven focused package/workflow contract tests passed after updating the pin.
 
 - Took the final root-only dependency snapshot after syncing upstream fixes; all nested dependencies remain uninitialized. Full local tooling discovery remains in progress. Exact-source GitHub CI is required before the separately authorized release dispatch.
+
+- Full local tooling discovery passed all 272 tests (988.058 seconds). npm verified 504 package signatures and 127 attestations.
+- Submodule CI investigation additionally found Aspire SDK/catalog drift in EventStore and McpCli and a stale FrontComposer hosting-version assertion. Their owning repositories received focused, validated repairs; root pointer synchronization follows those upstream commits without initializing nested checkouts.
