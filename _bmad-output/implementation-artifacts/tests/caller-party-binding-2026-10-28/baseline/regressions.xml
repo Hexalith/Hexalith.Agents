@@ -1,0 +1,23 @@
+<assemblies schema-version="3" id="e5540a81-6f27-4681-9b78-db9a81d70313" computer="DESKTOP-VIOG240" user="administrator" start-rtf="2026-10-28T11:46:39.4925055+00:00" finish-rtf="2026-10-28T11:46:39.7057529+00:00" timestamp="10/28/2026 12:46:39"><assembly environment="64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]" id="8968c74c-bbd9-4596-8e6e-e91f53cb8da5" name="/tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.Server.Tests.dll" run-date="2026-10-28" run-time="11:46:39" start-rtf="2026-10-28T11:46:39.4925055+00:00" test-framework="xUnit.net v3 4.0.2+0c7aa4991f" target-framework=".NETCoreApp,Version=v10.0" errors="0" failed="2" finish-rtf="2026-10-28T11:46:39.7057529+00:00" not-run="0" passed="0" skipped="0" time="0.214" time-rtf="00:00:00.2140000" total="2"><collection name="Test collection for Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests (id: 4f2f8e8368e26232d17e517685b13f66a2cf8346796910b5d73cbb76b30d5352)" id="d19402b1-a241-47f0-a501-dffff9f747d3" failed="2" not-run="0" passed="0" skipped="0" time="0.123" time-rtf="00:00:00.1230000" total="2"><test id="ee47161f-82b9-408a-9d18-9aef80bbb540" name="Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.TenantSuccessWithoutCurrentActorStopsBeforePartyLookup" result="Fail" time="0.11" time-rtf="00:00:00.1100000" start-rtf="2026-10-28T11:46:39.5588030+00:00" finish-rtf="2026-10-28T11:46:39.6815114+00:00" type="Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests" method="TenantSuccessWithoutCurrentActorStopsBeforePartyLookup" source-file="/tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs" source-line="33"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : parties.ReceivedCalls()
+    should be empty but had
+1
+    item and was
+[NSubstitute.Core.Call (20117377)]</message><stack-trace>   at Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.TenantSuccessWithoutCurrentActorStopsBeforePartyLookup() in /tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs:line 50
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test><test id="bf442fb2-39c4-44d2-955f-93cfaba78f36" name="Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence" result="Fail" time="0.013" time-rtf="00:00:00.0130000" start-rtf="2026-10-28T11:46:39.6863717+00:00" finish-rtf="2026-10-28T11:46:39.6999944+00:00" type="Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests" method="LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence" source-file="/tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs" source-line="20"><failure exception-type="Shouldly.ShouldAssertException"><message>Shouldly.ShouldAssertException : (await directory.ValidateCallerPartyAsync(\"tenant-a\", \"party-a\", CancellationToken.None)).Status
+    should be
+PartyLinkValidationStatus.Unavailable
+    but was
+PartyLinkValidationStatus.Valid</message><stack-trace>   at Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence() in /tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs:line 28
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+--- End of stack trace from previous location ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)</stack-trace></failure></test></collection></assembly></assemblies>

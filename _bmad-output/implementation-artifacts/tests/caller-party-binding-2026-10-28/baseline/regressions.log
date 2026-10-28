@@ -1,0 +1,37 @@
+xUnit.net v3 In-Process Runner v4.0.2+0c7aa4991f (64-bit .NET 10.0.13)
+  Discovering: Hexalith.Agents.Server.Tests
+  Discovered:  Hexalith.Agents.Server.Tests
+  Starting:    Hexalith.Agents.Server.Tests
+    Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.TenantSuccessWithoutCurrentActorStopsBeforePartyLookup [FAIL]
+      Shouldly.ShouldAssertException : parties.ReceivedCalls()
+          should be empty but had
+      1
+          item and was
+      [NSubstitute.Core.Call (20117377)]
+      Stack Trace:
+        /tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs(50,0): at Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.TenantSuccessWithoutCurrentActorStopsBeforePartyLookup()
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence [FAIL]
+      Shouldly.ShouldAssertException : (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Status
+          should be
+      PartyLinkValidationStatus.Unavailable
+          but was
+      PartyLinkValidationStatus.Valid
+      Stack Trace:
+        /tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs(28,0): at Hexalith.Agents.Server.Tests.CallerIdentityPriorBehaviorTests.LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence()
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+  Finished:    Hexalith.Agents.Server.Tests (ID = '34334b8849b348af8382a1a6a72111325642072a260414ec06ae543de69a677f')
+=== TEST EXECUTION SUMMARY ===
+   Hexalith.Agents.Server.Tests  Total: 2, Errors: 0, Failed: 2, Skipped: 0, Not Run: 0, Time: 0.214s

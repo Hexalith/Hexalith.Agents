@@ -1,0 +1,167 @@
+{
+  "observedAt": "2026-10-28T12:42:41.633186+00:00",
+  "scope": "Final root-verified bounded caller correction after all review patches. Full parent remains incomplete.",
+  "baselineCommit": "98c4dda84fe4ef5ec353bd8b92929132484a6f19",
+  "local": {
+    "exitCode": 0,
+    "passed": 6001,
+    "warningFreeBuilds": 5,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1731,
+        "passed": 1731,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    }
+  },
+  "targetedReviewTests": {
+    "passed": 115,
+    "failed": 0,
+    "skipped": 0
+  },
+  "sixFocusedSuites": {
+    "executedInFullRun": true,
+    "passed": 261,
+    "classes": [
+      "Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests",
+      "Hexalith.Agents.Server.Tests.AgentInteractionGateOrchestratorTests",
+      "Hexalith.Agents.Server.Tests.AuthorityCancellationAdmissionTests",
+      "Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests",
+      "Hexalith.Agents.Server.Tests.ProjectedProviderCatalogReaderTests",
+      "Hexalith.Agents.Server.Tests.Story54CurrentEvidenceTests"
+    ]
+  },
+  "matrixExecutedPasses": {
+    "CallerQueryUsesTheVerifiedStableActorAndAcceptsAnEarlierActorObservation": 1,
+    "CallerRequiresExactCurrentBindingAndFiniteCustody": 27,
+    "AuthorityIsRecheckedAcrossEveryAwait": 14,
+    "ClassificationMustMatchThePurpose": 6,
+    "RealReaderDirectoryAndGateComposeWithoutLosingAuthorityDeadlines": 4,
+    "SerializedHumanIdentityRoundTripUsesThePublicClient": 6,
+    "ExpiryDuringClientExtensionEnumerationDeniesBeforeDispatch": 1,
+    "NoncanonicalActorIdsStopBeforeTheOwnerClient": 6,
+    "BindingEffectiveAfterTheVerifiedActorObservationIsRejected": 1,
+    "IneligibleHumanResultsReleaseNeitherPartyNorCallerDeadline": 3,
+    "DelayedDispatchAcknowledgementRetainsTheAcceptedGateOutcome": 1
+  },
+  "live": {
+    "exitCode": 1,
+    "Blockers": [
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-PARTIES-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-CONV-AI-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-SECRETS-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-HOST-1"
+      }
+    ],
+    "ExternalCalls": 0,
+    "StoryComplete": false,
+    "Mode": "Live"
+  },
+  "sourceSha256": {
+    "eng/verify-story-5.4.ps1": "946d3fa2377642be575689240b95d0c3696b5e86f72809adc874626cf4b632b0",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "1bf923d401e091e0afb1e2111f477627b99ed45a69427601e1064db1c3be2194",
+    "src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs": "c63b987c1d1d72f12e1a5e06612f04e8810037cc47824980340928672c77be40",
+    "src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs": "8a1966bfed6ebcec677bbacddddb667e7d363eab7c735c925df0c17ecfafdf31",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "cd56668b43bf83c16b67386f0c92fffa48c360bd5428a2d0e6d064419d29c62d",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "da522319fc88c3fd703bfcd83bfacf3b3dfd8590f4fdb2d2f60ffe60e67b06ab",
+    "src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs": "4114971653c6c966dee0c022a1ac1add38a062aa4ed48189e8b0c4a21eae78e3",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs": "281548c7deef9a5a26a3f61a9a031f57d098af4f72cb60e064efd7a629ac5431",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "a9d8317142d38f2ab626358bf9a4291d8c92d4a2305a90273f8dabcb1d427d7c",
+    "test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs": "950bd88f2c67ff0cf52b059ff1ac86b3265fd255c460d6145b75c4eca7841356",
+    "test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs": "21fc51c54fa463705ffad7df0bfc78ff1eab00366a213cc8d2c5e1ffc50e36a3",
+    "test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs": "0b8b2c413a63f349196627d2473945a2dd8d1ce2f6610961bf9c472a183c3866",
+    "test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs": "cbd7e4ebc815b9c575ae42212ee70efccb2c832a1a13e8ea74463ea491d080e0",
+    "test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs": "b9b332edff7570f2b0959e33b8d1e27ae55749185a61b0ec64b3238dc7092e96",
+    "test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs": "d3ad585e70391ca80d1071643f3375a1d0abe94845434aa5353a42ca58930e3d",
+    "test/Hexalith.Agents.Server.Tests/CallerIdentityReplyHttpMessageHandler.cs": "16aa3d7c0d5f52fdf90ae554e13063107d77a5bffc916e3934f32b51a879afee"
+  },
+  "navigationDocSha256": {
+    "_bmad-output/implementation-artifacts/tests/caller-party-binding-2026-10-28/README.md": "c844837bfa341aa9808e8f20a252d386c1a378cf44fb92e9347d82181f75e6b4"
+  },
+  "postRunDependencyObservation": "post-run-dependencies.json",
+  "commands": {
+    "Local": "PATH=/tmp/agents-caller-identity-launcher:$PATH pwsh -NoProfile -File eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/caller-party-binding-2026-10-28/review-1/review-fixes/local",
+    "Live": "pwsh -NoProfile -File eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/caller-party-binding-2026-10-28/review-1/review-fixes/live"
+  },
+  "StoryComplete": false,
+  "LiveReadinessEstablished": false,
+  "artifactSha256": {
+    "FINAL-RESULTS.md": "d3c841a633df1be801b8efd94f8bcc7feec9337ab0438472c47be30ac2b67572",
+    "README.md": "0ca617c6e37f68184e0e9ec5a72597a77e6b481b3a61ecfce4dcd329e93fc1a4",
+    "REVIEW.md": "393929569db93664816c747a9db89a49c112b773c377a67189460a89f06ad4d0",
+    "focused-build-command.json": "22fd234d85ada46e6ef4efbb300fb055a8593973766271ce57c01f2326cbae0f",
+    "focused-build.log": "f07d4c2f63bf8b6c2a76e1adaabc2d6f8cd9418b1a5c01b537674458725d8113",
+    "focused-command.json": "58b43c827d955f5469bcc98088e4785247f966da252338c9c1f762c5650f1cec",
+    "focused-verification.json": "5965b85e25c912f9ce0f0b1895bda49786f2de3568fad3544c8227f4c9619bf4",
+    "focused.log": "c63c561257ab09a4c5863d3a83ae5f8d18ee2ddd8ba7d075bb257873d139076e",
+    "focused.xml": "82ff4e2aecfbc3e2b6ef5df113ea79221981467a3502e5fb39fbd081603f8e9a",
+    "live/result.json": "77be08233ffcc1e0bacd3d6e89cff21cd275023657c4421740a351b9b77a8123",
+    "live.log": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a",
+    "local/Hexalith.Agents.Client.Tests.build.log": "5625a0d10b0583a28a96fabd8db18a629e5b3cd774a152b717b814a47872cc21",
+    "local/Hexalith.Agents.Client.Tests.xml": "9674fdf40a2a971ce6b6238d8ff400d910a5c80ef80a9da98e09a06d6c2bae9c",
+    "local/Hexalith.Agents.Contracts.Tests.build.log": "7687251835ba53b7897caa2e4440206bb9108eaba85a62ec86b90e21aebd0475",
+    "local/Hexalith.Agents.Contracts.Tests.xml": "a8e156fe76a060020348470b298d21db5ff95c2c0b6a21906e578340dbb22c0f",
+    "local/Hexalith.Agents.Server.Tests.build.log": "1b3915b9336a9e9db9ac0bcc4fc4109e69128729660175b154652f710b784b2f",
+    "local/Hexalith.Agents.Server.Tests.xml": "e2e47e5ca454fba49213e1034671a3f139ac1e076a7ef90cf24c17452a1996de",
+    "local/Hexalith.Agents.Tests.build.log": "2b5303a2636de38bfe1af0c167d67c893ec66ba32ff6a1647111c1e28936f6d7",
+    "local/Hexalith.Agents.Tests.xml": "5e84cce8520856b2c92db6d9fb526a4f2d2a7ae61119e7c66cfc37bb7923a59a",
+    "local/Hexalith.Agents.UI.Tests.build.log": "8ce8d7bb7dbd380604606da53fddd0190837ccdb05c8dcde38bde5d4816e9f64",
+    "local/Hexalith.Agents.UI.Tests.xml": "c2e2f8c290bb70b84e459470cf74053832edaaf5e64e84ea533be8693106da8d",
+    "local/result.json": "0dbfa0059c5dc09edb10255fe726c70052514a42fd91a2d197f5bdf7058b00d0",
+    "local.log": "dbca16ac8f1ead15ead67bf1303ec1188003321ced4dc999003e34023453d497",
+    "post-run-dependencies.json": "8b0468338f18aeeea7f1023eff7f567ea0ae23574fb83819f96d1ebee26eca6c",
+    "source.patch": "e38f6792b35fd0b9e96021a0b75f9029369255c4cbc64731d24aaa73b595620b"
+  },
+  "review": {
+    "layersCompleted": 3,
+    "specLoopbacks": 1,
+    "remainingImplementationFindings": 0,
+    "deferredEntries": 2
+  }
+}

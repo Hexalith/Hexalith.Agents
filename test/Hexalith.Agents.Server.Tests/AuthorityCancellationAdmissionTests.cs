@@ -195,24 +195,31 @@ public sealed class AuthorityCancellationAdmissionTests
 
 #if HEXALITH_PARTIES_SOURCE
     /// <summary>A cancelled identity read performs no Parties client call.</summary>
-    [Fact]
-    public async Task PartyDirectoryCancellationBeforeAdmissionPerformsNoClientRead()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task PartyDirectoryCancellationBeforeAdmissionPerformsNoClientRead(bool caller)
     {
+        var clock = new Story54TimeProvider();
         var client = Substitute.For<IPartiesIdentityClient>();
-        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), new Story54TimeProvider());
+        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
 
-        await Should.ThrowAsync<OperationCanceledException>(() => directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
+        await Should.ThrowAsync<OperationCanceledException>(() => caller
+            ? directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(clock), cancellation.Token)
+            : directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
 
         client.ReceivedCalls().ShouldBeEmpty();
     }
 
     /// <summary>A failed cancelled Parties client read cannot turn into a processed unavailable result.</summary>
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task PartyDirectoryCancellationDuringClientReadIsPreserved(bool failure)
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task PartyDirectoryCancellationDuringClientReadIsPreserved(bool failure, bool caller)
     {
         var clock = new Story54TimeProvider();
         var client = Substitute.For<IPartiesIdentityClient>();
@@ -225,12 +232,16 @@ public sealed class AuthorityCancellationAdmissionTests
                 throw new InvalidOperationException("private source failure");
             }
 
-            return new PartyIdentityResult(PartyIdentityOutcome.Resolved, new PartyIdentityEvidence(1, "tenant-a", "party-a",
-                PartyIdentityClassification.Organization, true, false, false, 1, clock.GetUtcNow(), "observation", null));
+            return new PartyIdentityResult(PartyIdentityOutcome.Resolved, caller
+                ? Story54PartyIdentityFixture.Identity(clock)
+                : new PartyIdentityEvidence(1, "tenant-a", "party-a", PartyIdentityClassification.Organization,
+                    true, false, false, 1, clock.GetUtcNow(), "observation", null));
         });
         var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
 
-        await Should.ThrowAsync<OperationCanceledException>(() => directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
+        await Should.ThrowAsync<OperationCanceledException>(() => caller
+            ? directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(clock), cancellation.Token)
+            : directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
     }
 #endif
 

@@ -328,9 +328,13 @@ public sealed class ProjectedProviderCatalogReaderTests
             .ExecuteAsync(new AgentActivationRevalidationRequest("msg-2", "corr", tenantId, "hexa", "admin", true,
                 1, providerId, modelId, AgentResponseMode.Automatic), CancellationToken.None);
 
+        var gateClock = new Story54TimeProvider();
         ITenantAccessReader tenantAccess = Substitute.For<ITenantAccessReader>();
         tenantAccess.ReadAsync(tenantId, Arg.Any<string>(), "caller-party", Arg.Any<CancellationToken>())
-            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true)
+            {
+                CurrentActor = new(tenantId, "caller", "stable-actor", "caller-party", 1, 1, gateClock.Now, gateClock.Now.AddMinutes(1)),
+            });
         IConversationAccessReader conversationAccess = Substitute.For<IConversationAccessReader>();
         conversationAccess.ReadAsync(tenantId, "conversation", "caller-party", Arg.Any<CancellationToken>())
             .Returns(new ConversationAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
@@ -339,13 +343,13 @@ public sealed class ProjectedProviderCatalogReaderTests
             .Returns(new AgentInvocationReadiness(true, AgentLifecycleStatus.Active, true, "agent-party",
                 AgentResponseMode.Automatic, true, providerId, modelId, null, true, true));
         IAgentPartyDirectory parties = Substitute.For<IAgentPartyDirectory>();
-        parties.ValidateCallerPartyAsync(tenantId, "caller-party", Arg.Any<CancellationToken>())
-            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller-party"));
+        parties.ValidateCallerPartyAsync(tenantId, "caller-party", Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller-party") { CallerValidUntil = gateClock.Now.AddMinutes(1) });
         parties.ValidateExistingPartyAsync(tenantId, "agent-party", Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "agent-party"));
         AgentInteractionGateOutcomeResult interaction = await new AgentInteractionGateOrchestrator(
             tenantAccess, conversationAccess, readiness, parties, reader,
-            Substitute.For<IApproverPolicyResolver>(), dispatcher)
+            Substitute.For<IApproverPolicyResolver>(), dispatcher, gateClock)
             .ExecuteAsync(new AgentInteractionGateRequest("msg-3", "corr", tenantId, "interaction", "hexa",
                 "caller", "caller-party", "conversation", providerId, modelId,
                 AgentResponseMode.Automatic, "client-corr", null), CancellationToken.None);

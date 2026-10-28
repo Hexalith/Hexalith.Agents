@@ -57,6 +57,7 @@ public sealed class AgentInteractionGateOrchestrator
     private readonly IProviderCatalogReader _providerCatalogReader;
     private readonly IApproverPolicyResolver _approverPolicyResolver;
     private readonly IAgentCommandDispatcher _dispatcher;
+    private readonly TimeProvider _clock;
 
     /// <summary>Initializes a new instance of the <see cref="AgentInteractionGateOrchestrator"/> class.</summary>
     /// <param name="tenantAccessReader">The tenant-access read port (live binding deferred).</param>
@@ -66,6 +67,7 @@ public sealed class AgentInteractionGateOrchestrator
     /// <param name="providerCatalogReader">The reused provider-catalog reader (provider/model readiness).</param>
     /// <param name="approverPolicyResolver">The reused approver-policy resolver (Confirmation-mode response policy).</param>
     /// <param name="dispatcher">The command-dispatch seam (live binding deferred).</param>
+    /// <param name="clock">The registered clock used across the original authority evaluation interval.</param>
     public AgentInteractionGateOrchestrator(
         ITenantAccessReader tenantAccessReader,
         IConversationAccessReader conversationAccessReader,
@@ -73,7 +75,8 @@ public sealed class AgentInteractionGateOrchestrator
         IAgentPartyDirectory partyDirectory,
         IProviderCatalogReader providerCatalogReader,
         IApproverPolicyResolver approverPolicyResolver,
-        IAgentCommandDispatcher dispatcher)
+        IAgentCommandDispatcher dispatcher,
+        TimeProvider? clock = null)
     {
         ArgumentNullException.ThrowIfNull(tenantAccessReader);
         ArgumentNullException.ThrowIfNull(conversationAccessReader);
@@ -89,6 +92,7 @@ public sealed class AgentInteractionGateOrchestrator
         _providerCatalogReader = providerCatalogReader;
         _approverPolicyResolver = approverPolicyResolver;
         _dispatcher = dispatcher;
+        _clock = clock ?? TimeProvider.System;
     }
 
     /// <summary>Authorizes access before reading readiness, dispatching the gate command and returning its safe outcome.</summary>
@@ -99,39 +103,61 @@ public sealed class AgentInteractionGateOrchestrator
     {
         ArgumentNullException.ThrowIfNull(request);
         ct.ThrowIfCancellationRequested();
+        DateTimeOffset started = _clock.GetUtcNow();
+        DateTimeOffset checkedAt = started;
 
         // (1) Authorize each scope before protected downstream reads. No provider invocation, Conversations post,
         // proposal or target command follows a denied or uncertain tenant/caller/Conversation read.
         TenantAccessReadResult tenant = await ReadTenantAccessAsync(request, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
+        if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
+            || !HasCurrentActor(tenant, request, started, ref checkedAt))
         {
             // A denied caller must not address the claimed tenant's Party, Conversation, Agent or catalog,
             // or construct a target-domain command. Security observation is a private ingress operation.
             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
-        AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, caller: true, ct).ConfigureAwait(false);
+        AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, tenant.CurrentActor, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        if (callerParty.Status != PartyLinkValidationStatus.Valid)
+        if (callerParty.Status != PartyLinkValidationStatus.Valid || callerParty.PartyId != request.CallerPartyId
+            || callerParty.CallerValidUntil is not { } callerValidUntil
+            || !HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
         {
             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
 
         ConversationAccessReadResult conversation = await ReadConversationAccessAsync(request, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        if (conversation is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
+        if (conversation is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
+            || !HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
         {
             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
 
         AgentInvocationReadiness readiness = await ReadReadinessAsync(request, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        {
+            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
         AgentInteractionGateOutcome agentPartyIdentity = await ReadAgentPartyIdentityAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        {
+            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
         AgentInteractionGateOutcome providerReadiness = await ReadProviderReadinessAsync(request, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        {
+            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
         AgentInteractionGateOutcome responsePolicy = await ResolveResponsePolicyAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        {
+            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
 
         // (2) Map each read to exactly one verdict, in AgentInteractionGateCheck enum (evaluation) order.
         var verdicts = new List<AgentInvocationGateVerdict>
@@ -168,6 +194,11 @@ public sealed class AgentInteractionGateOrchestrator
 
         // (5) Dispatch (live binding deferred). (6) Return the safe outcome — status via the SHARED policy so the
         // orchestrator's reported status cannot drift from the aggregate's recorded decision (AD-12).
+        ct.ThrowIfCancellationRequested();
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        {
+            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
         await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
         return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInvocationGatePolicy.Decide(verdicts));
     }
@@ -210,12 +241,12 @@ public sealed class AgentInteractionGateOrchestrator
     }
 
     // The caller must be a Human Party; the Agent's linked Party must be its Organization/Agent identity.
-    private async Task<AgentPartyValidationResult> ValidatePartyAsync(string tenantId, string partyId, bool caller, CancellationToken ct)
+    private async Task<AgentPartyValidationResult> ValidatePartyAsync(string tenantId, string partyId, CurrentHumanActorEvidence? actor, CancellationToken ct)
     {
         try
         {
-            return caller
-                ? await _partyDirectory.ValidateCallerPartyAsync(tenantId, partyId, ct).ConfigureAwait(false)
+            return actor is not null
+                ? await _partyDirectory.ValidateCallerPartyAsync(tenantId, partyId, actor, ct).ConfigureAwait(false)
                 : await _partyDirectory.ValidateExistingPartyAsync(tenantId, partyId, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -238,8 +269,18 @@ public sealed class AgentInteractionGateOrchestrator
             return AgentInteractionGateOutcome.Missing;
         }
 
-        AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, caller: false, ct).ConfigureAwait(false);
+        AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, null, ct).ConfigureAwait(false);
         return MapPartyVerdict(agentParty.Status);
+    }
+
+    private bool HasCurrentActor(TenantAccessReadResult tenant, AgentInteractionGateRequest request, DateTimeOffset started, ref DateTimeOffset checkedAt, DateTimeOffset? callerValidUntil = null)
+    {
+        DateTimeOffset now = _clock.GetUtcNow();
+        bool current = now.Offset == TimeSpan.Zero && now >= checkedAt
+            && (callerValidUntil is null || callerValidUntil.Value.Offset == TimeSpan.Zero && callerValidUntil.Value > now)
+            && tenant.CurrentActor?.IsCurrentFor(request.TenantId, request.ActorUserId, request.CallerPartyId, started, now) == true;
+        checkedAt = now;
+        return current;
     }
 
     // ProviderModelReadiness (AD-9): the snapshot-recorded provider/model entry must be CURRENTLY enabled/ready in the

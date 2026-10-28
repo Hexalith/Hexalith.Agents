@@ -1,0 +1,11 @@
+<Project>
+<Target Name="CompilePriorCallerValidationWithoutChangingWorkingSources" BeforeTargets="CoreCompile">
+<ItemGroup Condition="'$(MSBuildProjectName)' == 'Hexalith.Agents.Server'">
+<Compile Remove="Ports/PartiesAgentPartyDirectory.cs;Application/AgentInteractions/AgentInteractionGateOrchestrator.cs" />
+<Compile Include="/tmp/agents-caller-identity-baseline/PartiesAgentPartyDirectory.cs;/tmp/agents-caller-identity-baseline/AgentInteractionGateOrchestrator.cs" />
+</ItemGroup>
+<ItemGroup Condition="'$(MSBuildProjectName)' == 'Hexalith.Agents.Server.Tests'">
+<Compile Remove="*.cs" />
+<Compile Include="/tmp/agents-caller-identity-baseline/CallerIdentityPriorBehaviorTests.cs" />
+</ItemGroup>
+</Target></Project>

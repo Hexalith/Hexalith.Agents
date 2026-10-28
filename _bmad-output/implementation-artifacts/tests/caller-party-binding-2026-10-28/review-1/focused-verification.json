@@ -1,0 +1,117 @@
+{
+  "observedAt": "2026-10-28T12:15:13.199271+00:00",
+  "scope": "Post-run local source and focused-result observation; no dependency availability or pre-run transitive attestation.",
+  "baselineCommit": "98c4dda84fe4ef5ec353bd8b92929132484a6f19",
+  "sourceFiles": {
+    "eng/verify-story-5.4.ps1": "946d3fa2377642be575689240b95d0c3696b5e86f72809adc874626cf4b632b0",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "1bf923d401e091e0afb1e2111f477627b99ed45a69427601e1064db1c3be2194",
+    "src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs": "c63b987c1d1d72f12e1a5e06612f04e8810037cc47824980340928672c77be40",
+    "src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs": "8a1966bfed6ebcec677bbacddddb667e7d363eab7c735c925df0c17ecfafdf31",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "900d1e1f541230e8446d9ca44fc548b1df733875c9a0e8cf26c704eefe7c856a",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "da522319fc88c3fd703bfcd83bfacf3b3dfd8590f4fdb2d2f60ffe60e67b06ab",
+    "src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs": "4114971653c6c966dee0c022a1ac1add38a062aa4ed48189e8b0c4a21eae78e3",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs": "f360a908bce865a30793ffec6f1b8c636d10c27ca2a23908d17cae61b368a5e0",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "109feb904514ed71124303777d0f26c9ee9569261ed00e84251bf03f2dfbffa0",
+    "test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs": "950bd88f2c67ff0cf52b059ff1ac86b3265fd255c460d6145b75c4eca7841356",
+    "test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs": "21fc51c54fa463705ffad7df0bfc78ff1eab00366a213cc8d2c5e1ffc50e36a3",
+    "test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs": "cfe688beb04869397943870fe230ef8d73ee19e9159c669b92e21dc96d8e9fda",
+    "test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs": "cbd7e4ebc815b9c575ae42212ee70efccb2c832a1a13e8ea74463ea491d080e0",
+    "test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs": "b9b332edff7570f2b0959e33b8d1e27ae55749185a61b0ec64b3238dc7092e96",
+    "test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs": "d3ad585e70391ca80d1071643f3375a1d0abe94845434aa5353a42ca58930e3d"
+  },
+  "sourcePatchSha256": "b2c2502866d91eb4dd43341b5e5bd86cebdf3e6a764be87d30ff6d167cf1d808",
+  "focusedBuild": {
+    "exitCode": 0,
+    "warnings": 0,
+    "errors": 0,
+    "command": "focused-build-command.json",
+    "log": "focused-build.log"
+  },
+  "focused": {
+    "exitCode": 0,
+    "attributes": {
+      "schema-version": "3",
+      "id": "a2005dc0-7812-44cd-bdbe-fbcbb506dbb5",
+      "computer": "DESKTOP-VIOG240",
+      "user": "administrator",
+      "start-rtf": "2026-10-28T12:14:26.6551629+00:00",
+      "finish-rtf": "2026-10-28T12:14:27.0168307+00:00",
+      "timestamp": "10/28/2026 13:14:27"
+    },
+    "command": "focused-command.json",
+    "log": "focused.log",
+    "xml": "focused.xml",
+    "assemblies": [
+      {
+        "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+        "id": "d48090cc-dd67-4761-9ae1-34a99e1ecfaf",
+        "name": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "run-date": "2026-10-28",
+        "run-time": "12:14:26",
+        "start-rtf": "2026-10-28T12:14:26.6551629+00:00",
+        "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+        "target-framework": ".NETCoreApp,Version=v10.0",
+        "errors": "0",
+        "failed": "0",
+        "finish-rtf": "2026-10-28T12:14:27.0168307+00:00",
+        "not-run": "0",
+        "passed": "241",
+        "skipped": "0",
+        "time": "0.361",
+        "time-rtf": "00:00:00.3610000",
+        "total": "241"
+      }
+    ]
+  },
+  "priorBehavior": {
+    "scope": "Three pre-review staged implementation copies substituted only for isolated compilation. Current support types and tests retained. Working sources unchanged.",
+    "buildExitCode": 0,
+    "expectedTestExitCode": 1,
+    "attributes": {
+      "schema-version": "3",
+      "id": "d65c202d-6e76-44d6-b291-71548fa7c289",
+      "computer": "DESKTOP-VIOG240",
+      "user": "administrator",
+      "start-rtf": "2026-10-28T12:12:32.2568124+00:00",
+      "finish-rtf": "2026-10-28T12:12:32.5262699+00:00",
+      "timestamp": "10/28/2026 13:12:32"
+    },
+    "sourceCopies": {
+      "prior-behavior/AgentInteractionGateOrchestrator.cs.txt": "e96d3f663bad26bce70512c40ee35a41d5f3e684b860f9db81fa50be7c20eb72",
+      "prior-behavior/PartiesAgentPartyDirectory.cs.txt": "0bb19adfe1ce3ab74f8a61956d0f317de3a9fa2ff48082ac388a98281883dfe4",
+      "prior-behavior/ProjectedTenantAccessReader.cs.txt": "6d81c4b039f88eb8115c6807299d3f283ff7fb1597e65f3a1f42f04d71e7d210"
+    },
+    "testCommand": "prior-behavior/test-command.json",
+    "result": "prior-behavior/regressions.xml",
+    "assemblies": [
+      {
+        "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+        "id": "99bcb8c8-4dee-4dbd-9a55-43406091a050",
+        "name": "/tmp/agents-caller-authority-review1-prior/bin/Hexalith.Agents.Server.Tests.dll",
+        "run-date": "2026-10-28",
+        "run-time": "12:12:32",
+        "start-rtf": "2026-10-28T12:12:32.2568124+00:00",
+        "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+        "target-framework": ".NETCoreApp,Version=v10.0",
+        "errors": "0",
+        "failed": "10",
+        "finish-rtf": "2026-10-28T12:12:32.5262699+00:00",
+        "not-run": "0",
+        "passed": "2",
+        "skipped": "0",
+        "time": "0.270",
+        "time-rtf": "00:00:00.2700000",
+        "total": "12"
+      }
+    ]
+  },
+  "mappingEnvironment": {
+    "path": "/tmp/agents-caller-identity-mapping/environment.json",
+    "sha256": "2d9932934a94099bdc472dbb20e4ce414bd8dfffc496cd4802985216fe3deb97"
+  },
+  "outstanding": [
+    "Root strict full Local/Live verification",
+    "Root dependency/SDK post-run observation and bounded parent-spec results",
+    "Full Story 5.4 acceptance and all four unavailable owner dependencies remain outstanding"
+  ]
+}

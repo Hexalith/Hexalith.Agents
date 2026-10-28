@@ -1,0 +1,12 @@
+<Project>
+<Target Name="CompilePriorAuthorityDeadlineBehaviorWithoutChangingSources" BeforeTargets="CoreCompile">
+<ItemGroup Condition="'$(MSBuildProjectName)' == 'Hexalith.Agents.Server'">
+<Compile Remove="Ports/ProjectedTenantAccessReader.cs" />
+<Compile Include="/tmp/agents-caller-authority-review1-prior/ProjectedTenantAccessReader.cs" />
+<Compile Remove="Ports/PartiesAgentPartyDirectory.cs" />
+<Compile Include="/tmp/agents-caller-authority-review1-prior/PartiesAgentPartyDirectory.cs" />
+<Compile Remove="Application/AgentInteractions/AgentInteractionGateOrchestrator.cs" />
+<Compile Include="/tmp/agents-caller-authority-review1-prior/AgentInteractionGateOrchestrator.cs" />
+</ItemGroup>
+</Target>
+</Project>

@@ -4,7 +4,7 @@ namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>
 /// Server-internal result of validating or provisioning the Party identity an Agent (<c>hexa</c>) is being linked
-/// to (AC1, AC2). It carries ONLY the safe verdict and the stable <see cref="PartyId"/> reference — never a Party
+/// to (AC1, AC2). It carries the safe verdict, stable <see cref="PartyId"/> reference and transient caller-validity deadline — never a Party
 /// display name, contact value, personal identifier, or any Parties personal-data object (AC1; AD-7, AD-14). This
 /// is the single value allowed to cross the port boundary back into the Agents side; the Parties PII never does.
 /// </summary>
@@ -16,6 +16,9 @@ namespace Hexalith.Agents.Server.Ports;
 /// <param name="PartyId">The validated/created stable Party id (a reference, not PII), or <see langword="null"/> when none.</param>
 public sealed record AgentPartyValidationResult(PartyLinkValidationStatus Status, string? PartyId)
 {
+    /// <summary>Gets the exclusive UTC deadline for successful current Human validation; never used for Agent identity.</summary>
+    public DateTimeOffset? CallerValidUntil { get; init; }
+
     /// <summary>Gets the unavailable external record.</summary>
     public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
 }

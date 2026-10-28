@@ -1,0 +1,18 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Hexalith.Commons.UniqueIds -> /home/administrator/projects/hexalith/agents/references/Hexalith.Commons/src/libraries/Hexalith.Commons.UniqueIds/bin/Debug/net10.0/Hexalith.Commons.UniqueIds.dll
+  Hexalith.EventStore.Contracts -> /home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/bin/Debug/net10.0/Hexalith.EventStore.Contracts.dll
+  Hexalith.Agents.Contracts -> /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Contracts/bin/Debug/net10.0/Hexalith.Agents.Contracts.dll
+  Hexalith.Agents.Client -> /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Client/bin/Debug/net10.0/Hexalith.Agents.Client.dll
+  Hexalith.FrontComposer.Contracts -> /home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer/src/Hexalith.FrontComposer.Contracts/bin/Debug/net10.0/Hexalith.FrontComposer.Contracts.dll
+  Hexalith.FrontComposer.Contracts.UI -> /home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer/src/Hexalith.FrontComposer.Contracts.UI/bin/Debug/net10.0/Hexalith.FrontComposer.Contracts.UI.dll
+  Hexalith.FrontComposer.Shell -> /home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer/src/Hexalith.FrontComposer.Shell/bin/Debug/net10.0/Hexalith.FrontComposer.Shell.dll
+  Hexalith.Agents.UI -> /home/administrator/projects/hexalith/agents/src/Hexalith.Agents.UI/bin/Debug/net10.0/Hexalith.Agents.UI.dll
+  Hexalith.FrontComposer.Testing -> /home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer/src/Hexalith.FrontComposer.Testing/bin/Debug/net10.0/Hexalith.FrontComposer.Testing.dll
+  Hexalith.Agents.UI.Tests -> /home/administrator/projects/hexalith/agents/test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.58

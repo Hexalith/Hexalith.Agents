@@ -1,0 +1,16 @@
+using System.Text.Json;
+using Hexalith.Builds.Tooling.Workspace;
+string root = Path.GetFullPath(args[0]);
+string workspace = Path.GetFullPath(args[1]);
+List<SourceMappingEntry> entries = [new("Hexalith.Agents", "source", root)];
+foreach (string line in File.ReadAllLines(Path.Combine(root, ".gitmodules")))
+{
+    string text = line.Trim();
+    if (!text.StartsWith("path = ", StringComparison.Ordinal)) continue;
+    string relative = text[7..];
+    entries.Add(new(Path.GetFileName(relative), "source", Path.Combine(root, relative)));
+}
+SourceMapping mapping = new(WorkspaceMode.Source, root, "Hexalith.Agents", entries, true);
+await SourceMappingMaterializer.WriteAsync(mapping, workspace, CancellationToken.None);
+await File.WriteAllTextAsync(Path.Combine(workspace, "environment.json"), JsonSerializer.Serialize(SourceMappingMaterializer.Environment(mapping, workspace), new JsonSerializerOptions { WriteIndented = true }));
+Console.WriteLine(mapping.ContentHash);

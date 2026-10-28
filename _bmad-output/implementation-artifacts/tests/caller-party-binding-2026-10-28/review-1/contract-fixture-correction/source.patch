@@ -1,0 +1,1446 @@
+diff --git a/eng/verify-story-5.4.ps1 b/eng/verify-story-5.4.ps1
+index 45a8918..c777b74 100644
+--- a/eng/verify-story-5.4.ps1
++++ b/eng/verify-story-5.4.ps1
+@@ -69,7 +69,7 @@ foreach ($name in $projects) {
+     }
+     $requiredClasses = switch ($name) {
+         'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests', 'AgentApproverPolicyTests') }
+-        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'AgentSetupApproverBasisTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
++        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'PartiesAgentPartyDirectoryTests', 'ApproverEvidenceAdmissionTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'AgentSetupApproverBasisTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
+         'Hexalith.Agents.UI.Tests' { @('AgentConfigurationTests', 'ApproverPolicyTests') }
+         default { @() }
+     }
+diff --git a/src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs b/src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs
+index 35aff52..40831a7 100644
+--- a/src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs
++++ b/src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs
+@@ -57,6 +57,7 @@ public sealed class AgentInteractionGateOrchestrator
+     private readonly IProviderCatalogReader _providerCatalogReader;
+     private readonly IApproverPolicyResolver _approverPolicyResolver;
+     private readonly IAgentCommandDispatcher _dispatcher;
++    private readonly TimeProvider _clock;
+ 
+     /// <summary>Initializes a new instance of the <see cref="AgentInteractionGateOrchestrator"/> class.</summary>
+     /// <param name="tenantAccessReader">The tenant-access read port (live binding deferred).</param>
+@@ -66,6 +67,7 @@ public sealed class AgentInteractionGateOrchestrator
+     /// <param name="providerCatalogReader">The reused provider-catalog reader (provider/model readiness).</param>
+     /// <param name="approverPolicyResolver">The reused approver-policy resolver (Confirmation-mode response policy).</param>
+     /// <param name="dispatcher">The command-dispatch seam (live binding deferred).</param>
++    /// <param name="clock">The registered clock used across the original authority evaluation interval.</param>
+     public AgentInteractionGateOrchestrator(
+         ITenantAccessReader tenantAccessReader,
+         IConversationAccessReader conversationAccessReader,
+@@ -73,7 +75,8 @@ public sealed class AgentInteractionGateOrchestrator
+         IAgentPartyDirectory partyDirectory,
+         IProviderCatalogReader providerCatalogReader,
+         IApproverPolicyResolver approverPolicyResolver,
+-        IAgentCommandDispatcher dispatcher)
++        IAgentCommandDispatcher dispatcher,
++        TimeProvider? clock = null)
+     {
+         ArgumentNullException.ThrowIfNull(tenantAccessReader);
+         ArgumentNullException.ThrowIfNull(conversationAccessReader);
+@@ -89,6 +92,7 @@ public sealed class AgentInteractionGateOrchestrator
+         _providerCatalogReader = providerCatalogReader;
+         _approverPolicyResolver = approverPolicyResolver;
+         _dispatcher = dispatcher;
++        _clock = clock ?? TimeProvider.System;
+     }
+ 
+     /// <summary>Authorizes access before reading readiness, dispatching the gate command and returning its safe outcome.</summary>
+@@ -99,39 +103,61 @@ public sealed class AgentInteractionGateOrchestrator
+     {
+         ArgumentNullException.ThrowIfNull(request);
+         ct.ThrowIfCancellationRequested();
++        DateTimeOffset started = _clock.GetUtcNow();
++        DateTimeOffset checkedAt = started;
+ 
+         // (1) Authorize each scope before protected downstream reads. No provider invocation, Conversations post,
+         // proposal or target command follows a denied or uncertain tenant/caller/Conversation read.
+         TenantAccessReadResult tenant = await ReadTenantAccessAsync(request, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
+-        if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
++        if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
++            || !HasCurrentActor(tenant, request, started, ref checkedAt))
+         {
+             // A denied caller must not address the claimed tenant's Party, Conversation, Agent or catalog,
+             // or construct a target-domain command. Security observation is a private ingress operation.
+             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
+         }
+-        AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, caller: true, ct).ConfigureAwait(false);
++        AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, tenant.CurrentActor, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
+-        if (callerParty.Status != PartyLinkValidationStatus.Valid)
++        if (callerParty.Status != PartyLinkValidationStatus.Valid || callerParty.PartyId != request.CallerPartyId
++            || callerParty.CallerValidUntil is not { } callerValidUntil
++            || !HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+         {
+             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
+         }
+ 
+         ConversationAccessReadResult conversation = await ReadConversationAccessAsync(request, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
+-        if (conversation is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true })
++        if (conversation is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
++            || !HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+         {
+             return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Denied);
+         }
+ 
+         AgentInvocationReadiness readiness = await ReadReadinessAsync(request, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
++        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
++        {
++            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
++        }
+         AgentInteractionGateOutcome agentPartyIdentity = await ReadAgentPartyIdentityAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
++        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
++        {
++            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
++        }
+         AgentInteractionGateOutcome providerReadiness = await ReadProviderReadinessAsync(request, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
++        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
++        {
++            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
++        }
+         AgentInteractionGateOutcome responsePolicy = await ResolveResponsePolicyAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
+         ct.ThrowIfCancellationRequested();
++        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
++        {
++            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
++        }
+ 
+         // (2) Map each read to exactly one verdict, in AgentInteractionGateCheck enum (evaluation) order.
+         var verdicts = new List<AgentInvocationGateVerdict>
+@@ -168,6 +194,11 @@ public sealed class AgentInteractionGateOrchestrator
+ 
+         // (5) Dispatch (live binding deferred). (6) Return the safe outcome — status via the SHARED policy so the
+         // orchestrator's reported status cannot drift from the aggregate's recorded decision (AD-12).
++        ct.ThrowIfCancellationRequested();
++        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
++        {
++            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
++        }
+         await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
+         return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInvocationGatePolicy.Decide(verdicts));
+     }
+@@ -210,12 +241,12 @@ public sealed class AgentInteractionGateOrchestrator
+     }
+ 
+     // The caller must be a Human Party; the Agent's linked Party must be its Organization/Agent identity.
+-    private async Task<AgentPartyValidationResult> ValidatePartyAsync(string tenantId, string partyId, bool caller, CancellationToken ct)
++    private async Task<AgentPartyValidationResult> ValidatePartyAsync(string tenantId, string partyId, CurrentHumanActorEvidence? actor, CancellationToken ct)
+     {
+         try
+         {
+-            return caller
+-                ? await _partyDirectory.ValidateCallerPartyAsync(tenantId, partyId, ct).ConfigureAwait(false)
++            return actor is not null
++                ? await _partyDirectory.ValidateCallerPartyAsync(tenantId, partyId, actor, ct).ConfigureAwait(false)
+                 : await _partyDirectory.ValidateExistingPartyAsync(tenantId, partyId, ct).ConfigureAwait(false);
+         }
+         catch (Exception ex) when (ex is not OperationCanceledException)
+@@ -238,10 +269,20 @@ public sealed class AgentInteractionGateOrchestrator
+             return AgentInteractionGateOutcome.Missing;
+         }
+ 
+-        AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, caller: false, ct).ConfigureAwait(false);
++        AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, null, ct).ConfigureAwait(false);
+         return MapPartyVerdict(agentParty.Status);
+     }
+ 
++    private bool HasCurrentActor(TenantAccessReadResult tenant, AgentInteractionGateRequest request, DateTimeOffset started, ref DateTimeOffset checkedAt, DateTimeOffset? callerValidUntil = null)
++    {
++        DateTimeOffset now = _clock.GetUtcNow();
++        bool current = now.Offset == TimeSpan.Zero && now >= checkedAt
++            && (callerValidUntil is null || callerValidUntil.Value.Offset == TimeSpan.Zero && callerValidUntil.Value > now)
++            && tenant.CurrentActor?.IsCurrentFor(request.TenantId, request.ActorUserId, request.CallerPartyId, started, now) == true;
++        checkedAt = now;
++        return current;
++    }
++
+     // ProviderModelReadiness (AD-9): the snapshot-recorded provider/model entry must be CURRENTLY enabled/ready in the
+     // catalog. The snapshot tells us WHICH provider/model; the catalog read tells us if it is ready now.
+     private async Task<AgentInteractionGateOutcome> ReadProviderReadinessAsync(AgentInteractionGateRequest request, CancellationToken ct)
+diff --git a/src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs b/src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs
+index 2b287e0..56c3dc4 100644
+--- a/src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs
++++ b/src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs
+@@ -4,7 +4,7 @@ namespace Hexalith.Agents.Server.Ports;
+ 
+ /// <summary>
+ /// Server-internal result of validating or provisioning the Party identity an Agent (<c>hexa</c>) is being linked
+-/// to (AC1, AC2). It carries ONLY the safe verdict and the stable <see cref="PartyId"/> reference — never a Party
++/// to (AC1, AC2). It carries the safe verdict, stable <see cref="PartyId"/> reference and transient caller-validity deadline — never a Party
+ /// display name, contact value, personal identifier, or any Parties personal-data object (AC1; AD-7, AD-14). This
+ /// is the single value allowed to cross the port boundary back into the Agents side; the Parties PII never does.
+ /// </summary>
+@@ -16,6 +16,9 @@ namespace Hexalith.Agents.Server.Ports;
+ /// <param name="PartyId">The validated/created stable Party id (a reference, not PII), or <see langword="null"/> when none.</param>
+ public sealed record AgentPartyValidationResult(PartyLinkValidationStatus Status, string? PartyId)
+ {
++    /// <summary>Gets the exclusive UTC deadline for successful current Human validation; never used for Agent identity.</summary>
++    public DateTimeOffset? CallerValidUntil { get; init; }
++
+     /// <summary>Gets the unavailable external record.</summary>
+     public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
+ }
+diff --git a/src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs b/src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs
+index 7d5850b..cefdf38 100644
+--- a/src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs
++++ b/src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs
+@@ -1,44 +1,62 @@
+-using System.Threading;
+-using System.Threading.Tasks;
+-
+-namespace Hexalith.Agents.Server.Ports;
+-
+-/// <summary>
+-/// Server-internal port the application orchestration uses to validate an existing Party identity, or provision a
+-/// new Agent Party, through the Parties module (AD-3, AD-7, AD-12). The implementation calls the public Parties
+-/// client and maps the dependency state to a safe <see cref="AgentPartyValidationResult"/>; it MUST never surface
+-/// Party PII (display names, contacts, personal-data objects) back across this boundary (AC1; AD-14).
+-/// </summary>
+-/// <remarks>
+-/// Keeping this a port (rather than calling the Parties client inline) preserves the AD-3 round-trip: the pure
+-/// aggregate receives the resulting verdict through a trusted command extension, never by calling Parties itself.
+-/// </remarks>
+-public interface IAgentPartyDirectory
+-{
+-    /// <summary>
+-    /// Validates an existing Party as the Agent's own identity and maps its state to a fail-closed verdict (AC2). An
+-    /// Organization or Agent Party qualifies; a Human Party is <see cref="PartyLinkValidationStatus.Unauthorized"/>.
+-    /// </summary>
+-    /// <param name="tenantId">The Agent's tenant scope.</param>
+-    /// <param name="partyId">The stable Party id to validate.</param>
+-    /// <param name="ct">The cancellation token.</param>
+-    /// <returns>The safe verdict plus the validated Party id (no PII).</returns>
+-    Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct);
+-
+-    /// <summary>
+-    /// Validates the calling Party of an Agent Call and maps its state to a fail-closed verdict (Story 5.4). Only a
+-    /// Human Party qualifies; an Organization or Agent Party is <see cref="PartyLinkValidationStatus.Unauthorized"/>.
+-    /// </summary>
+-    /// <param name="tenantId">The caller's tenant scope.</param>
+-    /// <param name="partyId">The caller's stable Party id.</param>
+-    /// <param name="ct">The cancellation token.</param>
+-    /// <returns>The safe verdict plus the validated Party id (no PII).</returns>
+-    Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct);
+-
+-    /// <summary>Provisions a new Agent Party (Organization, deterministic id) and returns its id with a verdict (AD-13).</summary>
+-    /// <param name="tenantId">The Agent's tenant scope.</param>
+-    /// <param name="request">The provisioning request (Agent id + non-personal label).</param>
+-    /// <param name="ct">The cancellation token.</param>
+-    /// <returns>The safe verdict plus the new Party id (no PII).</returns>
+-    Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct);
+-}
++using System.Threading;
++using System.Threading.Tasks;
++
++using Hexalith.Agents.Contracts.Agent;
++
++namespace Hexalith.Agents.Server.Ports;
++
++/// <summary>
++/// Server-internal port the application orchestration uses to validate an existing Party identity, or provision a
++/// new Agent Party, through the Parties module (AD-3, AD-7, AD-12). The implementation calls the public Parties
++/// client and maps the dependency state to a safe <see cref="AgentPartyValidationResult"/>; it MUST never surface
++/// Party PII (display names, contacts, personal-data objects) back across this boundary (AC1; AD-14).
++/// </summary>
++/// <remarks>
++/// Keeping this a port (rather than calling the Parties client inline) preserves the AD-3 round-trip: the pure
++/// aggregate receives the resulting verdict through a trusted command extension, never by calling Parties itself.
++/// </remarks>
++public interface IAgentPartyDirectory
++{
++    /// <summary>
++    /// Validates an existing Party as the Agent's own identity and maps its state to a fail-closed verdict (AC2). An
++    /// Organization or Agent Party qualifies; a Human Party is <see cref="PartyLinkValidationStatus.Unauthorized"/>.
++    /// </summary>
++    /// <param name="tenantId">The Agent's tenant scope.</param>
++    /// <param name="partyId">The stable Party id to validate.</param>
++    /// <param name="ct">The cancellation token.</param>
++    /// <returns>The safe verdict plus the validated Party id (no PII).</returns>
++    Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct);
++
++    /// <summary>
++    /// Preserves the historical caller-validation signature as unavailable: no current actor binding is supplied.
++    /// Current Human validation requires the actor-bearing overload.
++    /// </summary>
++    /// <param name="tenantId">The caller's tenant scope.</param>
++    /// <param name="partyId">The caller's stable Party id.</param>
++    /// <param name="ct">The cancellation token.</param>
++    /// <returns>The safe verdict plus the validated Party id (no PII).</returns>
++    Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct)
++    {
++        ct.ThrowIfCancellationRequested();
++        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
++    }
++
++    /// <summary>Validates the exact current Human binding using verified tenant-authorization evidence.</summary>
++    /// <param name="tenantId">The exact caller tenant.</param>
++    /// <param name="partyId">The exact caller Party.</param>
++    /// <param name="actor">Transient server-verified subject, stable actor and current binding.</param>
++    /// <param name="ct">The cancellation token.</param>
++    /// <returns>A safe verdict. Implementations without current-binding support remain closed.</returns>
++    Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CurrentHumanActorEvidence actor, CancellationToken ct)
++    {
++        ct.ThrowIfCancellationRequested();
++        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
++    }
++
++    /// <summary>Provisions a new Agent Party (Organization, deterministic id) and returns its id with a verdict (AD-13).</summary>
++    /// <param name="tenantId">The Agent's tenant scope.</param>
++    /// <param name="request">The provisioning request (Agent id + non-personal label).</param>
++    /// <param name="ct">The cancellation token.</param>
++    /// <returns>The safe verdict plus the new Party id (no PII).</returns>
++    Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct);
++}
+diff --git a/src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs b/src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs
+index f38995e..c0e0951 100644
+--- a/src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs
++++ b/src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs
+@@ -40,15 +40,30 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
+ 
+     /// <inheritdoc />
+     public Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct)
+-        => ValidateAsync(tenantId, partyId, human: false, ct);
++        => ValidateAsync(tenantId, partyId, null, ct);
+ 
+     /// <inheritdoc />
+     public Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct)
+-        => ValidateAsync(tenantId, partyId, human: true, ct);
++    {
++        ct.ThrowIfCancellationRequested();
++        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null)
++        {
++            Dependency = _availability.Check("EXT-PARTIES-1"),
++        });
++    }
++
++    /// <inheritdoc />
++    public Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CurrentHumanActorEvidence actor, CancellationToken ct)
++    {
++        ct.ThrowIfCancellationRequested();
++        return actor is null
++            ? Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null))
++            : ValidateAsync(tenantId, partyId, actor, ct);
++    }
+ 
+     // An Agent identity is Organization (Branch B, verified by id) or Agent; a caller is Human. A well-formed Party of
+     // the other kind is Unauthorized for that purpose, so a person cannot speak as hexa nor hexa act as a caller.
+-    private async Task<AgentPartyValidationResult> ValidateAsync(string tenantId, string partyId, bool human, CancellationToken ct)
++    private async Task<AgentPartyValidationResult> ValidateAsync(string tenantId, string partyId, CurrentHumanActorEvidence? actor, CancellationToken ct)
+     {
+         ct.ThrowIfCancellationRequested();
+         if (_availability.Check("EXT-PARTIES-1") is { } blocker)
+@@ -66,7 +81,13 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
+             try
+             {
+                 DateTimeOffset started = _clock.GetUtcNow();
+-                PartyIdentityResult result = await _identityClient.ResolvePartyIdentityAsync(tenantId, new ResolvePartyIdentity(tenantId, partyId), ct).ConfigureAwait(false);
++                if (actor is not null && !actor.IsCurrentFor(tenantId, actor.Subject, partyId, actor.ObservedAt, started))
++                {
++                    return new(PartyLinkValidationStatus.Unavailable, null);
++                }
++
++                PartyIdentityResult result = await _identityClient.ResolvePartyIdentityAsync(tenantId,
++                    new ResolvePartyIdentity(tenantId, partyId, actor?.ActorId), ct).ConfigureAwait(false);
+                 DateTimeOffset completed = _clock.GetUtcNow();
+                 ct.ThrowIfCancellationRequested();
+                 if (result.Outcome != PartyIdentityOutcome.Resolved || result.Evidence is not { } evidence)
+@@ -83,13 +104,23 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
+                     return new(PartyLinkValidationStatus.Unavailable, null);
+                 }
+ 
+-                if ((evidence.Classification == PartyIdentityClassification.Human) != human)
++                if ((evidence.Classification == PartyIdentityClassification.Human) != (actor is not null))
+                 {
+                     return new(PartyLinkValidationStatus.Unauthorized, null);
+                 }
+ 
++                if (actor is not null && (!actor.IsCurrentFor(tenantId, actor.Subject, partyId, actor.ObservedAt, completed)
++                    || !HasCurrentBinding(evidence, actor, completed)))
++                {
++                    return new(PartyLinkValidationStatus.Unavailable, null);
++                }
++
+                 return evidence.IsActive && !evidence.IsRestricted && !evidence.IsErasingOrErased
+-                    ? new(PartyLinkValidationStatus.Valid, partyId) : new(PartyLinkValidationStatus.Disabled, null);
++                    ? new(PartyLinkValidationStatus.Valid, partyId)
++                    {
++                        CallerValidUntil = actor is null ? null : CallerDeadline(actor, evidence.HumanBinding!),
++                    }
++                    : new(PartyLinkValidationStatus.Disabled, null);
+             }
+             catch (Exception exception) when (exception is not OperationCanceledException)
+             {
+@@ -102,6 +133,28 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
+         return new(PartyLinkValidationStatus.Unavailable, null);
+     }
+ 
++#if HEXALITH_PARTIES_SOURCE
++    private static DateTimeOffset CallerDeadline(CurrentHumanActorEvidence actor, HumanActorBindingEvidence binding)
++    {
++        DateTimeOffset deadline = actor.ValidUntil < binding.Custody.ExpiresAt ? actor.ValidUntil : binding.Custody.ExpiresAt;
++        return binding.ValidUntil is { } until && until < deadline ? until : deadline;
++    }
++
++    private static bool HasCurrentBinding(PartyIdentityEvidence evidence, CurrentHumanActorEvidence actor, DateTimeOffset completed)
++        => evidence.HumanBinding is { } binding
++            && binding.TenantId == actor.TenantId && binding.PartyId == actor.PartyId && binding.ActorId == actor.ActorId
++            && binding.BindingVersion == actor.BindingVersion && binding.ActorRevision > 0
++            && binding.ValidFrom != default && binding.ValidFrom.Offset == TimeSpan.Zero && binding.ValidFrom <= evidence.ObservedAt
++            && binding.ValidUntil is { Offset: var offset } until && offset == TimeSpan.Zero
++            && until > binding.ValidFrom && until > completed
++            && !string.IsNullOrWhiteSpace(binding.SourceId) && !string.IsNullOrWhiteSpace(binding.ProvenanceId)
++            && binding.Custody is { } custody && !string.IsNullOrWhiteSpace(custody.PolicyId)
++            && custody.Purpose == "party-actor-history-v1" && custody.LifecycleRevision > 0 && !string.IsNullOrWhiteSpace(custody.EvidenceId)
++            && custody.ExpiresAt.Offset == TimeSpan.Zero && custody.ExpiresAt >= until
++            && custody.ExpiresAt > completed && custody.ExpiresAt < DateTimeOffset.MaxValue
++            && custody.SourceExpiryEnforced && custody.RestoreSafe && custody.DerivedCopiesCovered;
++#endif
++
+     /// <inheritdoc />
+     public Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct)
+     {
+diff --git a/src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs b/src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs
+index ec274fc..30d565e 100644
+--- a/src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs
++++ b/src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs
+@@ -42,7 +42,10 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
+             bool granted = IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, now)
+                 && Grants(evidence, tenantId, actor.ActorId, administration ? "Agents.Administrator" : "User",
+                     administration ? null : callerPartyId, false, now, started);
+-            return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted);
++            return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted)
++            {
++                CurrentActor = granted ? actor with { ValidUntil = actor.ValidUntil < evidence!.ValidUntil ? actor.ValidUntil : evidence.ValidUntil } : null,
++            };
+         }
+         catch (Exception exception) when (exception is not OperationCanceledException)
+         {
+diff --git a/src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs b/src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs
+index 18c1132..b217205 100644
+--- a/src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs
++++ b/src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs
+@@ -4,8 +4,8 @@ namespace Hexalith.Agents.Server.Ports;
+ 
+ /// <summary>
+ /// Server-internal result of reading the caller's tenant access for the invocation gate (Story 2.2; AC1, AC3; AD-12).
+-/// It carries ONLY the fail-closed <see cref="Outcome"/> and a coarse <see cref="IsFresh"/> freshness flag — never a
+-/// raw claim, token, tenant-membership PII, or any record that would reveal cross-tenant existence (AC3; AD-14).
++/// It carries a fail-closed verdict and optional transient verified actor evidence, never a raw claim, token or
++/// tenant-membership PII. Actor evidence stays within Server and cannot disclose cross-tenant existence (AC3; AD-14).
+ /// </summary>
+ /// <remarks>
+ /// This is not a public contract — it is a Server-only port type (mirroring <c>AgentPartyValidationResult</c>). Per
+@@ -17,6 +17,9 @@ namespace Hexalith.Agents.Server.Ports;
+ /// <param name="IsFresh">Whether the consulted Tenants projection is within its freshness threshold.</param>
+ public sealed record TenantAccessReadResult(AgentInteractionGateOutcome Outcome, bool IsFresh)
+ {
++    /// <summary>Gets current actor evidence after successful completion-time authorization, bounded by the earlier actor or tenant deadline.</summary>
++    public CurrentHumanActorEvidence? CurrentActor { get; init; }
++
+     /// <summary>Gets the unavailable external record, without any claimed resource information.</summary>
+     public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
+     /// <summary>Gets the fail-closed not-available result (the deferred default) — unavailable and not fresh.</summary>
+diff --git a/test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs b/test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs
+index 6a33b70..306dc4b 100644
+--- a/test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs
++++ b/test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs
+@@ -3,6 +3,12 @@ using Hexalith.Agents.Contracts.AgentInteraction;
+ using Hexalith.Agents.Contracts.ProviderCatalog;
+ using Hexalith.Agents.Server.Application.AgentInteractions;
+ using Hexalith.Agents.Server.Ports;
++#if HEXALITH_PARTIES_SOURCE
++using Hexalith.Parties.Client.Abstractions;
++using Hexalith.Parties.Contracts.Models;
++using Hexalith.Parties.Contracts.Queries;
++using Hexalith.Parties.Contracts.ValueObjects;
++#endif
+ 
+ using NSubstitute;
+ 
+@@ -21,6 +27,139 @@ public sealed class AgentInteractionGateAdmissionTests
+     private readonly IApproverPolicyResolver _approvers = Substitute.For<IApproverPolicyResolver>();
+     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
+     private readonly List<string> _reads = [];
++    private readonly Story54TimeProvider _clock = new();
++
++    /// <summary>A bare tenant success is insufficient to address the caller's Party or any protected resource.</summary>
++    [Fact]
++    public async Task TenantSuccessWithoutCurrentActorStopsBeforePartyLookup()
++    {
++        Configure();
++        _tenants.ReadAsync("tenant-a", "subject", "caller", Arg.Any<CancellationToken>())
++            .Returns(_ =>
++            {
++                _reads.Add("Tenant");
++                return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true);
++            });
++
++        (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Denied);
++
++        _reads.ShouldBe(["Tenant"]);
++        _dispatcher.ReceivedCalls().ShouldBeEmpty();
++    }
++
++    /// <summary>Substituted, incomplete or noncurrent tenant-result evidence is rejected without protected reads.</summary>
++    [Theory]
++    [InlineData("tenant")]
++    [InlineData("subject")]
++    [InlineData("party")]
++    [InlineData("actor")]
++    [InlineData("version")]
++    [InlineData("position")]
++    [InlineData("future")]
++    [InlineData("old")]
++    [InlineData("expiry")]
++    [InlineData("observation-offset")]
++    [InlineData("expiry-offset")]
++    public async Task InvalidTenantActorStopsBeforePartyLookup(string corruption)
++    {
++        Configure();
++        CurrentHumanActorEvidence actor = Actor();
++        actor = corruption switch
++        {
++            "tenant" => actor with { TenantId = "foreign-tenant" },
++            "subject" => actor with { Subject = "foreign-subject" },
++            "party" => actor with { PartyId = "foreign-party" },
++            "actor" => actor with { ActorId = " " },
++            "version" => actor with { BindingVersion = 0 },
++            "position" => actor with { SourcePosition = 0 },
++            "future" => actor with { ObservedAt = _clock.Now.AddTicks(1) },
++            "old" => actor with { ObservedAt = _clock.Now.AddTicks(-1) },
++            "expiry" => actor with { ValidUntil = _clock.Now },
++            "observation-offset" => actor with { ObservedAt = _clock.Now.ToOffset(TimeSpan.FromHours(1)) },
++            "expiry-offset" => actor with { ValidUntil = actor.ValidUntil.ToOffset(TimeSpan.FromHours(1)) },
++            _ => throw new ArgumentOutOfRangeException(nameof(corruption)),
++        };
++        _tenants.ReadAsync("tenant-a", "subject", "caller", Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            _reads.Add("Tenant");
++            return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true) { CurrentActor = actor };
++        });
++
++        var result = await Orchestrator().ExecuteAsync(Request(), CancellationToken.None);
++
++        result.ShouldBe(new AgentInteractionGateOutcomeResult("interaction", AgentInteractionStatus.Denied));
++        _reads.ShouldBe(["Tenant"]);
++        _parties.ReceivedCalls().ShouldBeEmpty();
++        _dispatcher.ReceivedCalls().ShouldBeEmpty();
++        System.Text.Json.JsonSerializer.Serialize(result).ShouldNotContain("foreign");
++    }
++
++    /// <summary>Expiry and backward clock movement during any await prevent subsequent protected work.</summary>
++    [Theory]
++    [InlineData("Tenant", false)]
++    [InlineData("Caller", false)]
++    [InlineData("Conversation", false)]
++    [InlineData("Readiness", false)]
++    [InlineData("AgentParty", false)]
++    [InlineData("Provider", false)]
++    [InlineData("Approver", false)]
++    [InlineData("Tenant", true)]
++    [InlineData("Caller", true)]
++    [InlineData("Conversation", true)]
++    [InlineData("Readiness", true)]
++    [InlineData("AgentParty", true)]
++    [InlineData("Provider", true)]
++    [InlineData("Approver", true)]
++    public async Task AuthorityIsRecheckedAcrossEveryAwait(string changedRead, bool rollback)
++    {
++        Configure(completed: read =>
++        {
++            if (read == changedRead)
++            {
++                _clock.Now = _clock.Now.AddTicks(rollback ? -1 : TimeSpan.TicksPerMinute);
++            }
++        });
++
++        (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Denied);
++
++        string[] order = ["Tenant", "Caller", "Conversation", "Readiness", "AgentParty", "Provider", "Approver"];
++        _reads.ShouldBe(order.Take(Array.IndexOf(order, changedRead) + 1));
++        _dispatcher.ReceivedCalls().ShouldBeEmpty();
++    }
++
++    /// <summary>A rollback between reads also denies when the clock remains after the original interval start.</summary>
++    [Fact]
++    public async Task ClockRollbackAfterForwardProgressDeniesBeforeReadiness()
++    {
++        Configure(completed: read =>
++        {
++            if (read == "Caller")
++            {
++                _clock.Now = _clock.Now.AddSeconds(1);
++            }
++            if (read == "Conversation")
++            {
++                _clock.Now = _clock.Now.AddTicks(-1);
++            }
++        });
++
++        (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Denied);
++
++        _reads.ShouldBe(["Tenant", "Caller", "Conversation"]);
++        _dispatcher.ReceivedCalls().ShouldBeEmpty();
++    }
++
++    /// <summary>The exact tenant-authorized actor reaches the new directory seam without a legacy fallback.</summary>
++    [Fact]
++    public async Task CurrentActorIsPassedToTheActorBearingCallerOverload()
++    {
++        Configure();
++
++        await Orchestrator().ExecuteAsync(Request(), CancellationToken.None);
++
++        await _parties.Received(1).ValidateCallerPartyAsync("tenant-a", "caller", Actor(), Arg.Any<CancellationToken>());
++        await _parties.DidNotReceive().ValidateCallerPartyAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
++    }
+ 
+     /// <summary>Missing, revoked, uncertain and malformed caller evidence stops before Conversation and Agent reads.</summary>
+     [Theory]
+@@ -34,7 +173,7 @@ public sealed class AgentInteractionGateAdmissionTests
+     public async Task CallerDenialStopsBeforeProtectedReadsOrDispatch(PartyLinkValidationStatus status)
+     {
+         Configure();
+-        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CancellationToken>())
++        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
+             .Returns(_ =>
+             {
+                 _reads.Add("Caller");
+@@ -48,6 +187,153 @@ public sealed class AgentInteractionGateAdmissionTests
+         _dispatcher.ReceivedCalls().ShouldBeEmpty();
+     }
+ 
++    /// <summary>A Valid flag cannot substitute the exact caller Party or its current UTC deadline.</summary>
++    [Theory]
++    [InlineData("missing-party")]
++    [InlineData("foreign-party")]
++    [InlineData("missing-deadline")]
++    [InlineData("expired-deadline")]
++    [InlineData("offset-deadline")]
++    public async Task MalformedSuccessfulCallerResultStopsBeforeConversationRead(string corruption)
++    {
++        Configure();
++        DateTimeOffset? deadline = corruption switch
++        {
++            "missing-deadline" => null,
++            "expired-deadline" => _clock.Now,
++            "offset-deadline" => _clock.Now.AddSeconds(5).ToOffset(TimeSpan.FromHours(1)),
++            _ => _clock.Now.AddSeconds(5),
++        };
++        string? partyId = corruption switch
++        {
++            "missing-party" => null,
++            "foreign-party" => "foreign-party",
++            _ => "caller",
++        };
++        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
++            .Returns(_ =>
++            {
++                _reads.Add("Caller");
++                return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, partyId) { CallerValidUntil = deadline };
++            });
++
++        AgentInteractionGateOutcomeResult result = await Orchestrator().ExecuteAsync(Request(), CancellationToken.None);
++
++        result.ShouldBe(new AgentInteractionGateOutcomeResult("interaction", AgentInteractionStatus.Denied));
++        _reads.ShouldBe(["Tenant", "Caller"]);
++        _dispatcher.ReceivedCalls().ShouldBeEmpty();
++        System.Text.Json.JsonSerializer.Serialize(result).ShouldNotContain("foreign");
++    }
++
++    /// <summary>A shorter caller-binding or custody deadline stays exclusive through every later protected read.</summary>
++    [Theory]
++    [InlineData("Conversation")]
++    [InlineData("Readiness")]
++    [InlineData("AgentParty")]
++    [InlineData("Provider")]
++    [InlineData("Approver")]
++    public async Task EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(string changedRead)
++    {
++        DateTimeOffset deadline = _clock.Now.AddSeconds(5);
++        Configure(completed: read =>
++        {
++            if (read == changedRead)
++            {
++                _clock.Now = deadline;
++            }
++        });
++        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
++            .Returns(_ =>
++            {
++                _reads.Add("Caller");
++                return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller") { CallerValidUntil = deadline };
++            });
++
++        (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Denied);
++
++        string[] order = ["Tenant", "Caller", "Conversation", "Readiness", "AgentParty", "Provider", "Approver"];
++        _reads.ShouldBe(order.Take(Array.IndexOf(order, changedRead) + 1));
++        _dispatcher.ReceivedCalls().ShouldBeEmpty();
++    }
++
++#if HEXALITH_PARTIES_SOURCE
++    /// <summary>Real local reader, directory and gate compose for distinct subject/actor identities and all earlier deadlines.</summary>
++    [Theory]
++    [InlineData("current")]
++    [InlineData("tenant")]
++    [InlineData("binding")]
++    [InlineData("custody")]
++    public async Task RealReaderDirectoryAndGateComposeWithoutLosingAuthorityDeadlines(string earliest)
++    {
++        DateTimeOffset deadline = _clock.Now.AddSeconds(5);
++        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(_clock) with { Subject = "subject", PartyId = "caller" };
++        HumanActorBindingEvidence binding = Story54PartyIdentityFixture.Binding(_clock) with { PartyId = "caller" };
++        if (earliest == "binding")
++        {
++            binding = binding with { ValidUntil = deadline };
++        }
++        if (earliest == "custody")
++        {
++            binding = binding with { ValidFrom = deadline.AddDays(-365), ValidUntil = deadline, Custody = binding.Custody with { ExpiresAt = deadline } };
++        }
++        var actors = Substitute.For<ICurrentHumanActorSource>();
++        actors.ReadAsync("tenant-a", "subject", Arg.Any<CancellationToken>()).Returns(actor);
++        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
++        tenants.ReadAsync("tenant-a", false, Arg.Any<CancellationToken>()).Returns(new TenantAuthorityEvidence(
++            "tenant-a", "tenants", 2, _clock.Now, earliest == "tenant" ? deadline : actor.ValidUntil,
++            [new(1, string.Empty, null, "TenantActive", true), new(2, actor.ActorId, "caller", "User", true)],
++            SourceAggregateId: "tenant-a"));
++        var availability = Substitute.For<IAgentDependencyAvailability>();
++        var client = Substitute.For<IPartiesIdentityClient>();
++        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            ResolvePartyIdentity query = call.ArgAt<ResolvePartyIdentity>(1);
++            return new PartyIdentityResult(PartyIdentityOutcome.Resolved, query.PartyId == "caller"
++                ? Story54PartyIdentityFixture.Identity(_clock) with { PartyId = "caller", HumanBinding = binding }
++                : new PartyIdentityEvidence(1, "tenant-a", "agent-party", PartyIdentityClassification.Organization,
++                    true, false, false, 11, _clock.Now, "organization-observation", null));
++        });
++        _conversations.ReadAsync("tenant-a", "conversation", "caller", Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            if (earliest != "current")
++            {
++                _clock.Now = deadline;
++            }
++            return new ConversationAccessReadResult(AgentInteractionGateOutcome.Satisfied, true);
++        });
++        _readiness.ReadAsync("tenant-a", "hexa", Arg.Any<CancellationToken>()).Returns(new AgentInvocationReadiness(
++            true, AgentLifecycleStatus.Active, true, "agent-party", AgentResponseMode.Automatic, true, "provider", "model", null, true, true));
++        _providers.GetEntryAsync("tenant-a", "provider", "model", Arg.Any<CancellationToken>()).Returns(
++            new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success,
++                new ProviderCatalogEntryView("provider", "model", "local model", ProviderModelStatus.Enabled,
++                    true, 128_000, 16_000, new ProviderModelTimeoutPolicy(30_000, 3), ProviderModelCapabilityFlags.Streaming,
++                    ProviderConfigurationState.Configured, "configuration-reference", true, 1,
++                    new ProviderModelPricing("USD", 0.002m, 0.008m, 1))));
++        var orchestrator = new AgentInteractionGateOrchestrator(new ProjectedTenantAccessReader(tenants, availability, _clock, actors),
++            _conversations, _readiness, new PartiesAgentPartyDirectory(client, availability, _clock),
++            _providers, _approvers, _dispatcher, _clock);
++
++        AgentInteractionGateOutcomeResult result = await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
++
++        actor.Subject.ShouldNotBe(actor.ActorId);
++        await client.Received(1).ResolvePartyIdentityAsync("tenant-a", new ResolvePartyIdentity("tenant-a", "caller", actor.ActorId), Arg.Any<CancellationToken>());
++        if (earliest == "current")
++        {
++            result.Status.ShouldBe(AgentInteractionStatus.Authorized);
++            await client.Received(1).ResolvePartyIdentityAsync("tenant-a", new ResolvePartyIdentity("tenant-a", "agent-party"), Arg.Any<CancellationToken>());
++            await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
++        }
++        else
++        {
++            result.ShouldBe(new AgentInteractionGateOutcomeResult("interaction", AgentInteractionStatus.Denied));
++            _readiness.ReceivedCalls().ShouldBeEmpty();
++            _providers.ReceivedCalls().ShouldBeEmpty();
++            _dispatcher.ReceivedCalls().ShouldBeEmpty();
++            client.ReceivedCalls().Count().ShouldBe(1);
++        }
++    }
++#endif
++
+     /// <summary>Conversation denial or uncertainty stops before Agent, Provider and approver reads.</summary>
+     [Theory]
+     [InlineData(AgentInteractionGateOutcome.Unknown, true)]
+@@ -120,21 +406,22 @@ public sealed class AgentInteractionGateAdmissionTests
+     }
+ 
+     private AgentInteractionGateOrchestrator Orchestrator()
+-        => new(_tenants, _conversations, _readiness, _parties, _providers, _approvers, _dispatcher);
++        => new(_tenants, _conversations, _readiness, _parties, _providers, _approvers, _dispatcher, _clock);
+ 
+-    private void Configure(string? cancelledRead = null, CancellationTokenSource? cancellation = null, bool throws = false)
++    private void Configure(string? cancelledRead = null, CancellationTokenSource? cancellation = null, bool throws = false, Action<string>? completed = null)
+     {
++        CurrentHumanActorEvidence actor = Actor();
+         var source = new ApproverPolicySource(ApproverPolicySourceKind.TenantRole, null, "Approver");
+         var policy = new AgentApproverPolicy([source], ApproverPolicyBasisDisclosure.OperatorOnly);
+         _tenants.ReadAsync("tenant-a", "subject", "caller", Arg.Any<CancellationToken>()).Returns(_ =>
+         {
+             Complete("Tenant");
+-            return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true);
++            return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true) { CurrentActor = actor };
+         });
+-        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CancellationToken>()).Returns(_ =>
++        _parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>()).Returns(_ =>
+         {
+             Complete("Caller");
+-            return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller");
++            return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller") { CallerValidUntil = actor.ValidUntil };
+         });
+         _parties.ValidateExistingPartyAsync("tenant-a", Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(call =>
+         {
+@@ -166,6 +453,7 @@ public sealed class AgentInteractionGateAdmissionTests
+         void Complete(string read)
+         {
+             _reads.Add(read);
++            completed?.Invoke(read);
+             if (read == cancelledRead)
+             {
+                 cancellation!.Cancel();
+@@ -177,6 +465,9 @@ public sealed class AgentInteractionGateAdmissionTests
+         }
+     }
+ 
++    private CurrentHumanActorEvidence Actor()
++        => new("tenant-a", "subject", "stable-actor", "caller", 7, 11, _clock.Now, _clock.Now.AddMinutes(1));
++
+     private static AgentInteractionGateRequest Request()
+         => new("message", "correlation", "tenant-a", "interaction", "hexa", "subject", "caller", "conversation",
+             "provider", "model", AgentResponseMode.Confirmation, null, null);
+diff --git a/test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs b/test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs
+index bb9fc59..8b2676b 100644
+--- a/test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs
++++ b/test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs
+@@ -53,6 +53,7 @@ public sealed class AgentInteractionGateOrchestratorTests
+     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
+ 
+     private AgentCommandIntent? _lastDispatched;
++    private readonly Story54TimeProvider _clock = new();
+ 
+     private AgentInteractionGateOrchestrator Orchestrator => new(
+         _tenantAccessReader,
+@@ -61,7 +62,7 @@ public sealed class AgentInteractionGateOrchestratorTests
+         _partyDirectory,
+         _providerCatalogReader,
+         _approverPolicyResolver,
+-        _dispatcher);
++        _dispatcher, _clock);
+ 
+     // ===== All ready → Authorized (AC1) =====
+ 
+@@ -87,6 +88,27 @@ public sealed class AgentInteractionGateOrchestratorTests
+         verdicts.ShouldAllBe(v => v.Outcome == AgentInteractionGateOutcome.Satisfied);
+     }
+ 
++    /// <summary>An accepted dispatch retains its shared-policy outcome when acknowledgement arrives after authority expiry.</summary>
++    [Fact]
++    public async Task DelayedDispatchAcknowledgementRetainsTheAcceptedGateOutcome()
++    {
++        StubAllReady();
++        DateTimeOffset deadline = _clock.Now.AddMinutes(1);
++        _dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>()).Returns(call =>
++        {
++            _clock.Now.ShouldBeLessThan(deadline);
++            _lastDispatched = call.ArgAt<AgentCommandIntent>(0);
++            _clock.Now = deadline;
++            return new SubmitCommandResponse("correlation");
++        });
++
++        AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
++
++        outcome.Status.ShouldBe(AgentInteractionStatus.Authorized);
++        DispatchedVerdicts().ShouldAllBe(verdict => verdict.Outcome == AgentInteractionGateOutcome.Satisfied);
++        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
++    }
++
+     [Fact]
+     public async Task Confirmation_mode_with_a_resolvable_approver_policy_is_satisfied()
+     {
+@@ -126,7 +148,7 @@ public sealed class AgentInteractionGateOrchestratorTests
+     public async Task Caller_party_missing_maps_to_denied()
+     {
+         StubAllReady();
+-        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
++        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
+             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Missing, null));
+         CaptureDispatch();
+ 
+@@ -525,7 +547,7 @@ public sealed class AgentInteractionGateOrchestratorTests
+     {
+         // The caller's Party verdict is authorization-class; an Unauthorized outcome decides Denied (AC3).
+         StubAllReady();
+-        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
++        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
+             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Unauthorized, null));
+         CaptureDispatch();
+ 
+@@ -700,13 +722,16 @@ public sealed class AgentInteractionGateOrchestratorTests
+     private void StubAllReady()
+     {
+         _tenantAccessReader.ReadAsync(TenantId, Arg.Any<string>(), CallerPartyId, Arg.Any<CancellationToken>())
+-            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
++            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true)
++            {
++                CurrentActor = new(TenantId, "caller-user", "stable-actor", CallerPartyId, 1, 1, _clock.Now, _clock.Now.AddMinutes(1)),
++            });
+         _conversationAccessReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, Arg.Any<CancellationToken>())
+             .Returns(new ConversationAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
+         _readinessReader.ReadAsync(TenantId, AgentId, Arg.Any<CancellationToken>())
+             .Returns(Readiness());
+-        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
+-            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, CallerPartyId));
++        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
++            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, CallerPartyId) { CallerValidUntil = _clock.Now.AddMinutes(1) });
+         _partyDirectory.ValidateExistingPartyAsync(TenantId, AgentPartyId, Arg.Any<CancellationToken>())
+             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, AgentPartyId));
+         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
+diff --git a/test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs b/test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs
+index 4300a62..072c751 100644
+--- a/test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs
++++ b/test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs
+@@ -195,24 +195,31 @@ public sealed class AuthorityCancellationAdmissionTests
+ 
+ #if HEXALITH_PARTIES_SOURCE
+     /// <summary>A cancelled identity read performs no Parties client call.</summary>
+-    [Fact]
+-    public async Task PartyDirectoryCancellationBeforeAdmissionPerformsNoClientRead()
++    [Theory]
++    [InlineData(false)]
++    [InlineData(true)]
++    public async Task PartyDirectoryCancellationBeforeAdmissionPerformsNoClientRead(bool caller)
+     {
++        var clock = new Story54TimeProvider();
+         var client = Substitute.For<IPartiesIdentityClient>();
+-        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), new Story54TimeProvider());
++        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
+         using var cancellation = new CancellationTokenSource();
+         cancellation.Cancel();
+ 
+-        await Should.ThrowAsync<OperationCanceledException>(() => directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
++        await Should.ThrowAsync<OperationCanceledException>(() => caller
++            ? directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(clock), cancellation.Token)
++            : directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
+ 
+         client.ReceivedCalls().ShouldBeEmpty();
+     }
+ 
+     /// <summary>A failed cancelled Parties client read cannot turn into a processed unavailable result.</summary>
+     [Theory]
+-    [InlineData(false)]
+-    [InlineData(true)]
+-    public async Task PartyDirectoryCancellationDuringClientReadIsPreserved(bool failure)
++    [InlineData(false, false)]
++    [InlineData(true, false)]
++    [InlineData(false, true)]
++    [InlineData(true, true)]
++    public async Task PartyDirectoryCancellationDuringClientReadIsPreserved(bool failure, bool caller)
+     {
+         var clock = new Story54TimeProvider();
+         var client = Substitute.For<IPartiesIdentityClient>();
+@@ -225,12 +232,16 @@ public sealed class AuthorityCancellationAdmissionTests
+                 throw new InvalidOperationException("private source failure");
+             }
+ 
+-            return new PartyIdentityResult(PartyIdentityOutcome.Resolved, new PartyIdentityEvidence(1, "tenant-a", "party-a",
+-                PartyIdentityClassification.Organization, true, false, false, 1, clock.GetUtcNow(), "observation", null));
++            return new PartyIdentityResult(PartyIdentityOutcome.Resolved, caller
++                ? Story54PartyIdentityFixture.Identity(clock)
++                : new PartyIdentityEvidence(1, "tenant-a", "party-a", PartyIdentityClassification.Organization,
++                    true, false, false, 1, clock.GetUtcNow(), "observation", null));
+         });
+         var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
+ 
+-        await Should.ThrowAsync<OperationCanceledException>(() => directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
++        await Should.ThrowAsync<OperationCanceledException>(() => caller
++            ? directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(clock), cancellation.Token)
++            : directory.ValidateExistingPartyAsync("tenant-a", "party-a", cancellation.Token));
+     }
+ #endif
+ 
+diff --git a/test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs b/test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs
+new file mode 100644
+index 0000000..679262d
+--- /dev/null
++++ b/test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs
+@@ -0,0 +1,26 @@
++using Hexalith.Agents.Contracts.Agent;
++using Hexalith.Agents.Server.Ports;
++
++namespace Hexalith.Agents.Server.Tests;
++
++/// <summary>A historical directory implementation used to prove the new interface default stays closed.</summary>
++internal sealed class LegacyCallerOnlyPartyDirectory : IAgentPartyDirectory
++{
++    /// <summary>Gets whether the historical caller method was invoked.</summary>
++    internal bool LegacyCalled { get; private set; }
++
++    /// <inheritdoc />
++    public Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct)
++    {
++        LegacyCalled = true;
++        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, partyId));
++    }
++
++    /// <inheritdoc />
++    public Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct)
++        => throw new NotSupportedException();
++
++    /// <inheritdoc />
++    public Task<AgentPartyValidationResult> ProvisionAgentPartyAsync(string tenantId, AgentPartyProvisioningRequest request, CancellationToken ct)
++        => throw new NotSupportedException();
++}
+diff --git a/test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs b/test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs
+index 9f28bb0..b27f84e 100644
+--- a/test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs
++++ b/test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs
+@@ -15,6 +15,19 @@ namespace Hexalith.Agents.Server.Tests;
+ /// <summary>Local explicit-scope identity adapter tests; substituted clients provide no live availability evidence.</summary>
+ public sealed class PartiesAgentPartyDirectoryTests
+ {
++    /// <summary>An implementation of only the legacy caller method cannot authorize the new actor-bearing seam.</summary>
++    [Fact]
++    public async Task ActorBearingInterfaceDefaultNeverDelegatesToLegacyCallerValidation()
++    {
++        var legacy = new LegacyCallerOnlyPartyDirectory();
++        IAgentPartyDirectory directory = legacy;
++
++        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(new Story54TimeProvider()), CancellationToken.None))
++            .ShouldBe(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
++
++        legacy.LegacyCalled.ShouldBeFalse();
++    }
++
+     /// <summary>Verifies that legacy profile query and provisioning never execute while committed.</summary>
+     [Fact]
+     public async Task LegacyProfileQueryAndProvisioningNeverExecuteWhileCommitted()
+@@ -27,12 +40,30 @@ public sealed class PartiesAgentPartyDirectoryTests
+         read.Dependency.ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
+         (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Status
+             .ShouldBe(PartyLinkValidationStatus.Unavailable);
++        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(new Story54TimeProvider()), CancellationToken.None)).Status
++            .ShouldBe(PartyLinkValidationStatus.Unavailable);
+         AgentPartyValidationResult provision = await directory.ProvisionAgentPartyAsync("tenant-a", new("hexa", "label"), CancellationToken.None);
+         provision.Status.ShouldBe(PartyLinkValidationStatus.Unavailable);
+         queries.ReceivedCalls().ShouldBeEmpty();
+         commands.ReceivedCalls().ShouldBeEmpty();
+     }
+ #if HEXALITH_PARTIES_SOURCE
++    /// <summary>The historical caller signature cannot grant current Human authority or perform an owner read.</summary>
++    [Fact]
++    public async Task LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence()
++    {
++        var client = Substitute.For<IPartiesIdentityClient>();
++        var clock = new Story54TimeProvider();
++        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
++            .Returns(new PartyIdentityResult(PartyIdentityOutcome.Resolved, new PartyIdentityEvidence(1, "tenant-a", "party-a",
++                PartyIdentityClassification.Human, true, false, false, 1, clock.Now, "observation", null)));
++        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
++
++        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Status
++            .ShouldBe(PartyLinkValidationStatus.Unavailable);
++        client.ReceivedCalls().ShouldBeEmpty();
++    }
++
+     /// <summary>Verifies that only fresh exact tenant and immutable id evidence is valid.</summary>
+     [Theory]
+     [InlineData("tenant-a", "party-a", 1, true)]
+@@ -68,12 +99,13 @@ public sealed class PartiesAgentPartyDirectoryTests
+         var client = Substitute.For<IPartiesIdentityClient>();
+         var clock = new Story54TimeProvider();
+         var evidence = new PartyIdentityEvidence(1, "tenant-a", "party-a", classification,
+-            true, false, false, 1, clock.GetUtcNow(), "observation", null);
++            true, false, false, 1, clock.GetUtcNow(), "observation",
++            classification == PartyIdentityClassification.Human ? Story54PartyIdentityFixture.Binding(clock) : null);
+         client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
+             .Returns(new PartyIdentityResult(PartyIdentityOutcome.Resolved, evidence));
+         var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock);
+         AgentPartyValidationResult result = caller
+-            ? await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)
++            ? await directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(clock), CancellationToken.None)
+             : await directory.ValidateExistingPartyAsync("tenant-a", "party-a", CancellationToken.None);
+         result.Status.ShouldBe(expected);
+         result.PartyId.ShouldBe(expected == PartyLinkValidationStatus.Valid ? "party-a" : null);
+@@ -89,7 +121,223 @@ public sealed class PartiesAgentPartyDirectoryTests
+             .ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
+         (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Dependency
+             .ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
++        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(new Story54TimeProvider()), CancellationToken.None)).Dependency
++            .ShouldBe(new DependencyNotAvailable("EXT-PARTIES-1"));
+         client.ReceivedCalls().ShouldBeEmpty();
+     }
++
++    /// <summary>Tenant authorization's earlier observation remains valid and the query names its stable actor.</summary>
++    [Fact]
++    public async Task CallerQueryUsesTheVerifiedStableActorAndAcceptsAnEarlierActorObservation()
++    {
++        var clock = new Story54TimeProvider();
++        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(clock);
++        clock.Now = clock.Now.AddSeconds(1);
++        var client = Substitute.For<IPartiesIdentityClient>();
++        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
++            .Returns(new PartyIdentityResult(PartyIdentityOutcome.Resolved, Story54PartyIdentityFixture.Identity(clock)));
++
++        var result = await new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock)
++            .ValidateCallerPartyAsync("tenant-a", "party-a", actor, CancellationToken.None);
++
++        result.ShouldBe(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "party-a") { CallerValidUntil = actor.ValidUntil });
++        actor.Subject.ShouldNotBe(actor.ActorId);
++        await client.Received(1).ResolvePartyIdentityAsync("tenant-a", new ResolvePartyIdentity("tenant-a", "party-a", actor.ActorId), Arg.Any<CancellationToken>());
++    }
++
++    /// <summary>Direct callers cannot reach the owner with incomplete, foreign or noncurrent actor evidence.</summary>
++    [Theory]
++    [InlineData("missing")]
++    [InlineData("tenant")]
++    [InlineData("subject")]
++    [InlineData("party")]
++    [InlineData("actor")]
++    [InlineData("version")]
++    [InlineData("position")]
++    [InlineData("observation")]
++    [InlineData("future")]
++    [InlineData("expired")]
++    [InlineData("observation-offset")]
++    [InlineData("expiry-offset")]
++    public async Task MalformedCallerActorStopsBeforeTheOwnerClient(string corruption)
++    {
++        var clock = new Story54TimeProvider();
++        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(clock);
++        CurrentHumanActorEvidence? supplied = corruption switch
++        {
++            "missing" => null,
++            "tenant" => actor with { TenantId = "foreign-tenant" },
++            "subject" => actor with { Subject = " " },
++            "party" => actor with { PartyId = "foreign-party" },
++            "actor" => actor with { ActorId = " " },
++            "version" => actor with { BindingVersion = 0 },
++            "position" => actor with { SourcePosition = 0 },
++            "observation" => actor with { ObservedAt = default },
++            "future" => actor with { ObservedAt = clock.Now.AddTicks(1) },
++            "expired" => actor with { ValidUntil = clock.Now },
++            "observation-offset" => actor with { ObservedAt = clock.Now.ToOffset(TimeSpan.FromHours(1)) },
++            "expiry-offset" => actor with { ValidUntil = actor.ValidUntil.ToOffset(TimeSpan.FromHours(1)) },
++            _ => throw new ArgumentOutOfRangeException(nameof(corruption)),
++        };
++        var client = Substitute.For<IPartiesIdentityClient>();
++
++        AgentPartyValidationResult result = await new PartiesAgentPartyDirectory(client,
++            Substitute.For<IAgentDependencyAvailability>(), clock)
++            .ValidateCallerPartyAsync("tenant-a", "party-a", supplied!, CancellationToken.None);
++
++        result.ShouldBe(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
++        client.ReceivedCalls().ShouldBeEmpty();
++    }
++
++    /// <summary>The caller deadline carries the earliest actor, current binding or finite custody expiry.</summary>
++    [Theory]
++    [InlineData("actor")]
++    [InlineData("binding")]
++    [InlineData("custody")]
++    public async Task SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(string earliest)
++    {
++        var clock = new Story54TimeProvider();
++        DateTimeOffset expected = clock.Now.AddSeconds(5);
++        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(clock);
++        HumanActorBindingEvidence binding = Story54PartyIdentityFixture.Binding(clock);
++        if (earliest == "actor")
++        {
++            actor = actor with { ValidUntil = expected };
++        }
++        else if (earliest == "binding")
++        {
++            binding = binding with { ValidUntil = expected };
++        }
++        else
++        {
++            // Retention remains derived from immutable effective time even when its deadline is near.
++            binding = binding with
++            {
++                ValidFrom = expected.AddDays(-365),
++                ValidUntil = expected,
++                Custody = binding.Custody with { ExpiresAt = expected },
++            };
++        }
++        var client = Substitute.For<IPartiesIdentityClient>();
++        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
++            .Returns(new PartyIdentityResult(PartyIdentityOutcome.Resolved,
++                Story54PartyIdentityFixture.Identity(clock) with { HumanBinding = binding }));
++
++        AgentPartyValidationResult result = await new PartiesAgentPartyDirectory(client,
++            Substitute.For<IAgentDependencyAvailability>(), clock)
++            .ValidateCallerPartyAsync("tenant-a", "party-a", actor, CancellationToken.None);
++
++        result.ShouldBe(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "party-a") { CallerValidUntil = expected });
++    }
++
++    /// <summary>No resolved flag can replace exact current binding, provenance and finite custody evidence.</summary>
++    [Theory]
++    [InlineData("missing")]
++    [InlineData("tenant")]
++    [InlineData("party")]
++    [InlineData("actor")]
++    [InlineData("version")]
++    [InlineData("revision")]
++    [InlineData("future")]
++    [InlineData("expired")]
++    [InlineData("missing-end")]
++    [InlineData("empty-interval")]
++    [InlineData("reversed-interval")]
++    [InlineData("custody-shorter-than-binding")]
++    [InlineData("effective-offset")]
++    [InlineData("expiry-offset")]
++    [InlineData("source")]
++    [InlineData("provenance")]
++    [InlineData("custody")]
++    [InlineData("policy")]
++    [InlineData("purpose")]
++    [InlineData("lifecycle")]
++    [InlineData("receipt")]
++    [InlineData("custody-expired")]
++    [InlineData("custody-infinite")]
++    [InlineData("custody-offset")]
++    [InlineData("source-expiry")]
++    [InlineData("restore")]
++    [InlineData("copies")]
++    public async Task CallerRequiresExactCurrentBindingAndFiniteCustody(string corruption)
++    {
++        var clock = new Story54TimeProvider();
++        HumanActorBindingEvidence binding = Story54PartyIdentityFixture.Binding(clock);
++        HumanActorBindingEvidence? returned = corruption switch
++        {
++            "missing" => null,
++            "tenant" => binding with { TenantId = "foreign-tenant" },
++            "party" => binding with { PartyId = "foreign-party" },
++            "actor" => binding with { ActorId = "foreign-actor" },
++            "version" => binding with { BindingVersion = 8 },
++            "revision" => binding with { ActorRevision = 0 },
++            "future" => binding with { ValidFrom = clock.Now.AddTicks(1) },
++            "expired" => binding with { ValidUntil = clock.Now },
++            "missing-end" => binding with { ValidUntil = null },
++            "empty-interval" => binding with { ValidUntil = binding.ValidFrom },
++            "reversed-interval" => binding with { ValidUntil = binding.ValidFrom.AddTicks(-1) },
++            "custody-shorter-than-binding" => binding with { Custody = binding.Custody with { ExpiresAt = binding.ValidUntil!.Value.AddTicks(-1) } },
++            "effective-offset" => binding with { ValidFrom = binding.ValidFrom.ToOffset(TimeSpan.FromHours(1)) },
++            "expiry-offset" => binding with { ValidUntil = binding.ValidUntil!.Value.ToOffset(TimeSpan.FromHours(1)) },
++            "source" => binding with { SourceId = " " },
++            "provenance" => binding with { ProvenanceId = " " },
++            "custody" => binding with { Custody = null! },
++            "policy" => binding with { Custody = binding.Custody with { PolicyId = " " } },
++            "purpose" => binding with { Custody = binding.Custody with { Purpose = "different-purpose" } },
++            "lifecycle" => binding with { Custody = binding.Custody with { LifecycleRevision = 0 } },
++            "receipt" => binding with { Custody = binding.Custody with { EvidenceId = " " } },
++            "custody-expired" => binding with { Custody = binding.Custody with { ExpiresAt = clock.Now } },
++            "custody-infinite" => binding with { Custody = binding.Custody with { ExpiresAt = DateTimeOffset.MaxValue } },
++            "custody-offset" => binding with { Custody = binding.Custody with { ExpiresAt = binding.Custody.ExpiresAt.ToOffset(TimeSpan.FromHours(1)) } },
++            "source-expiry" => binding with { Custody = binding.Custody with { SourceExpiryEnforced = false } },
++            "restore" => binding with { Custody = binding.Custody with { RestoreSafe = false } },
++            "copies" => binding with { Custody = binding.Custody with { DerivedCopiesCovered = false } },
++            _ => throw new ArgumentOutOfRangeException(nameof(corruption)),
++        };
++        var client = Substitute.For<IPartiesIdentityClient>();
++        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
++            .Returns(new PartyIdentityResult(PartyIdentityOutcome.Resolved, Story54PartyIdentityFixture.Identity(clock) with { HumanBinding = returned }));
++
++        var result = await new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock)
++            .ValidateCallerPartyAsync("tenant-a", "party-a", Story54PartyIdentityFixture.Actor(clock), CancellationToken.None);
++
++        result.ShouldBe(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
++    }
++
++    /// <summary>Actor, binding and custody expiry remain exclusive at the owner read's completion.</summary>
++    [Theory]
++    [InlineData("actor")]
++    [InlineData("binding")]
++    [InlineData("custody")]
++    [InlineData("rollback")]
++    public async Task CallerEvidenceIsRecheckedAfterTheOwnerRead(string transition)
++    {
++        var clock = new Story54TimeProvider();
++        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(clock) with { ValidUntil = clock.Now.AddDays(366) };
++        PartyIdentityEvidence identity = Story54PartyIdentityFixture.Identity(clock);
++        if (transition is "actor")
++        {
++            actor = actor with { ValidUntil = clock.Now.AddSeconds(1) };
++        }
++        if (transition is "custody")
++        {
++            identity = identity with { HumanBinding = identity.HumanBinding! with { ValidUntil = identity.HumanBinding.Custody.ExpiresAt } };
++        }
++        var client = Substitute.For<IPartiesIdentityClient>();
++        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            clock.Now = transition switch
++            {
++                "actor" => actor.ValidUntil,
++                "binding" => identity.HumanBinding!.ValidUntil!.Value,
++                "custody" => identity.HumanBinding!.Custody.ExpiresAt,
++                _ => clock.Now.AddTicks(-1),
++            };
++            return new PartyIdentityResult(PartyIdentityOutcome.Resolved, identity);
++        });
++
++        (await new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), clock)
++            .ValidateCallerPartyAsync("tenant-a", "party-a", actor, CancellationToken.None)).Status.ShouldBe(PartyLinkValidationStatus.Unavailable);
++    }
+ #endif
+ }
+diff --git a/test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs b/test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs
+index ee6e963..459a72c 100644
+--- a/test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs
++++ b/test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs
+@@ -328,9 +328,13 @@ public sealed class ProjectedProviderCatalogReaderTests
+             .ExecuteAsync(new AgentActivationRevalidationRequest("msg-2", "corr", tenantId, "hexa", "admin", true,
+                 1, providerId, modelId, AgentResponseMode.Automatic), CancellationToken.None);
+ 
++        var gateClock = new Story54TimeProvider();
+         ITenantAccessReader tenantAccess = Substitute.For<ITenantAccessReader>();
+         tenantAccess.ReadAsync(tenantId, Arg.Any<string>(), "caller-party", Arg.Any<CancellationToken>())
+-            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
++            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true)
++            {
++                CurrentActor = new(tenantId, "caller", "stable-actor", "caller-party", 1, 1, gateClock.Now, gateClock.Now.AddMinutes(1)),
++            });
+         IConversationAccessReader conversationAccess = Substitute.For<IConversationAccessReader>();
+         conversationAccess.ReadAsync(tenantId, "conversation", "caller-party", Arg.Any<CancellationToken>())
+             .Returns(new ConversationAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
+@@ -339,13 +343,13 @@ public sealed class ProjectedProviderCatalogReaderTests
+             .Returns(new AgentInvocationReadiness(true, AgentLifecycleStatus.Active, true, "agent-party",
+                 AgentResponseMode.Automatic, true, providerId, modelId, null, true, true));
+         IAgentPartyDirectory parties = Substitute.For<IAgentPartyDirectory>();
+-        parties.ValidateCallerPartyAsync(tenantId, "caller-party", Arg.Any<CancellationToken>())
+-            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller-party"));
++        parties.ValidateCallerPartyAsync(tenantId, "caller-party", Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
++            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller-party") { CallerValidUntil = gateClock.Now.AddMinutes(1) });
+         parties.ValidateExistingPartyAsync(tenantId, "agent-party", Arg.Any<CancellationToken>())
+             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "agent-party"));
+         AgentInteractionGateOutcomeResult interaction = await new AgentInteractionGateOrchestrator(
+             tenantAccess, conversationAccess, readiness, parties, reader,
+-            Substitute.For<IApproverPolicyResolver>(), dispatcher)
++            Substitute.For<IApproverPolicyResolver>(), dispatcher, gateClock)
+             .ExecuteAsync(new AgentInteractionGateRequest("msg-3", "corr", tenantId, "interaction", "hexa",
+                 "caller", "caller-party", "conversation", providerId, modelId,
+                 AgentResponseMode.Automatic, "client-corr", null), CancellationToken.None);
+diff --git a/test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs b/test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs
+index e0a86e6..c618dcd 100644
+--- a/test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs
++++ b/test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs
+@@ -203,6 +203,77 @@ public sealed class Story54CurrentEvidenceTests
+         var reader = new ProjectedTenantAccessReader(tenants, Substitute.For<IAgentDependencyAvailability>(), clock, actors);
+         var result = await reader.ReadAsync("tenant-a", "authenticated-subject", string.Empty, CancellationToken.None);
+         result.Outcome.ShouldBe(allowed ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized);
++        if (allowed)
++        {
++            result.CurrentActor.ShouldNotBeNull().ActorId.ShouldBe("stable-actor");
++        }
++        else
++        {
++            result.CurrentActor.ShouldBeNull();
++        }
++    }
++
++    /// <summary>Only a completed exact tenant authorization releases transient actor evidence to the gate.</summary>
++    [Theory]
++    [InlineData("current", true)]
++    [InlineData("expired", false)]
++    [InlineData("rollback", false)]
++    [InlineData("revoked", false)]
++    public async Task TenantActorEvidenceRequiresSuccessfulCompletionTimeAuthorization(string transition, bool allowed)
++    {
++        var clock = new Story54TimeProvider();
++        var actor = Story54PartyIdentityFixture.Actor(clock);
++        var actors = Substitute.For<ICurrentHumanActorSource>();
++        actors.ReadAsync("tenant-a", actor.Subject, Arg.Any<CancellationToken>()).Returns(actor);
++        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
++        tenants.ReadAsync("tenant-a", false, Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            clock.Now = transition switch
++            {
++                "expired" => actor.ValidUntil,
++                "rollback" => clock.Now.AddTicks(-1),
++                _ => clock.Now,
++            };
++            return new TenantAuthorityEvidence("tenant-a", "tenants", 2, clock.Now, clock.Now.AddSeconds(5),
++                [new(1, string.Empty, null, "TenantActive", true), new(2, actor.ActorId, "party-a", "User", transition != "revoked")],
++                SourceAggregateId: "tenant-a");
++        });
++
++        var result = await new ProjectedTenantAccessReader(tenants, Substitute.For<IAgentDependencyAvailability>(), clock, actors)
++            .ReadAsync("tenant-a", actor.Subject, "party-a", CancellationToken.None);
++
++        result.Outcome.ShouldBe(allowed ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized);
++        result.CurrentActor.ShouldBe(allowed ? actor with { ValidUntil = clock.Now.AddSeconds(5) } : null);
++    }
++
++    /// <summary>Released evidence retains its exact correspondence and observation, bounded by both authority deadlines.</summary>
++    [Theory]
++    [InlineData(5, 60)]
++    [InlineData(60, 5)]
++    [InlineData(5, 5)]
++    public async Task TenantAuthorizationCarriesTheEarlierActorOrTenantDeadline(int actorSeconds, int tenantSeconds)
++    {
++        var clock = new Story54TimeProvider();
++        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(clock) with { ValidUntil = clock.Now.AddSeconds(actorSeconds) };
++        DateTimeOffset expectedDeadline = clock.Now.AddSeconds(Math.Min(actorSeconds, tenantSeconds));
++        var actors = Substitute.For<ICurrentHumanActorSource>();
++        actors.ReadAsync("tenant-a", actor.Subject, Arg.Any<CancellationToken>()).Returns(actor);
++        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
++        tenants.ReadAsync("tenant-a", false, Arg.Any<CancellationToken>()).Returns(_ =>
++        {
++            clock.Now = clock.Now.AddSeconds(1);
++            return new TenantAuthorityEvidence("tenant-a", "tenants", 2, clock.Now, actor.ObservedAt.AddSeconds(tenantSeconds),
++                [new(1, string.Empty, null, "TenantActive", true), new(2, actor.ActorId, actor.PartyId, "User", true)],
++                SourceAggregateId: "tenant-a");
++        });
++
++        TenantAccessReadResult result = await new ProjectedTenantAccessReader(tenants,
++            Substitute.For<IAgentDependencyAvailability>(), clock, actors)
++            .ReadAsync("tenant-a", actor.Subject, actor.PartyId, CancellationToken.None);
++
++        result.Outcome.ShouldBe(AgentInteractionGateOutcome.Satisfied);
++        result.CurrentActor.ShouldBe(actor with { ValidUntil = expectedDeadline });
++        actor.Subject.ShouldNotBe(actor.ActorId);
+     }
+ 
+     private static CurrentApproverEvidence Candidate(ApproverPolicySource source, string actor, string party, bool readAccess, Story54TimeProvider clock)
+diff --git a/test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs b/test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs
+new file mode 100644
+index 0000000..fcb8188
+--- /dev/null
++++ b/test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs
+@@ -0,0 +1,29 @@
++using Hexalith.Agents.Server.Ports;
++#if HEXALITH_PARTIES_SOURCE
++using Hexalith.Parties.Contracts.Models;
++using Hexalith.Parties.Contracts.ValueObjects;
++#endif
++
++namespace Hexalith.Agents.Server.Tests;
++
++/// <summary>Contract-valid local identity responses; these fixtures confer no owner availability.</summary>
++internal static class Story54PartyIdentityFixture
++{
++    /// <summary>The opaque stable actor, deliberately distinct from its authenticated subject.</summary>
++    internal const string ActorId = "01ARZ3NDEKTSV4RRFFQ69G5FAV";
++
++    /// <summary>Creates transient current tenant-authorized actor evidence.</summary>
++    internal static CurrentHumanActorEvidence Actor(Story54TimeProvider clock)
++        => new("tenant-a", "authenticated-subject", ActorId, "party-a", 7, 11, clock.Now, clock.Now.AddMinutes(1));
++
++#if HEXALITH_PARTIES_SOURCE
++    /// <summary>Creates a current binding with finite custody derived from its immutable effective time.</summary>
++    internal static HumanActorBindingEvidence Binding(Story54TimeProvider clock)
++        => new("tenant-a", "party-a", ActorId, 7, 3, clock.Now.AddDays(-1), clock.Now.AddMinutes(1), "actor-source", "operator-provenance",
++            new("history-policy-v1", "party-actor-history-v1", clock.Now.AddDays(364), 5, "custody-evidence", true, true, true));
++
++    /// <summary>Creates an eligible Human identity with its required binding.</summary>
++    internal static PartyIdentityEvidence Identity(Story54TimeProvider clock)
++        => new(1, "tenant-a", "party-a", PartyIdentityClassification.Human, true, false, false, 11, clock.Now, "observation", Binding(clock));
++#endif
++}

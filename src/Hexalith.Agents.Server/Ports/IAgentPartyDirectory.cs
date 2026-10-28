@@ -1,6 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
+
 namespace Hexalith.Agents.Server.Ports;
 
 /// <summary>
@@ -26,14 +28,30 @@ public interface IAgentPartyDirectory
     Task<AgentPartyValidationResult> ValidateExistingPartyAsync(string tenantId, string partyId, CancellationToken ct);
 
     /// <summary>
-    /// Validates the calling Party of an Agent Call and maps its state to a fail-closed verdict (Story 5.4). Only a
-    /// Human Party qualifies; an Organization or Agent Party is <see cref="PartyLinkValidationStatus.Unauthorized"/>.
+    /// Preserves the historical caller-validation signature as unavailable: no current actor binding is supplied.
+    /// Current Human validation requires the actor-bearing overload.
     /// </summary>
     /// <param name="tenantId">The caller's tenant scope.</param>
     /// <param name="partyId">The caller's stable Party id.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The safe verdict plus the validated Party id (no PII).</returns>
-    Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct);
+    Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
+    }
+
+    /// <summary>Validates the exact current Human binding using verified tenant-authorization evidence.</summary>
+    /// <param name="tenantId">The exact caller tenant.</param>
+    /// <param name="partyId">The exact caller Party.</param>
+    /// <param name="actor">Transient server-verified subject, stable actor and current binding.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A safe verdict. Implementations without current-binding support remain closed.</returns>
+    Task<AgentPartyValidationResult> ValidateCallerPartyAsync(string tenantId, string partyId, CurrentHumanActorEvidence actor, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return Task.FromResult(new AgentPartyValidationResult(PartyLinkValidationStatus.Unavailable, null));
+    }
 
     /// <summary>Provisions a new Agent Party (Organization, deterministic id) and returns its id with a verdict (AD-13).</summary>
     /// <param name="tenantId">The Agent's tenant scope.</param>

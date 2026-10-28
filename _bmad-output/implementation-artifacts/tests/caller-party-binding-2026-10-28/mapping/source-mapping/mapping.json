@@ -1,0 +1,76 @@
+{
+  "Mode": "source",
+  "Root": "/home/administrator/projects/hexalith/agents",
+  "ActiveModule": "Hexalith.Agents",
+  "Entries": [
+    {
+      "Identity": "Hexalith.Agents",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents"
+    },
+    {
+      "Identity": "Hexalith.AI.Tools",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.AI.Tools"
+    },
+    {
+      "Identity": "Hexalith.Commons",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Commons"
+    },
+    {
+      "Identity": "Hexalith.PolymorphicSerializations",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.PolymorphicSerializations"
+    },
+    {
+      "Identity": "Hexalith.Conversations",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations"
+    },
+    {
+      "Identity": "Hexalith.EventStore",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore"
+    },
+    {
+      "Identity": "Hexalith.Memories",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Memories"
+    },
+    {
+      "Identity": "Hexalith.Tenants",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants"
+    },
+    {
+      "Identity": "Hexalith.Parties",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties"
+    },
+    {
+      "Identity": "Hexalith.Builds",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Builds"
+    },
+    {
+      "Identity": "Hexalith.FrontComposer",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer"
+    },
+    {
+      "Identity": "Hexalith.McpCli",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli"
+    },
+    {
+      "Identity": "Hexalith.Platform",
+      "Origin": "source",
+      "Path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform"
+    }
+  ],
+  "HasGit": true,
+  "PlatformIdentity": null,
+  "IdentityFindings": [],
+  "ContentHash": "6a985b10a04dd9840c471bce1b5d5f0029904a2445f541258e8cfe08d79b8d53"
+}

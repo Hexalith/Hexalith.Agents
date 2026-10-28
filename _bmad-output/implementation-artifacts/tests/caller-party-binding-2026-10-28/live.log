@@ -1,0 +1,6 @@
+Exception: /home/administrator/projects/hexalith/agents/eng/verify-story-5.4.ps1:29
+Line |
+  29 |          throw ('DependencyNotAvailable: ' + (($blocked | ForEach-Obje …
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | DependencyNotAvailable: EXT-PARTIES-1, EXT-CONV-AI-1, EXT-SECRETS-1,
+     | EXT-HOST-1

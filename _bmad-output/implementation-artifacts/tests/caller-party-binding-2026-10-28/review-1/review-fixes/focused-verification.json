@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-10-28T12:39:37.769289+00:00",
+  "scope": "Only the edited directory and gate-orchestrator test suites; no wider test run or external call.",
+  "changedFiles": {
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "cd56668b43bf83c16b67386f0c92fffa48c360bd5428a2d0e6d064419d29c62d",
+    "test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs": "0b8b2c413a63f349196627d2473945a2dd8d1ce2f6610961bf9c472a183c3866",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "a9d8317142d38f2ab626358bf9a4291d8c92d4a2305a90273f8dabcb1d427d7c",
+    "test/Hexalith.Agents.Server.Tests/CallerIdentityReplyHttpMessageHandler.cs": "16aa3d7c0d5f52fdf90ae554e13063107d77a5bffc916e3934f32b51a879afee",
+    "_bmad-output/implementation-artifacts/tests/caller-party-binding-2026-10-28/README.md": "9c49d99752a546932f758722020e8d197269ad5e213872d49bfce5640c226079"
+  },
+  "sourcePatchSha256": "e38f6792b35fd0b9e96021a0b75f9029369255c4cbc64731d24aaa73b595620b",
+  "focusedBuild": {
+    "exitCode": 0,
+    "warnings": 0,
+    "errors": 0,
+    "command": "focused-build-command.json",
+    "log": "focused-build.log"
+  },
+  "focused": {
+    "exitCode": 0,
+    "command": "focused-command.json",
+    "log": "focused.log",
+    "xml": "focused.xml",
+    "assemblies": [
+      {
+        "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+        "id": "b43c6123-706d-42c2-812d-27c1cd34ad88",
+        "name": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "run-date": "2026-10-28",
+        "run-time": "12:38:42",
+        "start-rtf": "2026-10-28T12:38:42.6068661+00:00",
+        "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+        "target-framework": ".NETCoreApp,Version=v10.0",
+        "errors": "0",
+        "failed": "0",
+        "finish-rtf": "2026-10-28T12:38:42.9201284+00:00",
+        "not-run": "0",
+        "passed": "115",
+        "skipped": "0",
+        "time": "0.313",
+        "time-rtf": "00:00:00.3130000",
+        "total": "115"
+      }
+    ]
+  },
+  "outstanding": [
+    "Parent strict full Local/Live verification for changed source",
+    "Parent final source/dependency/SDK receipts and result link update",
+    "Full Story 5.4 and all four owner dependencies remain outstanding"
+  ]
+}

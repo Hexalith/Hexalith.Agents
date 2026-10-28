@@ -1,0 +1,123 @@
+{
+  "observedAt": "2026-10-28T12:17:37.856248+00:00",
+  "scope": "Post-run observation only. Does not establish pre-run or in-run transitive input stability, owner qualification, or availability.",
+  "rootHead": "98c4dda84fe4ef5ec353bd8b92929132484a6f19",
+  "sdkVersion": "10.0.402",
+  "installedSdks": [
+    "10.0.302 [/home/administrator/.dotnet/sdk]",
+    "10.0.400 [/home/administrator/.dotnet/sdk]",
+    "10.0.401 [/home/administrator/.dotnet/sdk]",
+    "10.0.402 [/home/administrator/.dotnet/sdk]"
+  ],
+  "globalJsonSha256": "4ec97d7c7e6bee864d2da2c965f18b94b0bd84e71058427f1f6fa69ee6824652",
+  "rootDeclaredSubmodules": [
+    {
+      "path": "references/Hexalith.AI.Tools",
+      "initialized": true,
+      "head": "3f194e17174994d308ec84af9ee2b5aa68674d0d",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Commons",
+      "initialized": true,
+      "head": "3edfbdafc7d4fa915286dce8a37dc4cc7c06085a",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.PolymorphicSerializations",
+      "initialized": true,
+      "head": "221ac4592ba908ae7661ba1fa9e2d1fcc23baee0",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Conversations",
+      "initialized": true,
+      "head": "861f13a2e728c3847a191b0688070762b1bfa29e",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.EventStore",
+      "initialized": true,
+      "head": "36c78f3435d2d492a73f1b0707cf865c8735d740",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Memories",
+      "initialized": true,
+      "head": "72c36c7113c750c8b809f9d72b945a2a8c2d4555",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Tenants",
+      "initialized": true,
+      "head": "7ddb864cda5e942925b056391617eae4895c1253",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Parties",
+      "initialized": true,
+      "head": "9239c531f3b0cbb4a998c419e537463b597ff14b",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Builds",
+      "initialized": true,
+      "head": "50a054a687d29a727c1f9f4b5350cfb814a5d467",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.FrontComposer",
+      "initialized": true,
+      "head": "5f665c4d38afb2255a7dde4620330e09824a40a1",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.McpCli",
+      "initialized": true,
+      "head": "2d7311cbbcc592c0ea0348463037389251d1cb4b",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    },
+    {
+      "path": "references/Hexalith.Platform",
+      "initialized": true,
+      "head": "27fddbf6331df820f52afafcfb8918825d180793",
+      "dirty": false,
+      "porcelain": [],
+      "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "untrackedFileSha256": {}
+    }
+  ]
+}

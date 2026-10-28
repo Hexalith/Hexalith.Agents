@@ -1,0 +1,25 @@
+{
+  "ExternalOwnerCalls": 0,
+  "StoryComplete": false,
+  "LiveReadinessEstablished": false,
+  "LocalContractsVerified": true,
+  "Blockers": [
+    {
+      "RecordId": "EXT-PARTIES-1",
+      "Code": "DependencyNotAvailable"
+    },
+    {
+      "RecordId": "EXT-CONV-AI-1",
+      "Code": "DependencyNotAvailable"
+    },
+    {
+      "RecordId": "EXT-SECRETS-1",
+      "Code": "DependencyNotAvailable"
+    },
+    {
+      "RecordId": "EXT-HOST-1",
+      "Code": "DependencyNotAvailable"
+    }
+  ],
+  "Mode": "Local"
+}

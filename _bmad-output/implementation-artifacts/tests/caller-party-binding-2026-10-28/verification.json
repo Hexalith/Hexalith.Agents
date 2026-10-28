@@ -1,0 +1,166 @@
+{
+  "observedAt": "2026-10-28T11:50:35.402777+00:00",
+  "baselineCommit": "98c4dda84fe4ef5ec353bd8b92929132484a6f19",
+  "local": {
+    "passed": 5947,
+    "projects": {
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1677,
+        "passed": 1677,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "warningFreeBuilds": 5,
+    "exitCode": 0
+  },
+  "focused": {
+    "total": 207,
+    "passed": 207,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "not-run": 0
+  },
+  "baselineRegression": {
+    "total": 2,
+    "failedAsExpected": 2,
+    "workingSourcesReverted": false
+  },
+  "live": {
+    "ExternalCalls": 0,
+    "Mode": "Live",
+    "StoryComplete": false,
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ]
+  },
+  "sourceMapping": {
+    "hash": "6a985b10a04dd9840c471bce1b5d5f0029904a2445f541258e8cfe08d79b8d53",
+    "producer": "Hexalith.Builds.Tooling.Workspace.SourceMappingMaterializer",
+    "scope": "Offline local source validation of actual root-declared paths; no owner or installed-tool qualification",
+    "launcherSha256": "30d4dd9ae86ce8f2bfae873fb05979de4dac55e1e59c3a7623eec662c191c4d1"
+  },
+  "sourceSha256": {
+    "eng/verify-story-5.4.ps1": "946d3fa2377642be575689240b95d0c3696b5e86f72809adc874626cf4b632b0",
+    "src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs": "93048e1b3b605c04727225afc3a5ce7c765b85b1b8d226a006723d2751700a81",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "6d81c4b039f88eb8115c6807299d3f283ff7fb1597e65f3a1f42f04d71e7d210",
+    "src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs": "8a1966bfed6ebcec677bbacddddb667e7d363eab7c735c925df0c17ecfafdf31",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "0bb19adfe1ce3ab74f8a61956d0f317de3a9fa2ff48082ac388a98281883dfe4",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "e96d3f663bad26bce70512c40ee35a41d5f3e684b860f9db81fa50be7c20eb72",
+    "test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs": "7f25fd281038f5f2b4e79afb5566f69edf6f88e0570bf27fd026db60253be07c",
+    "test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs": "77d9e5bc324423648ee2b7e7b00489df368656ec31e1a62a7fbf3749208f6133",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs": "f9e61f64ab88926f47b84db2632289833bfb40b299234f31719b8a12cc4e4673",
+    "test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs": "950bd88f2c67ff0cf52b059ff1ac86b3265fd255c460d6145b75c4eca7841356",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "47695489decbaf9eb7379acc38b5ab4b2dc66fa80b02bdfc8d04998b09b36165",
+    "test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs": "9b8bb0ae4f66f1006a7204b409ff3346e19ae8b54ccf7d2b3ec681dfc6fdb80b",
+    "test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs": "d3ad585e70391ca80d1071643f3375a1d0abe94845434aa5353a42ca58930e3d",
+    "test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs": "21fc51c54fa463705ffad7df0bfc78ff1eab00366a213cc8d2c5e1ffc50e36a3"
+  },
+  "priorSourceSha256": {
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "0afa7e9d668d14512a88098f14381a663e553a2a11b4cf570a2811bee5c440a1",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "ecedd357dcdbf7a298188ced3243876ba33f3ba93600f8e88a246775efc8ba63"
+  },
+  "blockersObserved": [
+    {
+      "stage": "Unmapped initial focused build",
+      "result": "Conversations requires producer-selected mapping; exact log retained in unmapped-build.log"
+    },
+    {
+      "stage": "Initial full Local with globally inherited mapping",
+      "result": "Three BuildContractConformanceTests failed because mapping leaked into deliberate package/CI probes; exact log retained in inherited-mapping-failure.log. Mapping then scoped solely to dotnet build children."
+    }
+  ],
+  "StoryComplete": false,
+  "LiveReadinessEstablished": false,
+  "artifactSha256": {
+    "focused-build-command.json": "35f62be27e08035aba5deb7c488592ece81b515a736c2a20ac017d1809639391",
+    "dotnet-launcher.py": "30d4dd9ae86ce8f2bfae873fb05979de4dac55e1e59c3a7623eec662c191c4d1",
+    "inherited-mapping-failure.log": "08bfaed0f70d4064b8fb7102c137f40d34a0bf40e0251a494985cd433e56ff69",
+    "commands.json": "82239652285ea2d800e29f266703dd685b7a18b3c600432ef2adc31a9c7f4bb0",
+    "live.log": "1fd77440e3c5fa74c8c272065396e93f0022531d6b31d5ed90103104e29de89a",
+    "focused.xml": "b196fddf1014506285f6c71e15409cf4aa9c82a9298130deeea83ce5f9befdba",
+    "focused.log": "953947e4f22a5bf1ad6de36b7038a87ebedcfb032361741b9ae5bb3a4a577374",
+    "local.log": "86ab4380b1cd7704072739f3daed1918e8a87b42e8090d371c728921ee10c468",
+    "unmapped-build.log": "3c2abd081d48795b82793272b9e167b832887f26982e93e6ce835338d4fcf0e8",
+    "mapping-helper/Program.cs.txt": "e3674c34c79a3a348b2618a843b5f59f02a77362a0a9f4deef74b3da2c7d3aee",
+    "mapping-helper/build-and-run.log": "6131a8bfddc75d10d5db321e11f93dab61775106f9c8c637576fcc1c00459dfe",
+    "mapping-helper/MappingHelper.csproj.txt": "920175f2e737d8641fa43a9b0b0d233a3b2ccf7b4d711e02c2ed98b00f96d9d9",
+    "baseline/CallerIdentityPriorBehaviorTests.cs.txt": "2edecb372d79a0824363e386ade25490a9207623597223b7bd2fb280e1f12708",
+    "baseline/build-command.json": "bc1c3d51e8d4f6f0866712bf9669008d5ee8997b9eab1202d2adf067c45cd008",
+    "baseline/regressions.xml": "6989a190d8521ea48f5a7071cd9cc57105feef42f5fd94c92a5ffdfc8bacf34f",
+    "baseline/regressions.log": "c5648a58e7309b3c68ef234b381e8590237c905ca3f548b3d4fff0469f382c75",
+    "baseline/build.log": "1fb0a6beaaa53fcf4bdd90e707e0e51bacc68f81e6df998177f9abd8c0f7f6c6",
+    "baseline/Baseline.targets": "146bbba4c8b44b3972e21c527a2b9138ba8d2fc8ec9ab3273b8778423b8ce6da",
+    "live/result.json": "3971923c5be5e2292d15a435736c17993268340426cc77d71995904cf9dd157c",
+    "mapping/environment.json": "2d9932934a94099bdc472dbb20e4ce414bd8dfffc496cd4802985216fe3deb97",
+    "local/Hexalith.Agents.Tests.build.log": "949b774c28c867352dc33660f1c37ce941683e7a625bf85090c61fb91e5d71ad",
+    "local/Hexalith.Agents.Contracts.Tests.xml": "79b0b0d6e2b6a75a589b9eb83e0db924a835f4250c48124e01b9745176bd162f",
+    "local/Hexalith.Agents.Client.Tests.xml": "a048e0a4d703be4727cb2314e13fda3939723edc11409d540db12a735aca0f01",
+    "local/Hexalith.Agents.UI.Tests.build.log": "bdf7f2f80f0a3e36e0013b3cddd73a4db2927438c7b14c6dd3a4ad26186a302c",
+    "local/Hexalith.Agents.Server.Tests.xml": "cc24c619c7925e840a2337e8ced68ba8156427e50f149c3e22ae0a32358c51d2",
+    "local/Hexalith.Agents.Contracts.Tests.build.log": "48abf5929991c7de1a2479e4f43e3eb4e1cff2d60d57cca2aed94b4bec8912a6",
+    "local/result.json": "d6d0473b25e12a4549e8524d66a7b6977b8febd242c0ba7942821f245e811b3a",
+    "local/Hexalith.Agents.Client.Tests.build.log": "1bf0b1633fb333ddf0c0a09edbbbe19cfe7385241a8c1d9aa678e5eaebd5279e",
+    "local/Hexalith.Agents.UI.Tests.xml": "59e93df6281312988ee7bae8a0be7ce5b9ab1ec3a2fe8aa52dca3c2d905a8c74",
+    "local/Hexalith.Agents.Server.Tests.build.log": "7a910b14049b19b648c79ab31f7d316e833fc764c545f362095fbffa2a5d69e0",
+    "local/Hexalith.Agents.Tests.xml": "30a8580d27d687d841a5bfcac6ed19fb157b5aae54b6628f30b6dc21a67fbb7e",
+    "mapping/source-mapping/SourceMapping.final.targets": "2db3c7ee8b6e02d011ac992f34a5a4273b103ac5cd75f44bcef5d9fa3914333a",
+    "mapping/source-mapping/SourceMapping.before-targets.props": "4303aab7eb7e689e33e56885beb94abb91a8a12206aca6a5f6edda1f464a7eb0",
+    "mapping/source-mapping/mapping.json": "81c256c6b857b1820bc945c7be3a28528fad215d5a3eeb41acbf8fe607ab0a22",
+    "mapping/source-mapping/SourceMapping.values.props": "28d317abdb427e34a5d104abb9b8884254df5a92c9d8189649208b6d8ef208c7",
+    "mapping/source-mapping/SourceMapping.late.props": "0053589ddc7048b14775494cffd76ed1e46cc5fefa3d3b9d96f08ca401fe7b09",
+    "mapping/source-mapping/SourceMapping.targets": "71bdc271ffe3c61eaa5fddadc0ba923b2464650a8c09bb34bccdcec94705a500",
+    "mapping/source-mapping/SourceMapping.values.targets": "c446b4d5c7194edad032f6d3260162ec0326722458418ecc3eb1228716025e01",
+    "mapping/source-mapping/SourceMapping.props": "0363694f252736cdfd0bcf6a567bb077940df16cc966e410153718a552769e82"
+  }
+}

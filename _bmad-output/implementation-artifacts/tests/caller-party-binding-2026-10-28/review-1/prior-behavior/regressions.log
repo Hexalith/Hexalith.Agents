@@ -1,0 +1,157 @@
+xUnit.net v3 In-Process Runner v4.0.2+0c7aa4991f (64-bit .NET 10.0.13)
+  Discovering: Hexalith.Agents.Server.Tests
+  Discovered:  Hexalith.Agents.Server.Tests
+  Starting:    Hexalith.Agents.Server.Tests
+    Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(earliest: "actor") [FAIL]
+      Shouldly.ShouldAssertException : result
+          should be
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = 10/14/2026 10:00:05 +00:00, Dependency =  }
+          but was
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = , Dependency =  }
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs(231,0): at Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(String earliest)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(changedRead: "Conversation") [FAIL]
+      Shouldly.ShouldAssertException : (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status
+          should be
+      AgentInteractionStatus.Denied
+          but was
+      AgentInteractionStatus.Blocked
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs(252,0): at Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(String changedRead)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.Story54CurrentEvidenceTests.TenantAuthorizationCarriesTheEarlierActorOrTenantDeadline(actorSeconds: 60, tenantSeconds: 5) [FAIL]
+      Shouldly.ShouldAssertException : result.CurrentActor
+          should be
+      CurrentHumanActorEvidence { TenantId = tenant-a, Subject = authenticated-subject, ActorId = 01ARZ3NDEKTSV4RRFFQ69G5FAV, PartyId = party-a, BindingVersion = 7, SourcePosition = 11, ObservedAt = 10/14/2026 10:00:00 +00:00, ValidUntil = 10/14/2026 10:00:05 +00:00 }
+          but was
+      CurrentHumanActorEvidence { TenantId = tenant-a, Subject = authenticated-subject, ActorId = 01ARZ3NDEKTSV4RRFFQ69G5FAV, PartyId = party-a, BindingVersion = 7, SourcePosition = 11, ObservedAt = 10/14/2026 10:00:00 +00:00, ValidUntil = 10/14/2026 10:01:00 +00:00 }
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs(275,0): at Hexalith.Agents.Server.Tests.Story54CurrentEvidenceTests.TenantAuthorizationCarriesTheEarlierActorOrTenantDeadline(Int32 actorSeconds, Int32 tenantSeconds)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(earliest: "binding") [FAIL]
+      Shouldly.ShouldAssertException : result
+          should be
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = 10/14/2026 10:00:05 +00:00, Dependency =  }
+          but was
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = , Dependency =  }
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs(231,0): at Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(String earliest)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(earliest: "custody") [FAIL]
+      Shouldly.ShouldAssertException : result
+          should be
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = 10/14/2026 10:00:05 +00:00, Dependency =  }
+          but was
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = , Dependency =  }
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs(231,0): at Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(String earliest)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(earliest: "open-binding") [FAIL]
+      Shouldly.ShouldAssertException : result
+          should be
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = 10/14/2026 10:00:05 +00:00, Dependency =  }
+          but was
+      AgentPartyValidationResult { Status = Valid, PartyId = party-a, CallerValidUntil = , Dependency =  }
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs(231,0): at Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline(String earliest)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(changedRead: "Readiness") [FAIL]
+      Shouldly.ShouldAssertException : (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status
+          should be
+      AgentInteractionStatus.Denied
+          but was
+      AgentInteractionStatus.Blocked
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs(252,0): at Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(String changedRead)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(changedRead: "AgentParty") [FAIL]
+      Shouldly.ShouldAssertException : (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status
+          should be
+      AgentInteractionStatus.Denied
+          but was
+      AgentInteractionStatus.Blocked
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs(252,0): at Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(String changedRead)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(changedRead: "Provider") [FAIL]
+      Shouldly.ShouldAssertException : (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status
+          should be
+      AgentInteractionStatus.Denied
+          but was
+      AgentInteractionStatus.Blocked
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs(252,0): at Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(String changedRead)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+    Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(changedRead: "Approver") [FAIL]
+      Shouldly.ShouldAssertException : (await Orchestrator().ExecuteAsync(Request(), CancellationToken.None)).Status
+          should be
+      AgentInteractionStatus.Denied
+          but was
+      AgentInteractionStatus.Blocked
+      Stack Trace:
+        test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs(252,0): at Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads(String changedRead)
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+        --- End of stack trace from previous location ---
+           at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+           at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+           at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task, ConfigureAwaitOptions options)
+  Finished:    Hexalith.Agents.Server.Tests (ID = 'b324b892ac0e682dd5458f1829e7944d709d58250cbf31a315c6116b588f8872')
+=== TEST EXECUTION SUMMARY ===
+   Hexalith.Agents.Server.Tests  Total: 12, Errors: 0, Failed: 10, Skipped: 0, Not Run: 0, Time: 0.270s

@@ -203,6 +203,77 @@ public sealed class Story54CurrentEvidenceTests
         var reader = new ProjectedTenantAccessReader(tenants, Substitute.For<IAgentDependencyAvailability>(), clock, actors);
         var result = await reader.ReadAsync("tenant-a", "authenticated-subject", string.Empty, CancellationToken.None);
         result.Outcome.ShouldBe(allowed ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized);
+        if (allowed)
+        {
+            result.CurrentActor.ShouldNotBeNull().ActorId.ShouldBe("stable-actor");
+        }
+        else
+        {
+            result.CurrentActor.ShouldBeNull();
+        }
+    }
+
+    /// <summary>Only a completed exact tenant authorization releases transient actor evidence to the gate.</summary>
+    [Theory]
+    [InlineData("current", true)]
+    [InlineData("expired", false)]
+    [InlineData("rollback", false)]
+    [InlineData("revoked", false)]
+    public async Task TenantActorEvidenceRequiresSuccessfulCompletionTimeAuthorization(string transition, bool allowed)
+    {
+        var clock = new Story54TimeProvider();
+        var actor = Story54PartyIdentityFixture.Actor(clock);
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        actors.ReadAsync("tenant-a", actor.Subject, Arg.Any<CancellationToken>()).Returns(actor);
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        tenants.ReadAsync("tenant-a", false, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = transition switch
+            {
+                "expired" => actor.ValidUntil,
+                "rollback" => clock.Now.AddTicks(-1),
+                _ => clock.Now,
+            };
+            return new TenantAuthorityEvidence("tenant-a", "tenants", 2, clock.Now, clock.Now.AddSeconds(5),
+                [new(1, string.Empty, null, "TenantActive", true), new(2, actor.ActorId, "party-a", "User", transition != "revoked")],
+                SourceAggregateId: "tenant-a");
+        });
+
+        var result = await new ProjectedTenantAccessReader(tenants, Substitute.For<IAgentDependencyAvailability>(), clock, actors)
+            .ReadAsync("tenant-a", actor.Subject, "party-a", CancellationToken.None);
+
+        result.Outcome.ShouldBe(allowed ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized);
+        result.CurrentActor.ShouldBe(allowed ? actor with { ValidUntil = clock.Now.AddSeconds(5) } : null);
+    }
+
+    /// <summary>Released evidence retains its exact correspondence and observation, bounded by both authority deadlines.</summary>
+    [Theory]
+    [InlineData(5, 60)]
+    [InlineData(60, 5)]
+    [InlineData(5, 5)]
+    public async Task TenantAuthorizationCarriesTheEarlierActorOrTenantDeadline(int actorSeconds, int tenantSeconds)
+    {
+        var clock = new Story54TimeProvider();
+        CurrentHumanActorEvidence actor = Story54PartyIdentityFixture.Actor(clock) with { ValidUntil = clock.Now.AddSeconds(actorSeconds) };
+        DateTimeOffset expectedDeadline = clock.Now.AddSeconds(Math.Min(actorSeconds, tenantSeconds));
+        var actors = Substitute.For<ICurrentHumanActorSource>();
+        actors.ReadAsync("tenant-a", actor.Subject, Arg.Any<CancellationToken>()).Returns(actor);
+        var tenants = Substitute.For<ICurrentTenantAuthoritySource>();
+        tenants.ReadAsync("tenant-a", false, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = clock.Now.AddSeconds(1);
+            return new TenantAuthorityEvidence("tenant-a", "tenants", 2, clock.Now, actor.ObservedAt.AddSeconds(tenantSeconds),
+                [new(1, string.Empty, null, "TenantActive", true), new(2, actor.ActorId, actor.PartyId, "User", true)],
+                SourceAggregateId: "tenant-a");
+        });
+
+        TenantAccessReadResult result = await new ProjectedTenantAccessReader(tenants,
+            Substitute.For<IAgentDependencyAvailability>(), clock, actors)
+            .ReadAsync("tenant-a", actor.Subject, actor.PartyId, CancellationToken.None);
+
+        result.Outcome.ShouldBe(AgentInteractionGateOutcome.Satisfied);
+        result.CurrentActor.ShouldBe(actor with { ValidUntil = expectedDeadline });
+        actor.Subject.ShouldNotBe(actor.ActorId);
     }
 
     private static CurrentApproverEvidence Candidate(ApproverPolicySource source, string actor, string party, bool readAccess, Story54TimeProvider clock)

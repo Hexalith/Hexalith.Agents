@@ -871,3 +871,11 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-terminal-setup-items.md`
   summary: Publish and pin an EventStore Client/DomainService pair supporting exact-domain workload status assertions, then enable and qualify the package-mode status capability.
   evidence: Review BH-5: current published Client 3.127.0 lacks the exact-domain overload and its DomainService issuer excludes CommandStatus. This batch implements and verifies the source path and explicit package refusal, but default package-mode terminal evidence remains unavailable until compatible published dependencies are selected and the capability is exercised. Existing host-reader overrides remain supported; deployment qualification is separate.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
+  summary: Detect clock rollback between the current tenant authority reader's internal awaits even when time stays after evaluation start.
+  evidence: Review BH3 traced the unchanged baseline ProjectedTenantAccessReader: actor lookup can complete at t+5 and tenant lookup at t+4, yet both compare only with t; the enclosing gate cannot observe the reader's intermediate instant. A monotonic per-await check and focused regression are needed independently of caller binding propagation.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
+  summary: Restore explicit Conversation denominator and dedicated enrolled service-Party constraints in the generated Epic 5 agent context.
+  evidence: Review FB9 compared the regenerated context with baseline 98c4dda: the prior context named open/undeleted Conversations over [from,to), including zero-call Conversations, and a dedicated enrolled Conversations service Party. Accepted planning/full owner contracts remain unchanged; this agent-context correction is deferred under the build workflow rule.

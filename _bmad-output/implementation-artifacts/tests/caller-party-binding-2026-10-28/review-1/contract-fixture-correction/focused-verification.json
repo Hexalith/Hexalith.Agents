@@ -1,0 +1,79 @@
+{
+  "observedAt": "2026-10-28T12:21:25.262412+00:00",
+  "scope": "Focused local correction following owner-client contract audit. Earlier receipts retained; no full validation or availability claim.",
+  "changes": [
+    "Current Human binding requires non-null UTC end strictly after effective time and completion",
+    "Custody expiry must cover the entire returned binding interval",
+    "Positive custody fixtures close binding at the custody deadline",
+    "Missing-end, empty/reversed interval and custody-shorter-than-binding negatives added"
+  ],
+  "previousFocusedReceipt": {
+    "path": "../focused-verification.json",
+    "sha256": "99ff43b2c01445a74d218af96fe4d664e623e6c3125bd90cf0d973f38aa4d30b"
+  },
+  "sourceFiles": {
+    "eng/verify-story-5.4.ps1": "946d3fa2377642be575689240b95d0c3696b5e86f72809adc874626cf4b632b0",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "1bf923d401e091e0afb1e2111f477627b99ed45a69427601e1064db1c3be2194",
+    "src/Hexalith.Agents.Server/Ports/AgentPartyValidationResult.cs": "c63b987c1d1d72f12e1a5e06612f04e8810037cc47824980340928672c77be40",
+    "src/Hexalith.Agents.Server/Ports/IAgentPartyDirectory.cs": "8a1966bfed6ebcec677bbacddddb667e7d363eab7c735c925df0c17ecfafdf31",
+    "src/Hexalith.Agents.Server/Ports/PartiesAgentPartyDirectory.cs": "d007dff9a02d50d4e69405db0bee12de2a251d4d7f7c6c5a2f28fa17ee96251a",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "da522319fc88c3fd703bfcd83bfacf3b3dfd8590f4fdb2d2f60ffe60e67b06ab",
+    "src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs": "4114971653c6c966dee0c022a1ac1add38a062aa4ed48189e8b0c4a21eae78e3",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateAdmissionTests.cs": "281548c7deef9a5a26a3f61a9a031f57d098af4f72cb60e064efd7a629ac5431",
+    "test/Hexalith.Agents.Server.Tests/AgentInteractionGateOrchestratorTests.cs": "109feb904514ed71124303777d0f26c9ee9569261ed00e84251bf03f2dfbffa0",
+    "test/Hexalith.Agents.Server.Tests/AuthorityCancellationAdmissionTests.cs": "950bd88f2c67ff0cf52b059ff1ac86b3265fd255c460d6145b75c4eca7841356",
+    "test/Hexalith.Agents.Server.Tests/LegacyCallerOnlyPartyDirectory.cs": "21fc51c54fa463705ffad7df0bfc78ff1eab00366a213cc8d2c5e1ffc50e36a3",
+    "test/Hexalith.Agents.Server.Tests/PartiesAgentPartyDirectoryTests.cs": "66a4841a723c033b0affbe72bc68edb624b5441b216fb428926a3f256aef5339",
+    "test/Hexalith.Agents.Server.Tests/ProjectedProviderCatalogReaderTests.cs": "cbd7e4ebc815b9c575ae42212ee70efccb2c832a1a13e8ea74463ea491d080e0",
+    "test/Hexalith.Agents.Server.Tests/Story54CurrentEvidenceTests.cs": "b9b332edff7570f2b0959e33b8d1e27ae55749185a61b0ec64b3238dc7092e96",
+    "test/Hexalith.Agents.Server.Tests/Story54PartyIdentityFixture.cs": "d3ad585e70391ca80d1071643f3375a1d0abe94845434aa5353a42ca58930e3d"
+  },
+  "ownerClientObservation": {
+    "path": "references/Hexalith.Parties/src/Hexalith.Parties.Client/HttpPartiesIdentityClient.cs",
+    "sha256": "22b0461bd1373c451575a950ed91e50b35c64ed84e3b033da1b81a8442697e27"
+  },
+  "sourcePatchSha256": "38c87a31fb4fb3ef43c7346148b115da3135d1905bf6ca3f7dcedc7db8ab1576",
+  "focusedBuild": {
+    "exitCode": 0,
+    "warnings": 0,
+    "errors": 0,
+    "command": "focused-build-command.json",
+    "log": "focused-build.log"
+  },
+  "focused": {
+    "exitCode": 0,
+    "command": "focused-command.json",
+    "log": "focused.log",
+    "xml": "focused.xml",
+    "assemblies": [
+      {
+        "environment": "64-bit (x64) .NET 10.0.13 [collection-per-class, parallel (collections, 14 threads)]",
+        "id": "9f162935-e21c-47e3-9ea0-76401bc70c23",
+        "name": "/home/administrator/projects/hexalith/agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "run-date": "2026-10-28",
+        "run-time": "12:20:36",
+        "start-rtf": "2026-10-28T12:20:36.4895656+00:00",
+        "test-framework": "xUnit.net v3 4.0.2+0c7aa4991f",
+        "target-framework": ".NETCoreApp,Version=v10.0",
+        "errors": "0",
+        "failed": "0",
+        "finish-rtf": "2026-10-28T12:20:36.8440102+00:00",
+        "not-run": "0",
+        "passed": "244",
+        "skipped": "0",
+        "time": "0.356",
+        "time-rtf": "00:00:00.3560000",
+        "total": "244"
+      }
+    ]
+  },
+  "mappingEnvironment": {
+    "path": "/tmp/agents-caller-identity-mapping/environment.json",
+    "sha256": "2d9932934a94099bdc472dbb20e4ce414bd8dfffc496cd4802985216fe3deb97"
+  },
+  "outstanding": [
+    "Root repeat of strict full Local/Live verification against corrected source",
+    "Root final post-run dependency/SDK observation and parent-spec results",
+    "Full Story 5.4 and all four unavailable owner dependencies remain outstanding"
+  ]
+}

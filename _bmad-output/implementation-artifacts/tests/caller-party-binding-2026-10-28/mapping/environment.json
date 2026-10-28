@@ -1,0 +1,9 @@
+{
+  "CustomBeforeDirectoryBuildProps": "/tmp/agents-caller-identity-mapping/source-mapping/SourceMapping.targets",
+  "CustomAfterMicrosoftCommonProps": "/tmp/agents-caller-identity-mapping/source-mapping/SourceMapping.props",
+  "CustomBeforeDirectoryBuildTargets": "/tmp/agents-caller-identity-mapping/source-mapping/SourceMapping.before-targets.props",
+  "CustomAfterDirectoryBuildTargets": "/tmp/agents-caller-identity-mapping/source-mapping/SourceMapping.late.props",
+  "AfterMicrosoftNETSdkTargets": "/tmp/agents-caller-identity-mapping/source-mapping/SourceMapping.final.targets",
+  "HEXALITH_SOURCE_MAPPING_HASH": "6a985b10a04dd9840c471bce1b5d5f0029904a2445f541258e8cfe08d79b8d53",
+  "Configuration": "Debug"
+}

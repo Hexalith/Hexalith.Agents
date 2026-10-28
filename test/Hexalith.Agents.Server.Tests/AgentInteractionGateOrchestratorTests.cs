@@ -53,6 +53,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     private readonly IAgentCommandDispatcher _dispatcher = Substitute.For<IAgentCommandDispatcher>();
 
     private AgentCommandIntent? _lastDispatched;
+    private readonly Story54TimeProvider _clock = new();
 
     private AgentInteractionGateOrchestrator Orchestrator => new(
         _tenantAccessReader,
@@ -61,7 +62,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         _partyDirectory,
         _providerCatalogReader,
         _approverPolicyResolver,
-        _dispatcher);
+        _dispatcher, _clock);
 
     // ===== All ready → Authorized (AC1) =====
 
@@ -85,6 +86,49 @@ public sealed class AgentInteractionGateOrchestratorTests
         verdicts.Count.ShouldBe(10); // one per AgentInteractionGateCheck, in evaluation order
         verdicts.Select(v => v.Check).ShouldBe(EvaluationOrder());
         verdicts.ShouldAllBe(v => v.Outcome == AgentInteractionGateOutcome.Satisfied);
+    }
+
+    /// <summary>Envelope preparation cannot cross the exclusive caller deadline and still dispatch.</summary>
+    [Fact]
+    public async Task ExpiryDuringClientExtensionEnumerationDeniesBeforeDispatch()
+    {
+        StubAllReady();
+        DateTimeOffset deadline = _clock.Now.AddMinutes(1);
+        bool enumerated = false;
+        var extensions = Substitute.For<IReadOnlyDictionary<string, string>>();
+        extensions.GetEnumerator().Returns(_ =>
+        {
+            enumerated = true;
+            _clock.Now = deadline;
+            return Enumerable.Empty<KeyValuePair<string, string>>().GetEnumerator();
+        });
+
+        AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(extensions), CancellationToken.None);
+
+        enumerated.ShouldBeTrue();
+        outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
+        _dispatcher.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>An accepted dispatch retains its shared-policy outcome when acknowledgement arrives after authority expiry.</summary>
+    [Fact]
+    public async Task DelayedDispatchAcknowledgementRetainsTheAcceptedGateOutcome()
+    {
+        StubAllReady();
+        DateTimeOffset deadline = _clock.Now.AddMinutes(1);
+        _dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            _clock.Now.ShouldBeLessThan(deadline);
+            _lastDispatched = call.ArgAt<AgentCommandIntent>(0);
+            _clock.Now = deadline;
+            return new SubmitCommandResponse("correlation");
+        });
+
+        AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.Authorized);
+        DispatchedVerdicts().ShouldAllBe(verdict => verdict.Outcome == AgentInteractionGateOutcome.Satisfied);
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -126,7 +170,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     public async Task Caller_party_missing_maps_to_denied()
     {
         StubAllReady();
-        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
+        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Missing, null));
         CaptureDispatch();
 
@@ -525,7 +569,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     {
         // The caller's Party verdict is authorization-class; an Unauthorized outcome decides Denied (AC3).
         StubAllReady();
-        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
+        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Unauthorized, null));
         CaptureDispatch();
 
@@ -700,13 +744,16 @@ public sealed class AgentInteractionGateOrchestratorTests
     private void StubAllReady()
     {
         _tenantAccessReader.ReadAsync(TenantId, Arg.Any<string>(), CallerPartyId, Arg.Any<CancellationToken>())
-            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true)
+            {
+                CurrentActor = new(TenantId, "caller-user", "stable-actor", CallerPartyId, 1, 1, _clock.Now, _clock.Now.AddMinutes(1)),
+            });
         _conversationAccessReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, Arg.Any<CancellationToken>())
             .Returns(new ConversationAccessReadResult(AgentInteractionGateOutcome.Satisfied, IsFresh: true));
         _readinessReader.ReadAsync(TenantId, AgentId, Arg.Any<CancellationToken>())
             .Returns(Readiness());
-        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CancellationToken>())
-            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, CallerPartyId));
+        _partyDirectory.ValidateCallerPartyAsync(TenantId, CallerPartyId, Arg.Any<CurrentHumanActorEvidence>(), Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, CallerPartyId) { CallerValidUntil = _clock.Now.AddMinutes(1) });
         _partyDirectory.ValidateExistingPartyAsync(TenantId, AgentPartyId, Arg.Any<CancellationToken>())
             .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, AgentPartyId));
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())

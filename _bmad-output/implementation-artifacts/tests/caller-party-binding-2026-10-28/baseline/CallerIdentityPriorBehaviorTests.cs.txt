@@ -1,0 +1,53 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Server.Application.AgentInteractions;
+using Hexalith.Agents.Server.Ports;
+using Hexalith.Parties.Client.Abstractions;
+using Hexalith.Parties.Contracts.Models;
+using Hexalith.Parties.Contracts.Queries;
+using Hexalith.Parties.Contracts.ValueObjects;
+using NSubstitute;
+using Shouldly;
+using Xunit;
+namespace Hexalith.Agents.Server.Tests;
+/// <summary>Regression assertions compiled with the two unmodified baseline production files outside the working sources.</summary>
+public sealed class CallerIdentityPriorBehaviorTests
+{
+    /// <summary>The unbound historical caller signature must remain closed.</summary>
+    [Fact]
+    public async Task LegacyCallerValidationRemainsClosedWithoutVerifiedActorEvidence()
+    {
+        var client = Substitute.For<IPartiesIdentityClient>();
+        client.ResolvePartyIdentityAsync("tenant-a", Arg.Any<ResolvePartyIdentity>(), Arg.Any<CancellationToken>())
+            .Returns(_ => new PartyIdentityResult(PartyIdentityOutcome.Resolved, new PartyIdentityEvidence(1, "tenant-a", "party-a",
+                PartyIdentityClassification.Human, true, false, false, 1, DateTimeOffset.UtcNow, "observation", null)));
+        var directory = new PartiesAgentPartyDirectory(client, Substitute.For<IAgentDependencyAvailability>(), TimeProvider.System);
+        (await directory.ValidateCallerPartyAsync("tenant-a", "party-a", CancellationToken.None)).Status
+            .ShouldBe(PartyLinkValidationStatus.Unavailable);
+        client.ReceivedCalls().ShouldBeEmpty();
+    }
+    /// <summary>A bare tenant success may not address protected Party data.</summary>
+    [Fact]
+    public async Task TenantSuccessWithoutCurrentActorStopsBeforePartyLookup()
+    {
+        var tenants = Substitute.For<ITenantAccessReader>();
+        tenants.ReadAsync("tenant-a", "subject", "caller", Arg.Any<CancellationToken>())
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true));
+        var parties = Substitute.For<IAgentPartyDirectory>();
+        parties.ValidateCallerPartyAsync("tenant-a", "caller", Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, "caller"));
+        var conversations = Substitute.For<IConversationAccessReader>();
+        conversations.ReadAsync("tenant-a", "conversation", "caller", Arg.Any<CancellationToken>())
+            .Returns(new ConversationAccessReadResult(AgentInteractionGateOutcome.Unauthorized, false));
+        var dispatcher = Substitute.For<IAgentCommandDispatcher>();
+        var gate = new AgentInteractionGateOrchestrator(tenants, conversations, Substitute.For<IAgentInvocationReadinessReader>(),
+            parties, Substitute.For<IProviderCatalogReader>(), Substitute.For<IApproverPolicyResolver>(), dispatcher);
+        (await gate.ExecuteAsync(new("message", "correlation", "tenant-a", "interaction", "hexa", "subject", "caller", "conversation",
+            "provider", "model", AgentResponseMode.Automatic, null, null), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Denied);
+        parties.ReceivedCalls().ShouldBeEmpty();
+        dispatcher.ReceivedCalls().ShouldBeEmpty();
+    }
+}

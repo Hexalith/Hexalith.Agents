@@ -1,0 +1,37 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Hexalith.Commons.UniqueIds -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.UniqueIds.dll
+  Successfully created package '/tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.UniqueIds.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.UniqueIds.1.0.0.snupkg'.
+  Hexalith.EventStore.Contracts -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.Contracts.dll
+  Hexalith.Agents.Contracts -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.Contracts.dll
+  Hexalith.EventStore.Client -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.Client.dll
+  Hexalith.EventStore.ServiceDefaults -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.ServiceDefaults.dll
+  Hexalith.EventStore.DomainService -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.DomainService.dll
+  Hexalith.EventStore.Admin.Abstractions -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.Admin.Abstractions.dll
+  Hexalith.EventStore.Server -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.Server.dll
+  Hexalith.EventStore.Gateway -> /tmp/agents-caller-identity-baseline/bin/Hexalith.EventStore.Gateway.dll
+  Hexalith.Agents.EventStore -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.EventStore.dll
+  Hexalith.Agents.Client -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.Client.dll
+  Hexalith.Agents -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.dll
+  Hexalith.Commons.Http -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.Http.dll
+  Successfully created package '/tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.Http.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.Http.1.0.0.snupkg'.
+  Hexalith.McpCli.Analyzers -> /tmp/agents-caller-identity-baseline/bin/Hexalith.McpCli.Analyzers.dll
+  Hexalith.McpCli.Abstractions -> /tmp/agents-caller-identity-baseline/bin/Hexalith.McpCli.Abstractions.dll
+  Hexalith.Parties.Contracts -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Parties.Contracts.dll
+  Hexalith.Parties.Client -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Parties.Client.dll
+  Hexalith.Commons.Serialization -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.Serialization.dll
+  The package Hexalith.Commons.Serialization.1.0.0 is missing a readme. Go to https://aka.ms/nuget/authoring-best-practices/readme to learn why package readmes are important.
+  Successfully created package '/tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.Serialization.1.0.0.nupkg'.
+  Successfully created package '/tmp/agents-caller-identity-baseline/bin/Hexalith.Commons.Serialization.1.0.0.snupkg'.
+  Hexalith.Conversations.Contracts -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Conversations.Contracts.dll
+  Hexalith.Conversations.Client -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Conversations.Client.dll
+  Hexalith.Agents.Server -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.Server.dll
+  Hexalith.Agents.Server.Tests -> /tmp/agents-caller-identity-baseline/bin/Hexalith.Agents.Server.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:17.99

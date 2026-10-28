@@ -42,7 +42,10 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
             bool granted = IsCurrentActor(actor, tenantId, actorUserId, callerPartyId, administration, started, now)
                 && Grants(evidence, tenantId, actor.ActorId, administration ? "Agents.Administrator" : "User",
                     administration ? null : callerPartyId, false, now, started);
-            return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted);
+            return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted)
+            {
+                CurrentActor = granted ? actor with { ValidUntil = actor.ValidUntil < evidence!.ValidUntil ? actor.ValidUntil : evidence.ValidUntil } : null,
+            };
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

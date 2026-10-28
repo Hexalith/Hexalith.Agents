@@ -1,0 +1,10 @@
+[
+  "dotnet",
+  "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+  "-class",
+  "Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests",
+  "-class",
+  "Hexalith.Agents.Server.Tests.AgentInteractionGateOrchestratorTests",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/caller-party-binding-2026-10-28/review-1/review-fixes/focused.xml"
+]

@@ -1,0 +1,12 @@
+[
+  "dotnet",
+  "/tmp/agents-caller-authority-review1-prior/bin/Hexalith.Agents.Server.Tests.dll",
+  "-method",
+  "Hexalith.Agents.Server.Tests.Story54CurrentEvidenceTests.TenantAuthorizationCarriesTheEarlierActorOrTenantDeadline",
+  "-method",
+  "Hexalith.Agents.Server.Tests.PartiesAgentPartyDirectoryTests.SuccessfulCallerValidationCarriesTheEarliestAuthorityDeadline",
+  "-method",
+  "Hexalith.Agents.Server.Tests.AgentInteractionGateAdmissionTests.EarlierCallerDeadlineStopsBeforeSubsequentProtectedReads",
+  "-result-xml",
+  "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/caller-party-binding-2026-10-28/review-1/prior-behavior/regressions.xml"
+]
