@@ -22,8 +22,18 @@ if args and pathlib.Path(args[0]).name == "pwsh.dll":
 name = pathlib.Path(sys.argv[0]).name
 with open(os.environ["AUDIT_LOG"], "a") as log:
     log.write(json.dumps({"name": name, "args": args}) + "\n")
-if name == "pwsh":
+if name in ("pwsh", "python3"):
     sys.exit(0)  # Unrelated package-authority and version-floor prerequisites.
+if any(arg.startswith("-p:HexalithEventStoreRoot=") and arg.endswith("missing-eventstore") for arg in args):
+    print("Source dependency 'references/Hexalith.EventStore' is missing.")
+    sys.exit(1)
+if "-p:UseHexalithProjectReferences=true" in args:
+    if args[0] == "pack":
+        print("Package creation must not use external Hexalith project references.")
+        sys.exit(1)
+    if "Release" in args:
+        print("Release builds must use package references for external Hexalith libraries.")
+        sys.exit(1)
 configuration = "Release" if "-p:Configuration=Release" in args or "Release" in args else "Debug"
 if args[0] in ("restore", "build") and configuration == os.environ["AUDIT_FAIL_CONFIGURATION"]:
     print("error NU1903: controlled high-severity advisory", file=sys.stderr)
@@ -51,7 +61,7 @@ class VerifierAuditPolicyTests(unittest.TestCase):
             (planning / "external-dependency-register.md").write_text("# Unavailable\n")
             commands = root / "commands"
             commands.mkdir()
-            for name in ("dotnet", "pwsh"):
+            for name in ("dotnet", "pwsh", "python3"):
                 command = commands / name
                 command.write_text(f"#!{sys.executable}\n{RUNNER}")
                 command.chmod(0o755)
@@ -63,6 +73,7 @@ class VerifierAuditPolicyTests(unittest.TestCase):
                 *arguments, *([] if script == "verify-story.ps1" else ["-ArtifactsPath", str(root / "evidence")])],
                 env=environment, capture_output=True, text=True, timeout=20)
             calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
+            self.tool_calls = calls
             return result, [call["args"] for call in calls if call["name"] == "dotnet"]
 
     def assert_audit_failure(self, result, calls) -> None:
@@ -81,6 +92,38 @@ class VerifierAuditPolicyTests(unittest.TestCase):
                 self.assertEqual(calls[-1][0], "restore")
                 self.assertIn(f"-p:Configuration={configuration}", calls[-1])
                 self.assertEqual(len(calls), 1 if configuration == "Debug" else 8)
+
+    def test_story_51_package_lane_starts_with_audited_release_restore(self) -> None:
+        result, calls = self.run_verifier(
+            "verify-story.ps1", ["-Story", "5.1", "-DependencyMode", "Package"], "Release"
+        )
+        self.assert_audit_failure(result, calls)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0][0], "restore")
+        self.assertIn("-p:Configuration=Release", calls[0])
+        self.assertIn("-p:UseHexalithProjectReferences=false", calls[0])
+
+    def test_story_51_package_lane_retains_tests_negative_gates_and_package_consumers(self) -> None:
+        result, calls = self.run_verifier(
+            "verify-story.ps1", ["-Story", "5.1", "-DependencyMode", "Package"], "None"
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual([call[0] for call in calls], ["restore", "build", *(["test"] * 5), "build", "pack", "build"])
+        self.assertIn("-p:Configuration=Release", calls[0])
+        self.assertIn("-p:UseHexalithProjectReferences=false", calls[0])
+        self.assertIn("-warnaserror", calls[1])
+        for call, floor in zip(calls[2:7], (529, 6, 787, 549, 1073), strict=True):
+            self.assertIn("Release", call)
+            self.assertIn("-p:UseHexalithProjectReferences=false", call)
+            self.assertEqual(call[call.index("--minimum-expected-tests") + 1], str(floor))
+            self.assertEqual(call[call.index("--fail-skips") + 1], "on")
+        for gate in ("release-source-mode", "pack-source-mode", "missing-source-root"):
+            self.assertIn(f"negative {gate} rejected as intended", result.stdout)
+        python_calls = [call["args"] for call in self.tool_calls if call["name"] == "python3"]
+        self.assertEqual([call[0] for call in python_calls], [
+            "scripts/pack-release-packages.py", "scripts/validate-nuget-packages.py",
+            "scripts/validate-consumer-package-references.py",
+        ])
 
     def test_story_54_source_audit_failure_stops_before_tests(self) -> None:
         result, calls = self.run_verifier("verify-story-5.4.ps1", [], "Debug")

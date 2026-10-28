@@ -50,6 +50,9 @@ if args and args[0] == "msbuild":
     print(json.dumps({"Items": {"PackageVersion": [{"Identity": "Hexalith.EventStore.Client", "Version": "3.119.0"}]}}))
     sys.exit(0)
 if args and args[0] in ("restore", "build"):
+    if args[0] == os.environ.get("STORY_52_FAIL_COMMAND"):
+        print("error NU1903: controlled audit failure", file=sys.stderr)
+        sys.exit(23)
     print("controlled source " + args[0])
     sys.exit(0)
 if not args or not args[0].endswith(".dll"):
@@ -81,6 +84,8 @@ if scenario == "progress":
 floors = {"Hexalith.Agents.Contracts.Tests": 529, "Hexalith.Agents.Client.Tests": 6,
           "Hexalith.Agents.Tests": 787, "Hexalith.Agents.Server.Tests": 573,
           "Hexalith.Agents.UI.Tests": 1073}
+if "Release" in Path(args[0]).parts:
+    floors["Hexalith.Agents.Server.Tests"] = 549
 method_floors = {
     "Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity": 12,
     "Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait": 4,
@@ -134,6 +139,9 @@ class Story52VerifierTests(unittest.TestCase):
             assembly.parent.mkdir(parents=True)
             assembly.touch()
             self.assemblies.append(assembly)
+            release_assembly = self.root / project / "bin" / "Release" / "net10.0" / assembly.name
+            release_assembly.parent.mkdir(parents=True)
+            release_assembly.touch()
         for relative, needle in BINDINGS.items():
             path = self.root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,11 +168,13 @@ class Story52VerifierTests(unittest.TestCase):
 
     def run_verifier(
         self, scenario: str = "success", target: str = "Hexalith.Agents.Tests.AgentLifecycleConfigurationVersionTests", *,
-        skip_build: bool = True,
+        skip_build: bool = True, configuration: str | None = None, fail_command: str = "",
     ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [PWSH, "-NoProfile", "-NonInteractive", "-File", str(self.script), *(["-SkipBuild"] if skip_build else [])],
-            env=self.environment_for(scenario, target),
+            [PWSH, "-NoProfile", "-NonInteractive", "-File", str(self.script),
+             *(["-SkipBuild"] if skip_build else []),
+             *(["-Configuration", configuration] if configuration else [])],
+            env=dict(self.environment_for(scenario, target), STORY_52_FAIL_COMMAND=fail_command),
             text=True,
             capture_output=True,
             timeout=30,
@@ -239,6 +249,48 @@ class Story52VerifierTests(unittest.TestCase):
         self.assertEqual(calls[2][calls[2].index("-c") + 1], "Debug")
         self.assertIn("-warnaserror", calls[2])
         self.assertTrue(calls[3][0].endswith(".dll"))
+
+    def test_release_invocation_builds_packages_and_checks_all_release_selections(self) -> None:
+        result = self.run_verifier(skip_build=False, configuration="Release")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = self.calls()
+        self.assertEqual([call[0] for call in calls[:3]], ["msbuild", "restore", "build"])
+        self.assertEqual(len(calls), 33)
+        self.assertIn("-p:Configuration=Release", calls[1])
+        self.assertEqual(calls[2][calls[2].index("-c") + 1], "Release")
+        self.assertIn("-warnaserror", calls[2])
+        for call in calls[1:3]:
+            self.assertIn("-p:UseHexalithProjectReferences=false", call)
+            self.assertNotIn("-p:NuGetAudit=false", call)
+        for call in calls[3:]:
+            self.assertIn("Release", Path(call[0]).parts)
+            self.assertNotIn("Debug", Path(call[0]).parts)
+            self.assertIn("-failSkips", call)
+
+    def test_release_regression_rejects_server_count_below_package_floor(self) -> None:
+        assembly = self.root / PROJECTS[3] / "bin/Release/net10.0/Hexalith.Agents.Server.Tests.dll"
+        result = self.run_verifier(
+            "below-floor", "all::" + str(assembly), configuration="Release"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("expected at least 549", self.diagnostic(result))
+
+    def test_release_restore_and_build_audit_failures_stop_before_tests(self) -> None:
+        for command in ("restore", "build"):
+            with self.subTest(command=command):
+                self.log.unlink(missing_ok=True)
+                result = self.run_verifier(skip_build=False, configuration="Release", fail_command=command)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("NU1903", result.stdout + result.stderr)
+                calls = self.calls()
+                self.assertEqual([call[0] for call in calls],
+                                 ["msbuild", "restore"] + (["build"] if command == "build" else []))
+
+    def test_configuration_casing_selects_canonical_release_paths(self) -> None:
+        result = self.run_verifier(configuration="release")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        for call in self.calls()[1:]:
+            self.assertIn("Release", Path(call[0]).parts)
 
     def test_package_floor_only_does_not_invoke_tests(self) -> None:
         result = subprocess.run(

@@ -1,6 +1,8 @@
 param(
     [Parameter(Mandatory = $true)]
-    [string] $Story
+    [string] $Story,
+    [ValidateSet('Both', 'Package')]
+    [string] $DependencyMode = 'Both'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -55,7 +57,8 @@ function Assert-NativeFailure {
     )
 
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
-    $startInfo.FileName = 'dotnet'
+    $startInfo.FileName = (Get-Command dotnet -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+    $startInfo.WorkingDirectory = $root
     $startInfo.UseShellExecute = $false
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
@@ -127,13 +130,15 @@ try {
     Write-Host 'Gate: effective EventStore package floor'
     pwsh -NoProfile -File (Join-Path $root 'eng/verify-story-5.2.ps1') -PackageFloorOnly
 
-    Write-Host 'Gate: source-build'
-    dotnet restore $solution -p:Configuration=Debug -p:UseHexalithProjectReferences=true /m:1 /nr:false
-    dotnet build $solution -c Debug --no-restore -warnaserror -p:UseHexalithProjectReferences=true /m:1 /nr:false
+    if ($DependencyMode -eq 'Both') {
+        Write-Host 'Gate: source-build'
+        dotnet restore $solution -p:Configuration=Debug -p:UseHexalithProjectReferences=true /m:1 /nr:false
+        dotnet build $solution -c Debug --no-restore -warnaserror -p:UseHexalithProjectReferences=true /m:1 /nr:false
 
-    foreach ($testProject in $testProjects) {
-        Write-Host "Gate: test $($testProject.Path) (minimum $($testProject.DebugMinimumExpectedTests))"
-        dotnet test --project $testProject.Path -c Debug --no-build -p:UseHexalithProjectReferences=true --minimum-expected-tests $testProject.DebugMinimumExpectedTests --fail-skips on
+        foreach ($testProject in $testProjects) {
+            Write-Host "Gate: test $($testProject.Path) (minimum $($testProject.DebugMinimumExpectedTests))"
+            dotnet test --project $testProject.Path -c Debug --no-build -p:UseHexalithProjectReferences=true --minimum-expected-tests $testProject.DebugMinimumExpectedTests --fail-skips on
+        }
     }
 
     Write-Host 'Gate: package-build'

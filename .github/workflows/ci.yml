@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   ci:
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@cf4bdea6defb767b4ac016e0c1e7819505f6a745
+    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@b15dab4cc740b6fb2d2065682f76b8166a7e120a
     with:
       solution: Hexalith.Agents.slnx
       test-platform: microsoft-testing-platform
@@ -47,7 +47,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git -C references/Hexalith.Builds rev-parse HEAD)" = "cf4bdea6defb767b4ac016e0c1e7819505f6a745"
+          test "$(git -C references/Hexalith.Builds rev-parse HEAD)" = "b15dab4cc740b6fb2d2065682f76b8166a7e120a"
       - uses: actions/setup-dotnet@v6.0.0
         with:
           global-json-file: global.json
@@ -67,11 +67,11 @@ jobs:
       - name: Enforce EventStore package floor
         shell: pwsh
         run: ./eng/verify-story-5.2.ps1 -PackageFloorOnly
-      - name: Enforce source and package test floors without skips
+      - name: Enforce package test floors without skips
         shell: pwsh
-        run: ./eng/verify-story.ps1 -Story 5.1
+        run: ./eng/verify-story.ps1 -Story 5.1 -DependencyMode Package
       - name: Enforce Story 5.2 focused and regression evidence
         shell: pwsh
-        run: ./eng/verify-story-5.2.ps1 -SkipBuild
+        run: ./eng/verify-story-5.2.ps1 -SkipBuild -Configuration Release
       - name: Run tooling contract tests
         run: python3 -m unittest discover -s tests/tooling -p '*_test.py'

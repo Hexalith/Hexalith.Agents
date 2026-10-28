@@ -97,7 +97,7 @@ public sealed class PackageInventoryTests
 
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/ci.yml"));
         workflow.ShouldContain(
-            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@cf4bdea6defb767b4ac016e0c1e7819505f6a745");
+            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@b15dab4cc740b6fb2d2065682f76b8166a7e120a");
         workflow.ShouldContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
         workflow.ShouldNotContain("domain-ci.yml@main");
         workflow.ShouldContain("test-platform: microsoft-testing-platform");
@@ -112,19 +112,19 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props -ExcludedPath $exclusions");
         workflow.ShouldContain("name: Enforce EventStore package floor");
         workflow.ShouldContain("./eng/verify-story-5.2.ps1 -PackageFloorOnly");
-        workflow.ShouldContain("./eng/verify-story-5.2.ps1 -SkipBuild");
+        workflow.ShouldContain("./eng/verify-story-5.2.ps1 -SkipBuild -Configuration Release");
         Regex.IsMatch(
             workflow,
-            @"(?m)^      - name: Enforce source and package test floors without skips\r?\n        shell: pwsh\r?\n        run: \./eng/verify-story\.ps1 -Story 5\.1\r?\n      - name: Enforce Story 5\.2 focused and regression evidence\r?\n        shell: pwsh\r?\n        run: \./eng/verify-story-5\.2\.ps1 -SkipBuild\r?\n(?=      - name:)")
-            .ShouldBeTrue("CI must run the blocking Story 5.2 gate immediately after the source/package builds.");
+            @"(?m)^      - name: Enforce package test floors without skips\r?\n        shell: pwsh\r?\n        run: \./eng/verify-story\.ps1 -Story 5\.1 -DependencyMode Package\r?\n      - name: Enforce Story 5\.2 focused and regression evidence\r?\n        shell: pwsh\r?\n        run: \./eng/verify-story-5\.2\.ps1 -SkipBuild -Configuration Release\r?\n(?=      - name:)")
+            .ShouldBeTrue("CI must run the blocking Story 5.2 gate immediately after the Release/package build.");
         workflow.ShouldContain("python3 -m unittest discover -s tests/tooling -p '*_test.py'");
         workflow.ShouldContain("git -c submodule.recurse=false submodule update --init");
         workflow.ShouldContain("timeout-minutes: 90");
-        workflow.ShouldContain("./eng/verify-story.ps1 -Story 5.1");
+        workflow.ShouldContain("./eng/verify-story.ps1 -Story 5.1 -DependencyMode Package");
         workflow.ShouldContain("npm audit signatures");
         workflow.ShouldContain("persist-credentials: false");
         workflow.ShouldContain("git -C references/Hexalith.Builds rev-parse HEAD");
-        workflow.ShouldContain("cf4bdea6defb767b4ac016e0c1e7819505f6a745");
+        workflow.ShouldContain("b15dab4cc740b6fb2d2065682f76b8166a7e120a");
         workflow.ShouldNotContain("--recursive");
 
         Match projectList = Regex.Match(
@@ -149,7 +149,7 @@ public sealed class PackageInventoryTests
     [InlineData("\r\n")]
     public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing(string lineEnding)
     {
-        const string approvedBuildsSha = "cf4bdea6defb767b4ac016e0c1e7819505f6a745";
+        const string approvedBuildsSha = "b15dab4cc740b6fb2d2065682f76b8166a7e120a";
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"))
             .ReplaceLineEndings(lineEnding);
         string releaseConfiguration = File.ReadAllText(ModuleLayout.ResolveModulePath(".releaserc.json"));
