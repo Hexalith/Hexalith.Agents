@@ -24,6 +24,9 @@ with open(os.environ["AUDIT_LOG"], "a") as log:
     log.write(json.dumps({"name": name, "args": args}) + "\n")
 if name in ("pwsh", "python3"):
     sys.exit(0)  # Unrelated package-authority and version-floor prerequisites.
+if "prepare-build" in args:
+    print('{"status":"prepared","buildPreparation":{"mode":"source","mappingHash":"","environment":{}}}')
+    sys.exit(0)
 if any(arg.startswith("-p:HexalithEventStoreRoot=") and arg.endswith("missing-eventstore") for arg in args):
     print("Source dependency 'references/Hexalith.EventStore' is missing.")
     sys.exit(1)
@@ -91,7 +94,11 @@ class VerifierAuditPolicyTests(unittest.TestCase):
                 self.assert_audit_failure(result, calls)
                 self.assertEqual(calls[-1][0], "restore")
                 self.assertIn(f"-p:Configuration={configuration}", calls[-1])
-                self.assertEqual(len(calls), 1 if configuration == "Debug" else 8)
+                self.assertEqual(calls[0][0], "run")
+                self.assertIn("prepare-build", calls[0])
+                self.assertIn("--mode", calls[0])
+                self.assertIn("source", calls[0])
+                self.assertEqual(len(calls), 2 if configuration == "Debug" else 9)
 
     def test_story_51_package_lane_starts_with_audited_release_restore(self) -> None:
         result, calls = self.run_verifier(

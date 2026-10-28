@@ -1,0 +1,46 @@
+{
+  "schema": "hexalith.module-manifest.v2",
+  "modules": [
+    {
+      "identity": {
+        "moduleId": "agents",
+        "servers": [],
+        "dependencies": []
+      },
+      "runtime": {
+        "dapr": [],
+        "extensions": [],
+        "resources": []
+      },
+      "surfaces": {
+        "interfaces": []
+      },
+      "integration": {
+        "topics": [],
+        "secrets": [],
+        "dynamicSecretNamespaces": [],
+        "identityNeeds": [],
+        "egress": [],
+        "providers": [],
+        "workers": []
+      },
+      "lifecycle": {
+        "readiness": [],
+        "tasks": [],
+        "recoveryHooks": [],
+        "fenceHooks": [],
+        "replay": {
+          "reopenBeforeReplay": false
+        },
+        "startup": {},
+        "criticalFlows": [],
+        "smokeSurfaces": [],
+        "classification": {
+          "changeClass": "none",
+          "reason": "Source-mapping enrollment for verification; this declaration does not launch a server."
+        },
+        "recoveryInventory": []
+      }
+    }
+  ]
+}

@@ -92,6 +92,45 @@ function Assert-NativeFailure {
     }
 }
 
+$script:SourceMappingEnvironmentNames = @()
+
+function Enable-PlatformSourceMapping {
+    $cli = Join-Path $root 'references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj'
+    $manifest = Join-Path $root 'module/hexalith.module-manifest.v2.json'
+    $workspaceParent = Join-Path $root 'artifacts/story-5.1'
+    New-Item -ItemType Directory -Force -Path $workspaceParent | Out-Null
+    $workspace = Join-Path $workspaceParent ('source-mapping-' + [guid]::NewGuid().ToString('N'))
+    Write-Host 'Gate: platform source mapping'
+    $lines = @(dotnet run --project $cli -v q -- prepare-build --manifest $manifest --mode source --workspace $workspace --output json)
+    $raw = @($lines | Where-Object { $_.TrimStart().StartsWith('{') } | Select-Object -Last 1) -join ''
+    $parsed = $raw | ConvertFrom-Json
+    if ($parsed.status -ne 'prepared' -or $parsed.buildPreparation.mode -ne 'source') {
+        throw "Platform source mapping was not prepared. Output:`n$($lines -join "`n")"
+    }
+
+    $properties = @()
+    if ($null -ne $parsed.buildPreparation.environment) {
+        $properties = @($parsed.buildPreparation.environment.PSObject.Properties)
+    }
+
+    $script:SourceMappingEnvironmentNames = @($properties | ForEach-Object { $_.Name } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    foreach ($property in $properties) {
+        if ([string]::IsNullOrWhiteSpace($property.Name)) {
+            continue
+        }
+
+        [System.Environment]::SetEnvironmentVariable($property.Name, [string] $property.Value)
+    }
+}
+
+function Disable-PlatformSourceMapping {
+    foreach ($name in $script:SourceMappingEnvironmentNames) {
+        [System.Environment]::SetEnvironmentVariable($name, $null)
+    }
+
+    $script:SourceMappingEnvironmentNames = @()
+}
+
 function New-UnrelatedPackageArchive {
     param(
         [Parameter(Mandatory = $true)]
@@ -131,6 +170,7 @@ try {
     pwsh -NoProfile -File (Join-Path $root 'eng/verify-story-5.2.ps1') -PackageFloorOnly
 
     if ($DependencyMode -eq 'Both') {
+        Enable-PlatformSourceMapping
         Write-Host 'Gate: source-build'
         dotnet restore $solution -p:Configuration=Debug -p:UseHexalithProjectReferences=true /m:1 /nr:false
         dotnet build $solution -c Debug --no-restore -warnaserror -p:UseHexalithProjectReferences=true /m:1 /nr:false
@@ -141,6 +181,7 @@ try {
         }
     }
 
+    Disable-PlatformSourceMapping
     Write-Host 'Gate: package-build'
     dotnet restore $solution -p:Configuration=Release -p:UseHexalithProjectReferences=false /m:1 /nr:false
     dotnet build $solution -c Release --no-restore -warnaserror -p:UseHexalithProjectReferences=false /m:1 /nr:false
