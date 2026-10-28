@@ -26,6 +26,36 @@ def command(args: list[str], **options) -> str:
     return subprocess.run(args, check=True, capture_output=True, text=True, timeout=120, **options).stdout
 
 
+def load_original_release(repository: str, tag: str) -> dict:
+    """Find one exact release, including drafts, in the complete authenticated inventory."""
+    payload = command(["gh", "api", f"repos/{repository}/releases?per_page=100", "--paginate"])
+    # gh emits one JSON document per page. Decode the complete stream without
+    # requiring --slurp, which is unavailable in older supported CLI installs.
+    pages = []
+    decoder = json.JSONDecoder()
+    offset = 0
+    while offset < len(payload):
+        if payload[offset] in " \t\r\n":
+            offset += 1
+            continue
+        page, offset = decoder.raw_decode(payload, offset)
+        if not isinstance(page, list):
+            raise ValueError("GitHub release inventory must contain paginated arrays")
+        pages.append(page)
+    matches = []
+    for page in pages:
+        for release in page:
+            if (not isinstance(release, dict) or type(release.get("id")) is not int
+                    or release["id"] <= 0 or not isinstance(release.get("tag_name"), str)
+                    or type(release.get("draft")) is not bool):
+                raise ValueError("GitHub release inventory contains a malformed release")
+            if release["tag_name"] == tag:
+                matches.append(release)
+    if len(matches) != 1:
+        raise ValueError(f"recovery requires exactly one original release for {tag}")
+    return matches[0]
+
+
 def verify_provenance(provenance: object, directory: Path, package_ids: tuple[str, ...],
                       version: str, repository: str, source_sha: str) -> dict:
     """Require exact original identity and raw archive hashes before remote publication probes."""
@@ -100,14 +130,18 @@ def main() -> int:
         raise ValueError("NUGET_API_KEY is required")
     package_ids = VERIFY.load_package_ids(ROOT / "eng/release-packages.json")
     tag = f"v{args.version}"
-    release = json.loads(command(["gh", "api", f"repos/{repository}/releases/tags/{tag}"]))
-    names = [entry.get("name") for entry in release.get("assets", [])]
+    release = load_original_release(repository, tag)
+    assets = release.get("assets")
+    if not isinstance(assets, list) or any(not isinstance(entry, dict) for entry in assets):
+        raise ValueError("original draft release assets are malformed")
+    names = [entry.get("name") for entry in assets]
     expected_names = {f"{package_id}.{args.version}.nupkg" for package_id in package_ids} | {PROVENANCE_NAME}
-    if (release.get("draft") is not True or release.get("tag_name") != tag
+    if (any(not isinstance(name, str) or not name for name in names)
+            or release.get("draft") is not True or release.get("tag_name") != tag
             or release.get("target_commitish") != args.source_sha
             or len(names) != len(expected_names) or set(names) != expected_names
             or any(entry.get("state") != "uploaded" or type(entry.get("size")) is not int
-                   or not 0 < entry["size"] <= MAX_ARCHIVE_BYTES for entry in release["assets"])):
+                   or not 0 < entry["size"] <= MAX_ARCHIVE_BYTES for entry in assets)):
         raise ValueError("recovery requires the exact original fully uploaded draft asset inventory")
     # Local tag must resolve to the original source; no release planning/tag creation is performed.
     tag_sha = command(["git", "rev-parse", f"refs/tags/{tag}^{{commit}}"], cwd=ROOT).strip()

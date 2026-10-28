@@ -8,12 +8,61 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from nuget_package_fixtures import PACKAGE_IDS, ROOT, VERSION, write_inventory
 
 sys.path.insert(0, str(ROOT / "scripts"))
 RECOVERY = importlib.import_module("recover-release-packages")
 VERIFY = importlib.import_module("verify-nuget-publication")
+
+
+class OriginalReleaseLookupTests(unittest.TestCase):
+    repository = "Hexalith/Hexalith.Agents"
+    tag = f"v{VERSION}"
+
+    def release(self, **changes):
+        return {"id": 101, "tag_name": self.tag, "draft": True,
+                "target_commitish": "a" * 40, "assets": [{"digest": "original digest"}], **changes}
+
+    def response(self, pages):
+        return "\n \t".join(json.dumps(page) for page in pages) if isinstance(pages, list) else json.dumps(pages)
+
+    def test_exact_draft_on_later_page_retains_full_original_metadata(self):
+        original = self.release()
+        pages = [[self.release(id=17, tag_name="v0.0.1", draft=False)], [], [original]]
+        with patch.object(RECOVERY, "command", return_value=self.response(pages)) as command:
+            self.assertEqual(RECOVERY.load_original_release(self.repository, self.tag), original)
+        command.assert_called_once_with([
+            "gh", "api", f"repos/{self.repository}/releases?per_page=100", "--paginate",
+        ])
+
+    def test_missing_or_ambiguous_exact_tags_are_rejected_across_all_pages(self):
+        original = self.release()
+        cases = [[], [[]], [[self.release(tag_name="v0.0.1")]],
+                 [[original], [original]], [[original], [self.release(id=102, draft=False)]]]
+        for pages in cases:
+            with self.subTest(pages=pages), patch.object(RECOVERY, "command", return_value=self.response(pages)):
+                with self.assertRaisesRegex(ValueError, "exactly one original release"):
+                    RECOVERY.load_original_release(self.repository, self.tag)
+
+    def test_malformed_pages_and_release_identities_fail_closed(self):
+        cases = [None, {}, [None], [{}], [[None]], [[[]]], [["release"]],
+                 [[self.release(id=0)]], [[self.release(id=True)]], [[self.release(id="101")]],
+                 [[self.release(tag_name=None)]], [[self.release(tag_name={})]],
+                 [[self.release(draft=None)]], [[self.release(draft="true")]],
+                 [[self.release()], [self.release(id=False, tag_name="unrelated")]]]
+        for pages in cases:
+            with self.subTest(pages=pages), patch.object(RECOVERY, "command", return_value=self.response(pages)):
+                with self.assertRaisesRegex(ValueError, "GitHub release inventory"):
+                    RECOVERY.load_original_release(self.repository, self.tag)
+
+    def test_invalid_json_is_not_treated_as_an_empty_inventory(self):
+        for response in ("not JSON", self.response([[self.release()]]) + "\nnot JSON",
+                         self.response([[self.release()]]) + "\u00a0"):
+            with self.subTest(response=response), patch.object(RECOVERY, "command", return_value=response):
+                with self.assertRaises(ValueError):
+                    RECOVERY.load_original_release(self.repository, self.tag)
 
 
 class RecoverReleasePackagesTests(unittest.TestCase):
@@ -94,7 +143,7 @@ class RecoverReleasePackagesTests(unittest.TestCase):
 
 
 class RecoverySubprocessTests(unittest.TestCase):
-    def invoke_recovery(self, fault=""):
+    def invoke_recovery(self, fault="", mode=""):
         import http.server
         import os
         import subprocess
@@ -110,7 +159,7 @@ class RecoverySubprocessTests(unittest.TestCase):
                     {"name": path.name, "size": path.stat().st_size,
                      "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in paths]}
             (archives / "release-provenance.json").write_text(json.dumps(provenance))
-            release = {"draft": True, "tag_name": f"v{VERSION}", "target_commitish": "a"*40,
+            release = {"id": 101, "draft": True, "tag_name": f"v{VERSION}", "target_commitish": "a"*40,
                 "assets": [{"name": path.name, "state": "uploaded", "size": path.stat().st_size,
                     "digest": "sha256:"+hashlib.sha256(path.read_bytes()).hexdigest()} for path in archives.iterdir()]}
             (directory / "release.json").write_text(json.dumps(release))
@@ -162,7 +211,31 @@ elif name == 'dotnet':
 elif args[0] == 'api':
     endpoint = args[1]
     if '/releases/tags/' in endpoint:
-        print((root/'release.json').read_text())
+        print('Release-by-tag does not return an unpublished draft.', file=sys.stderr)
+        raise SystemExit(1)
+    elif endpoint == 'repos/Hexalith/Hexalith.Agents/releases?per_page=100':
+        if '--slurp' in args:
+            raise SystemExit('unknown flag: --slurp')
+        if '--paginate' not in args:
+            raise SystemExit('The complete release inventory is required.')
+        draft = json.loads((root/'release.json').read_text())
+        pages = [[{{'id': 17, 'tag_name': 'v0.0.1', 'draft': False}}], [draft]]
+        fault = os.environ['FAULT']
+        if fault == 'draft-missing': pages.pop()
+        elif fault == 'draft-duplicate': pages.append([{{**draft, 'id': 102}}])
+        elif fault == 'inventory-malformed': pages = {{'releases': [draft]}}
+        elif fault == 'assets-malformed': draft['assets'] = {{}}
+        elif fault == 'asset-entry-malformed': draft['assets'][0] = 'asset'
+        elif fault == 'asset-name-malformed': draft['assets'][0]['name'] = {{}}
+        elif fault == 'published': draft['draft'] = False
+        elif fault == 'inventory-error':
+            print('fixture-key', file=sys.stderr)
+            raise SystemExit(89)
+        if isinstance(pages, list):
+            for page in pages:
+                print(json.dumps(page))
+        else:
+            print(json.dumps(pages))
     elif '/git/ref/' in endpoint:
         print(json.dumps({{'object':{{'type':'commit','sha':'a'*40}}}}))
     else:
@@ -185,7 +258,7 @@ sys.path.insert(0,{str(ROOT / 'scripts')!r})
 v=importlib.import_module('verify-nuget-publication')
 v.DEFAULT_REGISTRATION_BASE={base + '/registration'!r}
 v.DEFAULT_PACKAGE_BASE={base + '/packages'!r}
-sys.argv=['recover-release-packages.py',{VERSION!r},'--source-sha','a'*40]
+sys.argv=['recover-release-packages.py',{VERSION!r},'--source-sha','a'*40]+{['--' + mode] if mode else []!r}
 runpy.run_path({str(ROOT / 'scripts/recover-release-packages.py')!r},run_name='__main__')
 '''
             try:
@@ -206,6 +279,8 @@ runpy.run_path({str(ROOT / 'scripts/recover-release-packages.py')!r},run_name='_
         self.assertEqual(len(pushes.splitlines()), len(PACKAGE_IDS)-2)
         self.assertIn('"release", "edit"', calls)
         self.assertNotIn("semantic-release", calls)
+        self.assertIn('/releases?per_page=100', calls)
+        self.assertNotIn('/releases/tags/', calls)
 
     def test_conflicts_unconfirmed_probes_wrong_tags_and_tampered_originals_never_push(self):
         for fault in ("conflict", "unconfirmed", "tag", "archive"):
@@ -215,3 +290,27 @@ runpy.run_path({str(ROOT / 'scripts/recover-release-packages.py')!r},run_name='_
                 self.assertEqual(pushes, "")
                 self.assertNotIn('"release", "edit"', calls)
                 self.assertNotIn("fixture-key", result.stderr)
+
+    def test_missing_ambiguous_malformed_or_published_records_never_download_or_push(self):
+        for fault in ("draft-missing", "draft-duplicate", "inventory-malformed", "assets-malformed",
+                      "asset-entry-malformed", "asset-name-malformed", "published", "inventory-error"):
+            with self.subTest(fault=fault):
+                result, calls, pushes = self.invoke_recovery(fault)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(pushes, "")
+                self.assertNotIn('"release", "download"', calls)
+                self.assertNotIn('"release", "edit"', calls)
+                self.assertNotIn("fixture-key", result.stderr)
+
+    def test_staged_only_proves_original_draft_without_nuget_or_publication(self):
+        result, calls, pushes = self.invoke_recovery(mode="staged-only")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Verified retained original release assets", result.stdout)
+        self.assertEqual(pushes, "")
+        self.assertNotIn('"release", "edit"', calls)
+
+    def test_verify_only_keeps_refusing_an_incomplete_remote_inventory(self):
+        result, calls, pushes = self.invoke_recovery(mode="verify-only")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(pushes, "")
+        self.assertNotIn('"release", "edit"', calls)
