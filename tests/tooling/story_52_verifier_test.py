@@ -100,10 +100,13 @@ if scenario in ("zero", "misleading-zero"):
     counts["total"] = 0
 elif scenario in counts:
     counts[scenario] = 1
+elif scenario == "ansi-skipped":
+    counts["skipped"] = 1
 assembly = Path(args[0]).stem
 if scenario == "misleading-zero":
     print(f"   {assembly}  Total: 1, Errors: 0, Failed: 0, Skipped: 0, Not Run: 0")
-print("=== TEST EXECUTION SUMMARY ===")
+prefix = "\x1b[0m\x1b[37m" if scenario in ("ansi-summary", "ansi-skipped") else ""
+print(prefix + "=== TEST EXECUTION SUMMARY ===")
 if scenario == "wrong-assembly":
     assembly = "Unexpected.Test.Assembly"
 row = f"   {assembly}  Total: 0" if counts["total"] == 0 else f"   {assembly}  " + "Total: {total}, Errors: {errors}, Failed: {failed}, Skipped: {skipped}, Not Run: {not-run}, Time: 0.001s".format(**counts)
@@ -111,7 +114,7 @@ if scenario == "incomplete":
     row = f"   {assembly}  Total: 1"
 if scenario == "malformed":
     row = f"   {assembly}  Total: banana"
-print(row)
+print(prefix + row)
 if scenario == "duplicate-row":
     print(row)
 if scenario == "duplicate-section":
@@ -291,6 +294,16 @@ class Story52VerifierTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         for call in self.calls()[1:]:
             self.assertIn("Release", Path(call[0]).parts)
+
+    def test_ansi_colored_runner_summary_is_accepted(self) -> None:
+        result = self.run_verifier("ansi-summary", configuration="Release")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Story 5.2 verification succeeded.", result.stdout)
+
+    def test_ansi_colored_runner_summary_still_rejects_skips(self) -> None:
+        result = self.run_verifier("ansi-skipped", configuration="Release")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("skipped or did not run tests", self.diagnostic(result))
 
     def test_package_floor_only_does_not_invoke_tests(self) -> None:
         result = subprocess.run(

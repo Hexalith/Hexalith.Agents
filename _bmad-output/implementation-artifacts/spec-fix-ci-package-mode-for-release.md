@@ -46,3 +46,11 @@ context: []
 
 - Full local tooling discovery passed all 272 tests (988.058 seconds). npm verified 504 package signatures and 127 attestations.
 - Submodule CI investigation additionally found Aspire SDK/catalog drift in EventStore and McpCli and a stale FrontComposer hosting-version assertion. Their owning repositories received focused, validated repairs; root pointer synchronization follows those upstream commits without initializing nested checkouts.
+
+- Adopted upstream local source-mapping preparation; all five audit/pipeline regression tests pass after that integration.
+- Final Builds execution pin is 4250edc94af021945fe072085f02b5122c9b21c3, superseding b15dab4 after the AppHost exception-inventory repair. All 16 inventory entries and 30 validator scenarios passed upstream; root workflow lint and all seven package/workflow contract tests pass with the new pin.
+- Adopted the upstream Parties consumer-fixture repair after both affected tests and its Release build passed.
+- Conversations repair preserves the historical SM-2 qualification boundary, restores only the frozen AppHost fixture bytes, and retains a newly measured v4 projection successor. Nine baseline checks, seven public-package compatibility tests, eleven tooling checks, and two independent clean-cache restores passed. Final conformance validation remains with the owning submodule before root synchronization.
+
+- Conversations final conformance passed 297 portable and 90 internal cases before its owning repair was pushed.
+- Exact-source GitHub CI completed the Release build, all per-project floors, exact package inventory and seven isolated consumers, then exposed ANSI-colored xUnit summary records in the focused verifier. The verifier now removes terminal formatting before its unchanged strict assembly/count/skip checks; executable colored-summary acceptance and colored-skip rejection regressions pass.

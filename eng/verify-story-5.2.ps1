@@ -328,6 +328,11 @@ function Invoke-TestGate {
             throw "Gate '$Name' failed for '$($selection.Value)' with exit code $exitCode."
         }
 
+        # Hosted runners may force ANSI colors even when native output is redirected.
+        $output = @($output | ForEach-Object {
+            [regex]::Replace([string] $_, '\x1b\[[0-?]*[ -/]*[@-~]', '')
+        })
+
         $headers = @()
         for ($index = 0; $index -lt @($output).Count; $index++) {
             if (([string] $output[$index]).Trim() -ceq '=== TEST EXECUTION SUMMARY ===') {
