@@ -54,3 +54,5 @@ context: []
 
 - Conversations final conformance passed 297 portable and 90 internal cases before its owning repair was pushed.
 - Exact-source GitHub CI completed the Release build, all per-project floors, exact package inventory and seven isolated consumers, then exposed ANSI-colored xUnit summary records in the focused verifier. The verifier now removes terminal formatting before its unchanged strict assembly/count/skip checks; executable colored-summary acceptance and colored-skip rejection regressions pass.
+
+- Follow-up quality checks found FrontComposer catalog-selector and McpCli workflow-coordinate drift. Their owning fixes passed three governance and 22 release checks, and 139 topology-tooling checks, respectively; the final root synchronization includes both published fixes.
