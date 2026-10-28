@@ -1,0 +1,415 @@
+{
+  "schema": "Story5.4.MvpCustodyScopeVerification.v1",
+  "decisionId": "DEC-5.4-MVP-CUSTODY-2026-10-28",
+  "recordedAtUtc": "2026-10-28T10:36:20.675769+00:00",
+  "status": "Passed",
+  "rootPreChangeRevision": "ca53daf6152f674de563576dcea0bce6e35fb53b",
+  "platformPreChangeRevision": "ace1d5d9dd683b2edf30de6c98ae8f729489cfbd",
+  "rootPreExistingChanges": [
+    " M _bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md",
+    " M references/Hexalith.Builds",
+    " M references/Hexalith.Conversations",
+    " M references/Hexalith.McpCli",
+    " M references/Hexalith.Memories",
+    " M references/Hexalith.Parties",
+    " M references/Hexalith.Platform",
+    " M references/Hexalith.Tenants"
+  ],
+  "platformPreExistingChanges": [],
+  "checks": {
+    "originalFilesVerifiedUnchanged": 33,
+    "completeDependencyAndCohortSectionsIdentical": 13,
+    "allDependencyCommitmentTableRowsUnchanged": true,
+    "allLaunchGateTableRowsUnchanged": true,
+    "originalParentStoryFrozenIntentUnchanged": true,
+    "parentSprintStateUnchanged": true,
+    "preExistingDirtyOwnerPrerequisiteSpecUnchanged": true,
+    "priorRecommendationRecordPreserved": true,
+    "preservedHostTimingBranchRetentionAndAcceptedTargetHistory": true,
+    "allActualD2ResourceFieldsStillNull": true,
+    "advancedProcurementDeferred": true,
+    "currentHumanCustodyAndContentGatesUnchanged": true,
+    "sourceGateHashesVerified": 7,
+    "newRelativeLinksResolved": 26,
+    "noBackupLifetimeInvented": true,
+    "existingQualificationAuthorizationAndAvailabilityRemainFalse": true,
+    "originalQualificationPlanAndOpenBaoEvidenceUnchanged": true,
+    "structuredFileReferencesResolved": 18,
+    "pendingFutureOwnerEvidenceIsNotReportedInstalled": true,
+    "sectionIdentifiersAndExpectedDigestsRetained": true,
+    "threeAuthorityPurposesAndMissingDecisionIssuerExplicit": true,
+    "amendmentAndFutureOperationalDeliveryAcceptanceSeparated": true,
+    "existingMaintenanceProcedureAndOriginalBlockerReferenced": true,
+    "pendingBackupRestoreOwnerAndReturnDestinationRecorded": true,
+    "d3ThroughD9CurrentWorkDispositionsRecorded": true,
+    "d3ThroughD8AndPriorRecommendationFieldsExact": true,
+    "allOriginalResourceAndDateFieldsPreservedExceptExplicitWorkDisposition": true
+  },
+  "preservedOriginalHashes": {
+    "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/isolated-runtime-20261016/runtime-reference.json": "efade3ce11a5ebe51def33d83eba5876d0e7e2e176c937811b5626857da953e8",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md": "56d4f343aa8dc08f0c32bd93f47c071fa7793695f28d375ab882c7c7443b61d3",
+    "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/sprint-status.yaml": "9b7f45fba0e90cfdafab780bcc090ad3484878a83424b4fdc03369c244bcf401",
+    "/home/administrator/projects/hexalith/agents/eng/verify-story-5.4.ps1": "07dab240e22f64cd3e74066d32a0f6c74f8077377a186777c0bfc0c005a3e1ea",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs": "d4196790d202d78b342d71b990cacc3f6282180f2d6e7e13b252beb1d2b06b85",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-option-a-feasibility-2026-10-18/native-result.json": "6efa381bc70b3de57a24142e5e679f53781c7f89d5ab6740fb7664966f30888e",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/d2-resource-resolution-2026-10-28.json": "198d602334e576c1a089cfe587f1a9621138db138001e8b8004e00b8eb309fb8",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/d2-resource-verification-2026-10-28.json": "0f7884eb83a202b4131e2554d9a850d5554596b04ac061d9d97164667d2b8468",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/deployment-preflight.json": "36f0b4862233365128fdc93539fac4bb00f2d10cf9fa07aa3c47752a5c353192",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/filesystem-access-observation.json": "643e797050ea9f54de1e22591a90eb138540afafa4ef10d5bf8f2e29e875536d",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/infrastructure-observation.json": "9cf7ee66f0f1a045bd67c0f645faf262140b8ba8c4594193789e00ea17ef3e2b",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/observed-dapr-transport-ca.pem": "32241a03538035dcd13b3c0d848465ccb52b8cb45bb9961354f35ab39ccd4626",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/platform-installation-inspection-2026-10-28.json": "4f04d1716812dd6d4b8233ee6a090cde2cf3cb60743174c53ba9d6bc981e7ba7",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/preservation-observation.json": "e5b0e5c5c7b762c30f8525401e2f40c9cc28841db301b827745d2c698005445a",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/reuse-adoption-2026-10-28.json": "ac3574440a0a8d58948280647c7333a1597dfc214f9fe73455d39cc5fd06eb3c",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/source-and-enrollment-observation.json": "1cbe77862a22f06eddb3c80557fc1f473f62846ced59925a4d3e386cb7af35ca",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/SHA256SUMS.original": "65a2a5df251f622c1f46568715b619c1b911fe4772304ba77620b64ceef398fd",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/SPEC.md.original": "c5b2378dedc651599d6951b9310842efa7832b1538bd5a5da5fa0eec86e18df4",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/installation-commands.md.original": "553e312e27f6cc097ad455eea54b6f2085e3b92f65e32046343b8024f14386e7",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/installation-decision.md.original": "d13bdd7baff7da72dc7aa3b0708df4eb6f2f8ce254a1f45d2c62ed63840f0c12",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/legacy-draft.md.original": "e40a37d4aeae13c9a11f3f1998a8ba321cf4b4eb5767b7dbeb8d034fbb361960",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/owner-decisions.json.original": "de3d9117d772991366f9593e642412674dbda50ed37cd39d562ac6c314e58094",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/snapshot-index.json": "b7adc6c06495e89bb1e67c94e0adc4998f8c6afca014355a7cfdb53ea9ad4fa5",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/superseded-aws-proposal/verification.json.original": "f3dee50109d4870996c41972c82b3771dc37ae2aecf4d5fa184db8b7139bfc16",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/transport-trust-observation.json": "f3da421e624f75864b3648edc017bfc820d3d4b250dcf5c932db7fb199067d47",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/verification-mvp-no-aws.json": "74a44a59ef609d7b5f88feadb3e89d8f72be9eb8662c777ed873c3629e166804",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/verification.json": "f3dee50109d4870996c41972c82b3771dc37ae2aecf4d5fa184db8b7139bfc16",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/ext-secrets-1/public-joint-plan.json": "cbd4fa28443b121c0139cf4c67a939e05ef611666028100e4d63ecafebf22a99",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Api/AgentDependencyAvailabilityFilter.cs": "5bf72839ed89fe08fe4c8a77b8fccb3865adccc06ae7a54608843d62e9e4816f",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "be25fefb91b2a186acf6b3781f548775d7e2d21b8571857eab013c89e5a51950",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/CommittedAgentDependencyAvailability.cs": "40dfd8e14d99a005b292aece90ab95f50283b2072705e8db32e39213aad13b3c",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/ProjectedApproverPolicyResolver.cs": "2c52915a00fe0687d5f28266291953e11b977f72b5e555aa67f7b21e16739c52",
+    "/home/administrator/projects/hexalith/agents/src/Hexalith.Agents.Server/Ports/UnavailableAgentTrustedCommandAdmission.cs": "5a9659f3ab2f3ed41ed720de77108a61694e953b576f49ebff4c62f997cd95c3"
+  },
+  "verifiedNewLinks": [
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/D2-provisioning-request-2026-10-28.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "external-dependency-register.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../src/Hexalith.Agents.Server/Api/AgentDependencyAvailabilityFilter.cs"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../src/Hexalith.Agents.Server/Ports/CommittedAgentDependencyAvailability.cs"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../src/Hexalith.Agents.Server/Ports/UnavailableAgentTrustedCommandAdmission.cs"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../references/Hexalith.Parties/src/Hexalith.Parties/Queries/PartyIdentityQueryService.cs"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../src/Hexalith.Agents.Server/Ports/ProjectedApproverPolicyResolver.cs"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/next-baseline-reconciliation-20261028T070042156838Z/blocker.json"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../references/Hexalith.Platform/eng/ext-secrets-1/README.md#separate-isolated-custody-maintenance-2026-10-28"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "to": "../implementation-artifacts/tests/mvp-custody-scope-2026-10-28/verification.json"
+    },
+    {
+      "from": "_bmad-output/implementation-artifacts/epic-5-context.md",
+      "to": "../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/implementation-artifacts/spec-5-4-prove-trusted-principal-tenant-party-and-approver-readiness.md",
+      "to": "../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md",
+      "to": "../../sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/epics.md",
+      "to": "sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/epics.md",
+      "to": "sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/external-dependency-register.md",
+      "to": "sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/launch-readiness-register.md",
+      "to": "sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/prds/prd-agents-2026-06-23/prd.md",
+      "to": "../../sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "_bmad-output/planning-artifacts/ux-designs/ux-agents-2026-06-23/EXPERIENCE.md",
+      "to": "../../sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/D2-provisioning-request-2026-10-28.md",
+      "to": "../../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-commands.md",
+      "to": "../../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-commands.md",
+      "to": "owner-decisions.json"
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-decision.md",
+      "to": "../../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-decision.md",
+      "to": "installation-evidence/mvp-scope-amendment-2026-10-28.json"
+    }
+  ],
+  "review": "Required blind review: eight findings classified medium and patched; no findings deferred",
+  "effects": {
+    "runtimeOrProviderWrites": 0,
+    "installationInvocations": 0,
+    "maintenanceInvocations": 0,
+    "nativeExperiments": 0,
+    "trustEnrollments": 0,
+    "qualificationInvocations": 0,
+    "attemptReservations": 0,
+    "purchases": 0
+  },
+  "qualificationInvocations": 0,
+  "installerInvocations": 0,
+  "sourceTestsRerun": false,
+  "scopeLimit": "Approved documentation/work-priority and milestone-acceptance amendment; parent Story 5.4, complete dependency availability and live/launch acceptance remain blocked.",
+  "reproduciblePreservation": {
+    "baselineRevision": "ca53daf6152f674de563576dcea0bce6e35fb53b",
+    "canonicalDependencyRegisterCommand": [
+      "git",
+      "show",
+      "ca53daf6152f674de563576dcea0bce6e35fb53b:_bmad-output/planning-artifacts/external-dependency-register.md"
+    ],
+    "canonicalLaunchRegisterCommand": [
+      "git",
+      "show",
+      "ca53daf6152f674de563576dcea0bce6e35fb53b:_bmad-output/planning-artifacts/launch-readiness-register.md"
+    ],
+    "gitCommandWorkingDirectory": "/home/administrator/projects/hexalith/agents",
+    "sectionExtractionRegex": "(?ms)^### (EXT-[^\\s]+|OQ-5\\.4-1)[^\\n]*\\n.*?(?=^### |\\Z)",
+    "comparisonEncoding": "UTF-8 text; Python splitlines/newline normalization; SHA-256 of each complete matched section",
+    "dependencyAndCohortSections": {
+      "EXT-CONV-AI-1": {
+        "expectedSha256": "ea560dcab81a852dc8a44eb2f545a0505cdf8aaadcdfe0dc6091c794805811c8",
+        "observedSha256": "ea560dcab81a852dc8a44eb2f545a0505cdf8aaadcdfe0dc6091c794805811c8"
+      },
+      "EXT-CONV-RETRACTION-1": {
+        "expectedSha256": "bf781beeca431ba5632b89963ca9f187b4e18c7bb03e3e32b820e6983cf93107",
+        "observedSha256": "bf781beeca431ba5632b89963ca9f187b4e18c7bb03e3e32b820e6983cf93107"
+      },
+      "EXT-CONV-UI-1": {
+        "expectedSha256": "2393a11b8fc4b463e5f8ea2e87951c8650c0081cdd8ca491b6d7ae6c9e058af8",
+        "observedSha256": "2393a11b8fc4b463e5f8ea2e87951c8650c0081cdd8ca491b6d7ae6c9e058af8"
+      },
+      "EXT-PARTIES-1": {
+        "expectedSha256": "33404972f940086e5e35a8149fbf220b7c75a192afa6c1d1a576f4fc5a61ee39",
+        "observedSha256": "33404972f940086e5e35a8149fbf220b7c75a192afa6c1d1a576f4fc5a61ee39"
+      },
+      "EXT-HOST-1": {
+        "expectedSha256": "4a3fbc7fe82e6f9830385e0fe9e29ad16ab626354808fd7bb78d6b4ad12736a1",
+        "observedSha256": "4a3fbc7fe82e6f9830385e0fe9e29ad16ab626354808fd7bb78d6b4ad12736a1"
+      },
+      "EXT-PROVIDER-1": {
+        "expectedSha256": "a60ed5216800019413cce3bb1b559f81e83facce1c86b5e8473c8e598453be45",
+        "observedSha256": "a60ed5216800019413cce3bb1b559f81e83facce1c86b5e8473c8e598453be45"
+      },
+      "EXT-SAFETY-1": {
+        "expectedSha256": "6d7dbe92ad3689b3e9409b209cd09a9a4f096fe5fef996df0de168e8022f3dfc",
+        "observedSha256": "6d7dbe92ad3689b3e9409b209cd09a9a4f096fe5fef996df0de168e8022f3dfc"
+      },
+      "EXT-TOKEN-1": {
+        "expectedSha256": "754090847f7fb7530cf6956670382cc9e67d6d5c869df3afbc9190a556e6c28d",
+        "observedSha256": "754090847f7fb7530cf6956670382cc9e67d6d5c869df3afbc9190a556e6c28d"
+      },
+      "EXT-SECRETS-1": {
+        "expectedSha256": "379dd16f8fe7947326d10d5d3a9efbec9e7aeaa741dee3442eb23e78f251f7a4",
+        "observedSha256": "379dd16f8fe7947326d10d5d3a9efbec9e7aeaa741dee3442eb23e78f251f7a4"
+      },
+      "EXT-EXPORT-STORE-1": {
+        "expectedSha256": "dca995a8f8c04567dfd8aa62cac70cdea5fc7bffcc77e4e7e6d05f7e999eb903",
+        "observedSha256": "dca995a8f8c04567dfd8aa62cac70cdea5fc7bffcc77e4e7e6d05f7e999eb903"
+      },
+      "EXT-TOPOLOGY-1": {
+        "expectedSha256": "038f379835fcc0a12b98939f47602502c4393c39a7f95c240786e58dd5463f0b",
+        "observedSha256": "038f379835fcc0a12b98939f47602502c4393c39a7f95c240786e58dd5463f0b"
+      },
+      "EXT-PROTECTION-1": {
+        "expectedSha256": "f8c5f20d5919c58056fc3446d71ed53309583df532c2b6c6416839564046c9d0",
+        "observedSha256": "f8c5f20d5919c58056fc3446d71ed53309583df532c2b6c6416839564046c9d0"
+      },
+      "OQ-5.4-1": {
+        "expectedSha256": "5cd73669d07c7c83ab612208519ea4ff61009cfdc303cd88c83c7bf1fd624def",
+        "observedSha256": "5cd73669d07c7c83ab612208519ea4ff61009cfdc303cd88c83c7bf1fd624def"
+      }
+    },
+    "tableExtractionRecipe": "Select every line starting with | in document order; join with LF and append one final LF; SHA-256 UTF-8 bytes.",
+    "dependencyTable": {
+      "expectedSha256": "3c5515691916586c513ea48320b7d75d5e6329913e2edededb06ee03c95c6438",
+      "observedSha256": "3c5515691916586c513ea48320b7d75d5e6329913e2edededb06ee03c95c6438",
+      "rowCount": 165
+    },
+    "launchTable": {
+      "expectedSha256": "e31036e5f0b2ad978bb12a67bdf9b26c5c64b25a393c577b43c4d48d706138fb",
+      "observedSha256": "e31036e5f0b2ad978bb12a67bdf9b26c5c64b25a393c577b43c4d48d706138fb",
+      "rowCount": 364
+    },
+    "comparisonRecipe": "Recover each pre-change register using the canonical git show argv above. Extract sections/tables with these exact recipes and compare their SHA-256 values to expectedSha256. Apply the same recipes to the current registers and compare to observedSha256. Existing commitment fields/statuses and launch-gate rows must match exactly."
+  },
+  "verifiedStructuredReferences": [
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "D1_backend.currentMvpScopeDecisionReference",
+      "target": "installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "D2_resources.resolution.resourceCensusReference",
+      "target": "installation-evidence/d2-resource-resolution-2026-10-28.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/d2-resource-resolution-2026-10-28.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "D2_resources.resolution.supportedOptionAssessmentAndProvisioningRequestReference",
+      "target": "D2-provisioning-request-2026-10-28.md",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/D2-provisioning-request-2026-10-28.md",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "infrastructureResolutionProgress.currentScopeDecisionReference",
+      "target": "installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "mvpScopeAmendment.authoritativeAgentsAmendment",
+      "target": "../../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "resolved": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "mvpScopeAmendment.platformEvidenceReference",
+      "target": "installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "mvpOperationalInputs.backupAndRestore.returnThrough",
+      "target": "owner-decisions.json#/mvpOperationalInputs/backupAndRestore",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "jsonPointerVerified": true
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "mvpOperationalInputs.maintenancePreservationBaseline.retainedBlockerReference",
+      "target": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/next-baseline-reconciliation-20261028T070042156838Z/blocker.json",
+      "resolved": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/next-baseline-reconciliation-20261028T070042156838Z/blocker.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "mvpOperationalInputs.maintenancePreservationBaseline.maintenanceProcedureReference",
+      "target": "../../../eng/ext-secrets-1/README.md#separate-isolated-custody-maintenance-2026-10-28",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/ext-secrets-1/README.md",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "field": "mvpOperationalInputs.currentOperationalProfile.existingRuntimeReference",
+      "target": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/isolated-runtime-20261016/runtime-reference.json",
+      "resolved": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/isolated-runtime-20261016/runtime-reference.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "authoritativeAgentsAmendment",
+      "target": "../../../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "resolved": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "verificationReference",
+      "target": "../../../../../../_bmad-output/implementation-artifacts/tests/mvp-custody-scope-2026-10-28/verification.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/mvp-custody-scope-2026-10-28/verification.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "ownerDecisionReference",
+      "target": "../owner-decisions.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "qualification.planReference",
+      "target": "../../../../eng/ext-secrets-1/public-joint-plan.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/ext-secrets-1/public-joint-plan.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "mvpScope.authoritativeAgentsAmendment",
+      "target": "../../../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "resolved": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "mvpScope.platformEvidenceReference",
+      "target": "mvp-scope-amendment-2026-10-28.json",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "jsonPointerVerified": false
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "operationalOwnerInputsReference",
+      "target": "../owner-decisions.json#/mvpOperationalInputs",
+      "resolved": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "jsonPointerVerified": true
+    },
+    {
+      "from": "references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/mvp-scope-amendment-2026-10-28.json",
+      "field": "retainedMaintenanceBlockerReference",
+      "target": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/next-baseline-reconciliation-20261028T070042156838Z/blocker.json",
+      "resolved": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/next-baseline-reconciliation-20261028T070042156838Z/blocker.json",
+      "jsonPointerVerified": false
+    }
+  ],
+  "retainedMaintenanceBlockerSha256": "0481d4d9e115e58c811c0ee83e02cefdd21052b6b50a32829563bae1708acb6e"
+}

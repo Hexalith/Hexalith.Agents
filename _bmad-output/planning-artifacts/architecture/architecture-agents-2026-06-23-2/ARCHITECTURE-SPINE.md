@@ -7,7 +7,7 @@ paradigm: event-sourced Dapr-Workflow-orchestrated hexagonal Hexalith domain mod
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-10-23
+updated: 2026-10-28
 architecture_assumption_index_version: 14
 binds:
   - PRD FR-1..FR-34
@@ -158,6 +158,11 @@ companions:
 ---
 
 # Architecture Spine - Hexalith Agents
+
+## Approved MVP custody amendment — 2026-10-28
+
+The owner instruction **apply recommended** adopts the [pragmatic MVP custody scope](../../sprint-change-proposal-2026-10-28-mvp-custody.md). For current work priority and milestone acceptance, separate ordinary identity/operational-security work from deferred Luna/independent-authority/immutable-archive provisioning. The full requirements below remain applicable to deferred features. This is a planning/development milestone: current Human/approver evidence still requires custody, and no protected-content, history, export, destruction, live readiness or release path gains an exception. Full dependency contracts, target/date/command/status pins, FR-34, existing retention and RQ-1 remain enforced. The amendment's scope matrix and acceptance criteria govern this bounded milestone; it supplies no reduced executable contract or availability claim.
+
 
 **Approved McpCli course correction (2026-09-27):** `Hexalith.McpCli` is the target Hexalith-owned CLI/MCP surface for Agents operations that pass contract enrollment and authorization. Any proprietary module CLI, MCP host, plug-in, or planned adapter described below is an obsolete migration source or historical design, not a new target. The module retains its domain, UI, and security semantics; replacement or approved withdrawal and parity evidence precede retirement. External development CLIs are unaffected.
 

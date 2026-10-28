@@ -3,7 +3,7 @@ name: Hexalith Agents
 description: Behavioral spine for the Hexalith Agents FrontComposer UI. Owns surfaces, routes, policies, states, interactions, accessibility, and journeys for governed AI participation in Conversations. DESIGN.md owns visuals.
 status: final
 created: 2026-06-23
-updated: 2026-10-23
+updated: 2026-10-28
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
@@ -33,6 +33,11 @@ sources:
 ---
 
 # Hexalith Agents - Experience Spine
+
+## Approved MVP custody amendment — 2026-10-28
+
+The owner instruction **apply recommended** adopts the [pragmatic MVP custody scope](../../sprint-change-proposal-2026-10-28-mvp-custody.md). For current work priority and milestone acceptance, separate ordinary identity/operational-security work from deferred Luna/independent-authority/immutable-archive provisioning. The full requirements below remain applicable to deferred features. This is a planning/development milestone: current Human/approver evidence still requires custody, and no protected-content, history, export, destruction, live readiness or release path gains an exception. Full dependency contracts, target/date/command/status pins, FR-34, existing retention and RQ-1 remain enforced. The amendment's scope matrix and acceptance criteria govern this bounded milestone; it supplies no reduced executable contract or availability claim.
+
 
 > Spine reconciled to `prd.md` **as of its 2026-09-12 revision in full** — not to a hand-listed row set, which goes stale the moment the PRD moves and is how the FR-33-only reading happened — together with `ARCHITECTURE-SPINE.md` at `architecture_assumption_index_version` 14 (2026-09-19, keeping `ARCH-A-15` open pending the current `OD-DAPR-SECURITY-1` decision version), `epics.md` at its 33-story active backlog (Epics 5–8; Epics 1–4 are superseded history), the 2026-09-12 round-5 four-lens UX validation, and the shipped `src/Hexalith.Agents.UI` tree. **This banner is a claim about currency and is itself checkable**: each cited denominator is the `updated:` field or version field of the named file, and a reconciliation that does not re-verify all four leaves the claim false rather than merely old. The 2026-09-19 Story 5.1 closure reconciliation changes dependency and approval evidence only and introduces no UX behavior change. `DESIGN.md` owns visuals; this file owns behavior, surfaces, states, accessibility, and flows. The spines win on conflict with mockups, wireframes, imports, sketches, and shipped code. Decisions are logged in `.memlog.md`; the current reconciliation, dispositions, and deferred items are in `reconcile-validation-2026-09-12.md`, its predecessors in `reconcile-validation-2026-09-10.md`, `reconcile-validation-2026-09-09-2.md` and `reconcile-validation-2026-09-09.md`, and the 2026-08-02 closure set remains in force except where a later reconciliation records a revision.
 

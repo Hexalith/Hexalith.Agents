@@ -19,6 +19,11 @@ inputDocuments:
 
 # Hexalith Agents - Epic Breakdown
 
+## Approved MVP custody amendment — 2026-10-28
+
+The owner instruction **apply recommended** adopts the [pragmatic MVP custody scope](sprint-change-proposal-2026-10-28-mvp-custody.md). For current work priority and milestone acceptance, separate ordinary identity/operational-security work from deferred Luna/independent-authority/immutable-archive provisioning. The full requirements below remain applicable to deferred features. This is a planning/development milestone: current Human/approver evidence still requires custody, and no protected-content, history, export, destruction, live readiness or release path gains an exception. Full dependency contracts, target/date/command/status pins, FR-34, existing retention and RQ-1 remain enforced. The amendment's scope matrix and acceptance criteria govern this bounded milestone; it supplies no reduced executable contract or availability claim.
+
+
 ## Overview
 
 This document provides the complete epic and story breakdown for Hexalith Agents, decomposing the requirements from the PRD, UX Design if it exists, and Architecture requirements into implementable stories.
@@ -1424,6 +1429,8 @@ So that catalog truth is administered once while every tenant sees and selects o
 | Result | Reopened — backlog under `NC-5.3-PLATFORM-CATALOG-SCOPE`; shipped tenant-scoped implementation is migration source and historical evidence, not final conformance |
 
 ### Story 5.4: Prove Trusted Principal Tenant Party And Approver Readiness
+
+**Approved MVP work milestone (2026-10-28):** Prioritize ordinary identity/operational-security contract and installation work under the [approved custody scope amendment](sprint-change-proposal-2026-10-28-mvp-custody.md). Defer advanced custody provisioning. The complete acceptance criteria below remain the parent-story criteria; no current-human custody, shared availability, protection, history or erasure gate is bypassed. Story 5.4 remains in progress until complete applicable owner deliveries and acceptance.
 
 As a Tenant Security Operator,
 I want current tenant, Party, and Approver evidence bound into setup readiness,

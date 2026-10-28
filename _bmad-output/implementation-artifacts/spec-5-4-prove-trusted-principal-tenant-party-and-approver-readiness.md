@@ -16,6 +16,11 @@ context:
   - '_bmad-output/specs/spec-story-5-4-dependency-unblock/SPEC.md'
 ---
 
+
+## Approved MVP scope amendment — 2026-10-28
+
+The owner approved the [pragmatic MVP custody amendment](../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md). Add a bounded identity/operational-security work milestone; defer Luna/authority/WORM provisioning and advanced custody delivery. This changes current work priority and milestone acceptance, not the complete parent contract preserved below. Current Human/approver custody checks, all shared availability/admission gates, FR-34, retention/history and erasure obligations remain enforced. No partial result completes Story 5.4 or advances a full dependency record. The amendment contains the retained/blocked path matrix, Given/When/Then milestone criteria and exact owner handoff.
+
 <frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
 ## Intent
