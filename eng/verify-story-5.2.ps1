@@ -55,7 +55,7 @@ $testProjects = @(
 )
 
 function Assert-EventStorePackageFloor {
-    $minimumVersion = [Version]'3.106.0'
+    $minimumVersion = [Version]'3.128.3'
     $projectPath = if ([string]::IsNullOrWhiteSpace($PackageFloorProjectPath)) {
         'src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj'
     }
@@ -132,13 +132,17 @@ function Assert-EventStorePackageFloor {
             throw "The effective package-mode PackageVersion for '$identity' ('$versionText') is outside the supported version range."
         }
 
-        $isPrereleaseAtFloor =
-            $effectiveVersion -eq $minimumVersion -and $versionMatch.Groups['prerelease'].Success
-        if ($effectiveVersion -lt $minimumVersion -or $isPrereleaseAtFloor) {
-            throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version for '$identity' is $versionText. This release must include no-op result-payload forwarding, command-status reads, and trusted-extension admission."
+        if ($effectiveVersion -lt $minimumVersion -or $versionMatch.Groups['prerelease'].Success) {
+            throw "Story 5.2 requires Hexalith.EventStore $minimumVersion or later in package mode; effective version for '$identity' is $versionText. This release must include no-op result-payload forwarding, command-status reads, trusted-extension admission, and exact-domain workload status issuance."
         }
 
         $effectiveVersions.Add($versionText)
+    }
+
+    foreach ($requiredPackage in @('Hexalith.EventStore.Client', 'Hexalith.EventStore.DomainService')) {
+        if (-not @($eventStorePackageVersions | Where-Object { $_.Identity -ieq $requiredPackage }).Count) {
+            throw "Missing required workload-status capability package row: $requiredPackage."
+        }
     }
 
     $selectedVersions = [string]::Join(', ', @($effectiveVersions | Sort-Object -Unique))

@@ -125,7 +125,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(command);
 
-        if (!request.IsPlatformOperator)
+        if (!request.IsPlatformOperator || request.Authority?.IsCurrent == false)
         {
             return AgentAdministrationOutcome.Denied();
         }
@@ -149,7 +149,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
             request.CorrelationId,
             CausationId: null,
             request.ActorUserId,
-            BuildTrustedExtensions(request.ClientSuppliedExtensions));
+            BuildTrustedExtensions(request.ClientSuppliedExtensions)) { Authority = request.Authority };
 
         SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 
@@ -187,7 +187,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(command);
-        if (!authorized || string.IsNullOrWhiteSpace(tenantId)
+        if (!authorized || request.Authority?.IsCurrent == false || string.IsNullOrWhiteSpace(tenantId)
             || string.Equals(tenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
         {
             return AgentAdministrationOutcome.Denied();
@@ -206,7 +206,7 @@ public sealed class ProviderCatalogAdministrationOrchestrator
             request.CorrelationId,
             CausationId: null,
             request.ActorUserId,
-            extensions);
+            extensions) { Authority = request.Authority };
         SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
         return AgentAdministrationOutcome.FromDispatch(receipt);
     }

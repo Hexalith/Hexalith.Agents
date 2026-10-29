@@ -20,6 +20,11 @@ public static class AgentCommandDispatchFailure
     {
         ArgumentNullException.ThrowIfNull(exception);
 
+        if (exception is AgentCommandAuthorityExpiredException)
+        {
+            return AgentOperationErrorCode.NotAuthorized;
+        }
+
         return exception is EventStoreGatewayException gateway
             ? gateway.StatusCode switch
             {

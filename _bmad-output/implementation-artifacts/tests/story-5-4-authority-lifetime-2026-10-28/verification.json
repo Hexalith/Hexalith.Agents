@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T13:47:59.700619+00:00",
+  "scope": "Bounded current-authority lifetime correction for setup reads, activation and final command admission; local evidence only",
+  "observedRootBaseline": "0b0bb5385f642b00e68dcdffdd35758b938a57f0",
+  "originalStoryBaselinePreserved": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "storyStatus": "in-progress",
+  "fullStoryComplete": false,
+  "liveReadinessEstablished": false,
+  "changedSourceHashes": {
+    "eng/verify-story-5.4.ps1": "d91fc9b4d3f89a0784c9daf965542e2631d1383c9200fc6e9fd06e02ed897471",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs": "bcbcf6a6dd31ff7a94738b67127723a5c29d7e373faaffe0bb4e65a8a433068e",
+    "src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs": "c90982bce1bf0345e5a114760d301fff2da9a790de986b853c60a2745c88c90d",
+    "src/Hexalith.Agents.Server/Application/Agents/AgentActivationRevalidationRequest.cs": "025d04cf8978a0acd496c21f21b208ddc77f907d8c3e2f99f4a518d31ed53400",
+    "src/Hexalith.Agents.Server/Application/Agents/AgentAdministrationOrchestrator.cs": "e708df91446a76be54670b55b3e055413335a94955386a6dd28832bf3d1dff2e",
+    "src/Hexalith.Agents.Server/Application/Agents/AgentAdministrationRequest.cs": "d689799e0994c358a26c6b81d1e5b7f2b666c6991ab3ad4f87241ffbc6c25185",
+    "src/Hexalith.Agents.Server/Application/Agents/AgentResponseModeOrchestrator.cs": "6c78fd4516ea65d83d01538988018639607ee2f7fa66084b6b7e0d95ee819c3c",
+    "src/Hexalith.Agents.Server/Application/Agents/AgentResponseModeRequest.cs": "42efa42d47e58ed98f65fc662a7eb3f8863ac91befd444445af43699758f3d1a",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreAgentAdministrationOperations.cs": "8653d38d88f60852bf970f4ae433d0604fe5d44fe1ef520007871c7f9f61d0f5",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs": "e173b7f9b860f67edc652532d4968de04462486773e49faab5f3ac2cc0956b63",
+    "src/Hexalith.Agents.Server/Application/Agents/ProviderCatalogAdministrationOrchestrator.cs": "ba9f6d69da304bb1fe20c7fec3ffe9f7e9efdc053b8112f2e50da6b4e8ee18c9",
+    "src/Hexalith.Agents.Server/Application/Agents/ProviderCatalogAdministrationRequest.cs": "4257ab28e7b9afc4c0a262090f9ddbe9cc6ee05c4bfb94a19a8e1525f15a8c93",
+    "src/Hexalith.Agents.Server/Application/Queries/AgentSetupQueryHandlerBase.cs": "d075fba78db54b88c993038bda0f514f91cdaa8f0e7fdeb365c90eb4b81ba285",
+    "src/Hexalith.Agents.Server/Ports/AgentAdministrationContext.cs": "e6874a581afddf1bcb102284f4829330068dcefa281787ddcacb3d36fae05d24",
+    "src/Hexalith.Agents.Server/Ports/AgentCommandDispatchFailure.cs": "7eb5c1d15e69bd413039f462979388dd4518e6ce591ef8c4eddd8988edd59f81",
+    "src/Hexalith.Agents.Server/Ports/AgentCommandIntent.cs": "d7f4d3786daba7fefb22d6d0f85ccae6f3bd047d78a3c56e67b172c4d9c82f30",
+    "src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandDispatcher.cs": "89608300649d9fc6d9c8f326e5696308dcb70fe16a37e1eb5783d6b2bb9a8611",
+    "src/Hexalith.Agents.Server/Ports/HttpAgentAdministrationContextProvider.cs": "ab0380d65309d299632cf13eb4564d58e061170ed8ef48d6cee0a870cb37bd95",
+    "src/Hexalith.Agents.Server/Ports/ProjectedTenantAccessReader.cs": "9ab1ec737c9e7f3104958fee7b395950699a36f94a4c17c26fdfd97b09a395fa",
+    "src/Hexalith.Agents.Server/Ports/TenantAccessReadResult.cs": "29c2b3541ccdae2b077c1584b829c10bc87a134bb0ebea50bacb43e67858949a",
+    "src/Hexalith.Agents.Server/Ports/AgentAuthorityValidity.cs": "7221f191685eb03b0e9f8b3228a2fdc770c2a433608569efc66c20f42c6a0454",
+    "src/Hexalith.Agents.Server/Ports/AgentCommandAuthorityExpiredException.cs": "168e5e5c2e29362fbfa8273caf5e35aa9b3ff7560acbbef39b6db47ab6bc9a34",
+    "test/Hexalith.Agents.Server.Tests/SetupAuthorityLifetimeTests.cs": "fa0068ac40edfe3b5f5c5274554376370f326885afec6a747fa4599c797658ba"
+  },
+  "implementation": [
+    "Concrete HTTP administration and tenant readers retain the earlier actor/role exclusive deadline and their checked completion time in transient AgentAuthorityValidity.",
+    "Setup API/query reads retain the bound after store and approver awaits; expiry or rollback returns content-free NotAuthorized before later reads or disclosure.",
+    "Setup mutations, activation, provider mutation forwarding and interaction gate intents carry the same transient bound into final admission.",
+    "EventStore dispatcher refuses expired authority before target construction and before submission, and rejects admission that drops or replaces the bound.",
+    "Gateway-submitted outcomes remain authoritative after delayed acknowledgement; the local deadline does not rewrite accepted truth."
+  ],
+  "compatibility": {
+    "publicContractsAndExistingConstructorSignaturesPreserved": true,
+    "nullLifetime": "The optional lifetime grants no authority. Legacy default async administration providers still clear both role flags. Existing explicit host/test authorization adapters retain their port contract; concrete current-evidence readers always attach a bound on successful authorization. Existing machine/workflow intents without a human bound still require unchanged host admission.",
+    "serializedState": "Lifetime objects are JsonIgnore and never added to logical payload, extensions, signatures, events, projections or public operation results.",
+    "limits": "This is deadline/clock-order enforcement, not a new atomic revocation/effect protocol or proof of any production source, custody, signature, replay, denial spool or ACL."
+  },
+  "commands": {
+    "mapping": [
+      "dotnet",
+      "run",
+      "--project",
+      "/tmp/agents-caller-identity-mapping-helper/MappingHelper.csproj",
+      "--configuration",
+      "Debug",
+      "--",
+      "/home/administrator/projects/hexalith/agents",
+      "/tmp/agents-story54-authority-lifetime-2026-10-28/mapping"
+    ],
+    "sourceBuild": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+      "--configuration",
+      "Debug",
+      "-m:1",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "-p:HexalithEventStoreFromSource=true",
+      "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "-p:HexalithCommonsFromSource=true",
+      "-p:HexalithCommonsHttpFromSource=true",
+      "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+      "-p:HexalithMcpCliFromSource=true",
+      "--nologo"
+    ],
+    "redBuild": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+      "--configuration",
+      "Debug",
+      "-m:1",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "-p:HexalithEventStoreFromSource=true",
+      "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "-p:HexalithCommonsFromSource=true",
+      "-p:HexalithCommonsHttpFromSource=true",
+      "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+      "-p:HexalithMcpCliFromSource=true",
+      "-p:CustomAfterMicrosoftCommonTargets=/tmp/agents-story54-authority-lifetime-2026-10-28/prior-source.targets",
+      "--nologo"
+    ],
+    "greenForcedBuild": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+      "--configuration",
+      "Debug",
+      "--no-incremental",
+      "-m:1",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "-p:HexalithEventStoreFromSource=true",
+      "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "-p:HexalithCommonsFromSource=true",
+      "-p:HexalithCommonsHttpFromSource=true",
+      "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+      "-p:HexalithMcpCliFromSource=true",
+      "--nologo"
+    ],
+    "focused": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests",
+      "-result-xml",
+      "/tmp/agents-story54-authority-lifetime-2026-10-28/focused-green.xml"
+    ],
+    "local": {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/agents-story54-authority-lifetime-2026-10-28/local"
+      ],
+      "environmentOverride": {
+        "PATHPrefix": "/tmp/agents-story54-authority-lifetime-2026-10-28/launcher"
+      },
+      "mappingApplication": "Canonical generated source mapping applies only to build children; test runtime mapping keys are removed."
+    },
+    "live": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "./eng/verify-story-5.4.ps1",
+      "-Mode",
+      "Live",
+      "-ArtifactsPath",
+      "/tmp/agents-story54-authority-lifetime-2026-10-28/live"
+    ],
+    "whitespace": [
+      "git",
+      "-c",
+      "core.whitespace=cr-at-eol",
+      "diff",
+      "--check"
+    ]
+  },
+  "red": {
+    "stats": {
+      "total": 39,
+      "passed": 10,
+      "failed": 29,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "failedTests": [
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.ActivationDoesNotContinueAfterItsAuthorityExpires(boundary: \\\"store\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.ActivationDoesNotContinueAfterItsAuthorityExpires(boundary: \\\"catalog\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.ActivationDoesNotContinueAfterItsAuthorityExpires(boundary: \\\"approver\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.AdmissionCannotDiscardOrReplaceTheAuthorityLifetime(replace: False)",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.AdmissionCannotDiscardOrReplaceTheAuthorityLifetime(replace: True)",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupWritesRetainTheirBoundThroughFinalAdmission(operation: \\\"create\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupWritesRetainTheirBoundThroughFinalAdmission(operation: \\\"update\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupWritesRetainTheirBoundThroughFinalAdmission(operation: \\\"response-mode\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupWritesRetainTheirBoundThroughFinalAdmission(operation: \\\"disable\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupWritesRetainTheirBoundThroughFinalAdmission(operation: \\\"activate\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: False, boundary: \\\"store-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: False, boundary: \\\"store-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: False, boundary: \\\"approver-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: False, boundary: \\\"approver-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: True, boundary: \\\"store-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: True, boundary: \\\"store-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: True, boundary: \\\"approver-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: False, status: True, boundary: \\\"approver-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: False, boundary: \\\"store-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: False, boundary: \\\"store-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: False, boundary: \\\"approver-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: False, boundary: \\\"approver-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: True, boundary: \\\"store-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: True, boundary: \\\"store-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: True, boundary: \\\"approver-expiry\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.SetupReadsRetainAuthorityThroughStoreAndApproverAwaits(direct: True, status: True, boundary: \\\"approver-rollback\\\")",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.DispatcherRetainsTheOriginalDeadlineAndClockOrdering(boundary: \\\"already-expired\\\", accepted: False)",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.DispatcherRetainsTheOriginalDeadlineAndClockOrdering(boundary: \\\"admission-expiry\\\", accepted: False)",
+      "Hexalith.Agents.Server.Tests.SetupAuthorityLifetimeTests.DispatcherRetainsTheOriginalDeadlineAndClockOrdering(boundary: \\\"admission-rollback\\\", accepted: False)"
+    ],
+    "method": "Private compilation overlay selects the four baseline operation/query/activation/dispatcher source copies; additive model properties and concrete bound-producing readers remain current. No workspace production file was replaced. This isolates missing downstream guards, not a complete baseline checkout."
+  },
+  "initialFailedCandidate": {
+    "directory": "evidence.tar.gz:first-local-prior-overlay",
+    "reason": "Incremental MSBuild reused the red overlay binary when the overlay property was removed. Same 29 expected regressions failed. A forced current-source rebuild corrected artifacts; no gate was relaxed."
+  },
+  "focused": {
+    "total": 39,
+    "passed": 39,
+    "fullLocalExecutedRows": 39
+  },
+  "local": {
+    "exitCode": 0,
+    "total": 6052,
+    "passed": 6052,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1782,
+        "passed": 1782,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "warningFreeBuilds": 5,
+    "result": {
+      "LocalContractsVerified": true,
+      "Mode": "Local",
+      "LiveReadinessEstablished": false,
+      "ExternalOwnerCalls": 0,
+      "StoryComplete": false,
+      "Blockers": [
+        {
+          "RecordId": "EXT-PARTIES-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-CONV-AI-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-SECRETS-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-HOST-1",
+          "Code": "DependencyNotAvailable"
+        }
+      ]
+    }
+  },
+  "live": {
+    "exitCode": 1,
+    "expectedRefusal": true,
+    "result": {
+      "Mode": "Live",
+      "StoryComplete": false,
+      "ExternalCalls": 0,
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ]
+    }
+  },
+  "sourceComparison": {
+    "selectedRootFiles": 1054,
+    "changedFiles": [],
+    "scope": "Root src/test/eng excluding bin/obj, selected root build files and authoritative dependency register; not complete transitive/generated-input or runtime execution attestation.",
+    "before": "evidence.tar.gz:pre-local-root-sources.json",
+    "after": "evidence.tar.gz:post-local-root-sources.json"
+  },
+  "revisions": {
+    "before": "evidence.tar.gz:pre-local-revisions.json",
+    "after": "evidence.tar.gz:post-local-revisions.json"
+  },
+  "unchangedGateHashes": {
+    "src/Hexalith.Agents.Server/Api/AgentDependencyAvailabilityFilter.cs": "5bf72839ed89fe08fe4c8a77b8fccb3865adccc06ae7a54608843d62e9e4816f",
+    "src/Hexalith.Agents.Server/Ports/CommittedAgentDependencyAvailability.cs": "40dfd8e14d99a005b292aece90ab95f50283b2072705e8db32e39213aad13b3c",
+    "src/Hexalith.Agents.Server/Ports/UnavailableAgentTrustedCommandAdmission.cs": "5a9659f3ab2f3ed41ed720de77108a61694e953b576f49ebff4c62f997cd95c3",
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "e29b7fc41cb404209e0abb5fb1e735f29cab253ce4012b142a2c8c30a9c19860"
+  },
+  "testArtifactHashes": {
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll": "f28d5173fa0f526a215a2b2a29af00641937cf98f9a7d63cf4ef0202fd7a5e22",
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.pdb": "85d6793d54a7d51c0c1e239396485a7144868688b895c28125751e868d65f830",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll": "4181a1b008851b95be652739d2339903b58d713bb5d17565d3d7782aaa6cc046",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.pdb": "e2bf5948e644c9227d7b3ba4bfa3e25dc70cb0c302ee895dd3aca50a44bb1540",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll": "b5b252bf9203ff1d58f88364f30c2e780929a4b766b5d37461b41f43e07f24ea",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.pdb": "61190ac2caf5483b08d9644bc2a0bf3c40060c3398d8510c0f07506dcb6db4af",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll": "041139ffdb05a5f83891bf8240dfd819a874c416fcb2b8646f4d4a022739eaae",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.pdb": "0d876e835d54f447092024aa7cad5e3a01055b3cc8aa1e28e3d96cf2982416db",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll": "f4ef9193f3970538e1f2ca320a359793389a49be55576980fd5bc6a92d13dfb4",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.pdb": "ecbc026a60161baeb4585b57ead816ccdf292c886abb51fac005a770be15b332"
+  },
+  "sdk": "10.0.402",
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "f43f8c6be29f354eb48eb02161068e9af00b8f41fee75bc7f6dfd919791f145c"
+  },
+  "remainingFullAcceptance": [
+    "All four complete owner records remain Committed/unavailable; no owner qualification command was repeated.",
+    "Production Tenants/Parties/Conversations sources, immutable Party provisioning and current Human custody/approver bindings remain unavailable.",
+    "Genuine AD-30 operation/principal/scope verification, private persisted replay credentials, replicated denial spool and restricted recovery worker remain pending owner delivery.",
+    "Persisted live ACL, isolation, outage/restart/restore/lost-ack and complete matrix qualification remain incomplete.",
+    "The bounded setup correction does not complete full Story 5.4, advance sprint/dependency status, or enable the MVP operational milestone.",
+    "Remaining local scope: the separate provider-catalog read/freshness pipelines do not comprehensively retain lifetime checks across their protected awaits. Provider mutation forwarding is covered; this correction is not complete story-wide authority-lifetime enforcement."
+  ],
+  "reviewFollowup": "review-fix-1/verification.json",
+  "subsequentProviderLifetimeCompletion": "provider-lifetime/verification.json"
+}

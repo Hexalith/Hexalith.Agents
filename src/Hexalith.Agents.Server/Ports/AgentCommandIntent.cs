@@ -66,6 +66,10 @@ public sealed class AgentCommandIntent
     /// <summary>Gets a copy of metadata so it cannot change between canonical verification and target construction.</summary>
     public Dictionary<string, string>? Extensions => _extensions is null ? null : new(_extensions, StringComparer.Ordinal);
 
+    /// <summary>Gets the transient current-authority lifetime; admission must preserve this exact bound.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public AgentAuthorityValidity? Authority { get; init; }
+
     /// <summary>Returns only a type label, withholding payload, metadata and unadmitted target identity.</summary>
     /// <returns>The safe intent label.</returns>
     public override string ToString() => nameof(AgentCommandIntent);

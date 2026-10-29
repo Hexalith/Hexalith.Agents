@@ -16,6 +16,7 @@ using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Ports;
 
+using Hexalith.EventStore.Client.Gateway;
 using Hexalith.EventStore.Contracts.Commands;
 using Hexalith.EventStore.Contracts.Results;
 
@@ -108,6 +109,118 @@ public sealed class AgentInteractionGateOrchestratorTests
         enumerated.ShouldBeTrue();
         outcome.Status.ShouldBe(AgentInteractionStatus.Denied);
         _dispatcher.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    /// <summary>Final pre-dispatch clock evidence survives intent construction into admission, including equal and advancing controls.</summary>
+    [Theory]
+    [InlineData(1, false)]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    public async Task FinalAuthorityCheckIsRetainedThroughCommandAdmission(int admissionSeconds, bool accepted)
+    {
+        StubAllReady();
+        DateTimeOffset started = _clock.Now;
+        var extensions = Substitute.For<IReadOnlyDictionary<string, string>>();
+        extensions.GetEnumerator().Returns(_ =>
+        {
+            _clock.Now = started.AddSeconds(2);
+            return Enumerable.Empty<KeyValuePair<string, string>>().GetEnumerator();
+        });
+        var gateway = Substitute.For<IEventStoreGatewayClient>();
+        gateway.SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new SubmitCommandResponse("corr-1", MessageId: "msg-1"));
+        var admission = Substitute.For<IAgentTrustedCommandAdmission>();
+        admission.AdmitAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>())
+            .Returns(call => call.Arg<AgentCommandIntent>());
+        var dispatcher = new EventStoreAgentCommandDispatcher(gateway, admission);
+        _dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            _clock.Now = started.AddSeconds(admissionSeconds);
+            return dispatcher.DispatchAsync(call.Arg<AgentCommandIntent>(), call.Arg<CancellationToken>());
+        });
+
+        if (accepted)
+        {
+            AgentInteractionGateOutcomeResult result = await Orchestrator.ExecuteAsync(Request(extensions), CancellationToken.None);
+
+            result.Status.ShouldBe(AgentInteractionStatus.Authorized);
+            await gateway.Received(1).SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>());
+        }
+        else
+        {
+            (await Orchestrator.ExecuteAsync(Request(extensions), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Denied);
+
+            admission.ReceivedCalls().ShouldBeEmpty();
+            gateway.ReceivedCalls().ShouldBeEmpty();
+        }
+    }
+
+    /// <summary>The tenant reader's checked completion time cannot be lost before protected gate reads.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task TenantReaderClockHistoryIsRetainedBeforeCallerLookup(bool rollback)
+    {
+        StubAllReady();
+        DateTimeOffset started = _clock.Now;
+        var bound = new AgentAuthorityValidity(_clock, started, started.AddMinutes(1));
+        _tenantAccessReader.ReadAsync(TenantId, Arg.Any<string>(), CallerPartyId, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            _clock.Now = started.AddSeconds(5);
+            bound.IsCurrent.ShouldBeTrue();
+            _clock.Now = started.AddSeconds(rollback ? 4 : 5);
+            return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)
+            {
+                Authority = bound,
+                CurrentActor = new(TenantId, "caller-user", "stable-actor", CallerPartyId, 1, 1, started, started.AddMinutes(1)),
+            };
+        });
+        CaptureDispatch();
+
+        AgentInteractionGateOutcomeResult result = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        result.Status.ShouldBe(rollback ? AgentInteractionStatus.Denied : AgentInteractionStatus.Authorized);
+        if (rollback)
+        {
+            _partyDirectory.ReceivedCalls().ShouldBeEmpty();
+            _dispatcher.ReceivedCalls().ShouldBeEmpty();
+        }
+    }
+
+    /// <summary>A separate shorter tenant-role interval remains binding during final admission.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task TenantAuthorityDeadlineSurvivesFinalCommandAdmission(bool current)
+    {
+        StubAllReady();
+        DateTimeOffset started = _clock.Now;
+        _tenantAccessReader.ReadAsync(TenantId, Arg.Any<string>(), CallerPartyId, Arg.Any<CancellationToken>()).Returns(
+            new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)
+            {
+                Authority = new(_clock, started, started.AddSeconds(30)),
+                CurrentActor = new(TenantId, "caller-user", "stable-actor", CallerPartyId, 1, 1, started, started.AddMinutes(1)),
+            });
+        var gateway = Substitute.For<IEventStoreGatewayClient>();
+        gateway.SubmitCommandAsync(Arg.Any<SubmitCommandRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new SubmitCommandResponse("corr-1", MessageId: "msg-1"));
+        var admission = Substitute.For<IAgentTrustedCommandAdmission>();
+        admission.AdmitAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            _clock.Now = started.AddSeconds(current ? 29 : 30);
+            return call.Arg<AgentCommandIntent>();
+        });
+        var dispatcher = new EventStoreAgentCommandDispatcher(gateway, admission);
+        _dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>())
+            .Returns(call => dispatcher.DispatchAsync(call.Arg<AgentCommandIntent>(), call.Arg<CancellationToken>()));
+
+        AgentInteractionGateOutcomeResult result = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        result.Status.ShouldBe(current ? AgentInteractionStatus.Authorized : AgentInteractionStatus.Denied);
+        if (!current)
+        {
+            gateway.ReceivedCalls().ShouldBeEmpty();
+        }
     }
 
     /// <summary>An accepted dispatch retains its shared-policy outcome when acknowledgement arrives after authority expiry.</summary>

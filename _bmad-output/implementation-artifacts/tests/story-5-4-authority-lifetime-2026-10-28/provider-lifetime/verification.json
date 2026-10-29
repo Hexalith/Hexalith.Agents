@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-28T14:18:38.706757+00:00",
+  "scope": "Complete the previously recorded local provider-catalog read/freshness lifetime spans; no production dependency enablement.",
+  "observedRootBaseline": "0b0bb5385f642b00e68dcdffdd35758b938a57f0",
+  "originalStoryBaselinePreserved": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "storyStatus": "in-progress",
+  "fullStoryComplete": false,
+  "liveReadinessEstablished": false,
+  "fullLocalRunsAfterFinalFixes": 1,
+  "changes": [
+    "Retain current authority through platform/tenant catalog API and query model reads, projected provider reads, Platform enablement inspection, and public exact-command status lookup.",
+    "Carry the same bound through each freshness helper stream-head await, including missing-stream and failed responses, stopping later reads and withholding output on expiry or rollback.",
+    "Retain enablement/terms preflight authority before later reads or dispatch.",
+    "Record eligibility clock observations in the authority bound before evaluating disclosure, so a later rollback cannot hide behind the prior source-read instant.",
+    "Preserve Applied/AlreadyApplied receipts and known Submitted truth after a delayed raw submission acknowledgement when status authority is no longer current.",
+    "Require the new suite in the existing strict Local verifier; keep existing default availability/admission and public contract shapes unchanged."
+  ],
+  "compatibility": {
+    "publicHelperClrSignaturesRetained": true,
+    "helperOverloads": "Existing ProviderCatalogReadFreshness method signatures delegate to additive bound-aware overloads; existing call sites and binary signatures remain present.",
+    "publicApiContractsUnchanged": true,
+    "unavailableDefaultsUnchanged": true,
+    "authority": "The optional bound grants no role. Concrete current readers supply it on success; legacy default async administration providers continue to clear role flags. No lifetime data enters payloads, extensions, events, projections or public results."
+  },
+  "coverage": {
+    "newCases": 119,
+    "readBoundaryCases": 102,
+    "failedFreshnessCases": 5,
+    "acknowledgementCases": 3,
+    "eligibilityClockCases": 6,
+    "missingStreamCases": 3,
+    "entryPoints": [
+      "Platform catalog list/detail API and query",
+      "Tenant catalog list/detail API and query",
+      "Projected provider-entry reader",
+      "Platform tenant-enablement inspection",
+      "Platform and tenant public command-status lookup",
+      "Tenant-enablement and data-handling preflight reads"
+    ],
+    "observedBehavior": "Exact traced read prefixes prove no later model/head/status read follows expiry or rollback; denied results contain no protected provider or configuration-reference fields."
+  },
+  "red": {
+    "total": 110,
+    "passed": 18,
+    "failed": 92,
+    "method": "The full initial new matrix was built and run against retained unchanged provider production sources before any provider correction.",
+    "xml": "evidence.tar.gz:red-focused.xml"
+  },
+  "eligibilityRed": {
+    "total": 6,
+    "passed": 3,
+    "failed": 3,
+    "method": "Additional regressions against the first correction demonstrated the captured eligibility-time observation gap; advancing controls passed.",
+    "xml": "evidence.tar.gz:view-red.xml"
+  },
+  "focusedGreen": {
+    "total": 321,
+    "passed": 321,
+    "failed": 0,
+    "classes": [
+      "ProviderCatalogAuthorityLifetimeTests",
+      "ProviderCatalogQueryTests",
+      "ProjectedProviderCatalogReaderTests",
+      "EventStoreProviderCatalogOperationsTests"
+    ]
+  },
+  "local": {
+    "exitCode": 0,
+    "total": 6174,
+    "passed": 6174,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1904,
+        "passed": 1904,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "warningFreeBuilds": 5,
+    "newSuiteExecutedRows": 119,
+    "result": {
+      "Mode": "Local",
+      "StoryComplete": false,
+      "LocalContractsVerified": true,
+      "ExternalOwnerCalls": 0,
+      "LiveReadinessEstablished": false,
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ]
+    }
+  },
+  "live": {
+    "exitCode": 1,
+    "expectedRefusal": true,
+    "result": {
+      "StoryComplete": false,
+      "Mode": "Live",
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ],
+      "ExternalCalls": 0
+    }
+  },
+  "commands": {
+    "sourceBuild": [
+      "dotnet",
+      "build",
+      "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+      "--configuration",
+      "Debug",
+      "-m:1",
+      "-p:MinVerVersionOverride=1.0.0",
+      "-p:UseHexalithProjectReferences=true",
+      "-p:UseNuGetDeps=false",
+      "-p:HexalithBuildsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "-p:HexalithEventStoreRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "-p:HexalithEventStoreFromSource=true",
+      "-p:HexalithCommonsRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "-p:HexalithCommonsFromSource=true",
+      "-p:HexalithCommonsHttpFromSource=true",
+      "-p:HexalithMcpCliRoot=/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+      "-p:HexalithMcpCliFromSource=true",
+      "--nologo"
+    ],
+    "redFocused": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Server.Tests.ProviderCatalogAuthorityLifetimeTests",
+      "-result-xml",
+      "/tmp/agents-story54-provider-lifetime-2026-10-28/red-focused.xml"
+    ],
+    "eligibilityRed": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-method",
+      "Hexalith.Agents.Server.Tests.ProviderCatalogAuthorityLifetimeTests.EligibilityObservationCannotHideClockRollbackBeforeDisclosure",
+      "-result-xml",
+      "/tmp/agents-story54-provider-lifetime-2026-10-28/view-red.xml"
+    ],
+    "finalFocused": [
+      "dotnet",
+      "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+      "-class",
+      "Hexalith.Agents.Server.Tests.ProviderCatalogAuthorityLifetimeTests",
+      "-class",
+      "Hexalith.Agents.Server.Tests.ProviderCatalogQueryTests",
+      "-class",
+      "Hexalith.Agents.Server.Tests.ProjectedProviderCatalogReaderTests",
+      "-class",
+      "Hexalith.Agents.Server.Tests.EventStoreProviderCatalogOperationsTests",
+      "-result-xml",
+      "/tmp/agents-story54-provider-lifetime-2026-10-28/final-focused.xml"
+    ],
+    "local": {
+      "argv": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/agents-story54-provider-lifetime-2026-10-28/local"
+      ],
+      "environmentOverride": {
+        "PATHPrefix": "/tmp/agents-story54-authority-lifetime-2026-10-28/launcher"
+      },
+      "mapping": "Retained canonical Builds materializer output from ../verification.json, applied only to build processes; test mapping variables are removed."
+    },
+    "live": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "./eng/verify-story-5.4.ps1",
+      "-Mode",
+      "Live",
+      "-ArtifactsPath",
+      "/tmp/agents-story54-provider-lifetime-2026-10-28/live"
+    ]
+  },
+  "sourceHashes": {
+    "src/Hexalith.Agents.Server/Ports/AgentAuthorityValidity.cs": "6dea1cc7b91846f2313f7f909924c113b66c243cc9b176a67b634d6c88eb3d26",
+    "src/Hexalith.Agents.Server/Ports/AgentCommandAuthorityExpiredException.cs": "1d9439c681646f94754e3ae05fe944397393e1dce5d597b3c35a56caaa4490cc",
+    "src/Hexalith.Agents.Server/Projections/ProviderCatalogReadFreshness.cs": "47458a66593cae035c2ca707f1b687b11028167270fd4e8cef67de086ac3c6e4",
+    "src/Hexalith.Agents.Server/Ports/ProjectedProviderCatalogReader.cs": "56c4bf8094e3ee102f919a72e85b1719f7f468f128216f6f6553b7005cf18e3d",
+    "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs": "819e541ef98a65d21a6a0c2c995d38886cc4fc1a937695b074f9ff5715631dd5",
+    "src/Hexalith.Agents.Server/Application/Queries/ProviderCatalogQueryHandlerBase.cs": "51558354e84630e52182ab4b0a979dc7dfcea3fccd64aa838ce6699ef0d7d901",
+    "eng/verify-story-5.4.ps1": "70ec96cdfe585f75de81a2b3167716688a9136b39e0cbdbd242ef374438f60fe",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogAuthorityLifetimeTests.cs": "931035e4033bf132e42b106bea505ff65e2b376ef0ab31ef0c41870fc739bc70"
+  },
+  "unchangedGateHashes": {
+    "src/Hexalith.Agents.Server/Api/AgentDependencyAvailabilityFilter.cs": "5bf72839ed89fe08fe4c8a77b8fccb3865adccc06ae7a54608843d62e9e4816f",
+    "src/Hexalith.Agents.Server/Ports/CommittedAgentDependencyAvailability.cs": "40dfd8e14d99a005b292aece90ab95f50283b2072705e8db32e39213aad13b3c",
+    "src/Hexalith.Agents.Server/Ports/UnavailableAgentTrustedCommandAdmission.cs": "5a9659f3ab2f3ed41ed720de77108a61694e953b576f49ebff4c62f997cd95c3",
+    "_bmad-output/planning-artifacts/external-dependency-register.md": "e29b7fc41cb404209e0abb5fb1e735f29cab253ce4012b142a2c8c30a9c19860"
+  },
+  "sourceComparison": {
+    "selectedRootFiles": 1055,
+    "changedFiles": [],
+    "before": "evidence.tar.gz:pre-local-root-sources.json",
+    "after": "evidence.tar.gz:post-local-root-sources.json",
+    "limits": "Bounded root source/test/eng/config/register comparison; not complete transitive/generated-input or runtime execution attestation."
+  },
+  "revisions": {
+    "before": "evidence.tar.gz:pre-local-revisions.json",
+    "after": "evidence.tar.gz:post-local-revisions.json",
+    "allCanonicalHeadsStable": true
+  },
+  "testArtifactHashes": {
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll": "f28d5173fa0f526a215a2b2a29af00641937cf98f9a7d63cf4ef0202fd7a5e22",
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.pdb": "85d6793d54a7d51c0c1e239396485a7144868688b895c28125751e868d65f830",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll": "4181a1b008851b95be652739d2339903b58d713bb5d17565d3d7782aaa6cc046",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.pdb": "e2bf5948e644c9227d7b3ba4bfa3e25dc70cb0c302ee895dd3aca50a44bb1540",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll": "4ec2bc8e1c5b1658c01be0f51add5f43c8ab06332a1173f9f68794f147bb3932",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.pdb": "e80883ab360b9e4db4396f7aec3900a5a8248989cac488cb626e95236fcaf507",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll": "041139ffdb05a5f83891bf8240dfd819a874c416fcb2b8646f4d4a022739eaae",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.pdb": "0d876e835d54f447092024aa7cad5e3a01055b3cc8aa1e28e3d96cf2982416db",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll": "f4ef9193f3970538e1f2ca320a359793389a49be55576980fd5bc6a92d13dfb4",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.pdb": "ecbc026a60161baeb4585b57ead816ccdf292c886abb51fac005a770be15b332"
+  },
+  "priorArchivesPreserved": {
+    "evidence.tar.gz": "f43f8c6be29f354eb48eb02161068e9af00b8f41fee75bc7f6dfd919791f145c",
+    "review-fix-1/evidence.tar.gz": "fe385539443dfd86e468d8cf2382f6c8989f9fb6fae1aa4a46684a47d1771334"
+  },
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "d0a1473f62345ee2f05e765adbdb925e49181eeab2630a723d0e01bf13c07877"
+  },
+  "resolvesLocalScope": "The provider-catalog read/freshness spans recorded as remaining local scope in the earlier bounded lifetime receipts are corrected here. This does not claim that the full parent story is complete.",
+  "remainingFullAcceptance": [
+    "All four owner records remain Committed/unavailable; no owner command was repeated.",
+    "Production current Tenants/Parties/Conversations evidence, immutable Party provisioning and current Human custody/approver bindings remain unavailable.",
+    "Genuine AD-30 verification, private persisted replay credentials, replicated durable denial spool and restricted worker remain pending owner delivery.",
+    "Complete persisted live ACL/isolation/outage/restart/restore/lost-ack qualification and full parent acceptance remain incomplete."
+  ]
+}

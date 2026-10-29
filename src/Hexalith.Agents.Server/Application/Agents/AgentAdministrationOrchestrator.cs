@@ -109,7 +109,7 @@ public sealed class AgentAdministrationOrchestrator
         ArgumentNullException.ThrowIfNull(command);
 
         // Authorize — fail closed before any dispatch (AD-12).
-        if (!request.IsAgentsAdmin)
+        if (!request.IsAgentsAdmin || request.Authority?.IsCurrent == false)
         {
             return AgentAdministrationOutcome.Denied();
         }
@@ -124,7 +124,7 @@ public sealed class AgentAdministrationOrchestrator
             request.CorrelationId,
             CausationId: null,
             request.ActorUserId,
-            BuildTrustedExtensions(request.ClientSuppliedExtensions));
+            BuildTrustedExtensions(request.ClientSuppliedExtensions)) { Authority = request.Authority };
 
         SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 

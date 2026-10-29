@@ -17,17 +17,10 @@ internal sealed class CommandStatusWorkloadAssertionSource(
     public ValueTask<string?> IssueAsync(string operation, string tenant, string requestedDomain, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-#if HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS
         return source is not null
             && operation == EventStoreGatewayWorkloadOperations.CommandStatus
             && string.Equals(domain, requestedDomain, StringComparison.Ordinal)
             ? source.IssueAsync(operation, tenant, domain, cancellationToken)
             : ValueTask.FromResult<string?>(null);
-#else
-        // Client 3.127.0 cannot request an exact domain. Never fall back to its unscoped issuer call.
-        _ = source;
-        _ = domain;
-        return ValueTask.FromResult<string?>(null);
-#endif
     }
 }

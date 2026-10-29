@@ -44,6 +44,7 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
     {
         ArgumentNullException.ThrowIfNull(intent);
         ct.ThrowIfCancellationRequested();
+        EnsureCurrentAuthority(intent);
         // This await precedes even CommandEnvelope's eager target-identity validation. The ordinary dispatcher
         // never obtains the registrar or denial-worker credential from DI.
         AgentCommandIntent admitted = await _admission.AdmitAsync(intent, ct).ConfigureAwait(false);
@@ -56,6 +57,7 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
             throw new AgentDependencyNotAvailableException("EXT-HOST-1");
         }
 
+        EnsureCurrentAuthority(intent);
         var envelope = new CommandEnvelope(
             admitted.MessageId, admitted.TenantId, admitted.Domain, admitted.AggregateId, admitted.CommandType,
             admitted.Payload, admitted.CorrelationId, admitted.CausationId, admitted.UserId, admitted.Extensions);
@@ -76,7 +78,16 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
             // duplicate submission is idempotent at the gateway rather than appending a second event.
             envelope.MessageId);
 
+        EnsureCurrentAuthority(intent);
         return await _gateway.SubmitCommandAsync(request, ct).ConfigureAwait(false);
+    }
+
+    private static void EnsureCurrentAuthority(AgentCommandIntent intent)
+    {
+        if (intent.Authority?.IsCurrent == false)
+        {
+            throw new AgentCommandAuthorityExpiredException();
+        }
     }
 
     /// <summary>
@@ -86,7 +97,8 @@ public sealed class EventStoreAgentCommandDispatcher : IAgentCommandDispatcher
     /// </summary>
     private static bool PreservesAdmittedIntent(AgentCommandIntent original, AgentCommandIntent admitted)
     {
-        if (!string.Equals(original.MessageId, admitted.MessageId, StringComparison.Ordinal)
+        if (!ReferenceEquals(original.Authority, admitted.Authority)
+            || !string.Equals(original.MessageId, admitted.MessageId, StringComparison.Ordinal)
             || !string.Equals(original.TenantId, admitted.TenantId, StringComparison.Ordinal)
             || !string.Equals(original.Domain, admitted.Domain, StringComparison.Ordinal)
             || !string.Equals(original.AggregateId, admitted.AggregateId, StringComparison.Ordinal)

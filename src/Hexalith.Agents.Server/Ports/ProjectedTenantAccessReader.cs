@@ -46,6 +46,7 @@ public sealed class ProjectedTenantAccessReader(ICurrentTenantAuthoritySource so
                     administration ? null : callerPartyId, false, now, started);
             return new(granted ? AgentInteractionGateOutcome.Satisfied : AgentInteractionGateOutcome.Unauthorized, granted)
             {
+                Authority = granted ? new(clock, now, actor.ValidUntil < evidence!.ValidUntil ? actor.ValidUntil : evidence.ValidUntil) : null,
                 CurrentActor = granted ? actor with { ValidUntil = actor.ValidUntil < evidence!.ValidUntil ? actor.ValidUntil : evidence.ValidUntil } : null,
             };
         }

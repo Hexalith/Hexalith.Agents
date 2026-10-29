@@ -219,19 +219,20 @@ tenant and command domain. Dapr attribution and human bearer credentials do not
 replace that assertion. Register host overrides before setup composition. Legacy
 message-only reader registrations remain preserved, but their evidence is not used
 for scoped reads: implement the scoped rejection overload and status DTO read
-explicitly.
+explicitly. Host command admission must preserve the exact transient
+`AgentCommandIntent.Authority` reference when adding `trust:` metadata. When reconstructing
+an intent, explicitly copy its original `Authority` property; omitting, replacing
+or renewing that bound is refused before EventStore command construction.
 
-Both dependency modes use the supported public SDK workload-status transport.
-Published Client **3.127.0** lacks the exact-domain assertion-delegation overload
-present in the owner source checkout, and the stock DomainService **3.127.0**
-issuer also excludes status grants. Debug/source mode uses the owner overload
-and the declared-domain status issuer change recorded in
-[the terminal setup evidence](_bmad-output/implementation-artifacts/deferred-terminal-setup-verification-2026-10-25.md).
-Release/package mode deliberately refuses status credentials before HTTP until
-a compatible published Client and DomainService are pinned and the corresponding
-compile-time capability is enabled. Existing host-reader overrides still work
-in either mode. A client transport update alone is insufficient. Do not enable
-the exact-domain source capability against the 3.127.0 package.
+Both dependency modes use the supported public SDK workload-status transport and
+exact-domain assertion delegation. The maintained package gate requires verified
+compatible Client/DomainService **3.128.3** or later; the shared Builds catalog
+selects the versions. Both source and package tests exercise the configured live
+reader, declared-domain issuer, credential refusal and host-reader overrides.
+The earlier 3.127.0 package refusal remains historical evidence in
+[the terminal setup report](_bmad-output/implementation-artifacts/deferred-terminal-setup-verification-2026-10-25.md).
+A client transport update alone is insufficient: the host issuer must grant the
+exact requested status operation, tenant and declared domain.
 
 Agents generates no credentials. Missing/refused credentials and unsupported
 SDK capabilities preserve `UnableToVerify` and the original retry identity;

@@ -84,9 +84,11 @@ public sealed class EventStoreProviderCatalogOperations(
         string messageId,
         bool hasSubmissionReceipt,
         CancellationToken cancellationToken,
-        AgentOperationOptions? options = null)
+        AgentOperationOptions? options = null,
+        AgentAdministrationContext? originatingContext = null)
     {
-        AgentAdministrationContext context = await _contextProvider.GetContextAsync(targetTenantId == ProviderCatalogIdentity.PlatformTenantId, cancellationToken).ConfigureAwait(false);
+        AgentAdministrationContext context = originatingContext ?? await _contextProvider.GetContextAsync(targetTenantId == ProviderCatalogIdentity.PlatformTenantId, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         if (string.Equals(targetTenantId, "current", StringComparison.Ordinal))
         {
             targetTenantId = context.TenantId;
@@ -94,12 +96,15 @@ public sealed class EventStoreProviderCatalogOperations(
 
         if (string.IsNullOrWhiteSpace(targetTenantId) || string.IsNullOrWhiteSpace(messageId)
             || string.IsNullOrWhiteSpace(context.ActorUserId)
+            || !context.HasCurrentAuthority
             || !(context.IsPlatformOperator || context.IsAuthorized)
             || (targetTenantId == ProviderCatalogIdentity.PlatformTenantId && !context.IsPlatformOperator)
             || (targetTenantId != ProviderCatalogIdentity.PlatformTenantId
                 && !context.IsPlatformOperator && targetTenantId != context.TenantId))
         {
-            return AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.NotAuthorized);
+            return hasSubmissionReceipt
+                ? AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.Submitted)
+                : AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.NotAuthorized);
         }
 
         if (options?.CorrelationId is { } suppliedCorrelation && !IsCanonicalUlid(suppliedCorrelation))
@@ -121,6 +126,7 @@ public sealed class EventStoreProviderCatalogOperations(
             CommandStatusQueryResponse? status = await _statusReader.ReadAsync(
                 targetTenantId, domain, messageId, options?.CorrelationId, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
 
             // A status from another tenant or message is answered exactly like an absent one, so the lookup
             // cannot reveal that the identifier exists elsewhere.
@@ -162,9 +168,21 @@ public sealed class EventStoreProviderCatalogOperations(
                 };
             return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(outcome);
         }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return hasSubmissionReceipt
+                ? AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.Submitted)
+                : AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.NotAuthorized);
+        }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (!context.HasCurrentAuthority)
+            {
+                return hasSubmissionReceipt
+                    ? AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.Submitted)
+                    : AgentOperationResult<AgentSetupWriteOutcome>.Failed(AgentOperationErrorCode.NotAuthorized);
+            }
             return AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.UnableToVerify);
         }
     }
@@ -178,7 +196,8 @@ public sealed class EventStoreProviderCatalogOperations(
         CancellationToken cancellationToken = default)
     {
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-        if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!context.HasCurrentAuthority || !context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
                 new(ProviderCatalogInspectionStatus.NotAuthorized, null, null), correlationId: options?.CorrelationId);
@@ -198,21 +217,23 @@ public sealed class EventStoreProviderCatalogOperations(
             ReadModelEntry<TenantProviderEnablementReadModel> read = await _readModelStore
                 .GetAsync<TenantProviderEnablementReadModel>(_options.Value.StateStoreName,
                     TenantProviderEnablementReadModelAddresses.Detail(tenantId), cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
             if (read.Value?.IsScopedTo(tenantId) == false)
             {
                 return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
                     new(ProviderCatalogInspectionStatus.Unavailable, null, null), correlationId: options?.CorrelationId);
             }
 
-            ProviderCatalogReadModel? platform = await ReadPlatformModelAsync(cancellationToken).ConfigureAwait(false);
+            ProviderCatalogReadModel? platform = await ReadPlatformModelAsync(cancellationToken, context.Authority).ConfigureAwait(false);
             TenantProviderEntryState? entry = null;
             bool found = read.Value?.State.Entries.TryGetValue(
                 ProviderCatalogState.EntryKey(providerId, modelId), out entry) == true;
             if (!await ProviderCatalogReadFreshness.HasHeadAsync(_gateway, tenantId,
                 TenantProviderEnablementAggregate.Domain, tenantId,
-                read.Value?.LastSequenceNumber ?? 0, cancellationToken).ConfigureAwait(false)
+                read.Value?.LastSequenceNumber ?? 0, cancellationToken, context.Authority).ConfigureAwait(false)
                 || !await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, platform,
-                    providerId, modelId, cancellationToken).ConfigureAwait(false))
+                    providerId, modelId, cancellationToken, context.Authority).ConfigureAwait(false))
             {
                 return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
                     new(ProviderCatalogInspectionStatus.Success, null, null,
@@ -229,8 +250,19 @@ public sealed class EventStoreProviderCatalogOperations(
                     AgentSetupTruthState.ProjectionConfirmed),
                 correlationId: options?.CorrelationId);
         }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
+                new(ProviderCatalogInspectionStatus.NotAuthorized, null, null), correlationId: options?.CorrelationId);
+        }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!context.HasCurrentAuthority)
+            {
+                return AgentOperationResult<TenantProviderEnablementInspectionResult>.Succeeded(
+                    new(ProviderCatalogInspectionStatus.NotAuthorized, null, null), correlationId: options?.CorrelationId);
+            }
             return AgentOperationResult<TenantProviderEnablementInspectionResult>.Failed(
                 AgentCommandDispatchFailure.Map(exception), options?.CorrelationId);
         }
@@ -241,8 +273,8 @@ public sealed class EventStoreProviderCatalogOperations(
         bool includeDisabled = false,
         AgentOperationOptions? options = null,
         CancellationToken cancellationToken = default)
-        => ReadTenantAsync((platform, tenant) => TenantProviderCatalogViewFactory.CreateList(
-            platform, tenant, authorized: true, _clock.GetUtcNow(), includeDisabled),
+        => ReadTenantAsync((platform, tenant, evaluatedAt) => TenantProviderCatalogViewFactory.CreateList(
+            platform, tenant, authorized: true, evaluatedAt, includeDisabled),
             providerId: null, modelId: null, options, cancellationToken);
 
     /// <inheritdoc />
@@ -254,8 +286,8 @@ public sealed class EventStoreProviderCatalogOperations(
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(providerId);
         ArgumentException.ThrowIfNullOrWhiteSpace(modelId);
-        return ReadTenantAsync((platform, tenant) => TenantProviderCatalogViewFactory.CreateEntry(
-            platform, tenant, authorized: true, providerId, modelId, _clock.GetUtcNow()),
+        return ReadTenantAsync((platform, tenant, evaluatedAt) => TenantProviderCatalogViewFactory.CreateEntry(
+            platform, tenant, authorized: true, providerId, modelId, evaluatedAt),
             providerId, modelId, options, cancellationToken);
     }
 
@@ -267,7 +299,8 @@ public sealed class EventStoreProviderCatalogOperations(
     {
         ArgumentNullException.ThrowIfNull(command);
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-        if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!context.HasCurrentAuthority || !context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
         }
@@ -294,48 +327,52 @@ public sealed class EventStoreProviderCatalogOperations(
             return await WriteTenantAsync(command.ProviderId, command.ModelId, command.TenantId,
                 options, (request, ct) => _catalog.SetTenantEnablementAsync(
                     request, command with { CurrentTerms = null }, ct),
-                platformAuthority: true, cancellationToken).ConfigureAwait(false);
+                platformAuthority: true, cancellationToken, context).ConfigureAwait(false);
         }
 
-        ProviderCatalogReadModel? platform;
         try
         {
-            platform = await ReadPlatformModelAsync(cancellationToken).ConfigureAwait(false);
+            ProviderCatalogReadModel? platform = await ReadPlatformModelAsync(cancellationToken, context.Authority).ConfigureAwait(false);
+            ProviderCatalogEntryView? entry = platform?.Entries.FirstOrDefault(item =>
+                item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
+            if (entry is null)
+            {
+                string entryId = ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId);
+                bool absent = await ProviderCatalogReadFreshness.HasHeadAsync(_gateway,
+                    ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain, entryId,
+                    platform?.StreamSequences.GetValueOrDefault(entryId) ?? 0,
+                    cancellationToken, context.Authority).ConfigureAwait(false);
+                return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(
+                    absent ? AgentOperationErrorCode.NotFound : AgentOperationErrorCode.Unavailable);
+            }
+
+            if (!await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, platform,
+                command.ProviderId, command.ModelId, cancellationToken, context.Authority).ConfigureAwait(false))
+            {
+                return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable);
+            }
+
+            if (entry.Status != ProviderModelStatus.Enabled || entry.DataHandling is not { DataHandlingVersion: >= 1 })
+            {
+                return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Blocked);
+            }
+
+            context.Authority?.ThrowIfNotCurrent();
+            SetTenantProviderModelEnablement trusted = command with { CurrentTerms = entry.DataHandling };
+            return await WriteTenantAsync(command.ProviderId, command.ModelId, command.TenantId, options,
+                (request, ct) => _catalog.SetTenantEnablementAsync(request, trusted, ct),
+                platformAuthority: true, cancellationToken, context).ConfigureAwait(false);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable);
+            cancellationToken.ThrowIfCancellationRequested();
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(context.HasCurrentAuthority
+                ? AgentOperationErrorCode.Unavailable : AgentOperationErrorCode.NotAuthorized);
         }
-        ProviderCatalogEntryView? entry = platform?.Entries.FirstOrDefault(item =>
-            item.ProviderId == command.ProviderId && item.ModelId == command.ModelId);
-        if (entry is null)
-        {
-            // A rejected create advances the stream without a row, so compare with the projected sequence (FE1).
-            string entryId = ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId);
-            bool absent = await ProviderCatalogReadFreshness.HasHeadAsync(_gateway,
-                ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain, entryId,
-                platform?.StreamSequences.GetValueOrDefault(entryId) ?? 0,
-                cancellationToken).ConfigureAwait(false);
-            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(
-                absent ? AgentOperationErrorCode.NotFound : AgentOperationErrorCode.Unavailable);
-        }
-
-        if (!await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, platform,
-            command.ProviderId, command.ModelId, cancellationToken).ConfigureAwait(false))
-        {
-            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable);
-        }
-
-        if (entry.Status != ProviderModelStatus.Enabled || entry.DataHandling is not { DataHandlingVersion: >= 1 })
-        {
-            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Blocked);
-        }
-
-        SetTenantProviderModelEnablement trusted = command with { CurrentTerms = entry.DataHandling };
-        return await WriteTenantAsync(
-            command.ProviderId, command.ModelId, command.TenantId, options,
-            (request, ct) => _catalog.SetTenantEnablementAsync(request, trusted, ct),
-            platformAuthority: true, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -346,6 +383,7 @@ public sealed class EventStoreProviderCatalogOperations(
     {
         ArgumentNullException.ThrowIfNull(command);
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         if (!context.IsAuthorized)
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
@@ -371,12 +409,19 @@ public sealed class EventStoreProviderCatalogOperations(
             DecideProviderDataHandling retried = command with { DecidedAt = _clock.GetUtcNow() };
             return await WriteTenantAsync(command.ProviderId, command.ModelId, context.TenantId, options,
                 (request, ct) => _catalog.DecideDataHandlingAsync(request, retried, ct),
-                platformAuthority: false, cancellationToken).ConfigureAwait(false);
+                platformAuthority: false, cancellationToken, context).ConfigureAwait(false);
         }
 
-        TenantProviderCatalogInspectionResult visible = (await GetTenantEntryAsync(
-            command.ProviderId, command.ModelId, options, cancellationToken).ConfigureAwait(false)).Value
+        TenantProviderCatalogInspectionResult visible = (await ReadTenantAsync(
+            (platform, tenant, evaluatedAt) => TenantProviderCatalogViewFactory.CreateEntry(
+                platform, tenant, authorized: true, command.ProviderId, command.ModelId, evaluatedAt),
+            command.ProviderId, command.ModelId, options, cancellationToken, context).ConfigureAwait(false)).Value
             ?? new(ProviderCatalogInspectionStatus.Unavailable, []);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!context.IsAuthorized || visible.Status == ProviderCatalogInspectionStatus.NotAuthorized)
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
+        }
         if (visible.Status != ProviderCatalogInspectionStatus.Success || visible.Entries.Count != 1)
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(
@@ -395,7 +440,7 @@ public sealed class EventStoreProviderCatalogOperations(
         return await WriteTenantAsync(
             command.ProviderId, command.ModelId, context.TenantId, options,
             (request, ct) => _catalog.DecideDataHandlingAsync(request, trusted, ct),
-            platformAuthority: false, cancellationToken).ConfigureAwait(false);
+            platformAuthority: false, cancellationToken, context).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -444,7 +489,8 @@ public sealed class EventStoreProviderCatalogOperations(
     {
         ArgumentNullException.ThrowIfNull(command);
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-        if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!context.HasCurrentAuthority || !context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized);
         }
@@ -459,7 +505,7 @@ public sealed class EventStoreProviderCatalogOperations(
             command.ModelId,
             options,
             (request, ct) => _catalog.CreateAsync(request, Stamp(command), ct),
-            cancellationToken).ConfigureAwait(false);
+            cancellationToken, context).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -516,61 +562,60 @@ public sealed class EventStoreProviderCatalogOperations(
         int? expectedCapabilityVersion = null)
     {
         AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
         string? correlationId = options?.CorrelationId;
-        if (!context.IsPlatformOperator)
+        if (!context.HasCurrentAuthority || !context.IsPlatformOperator)
         {
             return AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(
-                ProviderCatalogInspectionResult.NotAuthorized(),
-                correlationId: correlationId);
+                ProviderCatalogInspectionResult.NotAuthorized(), correlationId: correlationId);
         }
 
-        ReadModelEntry<ProviderCatalogReadModel> entry;
         try
         {
-            entry = await _readModelStore
-                .GetAsync<ProviderCatalogReadModel>(
-                    _options.Value.StateStoreName,
-                    ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
-                    cancellationToken)
-                .ConfigureAwait(false);
+            ReadModelEntry<ProviderCatalogReadModel> entry = await _readModelStore.GetAsync<ProviderCatalogReadModel>(
+                _options.Value.StateStoreName, ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
+                cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
+            bool knownHeadsCurrent = await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, entry.Value,
+                providerId, modelId, cancellationToken, context.Authority).ConfigureAwait(false);
+            ProviderCatalogInspectionResult result = create(entry.Value, ProviderCatalogIdentity.PlatformTenantId);
+            if (!knownHeadsCurrent || providerId is null)
+            {
+                // A list cannot claim a complete inventory from checks of its projected stream names alone.
+                result = result with
+                {
+                    Status = ProviderCatalogInspectionStatus.Success,
+                    Entries = knownHeadsCurrent && providerId is null ? result.Entries : [],
+                    Freshness = AgentSetupFreshness.Stale,
+                    TruthState = AgentSetupTruthState.AuthoritativePending,
+                    ProjectedCommandMessageIds = null,
+                };
+            }
+            else if (result.Status == ProviderCatalogInspectionStatus.EntryNotFound && expectedCapabilityVersion is null)
+            {
+                result = result with
+                {
+                    Freshness = AgentSetupFreshness.Current,
+                    TruthState = AgentSetupTruthState.ProjectionConfirmed,
+                    ProjectedCommandMessageIds = null,
+                };
+            }
+            context.Authority?.ThrowIfNotCurrent();
+            return AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(result, correlationId: correlationId);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(
+                ProviderCatalogInspectionResult.NotAuthorized(), correlationId: correlationId);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            return AgentOperationResult<ProviderCatalogInspectionResult>.Failed(
-                AgentCommandDispatchFailure.Map(exception),
-                correlationId);
+            cancellationToken.ThrowIfCancellationRequested();
+            return context.HasCurrentAuthority
+                ? AgentOperationResult<ProviderCatalogInspectionResult>.Failed(AgentCommandDispatchFailure.Map(exception), correlationId)
+                : AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(ProviderCatalogInspectionResult.NotAuthorized(), correlationId: correlationId);
         }
-
-        ProviderCatalogInspectionResult result = create(entry.Value, ProviderCatalogIdentity.PlatformTenantId);
-        bool knownHeadsCurrent = await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, entry.Value,
-            providerId, modelId, cancellationToken).ConfigureAwait(false);
-        if (!knownHeadsCurrent || providerId is null)
-        {
-            result = result with
-            {
-                Status = ProviderCatalogInspectionStatus.Success,
-                // A list has no authoritative global stream inventory. Safe projected rows may be shown,
-                // but the list cannot claim completeness or current truth from named stream checks alone.
-                Entries = knownHeadsCurrent && providerId is null ? result.Entries : [],
-                Freshness = AgentSetupFreshness.Stale,
-                TruthState = AgentSetupTruthState.AuthoritativePending,
-                ProjectedCommandMessageIds = null,
-            };
-        }
-        else if (result.Status == ProviderCatalogInspectionStatus.EntryNotFound
-            && expectedCapabilityVersion is null)
-        {
-            result = result with
-            {
-                Freshness = AgentSetupFreshness.Current,
-                TruthState = AgentSetupTruthState.ProjectionConfirmed,
-                ProjectedCommandMessageIds = null,
-            };
-        }
-
-        return AgentOperationResult<ProviderCatalogInspectionResult>.Succeeded(
-            result,
-            correlationId: correlationId);
     }
 
     private async ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>> WriteAsync(
@@ -578,10 +623,12 @@ public sealed class EventStoreProviderCatalogOperations(
         string modelId,
         AgentOperationOptions? options,
         Func<ProviderCatalogAdministrationRequest, CancellationToken, Task<AgentAdministrationOutcome>> dispatch,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        AgentAdministrationContext? originatingContext = null)
     {
-        AgentAdministrationContext context = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-        if (!context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
+        AgentAdministrationContext context = originatingContext ?? await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!context.HasCurrentAuthority || !context.IsPlatformOperator || string.IsNullOrWhiteSpace(context.ActorUserId))
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(
                 AgentOperationErrorCode.NotAuthorized,
@@ -610,7 +657,7 @@ public sealed class EventStoreProviderCatalogOperations(
                         context.TenantId,
                         context.ActorUserId,
                         IsProviderAdmin: true,
-                        IsPlatformOperator: true),
+                        IsPlatformOperator: true) { Authority = context.Authority },
                     cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -622,7 +669,7 @@ public sealed class EventStoreProviderCatalogOperations(
         }
 
         return await ResolveWriteAsync(outcome, ProviderCatalogIdentity.PlatformTenantId,
-            providerId, modelId, messageId, correlationId, cancellationToken).ConfigureAwait(false);
+            providerId, modelId, messageId, correlationId, cancellationToken, context).ConfigureAwait(false);
     }
 
     private CreateProviderModelEntry Stamp(CreateProviderModelEntry command)
@@ -636,13 +683,15 @@ public sealed class EventStoreProviderCatalogOperations(
             : command with { DataHandling = command.DataHandling with { EffectiveAt = _clock.GetUtcNow() } };
 
     private async ValueTask<AgentOperationResult<TenantProviderCatalogInspectionResult>> ReadTenantAsync(
-        Func<ProviderCatalogReadModel?, TenantProviderEnablementReadModel?, TenantProviderCatalogInspectionResult> create,
+        Func<ProviderCatalogReadModel?, TenantProviderEnablementReadModel?, DateTimeOffset, TenantProviderCatalogInspectionResult> create,
         string? providerId,
         string? modelId,
         AgentOperationOptions? options,
-        CancellationToken ct)
+        CancellationToken ct,
+        AgentAdministrationContext? originatingContext = null)
     {
-        AgentAdministrationContext context = await _contextProvider.GetContextAsync(false, ct).ConfigureAwait(false);
+        AgentAdministrationContext context = originatingContext ?? await _contextProvider.GetContextAsync(false, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         if (!context.IsAuthorized || string.Equals(context.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
         {
             return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
@@ -654,9 +703,13 @@ public sealed class EventStoreProviderCatalogOperations(
             ReadModelEntry<ProviderCatalogReadModel> platform = await _readModelStore.GetAsync<ProviderCatalogReadModel>(
                 _options.Value.StateStoreName,
                 ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId), ct).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
             ReadModelEntry<TenantProviderEnablementReadModel> tenant = await _readModelStore.GetAsync<TenantProviderEnablementReadModel>(
                 _options.Value.StateStoreName,
                 TenantProviderEnablementReadModelAddresses.Detail(context.TenantId), ct).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
             if (tenant.Value?.IsScopedTo(context.TenantId) == false)
             {
                 return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
@@ -665,9 +718,11 @@ public sealed class EventStoreProviderCatalogOperations(
 
             if (!await ProviderCatalogReadFreshness.IsTenantCurrentAsync(_gateway,
                 context.TenantId, platform.Value, tenant.Value,
-                providerId, modelId, ct).ConfigureAwait(false))
+                providerId, modelId, ct, context.Authority).ConfigureAwait(false))
             {
-                TenantProviderCatalogInspectionResult pending = create(platform.Value, tenant.Value) with
+                DateTimeOffset evaluatedAt = _clock.GetUtcNow();
+                context.Authority?.ThrowIfNotCurrent(evaluatedAt);
+                TenantProviderCatalogInspectionResult pending = create(platform.Value, tenant.Value, evaluatedAt) with
                 {
                     Status = ProviderCatalogInspectionStatus.Success,
                     Entries = [],
@@ -675,26 +730,42 @@ public sealed class EventStoreProviderCatalogOperations(
                     TruthState = AgentSetupTruthState.AuthoritativePending,
                     ProjectedCommandMessageIds = null,
                 };
+                context.Authority?.ThrowIfNotCurrent();
                 return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
                     pending, correlationId: options?.CorrelationId);
             }
             // Freshness confirmed that a missing tenant read model has no enablement stream.
+            DateTimeOffset completedAt = _clock.GetUtcNow();
+            context.Authority?.ThrowIfNotCurrent(completedAt);
+            TenantProviderCatalogInspectionResult result = create(platform.Value, tenant.Value ?? new TenantProviderEnablementReadModel(), completedAt);
+            context.Authority?.ThrowIfNotCurrent();
+            return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(result, correlationId: options?.CorrelationId);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
             return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
-                create(platform.Value, tenant.Value ?? new TenantProviderEnablementReadModel()),
-                correlationId: options?.CorrelationId);
+                new(ProviderCatalogInspectionStatus.NotAuthorized, []), correlationId: options?.CorrelationId);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            ct.ThrowIfCancellationRequested();
+            if (!context.HasCurrentAuthority)
+            {
+                return AgentOperationResult<TenantProviderCatalogInspectionResult>.Succeeded(
+                    new(ProviderCatalogInspectionStatus.NotAuthorized, []), correlationId: options?.CorrelationId);
+            }
             return AgentOperationResult<TenantProviderCatalogInspectionResult>.Failed(
                 AgentCommandDispatchFailure.Map(exception), options?.CorrelationId);
         }
     }
 
-    private async Task<ProviderCatalogReadModel?> ReadPlatformModelAsync(CancellationToken ct)
+    private async Task<ProviderCatalogReadModel?> ReadPlatformModelAsync(CancellationToken ct, AgentAuthorityValidity? authority = null)
     {
         ReadModelEntry<ProviderCatalogReadModel> entry = await _readModelStore.GetAsync<ProviderCatalogReadModel>(
             _options.Value.StateStoreName,
             ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId), ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
+        authority?.ThrowIfNotCurrent();
         return entry.Value;
     }
 
@@ -705,10 +776,12 @@ public sealed class EventStoreProviderCatalogOperations(
         AgentOperationOptions? options,
         Func<ProviderCatalogAdministrationRequest, CancellationToken, Task<AgentAdministrationOutcome>> dispatch,
         bool platformAuthority,
-        CancellationToken ct)
+        CancellationToken ct,
+        AgentAdministrationContext context)
     {
-        AgentAdministrationContext context = await _contextProvider.GetContextAsync(platformAuthority, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(context.ActorUserId)
+            || !context.HasCurrentAuthority
             || (platformAuthority ? !context.IsPlatformOperator : !context.IsAuthorized || targetTenantId != context.TenantId)
             || string.IsNullOrWhiteSpace(targetTenantId)
             || string.Equals(targetTenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal))
@@ -733,9 +806,9 @@ public sealed class EventStoreProviderCatalogOperations(
             AgentAdministrationOutcome outcome = await dispatch(new ProviderCatalogAdministrationRequest(
                 messageId, correlationId, targetTenantId, context.ActorUserId,
                 IsProviderAdmin: context.IsAgentsAdmin,
-                IsPlatformOperator: context.IsPlatformOperator), ct).ConfigureAwait(false);
+                IsPlatformOperator: context.IsPlatformOperator) { Authority = context.Authority }, ct).ConfigureAwait(false);
             return await ResolveWriteAsync(outcome, targetTenantId, providerId, modelId,
-                messageId, correlationId, ct).ConfigureAwait(false);
+                messageId, correlationId, ct, context).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
@@ -750,8 +823,10 @@ public sealed class EventStoreProviderCatalogOperations(
         string modelId,
         string messageId,
         string correlationId,
-        CancellationToken ct)
+        CancellationToken ct,
+        AgentAdministrationContext context)
     {
+        ct.ThrowIfCancellationRequested();
         if (!outcome.Authorized)
         {
             return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.NotAuthorized, correlationId);
@@ -778,7 +853,7 @@ public sealed class EventStoreProviderCatalogOperations(
         else
         {
             AgentOperationResult<AgentSetupWriteOutcome> observed = await GetCommandOutcomeCoreAsync(
-                targetTenantId, messageId, hasSubmissionReceipt: true, ct, new AgentOperationOptions(correlationId)).ConfigureAwait(false);
+                targetTenantId, messageId, hasSubmissionReceipt: true, ct, new AgentOperationOptions(correlationId), context).ConfigureAwait(false);
             status = observed.IsSuccess && observed.Value is { } value
                 ? value == AgentSetupWriteOutcome.UnableToVerify ? AgentSetupWriteStatus.Submitted : (AgentSetupWriteStatus)((int)value - 1)
                 : AgentSetupWriteStatus.UnableToVerify;

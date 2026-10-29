@@ -78,7 +78,7 @@ public sealed class AgentActivationProviderRevalidation
         ct.ThrowIfCancellationRequested();
 
         // Authorize — fail closed before any read or dispatch (AD-12).
-        if (!request.IsAgentsAdmin)
+        if (!request.IsAgentsAdmin || request.Authority?.IsCurrent == false)
         {
             return AgentActivationRevalidationOutcome.Denied();
         }
@@ -99,6 +99,11 @@ public sealed class AgentActivationProviderRevalidation
                 .GetEntryAsync(request.TenantId, request.SelectedProviderId, request.SelectedModelId, ct)
                 .ConfigureAwait(false);
             ct.ThrowIfCancellationRequested();
+            if (request.Authority?.IsCurrent == false)
+            {
+                return AgentActivationRevalidationOutcome.Denied();
+            }
+
             providerVerdict = ProviderSelectionVerdict.Evaluate(read);
         }
 
@@ -113,6 +118,11 @@ public sealed class AgentActivationProviderRevalidation
                 .ResolveAsync(request.TenantId, policy, ct)
                 .ConfigureAwait(false);
             ct.ThrowIfCancellationRequested();
+            if (request.Authority?.IsCurrent == false)
+            {
+                return AgentActivationRevalidationOutcome.Denied();
+            }
+
             approverVerdict = ApproverPolicyVerdict.Evaluate(policy, resolution);
         }
 
@@ -132,7 +142,7 @@ public sealed class AgentActivationProviderRevalidation
         ArgumentNullException.ThrowIfNull(request);
         ct.ThrowIfCancellationRequested();
 
-        if (!request.IsAgentsAdmin)
+        if (!request.IsAgentsAdmin || request.Authority?.IsCurrent == false)
         {
             return Task.FromResult(AgentActivationRevalidationOutcome.Denied());
         }
@@ -158,6 +168,11 @@ public sealed class AgentActivationProviderRevalidation
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
+        if (request.Authority?.IsCurrent == false)
+        {
+            return AgentActivationRevalidationOutcome.Denied();
+        }
+
         var command = new ActivateAgent();
         var envelope = new AgentCommandIntent(
             request.MessageId,
@@ -173,7 +188,7 @@ public sealed class AgentActivationProviderRevalidation
                 request.ClientSuppliedExtensions,
                 providerVerdict,
                 approverVerdict,
-                request.ExpectedConfigurationVersion));
+                request.ExpectedConfigurationVersion)) { Authority = request.Authority };
 
         SubmitCommandResponse receipt = await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();

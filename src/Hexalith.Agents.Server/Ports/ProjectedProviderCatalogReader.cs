@@ -70,67 +70,79 @@ public sealed class ProjectedProviderCatalogReader(
                     ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
                     ct)
                 .ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
             tenant = await _readModelStore.GetAsync<TenantProviderEnablementReadModel>(
                 _options.Value.StateStoreName,
                 TenantProviderEnablementReadModelAddresses.Detail(tenantId), ct).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            context.Authority?.ThrowIfNotCurrent();
+
+            ProviderCatalogEntryView? platformEntry = entry.Value?.Entries.FirstOrDefault(item =>
+                item.ProviderId == providerId && item.ModelId == modelId);
+
+            // A tenant never enabled for any model has no enablement stream or read model; a missing stream at
+            // sequence zero is current empty truth, while an existing unprojected stream stays unavailable.
+            TenantProviderEnablementReadModel projectedTenant = tenant.Value ?? new TenantProviderEnablementReadModel();
+            if (!projectedTenant.IsScopedTo(tenantId))
+            {
+                // A misrouted model can never supply another tenant's enablement to a trusted verdict.
+                return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+            }
+
+            if (!await ProviderCatalogReadFreshness.HasHeadAsync(_gateway, tenantId, TenantProviderEnablementAggregate.Domain,
+                tenantId, projectedTenant.LastSequenceNumber, ct, context.Authority).ConfigureAwait(false))
+            {
+                return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+            }
+
+            // Do not probe a named platform stream for a key this tenant cannot see. Hidden and absent
+            // keys share the same result once the tenant projection is known to be current.
+            string key = ProviderCatalogState.EntryKey(providerId, modelId);
+            if (!projectedTenant.State.Entries.TryGetValue(key, out TenantProviderEntryState? enabled)
+                || !enabled.Enabled)
+            {
+                return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
+            }
+
+            // A platform stream at its projected sequence (missing, or holding only a rejected create) has no entry;
+            // a committed but unprojected create stays unavailable rather than absent.
+            string entryId = ProviderCatalogIdentity.EntryId(providerId, modelId);
+            if (!await ProviderCatalogReadFreshness.HasHeadAsync(_gateway, ProviderCatalogIdentity.PlatformTenantId,
+                ProviderCatalogAggregate.Domain, entryId, entry.Value?.StreamSequences.GetValueOrDefault(entryId) ?? 0, ct, context.Authority)
+                .ConfigureAwait(false))
+            {
+                return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+            }
+
+            if (platformEntry is null)
+            {
+                return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
+            }
+
+            // The authoritative reads can straddle the exclusive grace deadline. Evaluate eligibility only
+            // after both checkpoints have returned so a just-expired grace period cannot remain selectable.
+            DateTimeOffset evaluatedAt = _clock.GetUtcNow();
+            context.Authority?.ThrowIfNotCurrent(evaluatedAt);
+            TenantProviderCatalogInspectionResult visible = TenantProviderCatalogViewFactory.CreateEntry(
+                entry.Value, projectedTenant, authorized: true, providerId, modelId, evaluatedAt);
+            context.Authority?.ThrowIfNotCurrent();
+            return visible.Status == ProviderCatalogInspectionStatus.Success && visible.Entries.Count == 1
+                ? new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, platformEntry with
+                {
+                    IsSelectableForNewActiveUse = visible.Entries[0].IsSelectableForNewActiveUse,
+                })
+                : new ProviderCatalogEntryReadResult(visible.Status, null);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.NotAuthorized, null);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            // A degraded store read is not a denial: the verdict maps a successful-shape empty entry to Unavailable.
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
+            ct.ThrowIfCancellationRequested();
+            return new ProviderCatalogEntryReadResult(context.HasCurrentAuthority
+                ? ProviderCatalogInspectionStatus.Unavailable : ProviderCatalogInspectionStatus.NotAuthorized, null);
         }
-
-        ProviderCatalogEntryView? platformEntry = entry.Value?.Entries.FirstOrDefault(item =>
-            item.ProviderId == providerId && item.ModelId == modelId);
-
-        // A tenant never enabled for any model has no enablement stream or read model; a missing stream at
-        // sequence zero is current empty truth, while an existing unprojected stream stays unavailable.
-        TenantProviderEnablementReadModel projectedTenant = tenant.Value ?? new TenantProviderEnablementReadModel();
-        if (!projectedTenant.IsScopedTo(tenantId))
-        {
-            // A misrouted model can never supply another tenant's enablement to a trusted verdict.
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
-        }
-
-        if (!await ProviderCatalogReadFreshness.HasHeadAsync(_gateway, tenantId, TenantProviderEnablementAggregate.Domain,
-            tenantId, projectedTenant.LastSequenceNumber, ct).ConfigureAwait(false))
-        {
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
-        }
-
-        // Do not probe a named platform stream for a key this tenant cannot see. Hidden and absent
-        // keys share the same result once the tenant projection is known to be current.
-        string key = ProviderCatalogState.EntryKey(providerId, modelId);
-        if (!projectedTenant.State.Entries.TryGetValue(key, out TenantProviderEntryState? enabled)
-            || !enabled.Enabled)
-        {
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
-        }
-
-        // A platform stream at its projected sequence (missing, or holding only a rejected create) has no entry;
-        // a committed but unprojected create stays unavailable rather than absent.
-        string entryId = ProviderCatalogIdentity.EntryId(providerId, modelId);
-        if (!await ProviderCatalogReadFreshness.HasHeadAsync(_gateway, ProviderCatalogIdentity.PlatformTenantId,
-            ProviderCatalogAggregate.Domain, entryId, entry.Value?.StreamSequences.GetValueOrDefault(entryId) ?? 0, ct)
-            .ConfigureAwait(false))
-        {
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Unavailable, null);
-        }
-
-        if (platformEntry is null)
-        {
-            return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.EntryNotFound, null);
-        }
-
-        // The authoritative reads can straddle the exclusive grace deadline. Evaluate eligibility only
-        // after both checkpoints have returned so a just-expired grace period cannot remain selectable.
-        TenantProviderCatalogInspectionResult visible = TenantProviderCatalogViewFactory.CreateEntry(
-            entry.Value, projectedTenant, authorized: true, providerId, modelId, _clock.GetUtcNow());
-        return visible.Status == ProviderCatalogInspectionStatus.Success && visible.Entries.Count == 1
-            ? new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, platformEntry with
-            {
-                IsSelectableForNewActiveUse = visible.Entries[0].IsSelectableForNewActiveUse,
-            })
-            : new ProviderCatalogEntryReadResult(visible.Status, null);
     }
 }

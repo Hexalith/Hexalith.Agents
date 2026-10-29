@@ -22,7 +22,6 @@ public sealed class EventStoreAgentCommandStatusReaderTests
     private readonly IEventStoreGatewayWorkloadAssertionSource _source = Substitute.For<IEventStoreGatewayWorkloadAssertionSource>();
     private readonly CommandStatusResponseHandler _handler = new();
 
-#if HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS
     public EventStoreAgentCommandStatusReaderTests()
     {
         _source.IssueAsync(EventStoreGatewayWorkloadOperations.CommandStatus, Tenant, Domain, Arg.Any<CancellationToken>())
@@ -108,21 +107,6 @@ public sealed class EventStoreAgentCommandStatusReaderTests
         }
     }
 
-#else
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task PublishedSdkWithoutDomainDelegationRefusesStatusBeforeTransport(bool sourceAvailable)
-    {
-        _source.IssueAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<string?>("legacy-credential-cannot-bind-the-requested-domain"));
-        _handler.Status = Rejected();
-        (await Reader(sourceAvailable).WasRejectedAsync(Tenant, Domain, Message, Correlation,
-            TestContext.Current.CancellationToken)).ShouldBeNull();
-        _handler.Requests.ShouldBe(0);
-        _source.ReceivedCalls().ShouldBeEmpty();
-    }
-#endif
 
     [Fact]
     public async Task LegacyMessageOnlyResultsCannotBecomeScopedEvidence()

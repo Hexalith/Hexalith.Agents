@@ -10,7 +10,7 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <param name="CorrelationId">The correlation id for tracing, supplied by the API layer.</param>
 /// <param name="TenantId">The catalog's tenant scope (also the catalog aggregate id).</param>
 /// <param name="ActorUserId">The authenticated actor.</param>
-/// <param name="IsProviderAdmin">The trusted catalog-admin decision from claims (fails closed when false).</param>
+/// <param name="IsProviderAdmin">The trusted catalog-admin decision from current evidence (fails closed when false).</param>
 /// <param name="ClientSuppliedExtensions">Any client-supplied envelope extensions to sanitize (reserved keys are stripped).</param>
 public sealed record ProviderCatalogAdministrationRequest(
     string MessageId,
@@ -19,4 +19,9 @@ public sealed record ProviderCatalogAdministrationRequest(
     string ActorUserId,
     bool IsProviderAdmin,
     IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null,
-    bool IsPlatformOperator = false);
+    bool IsPlatformOperator = false)
+{
+    /// <summary>Gets the transient current-authority lifetime supplied by the authenticated operations boundary.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Hexalith.Agents.Server.Ports.AgentAuthorityValidity? Authority { get; init; }
+}

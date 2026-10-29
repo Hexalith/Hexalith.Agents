@@ -60,7 +60,6 @@ public abstract class ProviderCatalogQueryHandlerBase(
     {
         ArgumentNullException.ThrowIfNull(query);
         cancellationToken.ThrowIfCancellationRequested();
-
         if (string.IsNullOrWhiteSpace(query.UserId)
             || string.IsNullOrWhiteSpace(query.TenantId)
             || string.IsNullOrWhiteSpace(query.AggregateId))
@@ -69,82 +68,91 @@ public abstract class ProviderCatalogQueryHandlerBase(
         }
 
         bool platformQuery = string.Equals(query.TenantId, ProviderCatalogIdentity.PlatformTenantId, StringComparison.Ordinal);
-        if (!await IsProviderAdminAsync(query, platformQuery, cancellationToken).ConfigureAwait(false))
+        (bool authorized, AgentAuthorityValidity? authority) = await ReadAuthorityAsync(query, platformQuery, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!authorized || authority?.IsCurrent == false)
         {
             return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.NotAuthorized()));
         }
 
-        ReadModelEntry<ProviderCatalogReadModel> entry;
-        TenantProviderEnablementReadModel? tenant = null;
         try
         {
-            entry = await _readModelStore
-                .GetAsync<ProviderCatalogReadModel>(
-                    _options.Value.StateStoreName,
-                    ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId),
-                    cancellationToken)
+            ReadModelEntry<ProviderCatalogReadModel> entry = await _readModelStore
+                .GetAsync<ProviderCatalogReadModel>(_options.Value.StateStoreName,
+                    ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId), cancellationToken)
                 .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            authority?.ThrowIfNotCurrent();
+            TenantProviderEnablementReadModel? tenant = null;
             if (!platformQuery)
             {
                 tenant = (await _readModelStore.GetAsync<TenantProviderEnablementReadModel>(
-                    _options.Value.StateStoreName,
-                    TenantProviderEnablementReadModelAddresses.Detail(query.TenantId),
+                    _options.Value.StateStoreName, TenantProviderEnablementReadModelAddresses.Detail(query.TenantId),
                     cancellationToken).ConfigureAwait(false)).Value;
+                cancellationToken.ThrowIfCancellationRequested();
+                authority?.ThrowIfNotCurrent();
             }
+
+            if (tenant?.IsScopedTo(query.TenantId) == false)
+            {
+                return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
+            }
+
+            (string? providerId, string? modelId) = GetRequestedEntry(query);
+            bool current = platformQuery
+                ? await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, entry.Value,
+                    providerId, modelId, cancellationToken, authority).ConfigureAwait(false)
+                : await ProviderCatalogReadFreshness.IsTenantCurrentAsync(_gateway, query.TenantId,
+                    entry.Value, tenant, providerId, modelId, cancellationToken, authority).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            authority?.ThrowIfNotCurrent();
+            ProviderCatalogReadModel? platform = entry.Value;
+            if (current && !platformQuery)
+            {
+                // A current missing model has no stream or enabled key requiring a platform row.
+                tenant ??= new TenantProviderEnablementReadModel();
+                platform ??= new ProviderCatalogReadModel();
+            }
+
+            // Freshness reads may cross the exclusive grace deadline; eligibility uses completion time.
+            DateTimeOffset evaluatedAt = _clock.GetUtcNow();
+            authority?.ThrowIfNotCurrent(evaluatedAt);
+            object result = platformQuery
+                ? CreateResult(entry.Value, query)
+                : CreateTenantResult(platform, tenant, query, evaluatedAt);
+            if (!current || platformQuery && providerId is null)
+            {
+                result = platformQuery
+                    ? ((ProviderCatalogInspectionResult)result) with
+                    {
+                        Status = ProviderCatalogInspectionStatus.Success,
+                        Entries = current && providerId is null ? ((ProviderCatalogInspectionResult)result).Entries : [],
+                        Freshness = AgentSetupFreshness.Stale,
+                        TruthState = AgentSetupTruthState.AuthoritativePending,
+                        ProjectedCommandMessageIds = null,
+                    }
+                    : ((TenantProviderCatalogInspectionResult)result) with
+                    {
+                        Status = ProviderCatalogInspectionStatus.Success,
+                        Entries = [],
+                        Freshness = AgentSetupFreshness.Stale,
+                        TruthState = AgentSetupTruthState.AuthoritativePending,
+                        ProjectedCommandMessageIds = null,
+                    };
+            }
+            authority?.ThrowIfNotCurrent();
+            return QueryResult.FromPayload(JsonSerializer.SerializeToElement(result, result.GetType(), _jsonOptions));
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.NotAuthorized()));
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
+            cancellationToken.ThrowIfCancellationRequested();
+            return QueryResult.FromPayload(ToElement(authority?.IsCurrent == false
+                ? ProviderCatalogInspectionResult.NotAuthorized() : ProviderCatalogInspectionResult.Unavailable()));
         }
-
-        if (tenant?.IsScopedTo(query.TenantId) == false)
-        {
-            // The requested key never establishes the returned model's tenant; a misrouted model renders nothing.
-            return QueryResult.FromPayload(ToElement(ProviderCatalogInspectionResult.Unavailable()));
-        }
-
-        (string? providerId, string? modelId) = GetRequestedEntry(query);
-        bool current = platformQuery
-            ? await ProviderCatalogReadFreshness.IsPlatformCurrentAsync(_gateway, entry.Value,
-                providerId, modelId, cancellationToken).ConfigureAwait(false)
-            : await ProviderCatalogReadFreshness.IsTenantCurrentAsync(_gateway, query.TenantId,
-                entry.Value, tenant, providerId, modelId, cancellationToken).ConfigureAwait(false);
-        ProviderCatalogReadModel? platform = entry.Value;
-        if (current && !platformQuery)
-        {
-            // Freshness confirmed that a missing tenant read model has no enablement stream, and that no
-            // enabled key needs a platform row, so a missing platform read model is an empty catalog.
-            tenant ??= new TenantProviderEnablementReadModel();
-            platform ??= new ProviderCatalogReadModel();
-        }
-
-        // Freshness reads may cross the exclusive grace deadline. Build eligibility from server time
-        // after those reads, including when the result must be returned as pending.
-        object result = platformQuery
-            ? CreateResult(entry.Value, query)
-            : CreateTenantResult(platform, tenant, query, _clock.GetUtcNow());
-        if (!current || platformQuery && providerId is null)
-        {
-            result = platformQuery
-                ? ((ProviderCatalogInspectionResult)result) with
-                {
-                    Status = ProviderCatalogInspectionStatus.Success,
-                    Entries = current && providerId is null
-                        ? ((ProviderCatalogInspectionResult)result).Entries : [],
-                    Freshness = AgentSetupFreshness.Stale,
-                    TruthState = AgentSetupTruthState.AuthoritativePending,
-                    ProjectedCommandMessageIds = null,
-                }
-                : ((TenantProviderCatalogInspectionResult)result) with
-                {
-                    Status = ProviderCatalogInspectionStatus.Success,
-                    Entries = [],
-                    Freshness = AgentSetupFreshness.Stale,
-                    TruthState = AgentSetupTruthState.AuthoritativePending,
-                    ProjectedCommandMessageIds = null,
-                };
-        }
-        return QueryResult.FromPayload(JsonSerializer.SerializeToElement(result, result.GetType(), _jsonOptions));
     }
 
     /// <summary>Builds the authorized inspection result from the persisted read model.</summary>
@@ -193,7 +201,7 @@ public abstract class ProviderCatalogQueryHandlerBase(
         }
     }
 
-    private async Task<bool> IsProviderAdminAsync(QueryEnvelope query, bool platformQuery, CancellationToken cancellationToken)
+    private async Task<(bool Authorized, AgentAuthorityValidity? Authority)> ReadAuthorityAsync(QueryEnvelope query, bool platformQuery, CancellationToken cancellationToken)
     {
         if (platformQuery)
         {
@@ -202,15 +210,17 @@ public abstract class ProviderCatalogQueryHandlerBase(
             // token subject; the elevated context carries the Parties stable actor id, which may differ from it.
             string subject = _contextProvider.GetContext().ActorUserId;
             AgentAdministrationContext actor = await _contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-            return query.IsGlobalAdmin && actor.IsPlatformOperator
+            cancellationToken.ThrowIfCancellationRequested();
+            return (query.IsGlobalAdmin && actor.IsPlatformOperator && actor.HasCurrentAuthority
                 && !string.IsNullOrWhiteSpace(actor.ActorUserId)
                 && !string.IsNullOrWhiteSpace(subject)
-                && string.Equals(subject, query.UserId, StringComparison.Ordinal);
+                && string.Equals(subject, query.UserId, StringComparison.Ordinal), actor.Authority);
         }
 
         TenantAccessReadResult access = await _tenantAccessReader
             .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
             .ConfigureAwait(false);
-        return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true };
+        cancellationToken.ThrowIfCancellationRequested();
+        return (access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }, access.Authority);
     }
 }

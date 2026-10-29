@@ -17,6 +17,7 @@ reason: The write/read HTTP path uses HttpAgentAdministrationContextProvider whi
 status: done 2026-10-24
 resolution: `spec-five-deferred-owner-and-setup-verification-items.md` — Current composition installs ProjectedTenantAccessReader; the SDK dispatcher and both setup queries require verified subject/tenant binding, current actor/administrator authority and fresh tenant access before read-model disclosure. The maintained Story 5.2 gate now requires verified-caller and authority-ordering regressions; the full local source gate passes. These are admission-time checks; authority is not revalidated after store/enrichment awaits. Unavailable host authority defaults and live owner qualification remain binding.
 evidence_record: [Owner/setup verification](deferred-owner-setup-verification-2026-10-24.md#setup-query-authorization)
+follow_up: 2026-10-28 Story 5.4 now retains the earliest actor/role deadline and checked clock after setup store/enrichment awaits and through final command admission. Expiry or rollback withholds protected output and blocks later effects. This closes the local lifetime limitation in the original resolution; unavailable production authority and live owner qualification remain required. [Authority lifetime evidence](tests/story-5-4-authority-lifetime-2026-10-28/verification.json) and [final full verification](tests/story-5-4-authority-lifetime-2026-10-28/provider-lifetime/verification.json).
 
 ### DW-3: Optional post-write projection polling so AuthoritativePending can advance to ProjectionConfirmed without a manual reload.
 
@@ -163,7 +164,8 @@ origin: code review, 2026-09-14
 location: src/Hexalith.Agents.Server/Composition/AgentSetupServiceCollectionExtensions.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: The seam and rejection mapping are implemented, but package-mode builds cannot bind the live EventStore reader until the package containing GetCommandStatusAsync ships. The host-overridable deferred registration preserves fail-closed behavior meanwhile.
-status: open
+status: done 2026-10-25
+reconciliation: 2026-10-29 — Original status reconciled with the terminal closure addendum below; fresh published-SDK verification extends the existing local source proof. No new production qualification is claimed. [Published setup verification](deferred-published-setup-verification-2026-10-29.md)
 
 ### DW-8: Prevent persistent MSBuild nodes from holding the readiness runner's captured output pipe.
 
@@ -205,7 +207,8 @@ origin: code review round 2, 2026-09-14
 location: src/Hexalith.Agents.UI/Services/Gateways/AgentsClientSetupGateway.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: Until the live reader is bound Rejected is unreachable; binding must add a terminal mapping and localized wording so retry does not replay a known rejection forever.
-status: open
+status: done 2026-10-25
+reconciliation: 2026-10-29 — Original status reconciled with the terminal closure addendum below; fresh published-SDK verification extends the existing local source proof. No new production qualification is claimed. [Published setup verification](deferred-published-setup-verification-2026-10-29.md)
 
 ### DW-13: Extend Unknown-zero fallback to the remaining AgentInteraction and ProviderCatalog wire enums.
 
@@ -329,7 +332,8 @@ origin: code review, 2026-09-19
 location: references/Hexalith.EventStore/src/Hexalith.EventStore/Controllers/CommandStatusController.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: `GetStatus` returns 403 for any principal without an `eventstore:tenant` claim and has no global-admin bypass, while `DaprInternalAuthenticationHandler` issues only `sub`, `NameIdentifier`, `global_admin` and `dapr_caller_app_id`. The submit path works for that identity only because `ClaimsTenantValidator` short-circuits for global admins. Binding the live `IAgentCommandStatusReader` through `AddEventStoreDaprServiceInvocation` would therefore yield 403 → `EventStoreGatewayException` → `UnableToVerify`, never the `Rejected` the round-1 resolution specifies. This is the concrete mechanism behind the round-4 item deferred as only possibly unreachable, and it blocks DW-12 and DW-19.
-status: open
+status: done 2026-10-25
+reconciliation: 2026-10-29 — Original status reconciled with the terminal closure addendum below; fresh published-SDK verification extends the existing local source proof. No new production qualification is claimed. [Published setup verification](deferred-published-setup-verification-2026-10-29.md)
 
 ### DW-25 (carried): `Rejected`/`Blocked` map to retryable `Unavailable` in the UI.
 
@@ -337,7 +341,8 @@ origin: code review, 2026-09-19 (carried — owned by DW-12)
 location: src/Hexalith.Agents.UI/Services/Gateways/AgentsClientSetupGateway.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: Re-confirmed this round that the `_ => AgentSetupWriteStatus.Unavailable` fall-through is unchanged and `IsTerminalWriteFailure` excludes `Unavailable`, so a rejected write renders as a transient outage with a Retry that replays the same rejected key. Unreachable in every composition that exists because only `DeferredAgentCommandStatusReader` is registered. Recorded as a pointer only — DW-12 owns both the live binding and this terminal mapping, and the two must land together.
-status: open
+status: done 2026-10-25
+reconciliation: 2026-10-29 — Historical alias reconciled with the DW-12 closure addendum; not counted as a separate item.
 
 ### DW-26 (carried): `Unavailable` conflates "write path not bound" with "unreachable mid-flight".
 
@@ -345,7 +350,8 @@ origin: code review, 2026-09-19 (carried — round 2 rejected the same root caus
 location: src/Hexalith.Agents.UI/Services/Gateways/DeferredAgentSetupGateway.cs
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
 reason: `DeferredAgentSetupGateway` returns `Unavailable` unconditionally because the write path is not bound, but `ExecuteAttemptAsync` treats `Unavailable` as non-terminal, so a single click retains the attempt and disables every mutable control until Abandon is pressed. A distinct `NotBound` status adds public surface for no user-visible gain while the deferred gateway resolves only when no Agent target is named; revisit when the live gateway binding lands with DW-12.
-status: open
+status: done 2026-10-25
+reconciliation: 2026-10-29 — Original status reconciled with the terminal closure addendum below; fresh published-SDK verification extends the existing local source proof. No new production qualification is claimed. [Published setup verification](deferred-published-setup-verification-2026-10-29.md)
 
 ### DW-27: Revisit the repo-wide `-p:NuGetAudit=false` pin now its advisory is remediated.
 
@@ -871,6 +877,9 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-terminal-setup-items.md`
   summary: Publish and pin an EventStore Client/DomainService pair supporting exact-domain workload status assertions, then enable and qualify the package-mode status capability.
   evidence: Review BH-5: current published Client 3.127.0 lacks the exact-domain overload and its DomainService issuer excludes CommandStatus. This batch implements and verifies the source path and explicit package refusal, but default package-mode terminal evidence remains unavailable until compatible published dependencies are selected and the capability is exercised. Existing host-reader overrides remain supported; deployment qualification is separate.
+  status: done 2026-10-29
+  resolution: `spec-five-deferred-published-setup-status-items.md` — Current Builds already pins compatible published Client/DomainService 3.128.3. Removed the obsolete source-only assertion guard, verified the real issuer and composed reader across all three setup domains, required both SDK components and stable compatible versions, and passed the maintained Release/package gate. Four original status rows are reconciled with their earlier local closure; no new production qualification or availability is claimed.
+  evidence_record: [Published setup verification](deferred-published-setup-verification-2026-10-29.md)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
   summary: Detect clock rollback between the current tenant authority reader's internal awaits even when time stays after evaluation start.

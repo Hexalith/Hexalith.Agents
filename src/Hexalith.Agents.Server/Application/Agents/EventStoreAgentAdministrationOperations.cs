@@ -140,7 +140,7 @@ public sealed class EventStoreAgentAdministrationOperations(
                             request.AgentId,
                             request.ActorUserId,
                             request.IsAgentsAdmin,
-                            command.Mode),
+                            command.Mode) { Authority = request.Authority },
                         ct)
                     .ConfigureAwait(false);
                 return new AgentAdministrationOutcome(outcome.Authorized, outcome.Dispatched, outcome.Receipt);
@@ -259,9 +259,18 @@ public sealed class EventStoreAgentAdministrationOperations(
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (!context.IsAuthorized)
+            {
+                return AgentOperationResult<AgentSetupResult>.Succeeded(AgentSetupResult.NotAuthorized(), correlationId: correlationId);
+            }
             return AgentOperationResult<AgentSetupResult>.Failed(
                 AgentCommandDispatchFailure.Map(exception),
                 correlationId);
+        }
+
+        if (!context.IsAuthorized)
+        {
+            return AgentOperationResult<AgentSetupResult>.Succeeded(AgentSetupResult.NotAuthorized(), correlationId: correlationId);
         }
 
         if (entry.Value is not null
@@ -277,7 +286,8 @@ public sealed class EventStoreAgentAdministrationOperations(
             AgentSetupViewFactory.Create(entry.Value, context.TenantId, agentId, expectedConfigurationVersion, isAgentsAdmin: true),
             entry.Value, approverResolver, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
-        return AgentOperationResult<AgentSetupResult>.Succeeded(setup, correlationId: correlationId);
+        return AgentOperationResult<AgentSetupResult>.Succeeded(
+            context.IsAuthorized ? setup : AgentSetupResult.NotAuthorized(), correlationId: correlationId);
     }
 
     private async ValueTask<AgentOperationResult<AgentCommandAcceptance>> WriteAsync(
@@ -336,7 +346,7 @@ public sealed class EventStoreAgentAdministrationOperations(
                         context.TenantId,
                         agentId,
                         context.ActorUserId,
-                        context.IsAgentsAdmin),
+                        context.IsAgentsAdmin) { Authority = context.Authority },
                     cancellationToken)
                 .ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
@@ -375,13 +385,18 @@ public sealed class EventStoreAgentAdministrationOperations(
             // without it a blocked activation would be offered a retry that can never succeed. Only the coarse
             // answer is used: every rejection maps to one safe code, so no caller learns which rule fired.
             bool? wasRejected = null;
-            if (identityVerified)
+            if (identityVerified && context.HasCurrentAuthority)
             {
                 try
                 {
                     wasRejected = await _statusReader
                         .WasRejectedAsync(context.TenantId, "agent", receipt!.MessageId!, correlationId, cancellationToken)
                         .ConfigureAwait(false);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!context.HasCurrentAuthority)
+                    {
+                        wasRejected = null;
+                    }
                 }
                 catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
@@ -435,6 +450,11 @@ public sealed class EventStoreAgentAdministrationOperations(
             .ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (request.Authority?.IsCurrent == false)
+        {
+            return AgentAdministrationOutcome.Denied();
+        }
+
         AgentSetupReadModel? model = entry.Value;
         if (model is null
             || !model.IsCreated
@@ -458,7 +478,7 @@ public sealed class EventStoreAgentAdministrationOperations(
             model.ResponseMode,
             model.ApproverPolicySources.Count > 0
                 ? new AgentApproverPolicy(model.ApproverPolicySources, model.ApproverPolicyDisclosure)
-                : null);
+                : null) { Authority = request.Authority };
 
         AgentActivationRevalidationOutcome outcome = model.ConfigurationVersion == expectedConfigurationVersion
             ? await _activation.ExecuteAsync(activationRequest, cancellationToken).ConfigureAwait(false)

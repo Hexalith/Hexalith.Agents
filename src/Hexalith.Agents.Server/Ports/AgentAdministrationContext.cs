@@ -14,9 +14,17 @@ public sealed record AgentAdministrationContext(string TenantId, string ActorUse
     /// <summary>The fail-closed context used when no authenticated administrator can be established.</summary>
     public static AgentAdministrationContext Anonymous { get; } = new(string.Empty, string.Empty, IsAgentsAdmin: false);
 
+    /// <summary>Gets the transient lifetime of verified current authority, when supplied by the current-evidence adapter.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public AgentAuthorityValidity? Authority { get; init; }
+
+    /// <summary>Gets whether a supplied lifetime still permits protected work; this bound never grants a role.</summary>
+    public bool HasCurrentAuthority => Authority?.IsCurrent != false;
+
     /// <summary>Gets a value indicating whether this context may perform an Agent administration operation.</summary>
     public bool IsAuthorized
         => IsAgentsAdmin
+            && HasCurrentAuthority
             && !string.IsNullOrWhiteSpace(TenantId)
             && !string.IsNullOrWhiteSpace(ActorUserId);
 }

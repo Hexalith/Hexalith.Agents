@@ -1,0 +1,53 @@
+{
+  "recordedAt": "2026-10-28T15:12:37.155279+00:00",
+  "observedRevision": "0b0bb5385f642b00e68dcdffdd35758b938a57f0",
+  "preservedStoryBaseline": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "inspectionScope": "Current-run source/test/verifier diff; full parent live acceptance and historical baseline diff are not approved by this bounded inspection.",
+  "sourceFilesHashVerified": 28,
+  "finalTestArtifactsHashVerified": 10,
+  "independentXmlCount": 6174,
+  "warningFreeBuilds": 5,
+  "newCases": 161,
+  "regressionSuiteCounts": {
+    "SetupAuthorityLifetimeTests": 39,
+    "FinalAuthorityCheckIsRetainedThroughCommandAdmission": 3,
+    "ProviderCatalogAuthorityLifetimeTests": 119
+  },
+  "acceptedIntentAndTaskSectionUnchanged": true,
+  "remainingStoryTasks": "Production current authority/Party/custody sources, immutable provisioning, genuine signed admission, private durable replay/denial recovery and full persisted live qualification remain incomplete.",
+  "matrixAudit": {
+    "currentAuthority": "Local setup and provider expiry/rollback/parity tests pass. Installed current-evidence sources and live API/UI proof remain unavailable.",
+    "trustedDelivery": "Local original-bound integrity and final-admission timing tests pass. Genuine AD-30 signature/principal/scope, private persisted replay and ACL evidence remain unavailable.",
+    "denialRecovery": "No new backend delivery. Replicated spool, restricted worker and persisted outage/lost-ack evidence remain unavailable."
+  },
+  "liveResult": {
+    "StoryComplete": false,
+    "Mode": "Live",
+    "Blockers": [
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-PARTIES-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-CONV-AI-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-SECRETS-1"
+      },
+      {
+        "Code": "DependencyNotAvailable",
+        "RecordId": "EXT-HOST-1"
+      }
+    ],
+    "ExternalCalls": 0
+  },
+  "workflowDisposition": "Remain in implementation; full story tasks and matrix do not permit full-story review or completion.",
+  "priorEvidenceReceipts": [
+    "verification.json",
+    "review-fix-1/verification.json",
+    "provider-lifetime/verification.json"
+  ],
+  "gitDisposition": "Current-run changes staged for inspection; no commit, push or remote operation."
+}

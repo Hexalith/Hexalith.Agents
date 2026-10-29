@@ -284,10 +284,8 @@ public sealed class AgentSetupCompositionTests
                 "InvalidSetupRejection", "message") { TenantId = tenant, Domain = domain },
         };
         IEventStoreGatewayWorkloadAssertionSource source = Substitute.For<IEventStoreGatewayWorkloadAssertionSource>();
-#if HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS
         source.IssueAsync(EventStoreGatewayWorkloadOperations.CommandStatus, tenant, domain, Arg.Any<CancellationToken>())
             .Returns(ValueTask.FromResult<string?>("host-assertion"));
-#endif
         int sourceResolutions = 0;
         services.AddScoped<IEventStoreGatewayWorkloadAssertionSource>(_ =>
         {
@@ -307,7 +305,6 @@ public sealed class AgentSetupCompositionTests
         CommandStatusQueryResponse? status = await reader.ReadAsync(tenant, domain, "message", correlation, TestContext.Current.CancellationToken);
         (await reader.ReadAsync(tenant, domain, "message", "different-correlation", TestContext.Current.CancellationToken)).ShouldBeNull();
         sourceResolutions.ShouldBe(1);
-#if HEXALITH_EVENTSTORE_DOMAIN_ASSERTIONS
         status.ShouldNotBeNull().CorrelationId.ShouldBe(correlation);
         status.Domain.ShouldBe(domain);
         status.TenantId.ShouldBe(tenant);
@@ -316,11 +313,6 @@ public sealed class AgentSetupCompositionTests
         handler.Assertion.ShouldBe("host-assertion");
         handler.DaprAppId.ShouldBe("eventstore-runtime");
         await source.Received(2).IssueAsync(EventStoreGatewayWorkloadOperations.CommandStatus, tenant, domain, Arg.Any<CancellationToken>());
-#else
-        status.ShouldBeNull();
-        handler.Requests.ShouldBe(0);
-        source.ReceivedCalls().ShouldBeEmpty();
-#endif
     }
 
     [Theory]

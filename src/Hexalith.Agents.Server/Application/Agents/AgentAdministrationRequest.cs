@@ -12,7 +12,7 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <param name="TenantId">The Agent's tenant scope.</param>
 /// <param name="AgentId">The Agent aggregate id.</param>
 /// <param name="ActorUserId">The authenticated actor.</param>
-/// <param name="IsAgentsAdmin">The trusted Agents-admin decision from claims (the orchestration fails closed when false).</param>
+/// <param name="IsAgentsAdmin">The trusted Agents-admin decision from current evidence (the orchestration fails closed when false).</param>
 /// <param name="ClientSuppliedExtensions">Any client-supplied envelope extensions to sanitize (reserved keys are stripped).</param>
 public sealed record AgentAdministrationRequest(
     string MessageId,
@@ -21,4 +21,9 @@ public sealed record AgentAdministrationRequest(
     string AgentId,
     string ActorUserId,
     bool IsAgentsAdmin,
-    IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null);
+    IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null)
+{
+    /// <summary>Gets the transient current-authority lifetime supplied by the authenticated operations boundary.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Hexalith.Agents.Server.Ports.AgentAuthorityValidity? Authority { get; init; }
+}

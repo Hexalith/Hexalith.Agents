@@ -6,7 +6,7 @@ namespace Hexalith.Agents.Server.Application.Agents;
 
 /// <summary>
 /// Server-internal request driving the Response Mode configuration orchestration (Story 1.6 AC1). It carries the
-/// trusted, already-resolved <see cref="IsAgentsAdmin"/> authorization decision (from claims) and any
+/// trusted, already-resolved <see cref="IsAgentsAdmin"/> authorization decision (from current evidence) and any
 /// <see cref="ClientSuppliedExtensions"/> the orchestration must sanitize — the reserved <c>actor:agentsAdmin</c>
 /// (and the activation-path verdict keys) are stripped and repopulated from trusted sources only. Response-mode
 /// configuration has no external dependency, so no verdict is computed here.
@@ -16,7 +16,7 @@ namespace Hexalith.Agents.Server.Application.Agents;
 /// <param name="TenantId">The Agent's tenant scope.</param>
 /// <param name="AgentId">The Agent aggregate id.</param>
 /// <param name="ActorUserId">The authenticated actor.</param>
-/// <param name="IsAgentsAdmin">The trusted Agents-admin decision from claims (the orchestration fails closed when false).</param>
+/// <param name="IsAgentsAdmin">The trusted Agents-admin decision from current evidence (the orchestration fails closed when false).</param>
 /// <param name="Mode">The Response Mode the administrator chose.</param>
 /// <param name="ClientSuppliedExtensions">Any client-supplied envelope extensions to sanitize (reserved keys are stripped).</param>
 public sealed record AgentResponseModeRequest(
@@ -27,4 +27,9 @@ public sealed record AgentResponseModeRequest(
     string ActorUserId,
     bool IsAgentsAdmin,
     AgentResponseMode Mode,
-    IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null);
+    IReadOnlyDictionary<string, string>? ClientSuppliedExtensions = null)
+{
+    /// <summary>Gets the transient current-authority lifetime supplied by the authenticated operations boundary.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Hexalith.Agents.Server.Ports.AgentAuthorityValidity? Authority { get; init; }
+}

@@ -178,28 +178,45 @@ public sealed class AgentInteractionGateOrchestrator
         // discarded (the request carries none). The interaction id mirrors the envelope aggregate id (Story 2.1).
         var command = new EvaluateAgentInteractionGate(request.AgentInteractionId, verdicts);
 
-        // (4) Build the envelope (AggregateId = interaction id, Domain = agent-interaction); strip reserved client
-        // trust extensions (none repopulated on this path).
+        // (4) Prepare exact bytes and sanitize metadata before the final authority check: client extension
+        // enumeration may advance the clock. Carry that final checked instant into dispatch admission.
+        byte[] payload = JsonSerializer.SerializeToUtf8Bytes(command);
+        Dictionary<string, string>? extensions = BuildTrustedExtensions(request.ClientSuppliedExtensions);
+        ct.ThrowIfCancellationRequested();
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        {
+            return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
+        }
+
+        DateTimeOffset validUntil = tenant.CurrentActor!.ValidUntil < callerValidUntil
+            ? tenant.CurrentActor.ValidUntil : callerValidUntil;
         var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
             InteractionDomain,
             request.AgentInteractionId,
             nameof(EvaluateAgentInteractionGate),
-            JsonSerializer.SerializeToUtf8Bytes(command),
+            payload,
             request.CorrelationId,
             CausationId: null,
             request.ActorUserId,
-            BuildTrustedExtensions(request.ClientSuppliedExtensions));
+            extensions)
+        {
+            Authority = tenant.Authority?.Restrict(checkedAt, validUntil)
+                ?? new(_clock, checkedAt, validUntil),
+        };
 
         // (5) Dispatch (live binding deferred). (6) Return the safe outcome — status via the SHARED policy so the
         // orchestrator's reported status cannot drift from the aggregate's recorded decision (AD-12).
-        ct.ThrowIfCancellationRequested();
-        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        try
         {
+            await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            ct.ThrowIfCancellationRequested();
             return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
-        await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
         return new AgentInteractionGateOutcomeResult(request.AgentInteractionId, AgentInvocationGatePolicy.Decide(verdicts));
     }
 
@@ -276,6 +293,14 @@ public sealed class AgentInteractionGateOrchestrator
     private bool HasCurrentActor(TenantAccessReadResult tenant, AgentInteractionGateRequest request, DateTimeOffset started, ref DateTimeOffset checkedAt, DateTimeOffset? callerValidUntil = null)
     {
         DateTimeOffset now = _clock.GetUtcNow();
+        try
+        {
+            tenant.Authority?.ThrowIfNotCurrent(now);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return false;
+        }
         bool current = now.Offset == TimeSpan.Zero && now >= checkedAt
             && (callerValidUntil is null || callerValidUntil.Value.Offset == TimeSpan.Zero && callerValidUntil.Value > now)
             && tenant.CurrentActor?.IsCurrentFor(request.TenantId, request.ActorUserId, request.CallerPartyId, started, now) == true;

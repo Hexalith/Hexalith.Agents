@@ -17,6 +17,10 @@ namespace Hexalith.Agents.Server.Ports;
 /// <param name="IsFresh">Whether the consulted Tenants projection is within its freshness threshold.</param>
 public sealed record TenantAccessReadResult(AgentInteractionGateOutcome Outcome, bool IsFresh)
 {
+    /// <summary>Gets the transient lifetime of a verified current tenant authorization; it grants no access by itself.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public AgentAuthorityValidity? Authority { get; init; }
+
     /// <summary>Gets current actor evidence after successful completion-time authorization, bounded by the earlier actor or tenant deadline.</summary>
     public CurrentHumanActorEvidence? CurrentActor { get; init; }
 

@@ -70,7 +70,10 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
                 return identity;
             }
 
-            return new(platform ? "system" : identity.TenantId, actor.ActorId, !platform, platform);
+            return new(platform ? "system" : identity.TenantId, actor.ActorId, !platform, platform)
+            {
+                Authority = new(_clock, now, actor.ValidUntil < roles!.ValidUntil ? actor.ValidUntil : roles.ValidUntil),
+            };
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

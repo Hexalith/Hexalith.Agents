@@ -47,7 +47,7 @@ if args and Path(args[0]).name == "pwsh.dll":
 with open(os.environ["STORY_52_CALL_LOG"], "a", encoding="utf-8") as log:
     log.write(json.dumps(args) + "\n")
 if args and args[0] == "msbuild":
-    print(json.dumps({"Items": {"PackageVersion": [{"Identity": "Hexalith.EventStore.Client", "Version": "3.119.0"}]}}))
+    print(json.dumps({"Items": {"PackageVersion": [{"Identity": "Hexalith.EventStore.Client", "Version": "3.128.3"}, {"Identity": "Hexalith.EventStore.DomainService", "Version": "3.128.3"}]}}))
     sys.exit(0)
 if args and args[0] in ("restore", "build"):
     if args[0] == os.environ.get("STORY_52_FAIL_COMMAND"):

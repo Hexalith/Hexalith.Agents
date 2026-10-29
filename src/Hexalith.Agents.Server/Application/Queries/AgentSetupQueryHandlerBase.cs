@@ -69,7 +69,11 @@ public abstract class AgentSetupQueryHandlerBase(
             return QueryResult.FromPayload(ToElement(AgentSetupResult.NotAuthorized()));
         }
 
-        if (!await IsAgentsAdminAsync(query, cancellationToken).ConfigureAwait(false))
+        (AgentAdministrationContext? actor, TenantAccessReadResult? access) = await ReadAuthorityAsync(query, cancellationToken).ConfigureAwait(false);
+        bool IsAuthorized() => actor?.IsAuthorized == true
+            && access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
+            && access.Authority?.IsCurrent != false;
+        if (!IsAuthorized())
         {
             return QueryResult.FromPayload(ToElement(AgentSetupResult.NotAuthorized()));
         }
@@ -87,17 +91,22 @@ public abstract class AgentSetupQueryHandlerBase(
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return QueryResult.FromPayload(ToElement(AgentSetupResult.Unavailable()));
+            return QueryResult.FromPayload(ToElement(IsAuthorized() ? AgentSetupResult.Unavailable() : AgentSetupResult.NotAuthorized()));
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (!IsAuthorized())
+        {
+            return QueryResult.FromPayload(ToElement(AgentSetupResult.NotAuthorized()));
+        }
 
         AgentSetupResult setup = await AgentSetupBasisEnricher.EnrichAsync(
             AgentSetupViewFactory.Create(entry.Value, query.TenantId, query.AggregateId,
                 ReadExpectedConfigurationVersion(query.Payload), isAgentsAdmin: true),
             entry.Value, approverResolver, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
-        return QueryResult.FromPayload(ToElement(setup));
+        return QueryResult.FromPayload(ToElement(IsAuthorized() ? setup : AgentSetupResult.NotAuthorized()));
     }
 
     /// <summary>Serializes the payload with contract enum names.</summary>
@@ -126,13 +135,14 @@ public abstract class AgentSetupQueryHandlerBase(
         }
     }
 
-    private async Task<bool> IsAgentsAdminAsync(QueryEnvelope query, CancellationToken cancellationToken)
+    private async Task<(AgentAdministrationContext? Actor, TenantAccessReadResult? Access)> ReadAuthorityAsync(QueryEnvelope query, CancellationToken cancellationToken)
     {
         if (contextProvider is null)
         {
-            return false;
+            return (null, null);
         }
 
+        AgentAdministrationContext actor;
         try
         {
             // Query UserId is the authenticated token subject; current authority may resolve it to a different
@@ -142,27 +152,27 @@ public abstract class AgentSetupQueryHandlerBase(
             if (!string.Equals(identity.ActorUserId, query.UserId, StringComparison.Ordinal)
                 || !string.Equals(identity.TenantId, query.TenantId, StringComparison.Ordinal))
             {
-                return false;
+                return (null, null);
             }
 
-            AgentAdministrationContext actor = await contextProvider
+            actor = await contextProvider
                 .GetContextAsync(false, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
             if (!actor.IsAuthorized || !string.Equals(actor.TenantId, query.TenantId, StringComparison.Ordinal))
             {
-                return false;
+                return (null, null);
             }
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return false;
+            return (null, null);
         }
 
         TenantAccessReadResult access = await _tenantAccessReader
             .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
             .ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
-        return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true };
+        return (actor, access);
     }
 }

@@ -160,20 +160,26 @@ public sealed class BuildContractConformanceTests
     }
 
     [Theory]
-    [InlineData("3.104.0", "requires Hexalith.EventStore 3.106.0 or later")]
-    [InlineData("3.106.0-alpha", "requires Hexalith.EventStore 3.106.0 or later")]
+    [InlineData("3.127.0", "requires Hexalith.EventStore 3.128.3 or later")]
+    [InlineData("3.128.2", "requires Hexalith.EventStore 3.128.3 or later")]
+    [InlineData("3.128.3-alpha", "requires Hexalith.EventStore 3.128.3 or later")]
+    [InlineData("3.128.4-alpha", "requires Hexalith.EventStore 3.128.3 or later")]
+    [InlineData("3.129.0-preview", "requires Hexalith.EventStore 3.128.3 or later")]
     [InlineData("not-a-version", "is not a valid SemVer 2 version")]
     [InlineData(null, "No effective package-mode Hexalith.EventStore PackageVersion rows were found")]
-    public void EventStorePackageFloorShouldFailClosedForInvalidPackageVersionRows(
+    [InlineData("3.128.3", null)]
+    [InlineData("3.128.3+build.1", null)]
+    [InlineData("3.129.0", null)]
+    public void EventStorePackageFloorShouldRequireCompatibleStablePackageVersionRows(
         string? packageVersion,
-        string expectedDiagnostic)
+        string? expectedDiagnostic)
     {
         DirectoryInfo fixture = Directory.CreateTempSubdirectory("hexalith-agents-eventstore-floor-");
         try
         {
             string packageVersionDeclaration = packageVersion is null
                 ? """<PackageVersion Include="Example.Package" Version="1.0.0" />"""
-                : $"""<PackageVersion Include="Hexalith.EventStore.Contracts" Version="{packageVersion}" />""";
+                : $"""<PackageVersion Include="Hexalith.EventStore.Client" Version="{packageVersion}" /><PackageVersion Include="Hexalith.EventStore.DomainService" Version="{packageVersion}" />""";
             string projectPath = Path.Combine(fixture.FullName, "PackageFloorFixture.proj");
             File.WriteAllText(
                 projectPath,
@@ -195,8 +201,41 @@ public sealed class BuildContractConformanceTests
                 "-PackageFloorProjectPath",
                 projectPath);
 
+            if (expectedDiagnostic is null)
+            {
+                exitCode.ShouldBe(0, output);
+                output.ShouldContain("Gate: EventStore package floor");
+            }
+            else
+            {
+                exitCode.ShouldNotBe(0);
+                output.ShouldContain(expectedDiagnostic);
+            }
+        }
+        finally
+        {
+            fixture.Delete(true);
+        }
+    }
+
+    [Theory]
+    [InlineData("Hexalith.EventStore.Contracts")]
+    [InlineData("Hexalith.EventStore.Client")]
+    [InlineData("Hexalith.EventStore.DomainService")]
+    public void EventStorePackageFloorRequiresBothStatusCapabilityComponents(string onlyPackage)
+    {
+        DirectoryInfo fixture = Directory.CreateTempSubdirectory("hexalith-agents-status-components-");
+        try
+        {
+            string projectPath = Path.Combine(fixture.FullName, "PackageFloorFixture.proj");
+            File.WriteAllText(projectPath,
+                $"""<Project><ItemGroup><PackageVersion Include="{onlyPackage}" Version="3.128.3" /></ItemGroup></Project>""");
+
+            string output = RunProcess("pwsh", out int exitCode, "-NoProfile", "-File",
+                ModuleLayout.RootFile("eng/verify-story-5.2.ps1"), "-PackageFloorOnly", "-PackageFloorProjectPath", projectPath);
+
             exitCode.ShouldNotBe(0);
-            output.ShouldContain(expectedDiagnostic);
+            output.ShouldContain("Missing required workload-status capability package row:");
         }
         finally
         {

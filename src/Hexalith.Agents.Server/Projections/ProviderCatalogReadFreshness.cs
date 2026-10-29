@@ -1,3 +1,4 @@
+using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.ProviderCatalog;
 using Hexalith.Agents.TenantProviderEnablement;
@@ -11,13 +12,25 @@ namespace Hexalith.Agents.Server.Projections;
 public static class ProviderCatalogReadFreshness
 {
     /// <summary>Returns whether every relevant platform entry projection is authoritative.</summary>
-    public static async Task<bool> IsPlatformCurrentAsync(
+    public static Task<bool> IsPlatformCurrentAsync(
         IEventStoreGatewayClient? gateway,
         ProviderCatalogReadModel? platform,
         string? providerId,
         string? modelId,
         CancellationToken cancellationToken)
+        => IsPlatformCurrentAsync(gateway, platform, providerId, modelId, cancellationToken, null);
+
+    /// <summary>Compares current stream evidence within the caller's transient authorization lifetime.</summary>
+    public static async Task<bool> IsPlatformCurrentAsync(
+        IEventStoreGatewayClient? gateway,
+        ProviderCatalogReadModel? platform,
+        string? providerId,
+        string? modelId,
+        CancellationToken cancellationToken,
+        AgentAuthorityValidity? authority)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        authority?.ThrowIfNotCurrent();
         if (gateway is null)
         {
             return false;
@@ -28,7 +41,7 @@ public static class ProviderCatalogReadFreshness
             return providerId is not null && modelId is not null
                 && await HasHeadAsync(gateway, ProviderCatalogIdentity.PlatformTenantId,
                     ProviderCatalogAggregate.Domain, ProviderCatalogIdentity.EntryId(providerId, modelId),
-                    0, cancellationToken).ConfigureAwait(false);
+                    0, cancellationToken, authority).ConfigureAwait(false);
         }
 
         IEnumerable<string> entryIds = providerId is not null && modelId is not null
@@ -39,7 +52,7 @@ public static class ProviderCatalogReadFreshness
         {
             if (!await HasHeadAsync(gateway, ProviderCatalogIdentity.PlatformTenantId,
                 ProviderCatalogAggregate.Domain, entryId,
-                platform.StreamSequences.GetValueOrDefault(entryId), cancellationToken).ConfigureAwait(false))
+                platform.StreamSequences.GetValueOrDefault(entryId), cancellationToken, authority).ConfigureAwait(false))
             {
                 return false;
             }
@@ -49,7 +62,7 @@ public static class ProviderCatalogReadFreshness
     }
 
     /// <summary>Returns whether tenant enablement and relevant platform projections are authoritative.</summary>
-    public static async Task<bool> IsTenantCurrentAsync(
+    public static Task<bool> IsTenantCurrentAsync(
         IEventStoreGatewayClient? gateway,
         string tenantId,
         ProviderCatalogReadModel? platform,
@@ -57,13 +70,27 @@ public static class ProviderCatalogReadFreshness
         string? providerId,
         string? modelId,
         CancellationToken cancellationToken)
+        => IsTenantCurrentAsync(gateway, tenantId, platform, tenant, providerId, modelId, cancellationToken, null);
+
+    /// <summary>Compares current stream evidence within the caller's transient authorization lifetime.</summary>
+    public static async Task<bool> IsTenantCurrentAsync(
+        IEventStoreGatewayClient? gateway,
+        string tenantId,
+        ProviderCatalogReadModel? platform,
+        TenantProviderEnablementReadModel? tenant,
+        string? providerId,
+        string? modelId,
+        CancellationToken cancellationToken,
+        AgentAuthorityValidity? authority)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        authority?.ThrowIfNotCurrent();
         // A tenant never enabled for any model has no enablement stream or read model; a missing stream at
         // sequence zero is confirmed empty truth, while an existing unprojected stream stays pending.
         tenant ??= new TenantProviderEnablementReadModel();
         if (gateway is null
             || !await HasHeadAsync(gateway, tenantId, TenantProviderEnablementAggregate.Domain,
-                tenantId, tenant.LastSequenceNumber, cancellationToken).ConfigureAwait(false))
+                tenantId, tenant.LastSequenceNumber, cancellationToken, authority).ConfigureAwait(false))
         {
             return false;
         }
@@ -95,7 +122,7 @@ public static class ProviderCatalogReadFreshness
             string entryId = ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId);
             if (!await HasHeadAsync(gateway, ProviderCatalogIdentity.PlatformTenantId,
                 ProviderCatalogAggregate.Domain, entryId,
-                platform!.StreamSequences.GetValueOrDefault(entryId), cancellationToken).ConfigureAwait(false))
+                platform!.StreamSequences.GetValueOrDefault(entryId), cancellationToken, authority).ConfigureAwait(false))
             {
                 return false;
             }
@@ -105,14 +132,27 @@ public static class ProviderCatalogReadFreshness
     }
 
     /// <summary>Returns whether one stream head equals its projected sequence.</summary>
-    public static async Task<bool> HasHeadAsync(
+    public static Task<bool> HasHeadAsync(
         IEventStoreGatewayClient? gateway,
         string tenantId,
         string domain,
         string aggregateId,
         long projectedSequence,
         CancellationToken cancellationToken)
+        => HasHeadAsync(gateway, tenantId, domain, aggregateId, projectedSequence, cancellationToken, null);
+
+    /// <summary>Compares current stream evidence within the caller's transient authorization lifetime.</summary>
+    public static async Task<bool> HasHeadAsync(
+        IEventStoreGatewayClient? gateway,
+        string tenantId,
+        string domain,
+        string aggregateId,
+        long projectedSequence,
+        CancellationToken cancellationToken,
+        AgentAuthorityValidity? authority)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        authority?.ThrowIfNotCurrent();
         if (gateway is null)
         {
             return false;
@@ -122,6 +162,8 @@ public static class ProviderCatalogReadFreshness
         {
             StreamReadPage page = await gateway.ReadStreamAsync(
                 new StreamReadRequest(tenantId, domain, aggregateId, PageSize: 1), cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            authority?.ThrowIfNotCurrent();
             return string.Equals(page.Tenant, tenantId, StringComparison.Ordinal)
                 && string.Equals(page.Domain, domain, StringComparison.Ordinal)
                 && string.Equals(page.AggregateId, aggregateId, StringComparison.Ordinal)
@@ -131,10 +173,14 @@ public static class ProviderCatalogReadFreshness
             && exception.StatusCode == 404
             && string.Equals(exception.ReasonCode, StreamReplayReasonCodes.MissingStream, StringComparison.Ordinal))
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            authority?.ThrowIfNotCurrent();
             return true;
         }
-        catch (Exception exception) when (exception is not OperationCanceledException)
+        catch (Exception exception) when (exception is not (OperationCanceledException or AgentCommandAuthorityExpiredException))
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            authority?.ThrowIfNotCurrent();
             return false;
         }
     }
