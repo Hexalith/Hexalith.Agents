@@ -21,11 +21,21 @@ if args and pathlib.Path(args[0]).name == "pwsh.dll":
     os.execv(os.environ["AUDIT_REAL_DOTNET"], [os.environ["AUDIT_REAL_DOTNET"], *args])
 name = pathlib.Path(sys.argv[0]).name
 with open(os.environ["AUDIT_LOG"], "a") as log:
-    log.write(json.dumps({"name": name, "args": args}) + "\n")
+    log.write(json.dumps({"name": name, "args": args, "mappingHash": os.environ.get("HEXALITH_SOURCE_MAPPING_HASH")}) + "\n")
 if name in ("pwsh", "python3"):
     sys.exit(0)  # Unrelated package-authority and version-floor prerequisites.
 if "prepare-build" in args:
-    print('{"status":"prepared","buildPreparation":{"mode":"source","mappingHash":"","environment":{}}}')
+    workspace = pathlib.Path(args[args.index("--workspace") + 1])
+    directory = workspace / "source-mapping"
+    directory.mkdir(parents=True)
+    imports = {"CustomBeforeDirectoryBuildProps": "SourceMapping.targets", "CustomAfterMicrosoftCommonProps": "SourceMapping.props",
+               "CustomBeforeDirectoryBuildTargets": "SourceMapping.before-targets.props", "CustomAfterDirectoryBuildTargets": "SourceMapping.late.props",
+               "AfterMicrosoftNETSdkTargets": "SourceMapping.final.targets"}
+    for filename in imports.values(): (directory / filename).write_text("<Project />")
+    environment = {key: str(directory / filename) for key, filename in imports.items()}
+    environment.update(Configuration="Debug", HEXALITH_SOURCE_MAPPING_HASH="a" * 64)
+    print(json.dumps({"status": "prepared", "outcome": {"exitCode": "Success"}, "buildPreparation": {
+        "workspace": str(workspace), "mode": "source", "mappingHash": "a" * 64, "environment": environment}}))
     sys.exit(0)
 if any(arg.startswith("-p:HexalithEventStoreRoot=") and arg.endswith("missing-eventstore") for arg in args):
     print("Source dependency 'references/Hexalith.EventStore' is missing.")
@@ -55,6 +65,7 @@ class VerifierAuditPolicyTests(unittest.TestCase):
             shutil.copyfile(ROOT / "eng" / script, eng / script)
             (eng / "package-authority-exclusions.txt").write_text("# fixture\n")
             for prerequisite in ("references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1",
+                                 "references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj",
                                  "eng/verify-story-5.2.ps1"):
                 path = root / prerequisite
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -135,8 +146,10 @@ class VerifierAuditPolicyTests(unittest.TestCase):
     def test_story_54_source_audit_failure_stops_before_tests(self) -> None:
         result, calls = self.run_verifier("verify-story-5.4.ps1", [], "Debug")
         self.assert_audit_failure(result, calls)
-        self.assertEqual(len(calls), 1)
-        self.assertIn("-p:UseHexalithProjectReferences=true", calls[0])
+        self.assertEqual(len(calls), 2)
+        self.assertIn("prepare-build", calls[0])
+        self.assertIn("source", calls[0])
+        self.assertEqual(self.tool_calls[-1]["mappingHash"], "a" * 64)
 
     def test_story_61_both_dependency_lanes_propagate_audit_failure(self) -> None:
         for lane, configuration, source in (("Source", "Debug", "true"), ("Package", "Release", "false")):

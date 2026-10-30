@@ -35,23 +35,77 @@ $projects = @(
     'Hexalith.Agents.Contracts.Tests', 'Hexalith.Agents.Client.Tests', 'Hexalith.Agents.Tests',
     'Hexalith.Agents.Server.Tests', 'Hexalith.Agents.UI.Tests'
 )
-# Parties' source build takes its mapping from its caller. Supply global properties so restore and every
-# transitive project use the existing root-declared sources, without initializing Parties' nested references.
-$sourceProperties = @(
-    '-p:UseHexalithProjectReferences=true', '-p:UseNuGetDeps=false',
-    "-p:HexalithBuildsRoot=$(Join-Path $root 'references/Hexalith.Builds')",
-    "-p:HexalithEventStoreRoot=$(Join-Path $root 'references/Hexalith.EventStore')",
-    '-p:HexalithEventStoreFromSource=true',
-    "-p:HexalithCommonsRoot=$(Join-Path $root 'references/Hexalith.Commons')",
-    '-p:HexalithCommonsFromSource=true', '-p:HexalithCommonsHttpFromSource=true',
-    "-p:HexalithMcpCliRoot=$(Join-Path $root 'references/Hexalith.McpCli')",
-    '-p:HexalithMcpCliFromSource=true'
-)
+# The producer owns source selection and validation across every root-declared reference. Prepare its
+# imports without starting resources; hand-selected roots cannot enroll newer Conversations builds.
+$producer = Join-Path $root 'references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj'
+$manifest = Join-Path $root 'module/hexalith.module-manifest.v2.json'
+$preparationDirectory = Join-Path ([IO.Path]::GetFullPath($ArtifactsPath)) ('build-preparation-' + [Guid]::NewGuid().ToString('N'))
+$preparationLog = Join-Path $ArtifactsPath 'build-preparation.json'
+$preparationErrorLog = Join-Path $ArtifactsPath 'build-preparation.stderr.log'
+if (-not (Test-Path -LiteralPath $producer -PathType Leaf)) { throw 'BuildPreparationProducerMissing' }
+$nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
+try {
+    $PSNativeCommandUseErrorActionPreference = $false
+    $preparationOutput = & dotnet run --project $producer --configuration Debug --no-launch-profile --verbosity quiet -- `
+        prepare-build --manifest $manifest --mode source --workspace $preparationDirectory --output json 2> $preparationErrorLog
+    $preparationExitCode = $LASTEXITCODE
+}
+finally {
+    $PSNativeCommandUseErrorActionPreference = $nativeErrorPreference
+}
+$preparationOutput | Tee-Object -FilePath $preparationLog
+Get-Content -LiteralPath $preparationErrorLog | ForEach-Object { Write-Host $_ }
+if ($preparationExitCode -ne 0) { throw "BuildPreparationFailed: $preparationExitCode" }
+try {
+    $preparation = ($preparationOutput -join "`n") | ConvertFrom-Json -AsHashtable
+    $prepared = $preparation.buildPreparation
+    $buildEnvironment = $prepared.environment
+    if ($preparation.status -cne 'prepared' -or $preparation.outcome.exitCode -cne 'Success' -or
+        $prepared.mode -cne 'source' -or $prepared.workspace -cne $preparationDirectory -or
+        $prepared.mappingHash -cnotmatch '^[0-9a-f]{64}$' -or $buildEnvironment -isnot [System.Collections.IDictionary]) {
+        throw 'Invalid producer result'
+    }
+    $imports = @{
+        CustomBeforeDirectoryBuildProps = 'SourceMapping.targets'
+        CustomAfterMicrosoftCommonProps = 'SourceMapping.props'
+        CustomBeforeDirectoryBuildTargets = 'SourceMapping.before-targets.props'
+        CustomAfterDirectoryBuildTargets = 'SourceMapping.late.props'
+        AfterMicrosoftNETSdkTargets = 'SourceMapping.final.targets'
+    }
+    if ($buildEnvironment.Count -ne ($imports.Count + 2) -or $buildEnvironment.Configuration -cne 'Debug' -or
+        $buildEnvironment.HEXALITH_SOURCE_MAPPING_HASH -cne $prepared.mappingHash) { throw 'Invalid producer environment' }
+    foreach ($key in $imports.Keys) {
+        $expected = Join-Path $preparationDirectory "source-mapping/$($imports[$key])"
+        if ($buildEnvironment[$key] -cne $expected -or -not (Test-Path -LiteralPath $expected -PathType Leaf)) {
+            throw "Invalid producer import: $key"
+        }
+    }
+}
+catch {
+    throw "BuildPreparationInvalid: $($_.Exception.Message)"
+}
 foreach ($name in $projects) {
     $project = Join-Path $root "test/$name/$name.csproj"
     $buildLog = Join-Path $ArtifactsPath "$name.build.log"
-    & dotnet build $project --configuration Debug -m:1 -p:MinVerVersionOverride=1.0.0 @sourceProperties --nologo 2>&1 | Tee-Object -FilePath $buildLog
-    if ($LASTEXITCODE -ne 0) { throw "BuildFailed: $name" }
+    $previousEnvironment = @{}
+    try {
+        foreach ($key in $buildEnvironment.Keys) {
+            $previousEnvironment[$key] = [Environment]::GetEnvironmentVariable($key, 'Process')
+            [Environment]::SetEnvironmentVariable($key, $buildEnvironment[$key], 'Process')
+        }
+        & dotnet build $project --configuration Debug -m:1 -p:MinVerVersionOverride=1.0.0 --nologo 2>&1 | Tee-Object -FilePath $buildLog
+        if ($LASTEXITCODE -ne 0) { throw "BuildFailed: $name" }
+    }
+    finally {
+        foreach ($key in $previousEnvironment.Keys) {
+            if ($null -eq $previousEnvironment[$key]) {
+                Remove-Item -LiteralPath "Env:$key" -ErrorAction SilentlyContinue
+            }
+            else {
+                [Environment]::SetEnvironmentVariable($key, $previousEnvironment[$key], 'Process')
+            }
+        }
+    }
     if ((Get-Content $buildLog -Raw) -notmatch '(?m)^\s*0 Warning\(s\)\s*$') { throw "WarningGateFailed: $name" }
     $assembly = Join-Path $root "test/$name/bin/Debug/net10.0/$name.dll"
     $xml = Join-Path $ArtifactsPath "$name.xml"
