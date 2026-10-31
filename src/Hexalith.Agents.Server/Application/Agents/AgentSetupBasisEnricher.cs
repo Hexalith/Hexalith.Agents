@@ -53,6 +53,11 @@ internal static class AgentSetupBasisEnricher
             basis.Add(new(sources[index].Kind, status));
         }
 
+        if (resolved?.Authority?.IsCurrent == false)
+        {
+            basis = sources.Select(source => new ApproverPolicyBasisEntry(source.Kind, ApproverPolicyValidationStatus.Unavailable)).ToList();
+        }
+
         return result with { Setup = setup with { Agent = setup.Agent with { ApproverPolicyBasis = basis } } };
     }
 }

@@ -152,9 +152,10 @@ public sealed class AgentInteractionGateOrchestrator
         {
             return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
-        AgentInteractionGateOutcome responsePolicy = await ResolveResponsePolicyAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
+        (AgentInteractionGateOutcome responsePolicy, AgentAuthorityValidity? approverAuthority) =
+            await ResolveResponsePolicyAsync(request.TenantId, readiness, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil) || approverAuthority?.IsCurrent == false)
         {
             return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
@@ -183,13 +184,15 @@ public sealed class AgentInteractionGateOrchestrator
         byte[] payload = JsonSerializer.SerializeToUtf8Bytes(command);
         Dictionary<string, string>? extensions = BuildTrustedExtensions(request.ClientSuppliedExtensions);
         ct.ThrowIfCancellationRequested();
-        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
+        if (!HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil) || approverAuthority?.IsCurrent == false)
         {
             return new(request.AgentInteractionId, AgentInteractionStatus.Denied);
         }
 
         DateTimeOffset validUntil = tenant.CurrentActor!.ValidUntil < callerValidUntil
             ? tenant.CurrentActor.ValidUntil : callerValidUntil;
+        AgentAuthorityValidity authority = tenant.Authority?.Restrict(checkedAt, validUntil)
+            ?? new(_clock, checkedAt, validUntil);
         var envelope = new AgentCommandIntent(
             request.MessageId,
             request.TenantId,
@@ -202,8 +205,7 @@ public sealed class AgentInteractionGateOrchestrator
             request.ActorUserId,
             extensions)
         {
-            Authority = tenant.Authority?.Restrict(checkedAt, validUntil)
-                ?? new(_clock, checkedAt, validUntil),
+            Authority = approverAuthority is null ? authority : authority.Retain(approverAuthority),
         };
 
         // (5) Dispatch (live binding deferred). (6) Return the safe outcome — status via the SHARED policy so the
@@ -332,41 +334,44 @@ public sealed class AgentInteractionGateOrchestrator
 
     // ResponsePolicy (AD-8): the CURRENT Response Mode must be set; a Confirmation-mode Agent additionally needs a
     // resolvable approver policy. Automatic needs no approver. Uses current readiness (AD-12), not the snapshot mode.
-    private async Task<AgentInteractionGateOutcome> ResolveResponsePolicyAsync(string tenantId, AgentInvocationReadiness readiness, CancellationToken ct)
+    private async Task<(AgentInteractionGateOutcome Outcome, AgentAuthorityValidity? Authority)> ResolveResponsePolicyAsync(
+        string tenantId, AgentInvocationReadiness readiness, CancellationToken ct)
     {
         if (!readiness.IsAvailable)
         {
-            return AgentInteractionGateOutcome.Unavailable;
+            return (AgentInteractionGateOutcome.Unavailable, null);
         }
 
         switch (readiness.ResponseMode)
         {
             case AgentResponseMode.Automatic:
-                return AgentInteractionGateOutcome.Satisfied;
+                return (AgentInteractionGateOutcome.Satisfied, null);
             case AgentResponseMode.Confirmation:
                 return await ResolveApproverPolicyAsync(tenantId, readiness.ApproverPolicy, ct).ConfigureAwait(false);
             case AgentResponseMode.Unknown:
             default:
-                return AgentInteractionGateOutcome.Missing;
+                return (AgentInteractionGateOutcome.Missing, null);
         }
     }
 
-    private async Task<AgentInteractionGateOutcome> ResolveApproverPolicyAsync(string tenantId, AgentApproverPolicy? policy, CancellationToken ct)
+    private async Task<(AgentInteractionGateOutcome Outcome, AgentAuthorityValidity? Authority)> ResolveApproverPolicyAsync(
+        string tenantId, AgentApproverPolicy? policy, CancellationToken ct)
     {
         if (policy is null)
         {
             // Confirmation mode with no approver policy has nothing to confirm with — fail closed (AC3; AD-8).
-            return AgentInteractionGateOutcome.Missing;
+            return (AgentInteractionGateOutcome.Missing, null);
         }
 
         try
         {
             ApproverPolicyResolutionResult result = await _approverPolicyResolver.ResolveAsync(tenantId, policy, ct).ConfigureAwait(false);
-            return MapApproverPolicy(ApproverPolicyVerdict.Evaluate(policy, result));
+            ApproverPolicyValidationStatus verdict = ApproverPolicyVerdict.Evaluate(policy, result);
+            return (MapApproverPolicy(verdict), verdict == ApproverPolicyValidationStatus.Valid ? result.Authority : null);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            return AgentInteractionGateOutcome.Unavailable;
+            return (AgentInteractionGateOutcome.Unavailable, null);
         }
     }
 

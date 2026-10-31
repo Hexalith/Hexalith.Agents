@@ -19,4 +19,12 @@
     <DefineConstants>$(DefineConstants);HEXALITH_PARTIES_SOURCE</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(HexalithEventStoreFromSource)' == 'true'">
+    <DefineConstants>$(DefineConstants);HEXALITH_EVENTSTORE_SOURCE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(HexalithEventStoreFromSource)' != 'true'">
+    <Compile Remove="FixtureAgentRouteCatalog.cs;FixtureAgentRouteCatalogTests.cs;FixtureDeclaredAgentIntentAdapter.cs;FixtureBoundAgentCommandHandler.cs;FixtureGatewayPrincipalAuthenticationHandler.cs" />
+  </ItemGroup>
+
 </Project>

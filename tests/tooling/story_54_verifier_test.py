@@ -70,7 +70,7 @@ assert args[0].endswith(".dll")
 assembly = Path(args[0]).stem
 classes = {
     "Hexalith.Agents.Tests": ["TrustedEnvelopeReplayTests", "SecurityEventLogTests", "AgentApproverPolicyTests"],
-    "Hexalith.Agents.Server.Tests": ["Story54CurrentEvidenceTests", "Story54BoundaryTests", "PartiesAgentPartyDirectoryTests", "ApproverEvidenceAdmissionTests", "TenantAuthorityAdmissionOrderingTests", "AuthorityCancellationAdmissionTests", "AgentSetupQueryHandlerTests", "AgentSetupApproverBasisTests", "SetupReadCancellationAdmissionTests", "SetupWriteCancellationAdmissionTests", "SetupAuthorityLifetimeTests", "ProviderCatalogAuthorityLifetimeTests", "AuditQueryIsolationTests", "AgentInteractionAuditQueryHandlerTests", "AgentInteractionGateAdmissionTests"],
+    "Hexalith.Agents.Server.Tests": ["Story54CurrentEvidenceTests", "Story54BoundaryTests", "PartiesAgentPartyDirectoryTests", "ApproverEvidenceAdmissionTests", "ApproverAuthorityLifetimeTests", "FixtureAgentRouteCatalogTests", "TenantAuthorityAdmissionOrderingTests", "AuthorityCancellationAdmissionTests", "AgentSetupQueryHandlerTests", "AgentSetupApproverBasisTests", "SetupReadCancellationAdmissionTests", "SetupWriteCancellationAdmissionTests", "SetupAuthorityLifetimeTests", "ProviderCatalogAuthorityLifetimeTests", "AuditQueryIsolationTests", "AgentInteractionAuditQueryHandlerTests", "AgentInteractionGateAdmissionTests"],
     "Hexalith.Agents.UI.Tests": ["AgentConfigurationTests", "ApproverPolicyTests"],
 }.get(assembly, ["RequiredProjectTests"])
 root = Element("assemblies")

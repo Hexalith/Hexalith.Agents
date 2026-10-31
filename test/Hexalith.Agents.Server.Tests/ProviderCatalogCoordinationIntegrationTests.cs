@@ -99,7 +99,11 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
             .SetValue(coordinator, Substitute.For<IActorStateManager>());
         factory.CreateActorProxy<ICoordinatedCommandActor>(Arg.Any<ActorId>(), Arg.Any<string>())
             .Returns(coordinator);
-        var router = new CommandRouter(factory, Options.Create(new EventStoreActorOptions()),
+        var router = new CommandRouter(
+#if HEXALITH_EVENTSTORE_SOURCE
+            new FixtureAgentRouteCatalog(),
+#endif
+            factory, Options.Create(new EventStoreActorOptions()),
             NullLogger<CommandRouter>.Instance, [policy]);
         var fence = new IdempotencyExecutionContext(1, "admission", 1, "v1", command.MessageId,
             command.CorrelationId, command.TenantId, command.Domain, command.AggregateId,
@@ -198,7 +202,11 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
             .SetValue(coordinator, Substitute.For<IActorStateManager>());
         factory.CreateActorProxy<ICoordinatedCommandActor>(Arg.Any<ActorId>(), Arg.Any<string>())
             .Returns(coordinator);
-        var router = new CommandRouter(factory, Options.Create(new EventStoreActorOptions()),
+        var router = new CommandRouter(
+#if HEXALITH_EVENTSTORE_SOURCE
+            new FixtureAgentRouteCatalog(),
+#endif
+            factory, Options.Create(new EventStoreActorOptions()),
             NullLogger<CommandRouter>.Instance, [policy]);
 
         if (updateFirst)

@@ -28,12 +28,22 @@ using Hexalith.EventStore.Authorization;
 using Hexalith.EventStore.Configuration;
 using Hexalith.EventStore.Controllers;
 using Hexalith.EventStore.Contracts.Commands;
+#if HEXALITH_EVENTSTORE_SOURCE
+using Hexalith.EventStore.Contracts.Routing;
+#endif
 using Hexalith.EventStore.DomainService;
 using Hexalith.EventStore.Server.Actors;
 using Hexalith.EventStore.Server.Commands;
 using Hexalith.EventStore.Server.Configuration;
 using Hexalith.EventStore.Server.Pipeline;
 using Hexalith.EventStore.Server.Pipeline.Commands;
+#if HEXALITH_EVENTSTORE_SOURCE
+using Microsoft.AspNetCore.Authentication;
+using Hexalith.EventStore.Contracts.Authorization;
+using Hexalith.EventStore.ServiceDefaults.Authentication;
+using Hexalith.EventStore.Server.Projections;
+using Hexalith.EventStore.ServiceDefaults.Routing;
+#endif
 using Hexalith.EventStore.Validation;
 
 using MediatR;
@@ -134,6 +144,9 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         services.AddLogging();
         services.AddSingleton(factory);
         services.AddSingleton(Options.Create(new EventStoreActorOptions()));
+#if HEXALITH_EVENTSTORE_SOURCE
+        services.AddSingleton<IRouteCatalogAuthority>(new FixtureAgentRouteCatalog());
+#endif
         services.AddSingleton<ICommandRouter, CommandRouter>();
         using ServiceProvider provider = services.BuildServiceProvider();
         DateTimeOffset now = new(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
@@ -385,7 +398,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             approverVerdict: nameof(ApproverPolicyValidationStatus.Valid));
         byte[] originalIntent = registry.Resolve(original).CanonicalIntent;
 
-        registry.Resolve(original with { Tenant = "tenant-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
+        Registry("tenant-b").Resolve(original with { Tenant = "tenant-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
         registry.Resolve(original with { AggregateId = "agent-b" }).CanonicalIntent.ShouldNotBe(originalIntent);
     }
 
@@ -463,7 +476,11 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             Domain = "other-domain",
         };
 
+#if HEXALITH_EVENTSTORE_SOURCE
+        Should.Throw<InvalidOperationException>(() => Registry().Resolve(foreign));
+#else
         Should.Throw<ArgumentException>(() => Registry().Resolve(foreign));
+#endif
     }
 
     [Fact]
@@ -481,7 +498,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             ledger,
             registerAgentsIntegration: true);
         await gateway.StartAsync().ConfigureAwait(true);
-        using HttpClient client = gateway.GetTestClient();
+        using HttpClient client = GatewayClient(gateway);
 
         SubmitCommandRequest original = ActivationRequest(
             payload: JsonSerializer.SerializeToElement(new { value = 1, nested = new { b = 2, a = 1 } }),
@@ -568,7 +585,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             ledger,
             registerAgentsIntegration: true);
         await gateway.StartAsync().ConfigureAwait(true);
-        using HttpClient client = gateway.GetTestClient();
+        using HttpClient client = GatewayClient(gateway);
 
         using HttpResponseMessage first = await client
             .PostAsJsonAsync("/api/v1/commands", Delivery("trust:deliveryNonce", "delivery-1"))
@@ -621,7 +638,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             registerAgentsIntegration: true,
             admission);
         await gateway.StartAsync().ConfigureAwait(true);
-        using HttpClient client = gateway.GetTestClient();
+        using HttpClient client = GatewayClient(gateway);
 
         SubmitCommandRequest original = ResponseModeRequest("{\"Mode\":\"Automatic\"}");
         SubmitCommandRequest spelled = ResponseModeRequest("{\"mode\":\"automatic\"}");
@@ -716,7 +733,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             registerAgentsIntegration: true,
             admission);
         await gateway.StartAsync().ConfigureAwait(true);
-        using HttpClient client = gateway.GetTestClient();
+        using HttpClient client = GatewayClient(gateway);
 
         using HttpResponseMessage response = await client
             .PostAsJsonAsync("/api/v1/commands", retry)
@@ -727,12 +744,13 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Theory]
-    [InlineData("other-domain", "{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}")]
-    [InlineData("agent", "null")]
-    [InlineData("agent", "[]")]
+    [InlineData("other-domain", "{\"displayName\":\"Hexa\",\"instructions\":\"Stay terse\"}", false)]
+    [InlineData("agent", "null", true)]
+    [InlineData("agent", "[]", true)]
     public async Task A_command_the_setup_adapter_rejects_fails_on_the_gateway_before_execution(
         string commandDomain,
-        string payload)
+        string payload,
+        bool declaredRoute)
     {
         int domainExecutions = 0;
         await using WebApplication domain = BuildDomainApp(_ => domainExecutions++);
@@ -744,7 +762,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             ledger,
             registerAgentsIntegration: true);
         await gateway.StartAsync().ConfigureAwait(true);
-        using HttpClient client = gateway.GetTestClient();
+        using HttpClient client = GatewayClient(gateway);
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/commands",
@@ -753,11 +771,23 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                 Payload = JsonPayload(payload),
             }).ConfigureAwait(true);
 
+#if HEXALITH_EVENTSTORE_SOURCE
+        if (payload is "null" or "[]")
+        {
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Forbidden);
+            domainExecutions.ShouldBe(0);
+            ledger.ExecutionCount.ShouldBe(0);
+            return;
+        }
+#endif
         using JsonDocument failure = JsonDocument.Parse(
             await response.Content.ReadAsStringAsync().ConfigureAwait(true));
-        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
-        failure.RootElement.GetProperty("retryable").GetBoolean().ShouldBeFalse();
-        failure.RootElement.GetProperty("clientAction").GetString().ShouldBe("correct_request");
+#if !HEXALITH_EVENTSTORE_SOURCE
+        declaredRoute = true;
+#endif
+        response.StatusCode.ShouldBe(declaredRoute ? System.Net.HttpStatusCode.BadRequest : System.Net.HttpStatusCode.ServiceUnavailable);
+        failure.RootElement.GetProperty("retryable").GetBoolean().ShouldBe(!declaredRoute);
+        failure.RootElement.GetProperty("clientAction").GetString().ShouldBe(declaredRoute ? "correct_request" : "retry_later");
         domainExecutions.ShouldBe(0);
         ledger.ExecutionCount.ShouldBe(0);
     }
@@ -779,7 +809,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             ledger,
             registerAgentsIntegration);
         await gateway.StartAsync().ConfigureAwait(true);
-        using HttpClient client = gateway.GetTestClient();
+        using HttpClient client = GatewayClient(gateway);
 
         using HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/v1/commands",
@@ -789,6 +819,15 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                 nameof(ProviderSelectionValidationStatus.Valid),
                 nameof(ApproverPolicyValidationStatus.Valid))).ConfigureAwait(true);
 
+#if HEXALITH_EVENTSTORE_SOURCE
+        if (authenticationType != DaprInternalAuthenticationOptions.SchemeName)
+        {
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Forbidden);
+            domainExecutions.ShouldBe(0);
+            ledger.ExecutionCount.ShouldBe(0);
+            return;
+        }
+#endif
         response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
         response.Content.Headers.ContentType?.MediaType.ShouldBe("application/problem+json");
         domainExecutions.ShouldBe(0);
@@ -1070,14 +1109,20 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, [domain, "OtherCommand", key]).ShouldBe(false);
     }
 
-    private static IdempotencyIntentAdapterRegistry Registry()
+    private static IdempotencyIntentAdapterRegistry Registry(string tenantId = "tenant-a")
     {
         ServiceCollection services = new();
         _ = services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
         using ServiceProvider provider = services.BuildServiceProvider();
-        return new IdempotencyIntentAdapterRegistry(
-            provider.GetServices<IIdempotencyIntentAdapter>().ToArray(),
+#if HEXALITH_EVENTSTORE_SOURCE
+        var catalog = new FixtureAgentRouteCatalog(tenantId);
+        return new IdempotencyIntentAdapterRegistry(catalog,
+            provider.GetServices<IIdempotencyIntentAdapter>().Select(adapter => new FixtureDeclaredAgentIntentAdapter(adapter)).ToArray(),
             new CanonicalIdempotencyIntentEncoder());
+#else
+        return new IdempotencyIntentAdapterRegistry(provider.GetServices<IIdempotencyIntentAdapter>().ToArray(),
+            new CanonicalIdempotencyIntentEncoder());
+#endif
     }
 
     private static ITrustedCommandExtensionPolicy Policy()
@@ -1261,6 +1306,37 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         return app;
     }
 
+    private static HttpClient GatewayClient(WebApplication app)
+    {
+#if HEXALITH_EVENTSTORE_SOURCE
+        return new HttpClient(new FixtureBoundAgentCommandHandler(app.GetTestServer().CreateHandler())) { BaseAddress = new Uri("http://localhost") };
+#else
+        return app.GetTestClient();
+#endif
+    }
+
+#if HEXALITH_EVENTSTORE_SOURCE
+    /// <summary>The SDK's human policy refuses a workload principal even when its operation policy would allow bound dispatch.</summary>
+    [Fact]
+    public async Task WorkloadPrincipalCannotSubmitOnTheHumanCommandSurface()
+    {
+        int executions = 0;
+        await using WebApplication domain = BuildDomainApp(_ => executions++);
+        await domain.StartAsync();
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        await using WebApplication gateway = BuildGatewayApp(Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId), ledger, true);
+        await gateway.StartAsync();
+        using HttpClient client = gateway.GetTestClient();
+
+        using HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/commands", Request("agent", nameof(ActivateAgent)));
+
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Forbidden);
+        executions.ShouldBe(0);
+        ledger.ExecutionCount.ShouldBe(0);
+    }
+#endif
+
     private static WebApplication BuildGatewayApp(
         ClaimsPrincipal principal,
         InMemoryAdmissionLedger ledger,
@@ -1270,7 +1346,31 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         ProductionAdmissionState state = admissionState ?? new ProductionAdmissionState();
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
+#if HEXALITH_EVENTSTORE_SOURCE
+        principal = principal.Clone();
+        ClaimsIdentity identity = principal.Identities.Single();
+        if (identity.AuthenticationType == DaprInternalAuthenticationOptions.SchemeName)
+        {
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "workload:agents"));
+            identity.AddClaim(new Claim(EventStoreWorkloadAuthenticationDefaults.WorkloadClaimType, "agents"));
+            identity.AddClaim(new Claim(EventStoreWorkloadAuthenticationDefaults.OperationClaimType, EventStoreOperationIdentifiers.GatewayCommandSubmit));
+        }
+        builder.Services.AddSingleton(principal);
+        builder.Services.AddAuthentication(DaprInternalAuthenticationOptions.SchemeName)
+            .AddScheme<AuthenticationSchemeOptions, FixtureGatewayPrincipalAuthenticationHandler>(DaprInternalAuthenticationOptions.SchemeName, _ => { })
+            .AddScheme<AuthenticationSchemeOptions, FixtureGatewayPrincipalAuthenticationHandler>("Bearer", _ => { });
+        builder.Services.AddEventStoreWorkloadPolicies(DaprInternalAuthenticationOptions.SchemeName,
+            [EventStoreOperationIdentifiers.GatewayCommandSubmit]);
+        builder.Services.AddAuthorization(options => options.AddPolicy(EventStoreHttpHostSecurityExtensions.HumanPolicy,
+            EventStoreHttpHostSecurityExtensions.CreateHumanPolicy()));
+        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Authentication:BoundCommand:AllowedDomains:agents"] = "agent,other-domain",
+            ["Authentication:BoundStreamRead:PublicKeys:agents"] = FixtureBoundAgentCommandHandler.PublicKey,
+        });
+#else
         _ = builder.Services.AddAuthorization();
+#endif
         _ = builder.Services.AddControllers().AddApplicationPart(typeof(CommandsController).Assembly);
         builder.Services.AddSingleton<IOptions<ExtensionMetadataOptions>>(
             Options.Create(new ExtensionMetadataOptions()));
@@ -1285,17 +1385,36 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         builder.Services.AddSingleton<IMediator>(services =>
         {
             var mediator = Substitute.For<IMediator>();
-            var registry = new IdempotencyIntentAdapterRegistry(
-                services.GetServices<IIdempotencyIntentAdapter>(),
+#if HEXALITH_EVENTSTORE_SOURCE
+            var catalog = new FixtureAgentRouteCatalog();
+            var registry = new IdempotencyIntentAdapterRegistry(catalog,
+                services.GetServices<IIdempotencyIntentAdapter>().Select(adapter => new FixtureDeclaredAgentIntentAdapter(adapter)),
                 new CanonicalIdempotencyIntentEncoder());
+#else
+            var registry = new IdempotencyIntentAdapterRegistry(services.GetServices<IIdempotencyIntentAdapter>(),
+                new CanonicalIdempotencyIntentEncoder());
+#endif
             IActorProxyFactory actorProxyFactory = services.GetRequiredService<IActorProxyFactory>();
             IIdempotencyDigestKeyProvider keyProvider = services
                 .GetRequiredService<IIdempotencyDigestKeyProvider>();
             var coordinator = new IdempotencyAdmissionCoordinator(
+#if HEXALITH_EVENTSTORE_SOURCE
+                catalog,
+#endif
                 actorProxyFactory,
                 new IdempotencyKeyProtector(keyProvider),
                 registry,
-                new IdempotencyExecutionContextProtector(keyProvider, actorProxyFactory));
+                new IdempotencyExecutionContextProtector(keyProvider, actorProxyFactory)
+#if HEXALITH_EVENTSTORE_SOURCE
+                ,
+                Options.Create(new IdempotencyAdmissionOptions { Enabled = true, ActiveDigestKeyVersion = "v1" }),
+                Options.Create(new RouteCatalogHostOptions
+                {
+                    Identity = new("eventstore", "eventstore", "fixture-inventory", "fixture-topology", "fixture-authentication"),
+                    Profile = "Development", DevelopmentFixture = true,
+                })
+#endif
+                );
 
             ICommandRouter router = Substitute.For<ICommandRouter>();
             router.RouteFencedCommandAsync(
@@ -1321,11 +1440,19 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             archiveStore.ReadCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult<ArchivedCommand?>(null));
             var handler = new SubmitCommandHandler(
+#if HEXALITH_EVENTSTORE_SOURCE
+                catalog,
+#endif
                 statusStore,
                 archiveStore,
                 router,
+#if HEXALITH_EVENTSTORE_SOURCE
+                null,
+                null,
+                new NoOpProjectionUpdateOrchestrator(),
+#endif
                 NullLogger<SubmitCommandHandler>.Instance,
-                coordinator);
+                idempotencyAdmissionCoordinator: coordinator);
             mediator.Send(Arg.Any<SubmitCommand>(), Arg.Any<CancellationToken>())
                 .Returns(call => handler.Handle(
                     call.ArgAt<SubmitCommand>(0),
@@ -1355,6 +1482,18 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
                     clientAction = exception.ClientAction,
                 }).ConfigureAwait(false);
             }
+#if HEXALITH_EVENTSTORE_SOURCE
+            catch (RouteCatalogUnavailableException)
+            {
+                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    status = StatusCodes.Status503ServiceUnavailable,
+                    retryable = true,
+                    clientAction = "retry_later",
+                }).ConfigureAwait(false);
+            }
+#endif
         });
         app.UseAuthorization();
         app.MapControllers();

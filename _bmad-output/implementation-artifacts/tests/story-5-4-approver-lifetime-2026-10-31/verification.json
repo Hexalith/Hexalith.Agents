@@ -1,0 +1,259 @@
+{
+  "createdUtc": "2026-10-31T22:44:59.054727+00:00",
+  "story": "5.4",
+  "scope": "Bounded confirmed-approver lifetime and local SDK fixture compatibility",
+  "storyComplete": false,
+  "status": "in-progress",
+  "originalBaselineCommit": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+  "commands": {
+    "local": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-approver-lifetime-20261031/local",
+    "live": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-approver-lifetime-20261031/live",
+    "packageBuild": "dotnet build test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj --configuration Release -p:UseHexalithProjectReferences=false -p:MinVerVersionOverride=1.0.0 -m:1 --nologo",
+    "packageTests": "dotnet test/Hexalith.Agents.Server.Tests/bin/Release/net10.0/Hexalith.Agents.Server.Tests.dll -result-xml /tmp/agents-story54-approver-lifetime-20261031/package.xml",
+    "tooling": "python3 -m unittest discover -s tests/tooling -p story_54_verifier_test.py"
+  },
+  "sdk": "10.0.403",
+  "canonicalRevisions": {
+    ".": {
+      "revision": "96f220f8cbce5a34ea8d1e4c94ecafeea43e1548",
+      "status": " M eng/verify-story-5.4.ps1\n M src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionGateOrchestrator.cs\n M src/Hexalith.Agents.Server/Application/Agents/AgentActivationProviderRevalidation.cs\n M src/Hexalith.Agents.Server/Application/Agents/AgentSetupBasisEnricher.cs\n M src/Hexalith.Agents.Server/Application/Agents/ApproverPolicyVerdict.cs\n M src/Hexalith.Agents.Server/Ports/AgentAuthorityValidity.cs\n M src/Hexalith.Agents.Server/Ports/ApproverPolicyResolutionResult.cs\n M src/Hexalith.Agents.Server/Ports/ProjectedApproverPolicyResolver.cs\n M test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs\n M test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj\n M test/Hexalith.Agents.Server.Tests/ProviderCatalogCoordinationIntegrationTests.cs\n M tests/tooling/story_54_verifier_test.py\n?? test/Hexalith.Agents.Server.Tests/ApproverAuthorityLifetimeTests.cs\n?? test/Hexalith.Agents.Server.Tests/FixtureAgentRouteCatalog.cs\n?? test/Hexalith.Agents.Server.Tests/FixtureAgentRouteCatalogTests.cs\n?? test/Hexalith.Agents.Server.Tests/FixtureBoundAgentCommandHandler.cs\n?? test/Hexalith.Agents.Server.Tests/FixtureDeclaredAgentIntentAdapter.cs\n?? test/Hexalith.Agents.Server.Tests/FixtureGatewayPrincipalAuthenticationHandler.cs\n"
+    },
+    "references/Hexalith.AI.Tools": {
+      "revision": "9b78aa008cfc62cd88ad0ea4b39b1f07311956ce",
+      "status": ""
+    },
+    "references/Hexalith.Commons": {
+      "revision": "0604bcf5304fc09a569f7abbd8e5d1b9049c02b7",
+      "status": ""
+    },
+    "references/Hexalith.PolymorphicSerializations": {
+      "revision": "92ede24cc11129379efe52cfe7fd2c820c567f7f",
+      "status": ""
+    },
+    "references/Hexalith.Conversations": {
+      "revision": "bc8ea08fdb06719a29931e1d3fd53d2338ee6bbf",
+      "status": ""
+    },
+    "references/Hexalith.EventStore": {
+      "revision": "5e3c2f0e60b114cdaab52594ccbb254829d40e0f",
+      "status": ""
+    },
+    "references/Hexalith.Memories": {
+      "revision": "cc5a8b366c753c545e174632f8e2370826e2c800",
+      "status": ""
+    },
+    "references/Hexalith.Tenants": {
+      "revision": "c12761223eafbe863d0a20c946685873173a9da4",
+      "status": ""
+    },
+    "references/Hexalith.Parties": {
+      "revision": "05aeee0d647a34eab112b6f8282a0810d35b7bf6",
+      "status": ""
+    },
+    "references/Hexalith.Builds": {
+      "revision": "a22b55f0a4f6d2aaa3a5ccc505896064ac595364",
+      "status": ""
+    },
+    "references/Hexalith.FrontComposer": {
+      "revision": "34d0afde14c43b6079208c47f95297d0cf99b51d",
+      "status": ""
+    },
+    "references/Hexalith.McpCli": {
+      "revision": "a267e4709f4cbea34511c470bb1823c79a732327",
+      "status": ""
+    },
+    "references/Hexalith.Platform": {
+      "revision": "3dc3f6b6d156f566286f15807730ee3a93263252",
+      "status": ""
+    }
+  },
+  "dependencyRecords": {
+    "EXT-PARTIES-1": {
+      "TargetVersionOrCommit": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "TargetIntegrationDate": "2026-10-08",
+      "AcceptedStatus": "Committed"
+    },
+    "EXT-CONV-AI-1": {
+      "TargetVersionOrCommit": "87e8b4a6ec3224b20a560b0e83de857805925572",
+      "TargetIntegrationDate": "2026-10-08",
+      "AcceptedStatus": "Committed"
+    },
+    "EXT-SECRETS-1": {
+      "TargetVersionOrCommit": "abbec4093715c1db854433119b32d4e16df20d08",
+      "TargetIntegrationDate": "2026-10-08",
+      "AcceptedStatus": "Committed"
+    },
+    "EXT-HOST-1": {
+      "TargetVersionOrCommit": "abbec4093715c1db854433119b32d4e16df20d08",
+      "TargetIntegrationDate": "2026-10-08",
+      "AcceptedStatus": "Committed"
+    }
+  },
+  "sourceAudit": {
+    "selectedRootFiles": 1038,
+    "changedFiles": [],
+    "scope": "Selected root sources, tests, tooling, configuration and register. Generated and transitive compiler inputs are not attested."
+  },
+  "local": {
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1972,
+        "passed": 1972,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "total": 6242,
+    "warningFreeBuilds": 5,
+    "result": {
+      "LocalContractsVerified": true,
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ],
+      "ExternalOwnerCalls": 0,
+      "LiveReadinessEstablished": false,
+      "StoryComplete": false,
+      "Mode": "Local"
+    }
+  },
+  "live": {
+    "StoryComplete": false,
+    "Mode": "Live",
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ],
+    "ExternalCalls": 0
+  },
+  "priorSourceDiagnostic": {
+    "result": {
+      "total": 22,
+      "passed": 11,
+      "failed": 11,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "overlay": "Seven production files read from HEAD, with only the two then-incompatible SDK integration test files excluded in this focused diagnostic. Original broad constructor/fixture errors are retained in initial-red-build.log. No owner source was edited. The red test DLL/PDB was not retained.",
+    "finalFocused": {
+      "total": 27,
+      "passed": 27,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    }
+  },
+  "package": {
+    "version": "3.128.4",
+    "warningFreeBuild": true,
+    "result": {
+      "total": 1861,
+      "passed": 1861,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "scope": "Complete Server suite; source-only route/auth fixtures excluded, original package API path retained."
+  },
+  "tooling": {
+    "passed": 6,
+    "failed": 0,
+    "scope": "Six unittest methods, including producer-validation subcases; final verifier suite list is included."
+  },
+  "artifactSha256": {
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.dll": "7b80a3e51e90b4e64acc0fe961a3345f4484fd687bfa6d0ffcb0751973bb42f1",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Debug/net10.0/Hexalith.Agents.Contracts.Tests.pdb": "2b631108780a0f24d3d58fc142bbe10284b23ca8a9c4012a5a6ed298690a1de2",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll": "187fba6c4417bed9a71e94dd24c78f791f30fa756cab1e0638d3bf8d3d081c9f",
+    "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.pdb": "a52b555f77dbc53dd5e87e6edceb8ff991db58f9b7e0e03f0d5d780b7aacdd21",
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.dll": "8467220d8a022ab07dec43990f9ddbabcbe09d1b7be91f7ae69c4f73d6318ba2",
+    "test/Hexalith.Agents.Client.Tests/bin/Debug/net10.0/Hexalith.Agents.Client.Tests.pdb": "395105738dc70adb15bf6071b94be181981ce453e8dcd094caa1913b959521eb",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll": "3a91c442487360c2f8297a56705ce4c69f8d41ee1579abc59db155f4ca3b36e0",
+    "test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.pdb": "c8b6e5bf5129b8ed1e5451a383b29cd49fdea7e53610764457c894f17ab0727c",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.dll": "2f13d46271675ea9a37ef7c0e5edbf311c92d970dab7319f0b6f17478ffcd9d4",
+    "test/Hexalith.Agents.UI.Tests/bin/Debug/net10.0/Hexalith.Agents.UI.Tests.pdb": "e5d4f76f3c92aa81fecaad8b4f6452aa9a72fba37ffd68223baaa1c3ac250c2f",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Release/net10.0/Hexalith.Agents.Contracts.Tests.dll": "a32aa2c14ece228a9f653e412a8e643ebe7b911bf02cc42a711534f28cf64d21",
+    "test/Hexalith.Agents.Contracts.Tests/bin/Release/net10.0/Hexalith.Agents.Contracts.Tests.pdb": "a59f695eae86963f91205474dc852b341e4190f6d41ad3d000e8b4db856ea362",
+    "test/Hexalith.Agents.Tests/bin/Release/net10.0/Hexalith.Agents.Tests.dll": "17064d8e96bc92c02a92a8735f0e5ad713e2d439f68162a7efd979c8c29e055c",
+    "test/Hexalith.Agents.Tests/bin/Release/net10.0/Hexalith.Agents.Tests.pdb": "1cba68f2b203a970a18b72c19f3470249d0b8dd170f6ff586529540e09fcf5fd",
+    "test/Hexalith.Agents.Client.Tests/bin/Release/net10.0/Hexalith.Agents.Client.Tests.dll": "b8c6f742354e2aeab35e106771de07e20ba311b3462ba380f5a33357af5dd047",
+    "test/Hexalith.Agents.Client.Tests/bin/Release/net10.0/Hexalith.Agents.Client.Tests.pdb": "28c99a74ee5b983f501c02ff47f859e870befe54a61cad418bc2a6fc1efe0fa3",
+    "test/Hexalith.Agents.Server.Tests/bin/Release/net10.0/Hexalith.Agents.Server.Tests.dll": "4aa2c840e8bb434e8b121503f3611063954ffe782682e5a155efa3333784213e",
+    "test/Hexalith.Agents.Server.Tests/bin/Release/net10.0/Hexalith.Agents.Server.Tests.pdb": "67ff2ffad0d9a3dc1c001ec90f858c488580f52071307b42e34d6ac53adb6e15",
+    "test/Hexalith.Agents.UI.Tests/bin/Release/net10.0/Hexalith.Agents.UI.Tests.dll": "953b61b210a2bfa6197b2340769af3125da21941c9389ad4e87bdd4efa5b9624",
+    "test/Hexalith.Agents.UI.Tests/bin/Release/net10.0/Hexalith.Agents.UI.Tests.pdb": "815c5774d24460378a1558a4df123f1ab3cab21cbd73f8797298823c52e07ffa"
+  },
+  "remaining": [
+    "Production current tenant/actor/Party/approver sources, custody and immutable provisioning remain unbound.",
+    "AD-30 signature/principal/operation/scope admission and private durable replay registration remain unavailable.",
+    "Replicated denial spool, restricted worker credentials and persisted ACL/outage/restart/restore/isolation matrix remain unavailable.",
+    "Production Agents intent adapters still need declared catalog enrollment and the exact authenticated host/gateway integration for the newer source SDK; the compatibility wrappers and TestServer principals are local fixtures only.",
+    "Proposal approval/rejection/abandonment/edit/regeneration operations remain unavailable with no runtime callers; when wired, preserve the returned approver bound through their later work and final dispatch.",
+    "Full Story 5.4 tasks/status, accepted dependency pins and RQ-1 remain unchanged; no owner command was repeated and no full-story review began."
+  ],
+  "archiveSha256": "e5a0cde5be309fb741e9f9571edddd46caf041076880db142d9d97cbcd1f9a13"
+}

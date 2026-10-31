@@ -33,7 +33,7 @@ internal static class ApproverPolicyVerdict
         // Fail closed on a partial/degraded read: if the resolution does not cover every configured source, the policy
         // can never be Valid under that uncertainty — treat the gap as a degraded read (Unavailable) so an omitted
         // source can never be silently ignored into a Valid verdict (AC3; AD-12).
-        if (result.Sources.Count != policy.Sources.Count)
+        if (result.Authority?.IsCurrent == false || result.Sources.Count != policy.Sources.Count)
         {
             return ApproverPolicyValidationStatus.Unavailable;
         }
@@ -116,7 +116,7 @@ internal static class ApproverPolicyVerdict
             return ApproverPolicyValidationStatus.Incomplete;
         }
 
-        if (result.Sources.Count != policy.Sources.Count)
+        if (result.Authority?.IsCurrent == false || result.Sources.Count != policy.Sources.Count)
         {
             return ApproverPolicyValidationStatus.Unavailable;
         }

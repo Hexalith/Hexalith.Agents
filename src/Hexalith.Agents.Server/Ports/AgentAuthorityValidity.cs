@@ -8,6 +8,7 @@ public sealed class AgentAuthorityValidity
     private readonly TimeProvider _clock;
     private readonly DateTimeOffset _validUntil;
     private readonly AgentAuthorityValidity? _retained;
+    private readonly AgentAuthorityValidity? _additional;
     private DateTimeOffset _checkedAt;
     private bool _invalid;
 
@@ -25,10 +26,12 @@ public sealed class AgentAuthorityValidity
             || validUntil.Offset != TimeSpan.Zero || validUntil <= checkedAt;
     }
 
-    private AgentAuthorityValidity(TimeProvider clock, DateTimeOffset checkedAt, DateTimeOffset validUntil, AgentAuthorityValidity retained)
+    private AgentAuthorityValidity(TimeProvider clock, DateTimeOffset checkedAt, DateTimeOffset validUntil,
+        AgentAuthorityValidity retained, AgentAuthorityValidity? additional = null)
         : this(clock, checkedAt, validUntil)
     {
         _retained = retained;
+        _additional = additional;
     }
 
     /// <summary>Adds a narrower interval without discarding this bound's deadline or checked history.</summary>
@@ -37,6 +40,18 @@ public sealed class AgentAuthorityValidity
     /// <returns>A transient bound that requires both intervals to remain current.</returns>
     internal AgentAuthorityValidity Restrict(DateTimeOffset checkedAt, DateTimeOffset validUntil)
         => new(_clock, checkedAt, validUntil, this);
+
+    /// <summary>Retains both independently checked intervals through subsequent protected work.</summary>
+    /// <param name="additional">The additional current evidence bound, including its checked clock history.</param>
+    /// <returns>A transient bound that can never outlive or reopen either original interval.</returns>
+    internal AgentAuthorityValidity Retain(AgentAuthorityValidity additional)
+    {
+        ArgumentNullException.ThrowIfNull(additional);
+        lock (_gate)
+        {
+            return new(_clock, _checkedAt, _validUntil, this, additional);
+        }
+    }
 
     /// <summary>Checks exclusive expiry and per-await clock ordering; a failed bound never becomes valid again.</summary>
     public bool IsCurrent
@@ -79,6 +94,13 @@ public sealed class AgentAuthorityValidity
             lock (_retained._gate)
             {
                 _invalid |= !_retained.Check(now);
+            }
+        }
+        if (_additional is not null)
+        {
+            lock (_additional._gate)
+            {
+                _invalid |= !_additional.Check(now);
             }
         }
         _invalid |= now < _checkedAt || now >= _validUntil || now.Offset != TimeSpan.Zero;

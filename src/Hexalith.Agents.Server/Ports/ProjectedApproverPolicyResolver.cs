@@ -136,7 +136,10 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
             return Unavailable(policy);
         }
 
-        return new(results);
+        return new(results)
+        {
+            Authority = new(clock, completed, currentCandidates.Min(candidate => candidate.Actor.ValidUntil)),
+        };
     }
 
     private static ApproverPolicyResolutionResult Unavailable(AgentApproverPolicy policy)

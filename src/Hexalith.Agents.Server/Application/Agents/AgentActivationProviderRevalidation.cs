@@ -124,6 +124,10 @@ public sealed class AgentActivationProviderRevalidation
             }
 
             approverVerdict = ApproverPolicyVerdict.Evaluate(policy, resolution);
+            if (approverVerdict == ApproverPolicyValidationStatus.Valid && resolution.Authority is { } approverAuthority)
+            {
+                request = request with { Authority = request.Authority?.Retain(approverAuthority) ?? approverAuthority };
+            }
         }
 
         return await DispatchAsync(request, providerVerdict, approverVerdict, ct).ConfigureAwait(false);
