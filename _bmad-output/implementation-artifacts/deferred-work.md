@@ -891,3 +891,34 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
   summary: Restore explicit Conversation denominator and dedicated enrolled service-Party constraints in the generated Epic 5 agent context.
   evidence: Review FB9 compared the regenerated context with baseline 98c4dda: the prior context named open/undeleted Conversations over [from,to), including zero-call Conversations, and a dedicated enrolled Conversations service Party. Accepted planning/full owner contracts remain unchanged; this agent-context correction is deferred under the build workflow rule.
+
+## Deferred from: code review of spec-6-1-start-and-recover-an-automatic-interaction.md (2026-11-01)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: An existing legacy stream at the untagged AD-29 interaction id makes `CreatePermittedAgentInteraction` reject as `LegacyStream` permanently. Recovery then polls for about 12 seconds, throws `AuthoritativeCheckpointNotObserved`, and leaves the permit orphaned.
+  evidence: Review BH (round 2), `InteractionOutboxRecoveryOrchestrator.cs:44` and `AgentInteractionAggregate.Automatic.cs:26`. Unverified (medium if true). It is settled by confirming whether the legacy `RequestAgentInteraction` id formula equals `ConversationAgentStateIdentity.Interaction`, and whether the goal-B inventory contains such streams. Goal B was deferred 2026-10-19.
+  status: open
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: `RateAdmissionAuthorized`, `BudgetReservationAuthorized`, `CapacityAdmissionAuthorized` and `AgentCallAccepted` are recorded on `agent-interaction` after a separate directory read, so Closing can land between the read and the record. Cleanup only happens at the next checkpoint.
+  evidence: Review AA (round 2), `AutomaticInteractionStepOrchestrator.cs:77`. Closing this cross-aggregate race needs the goal-B EventStore epoch write fence, which was deferred by decision 2026-10-19.
+  status: open
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: `ProviderInvocationNotAuthorized` records no typed AD-13 reason (OutputStatusAuthorityOpen/Missing/Malformed/Unavailable). Outside Closing, `CancelNoInvocation` is emitted without the allocator lookup that AD-13 requires.
+  evidence: Review AA (round 2), `AutomaticInteractionStepOrchestrator.cs:169` and `AutomaticInteractionPolicy.cs:44-49`. Story 6.8 owns missing fail-closed runtime contract members; Story 6.5 owns the capacity allocator.
+  status: open
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: A Failed, Terminated or Canceled interaction workflow instance has no resume or terminalize path. The scheduler always throws `InteractionWorkflowRecoveryRequired`, and the committed leases stay unsettled.
+  evidence: Review AA/BH (round 2), `DaprInteractionWorkflowScheduler.cs:28`. AD-18 requires recovery to resume or terminalize the existing instance. Decision 2026-11-01: keep the explicit RecoveryRequired from BH-6 and design terminal recovery under AD-23 once live Dapr (Level 4) is available.
+  status: open
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: `InteractionCommandDispatch` uses the aggregate id as `UserId` and as `CorrelationId`. Its `LogicalCommandId` puts the aggregate id in AD-29's PrincipalIdentity slot and the domain in the TargetAggregateIdentity slot.
+  evidence: Review AA/BH (round 2), `InteractionCommandDispatch.cs:30-32`. Decision 2026-11-01: fix UserId, the correlation id and the AD-29 slot order together once EXT-HOST-1 defines the Interaction Workflow principal.
+  status: open
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: Outbox recovery needs the exact interaction id. If the host crashes between the permit and creation and the client never retries, the permit is left unconsumed and nothing discovers it.
+  evidence: Review AA (round 2), `InteractionOutboxRecoveryOrchestrator.cs:17`. Decision 2026-11-01: a cross-conversation sweep needs an index that only the platform host can provide (EXT-HOST-1).
+  status: open
+- source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
+  summary: The per-conversation directory state keeps every permit, each with its full protected Request, plus every acknowledgement and lease. Nothing is pruned, and no test covers two workflows contending on one directory.
+  evidence: Review BH (round 2), `ConversationAgentStateState.cs:23-27`. Pruning Request after acknowledgement needs digest-based retry comparison. Decision 2026-11-01: prune state with the Story 8.3 deletion and retention work.
+  status: open
