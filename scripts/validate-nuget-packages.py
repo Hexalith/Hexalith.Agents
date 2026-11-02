@@ -107,6 +107,7 @@ EXPECTED_DEPENDENCIES = {
             "Hexalith.Agents.Client",
             "Hexalith.Agents.Contracts",
             "Hexalith.FrontComposer.Contracts",
+            "Hexalith.FrontComposer.Contracts.UI",
             "Hexalith.FrontComposer.Shell",
             "ByteAether.Ulid",
             "Fluxor",
