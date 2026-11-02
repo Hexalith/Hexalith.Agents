@@ -43,6 +43,7 @@ public sealed class HttpAgentAdministrationContextProvider(IHttpContextAccessor 
         AgentAdministrationContext identity = GetContext();
         if (tenantSource is null || actorSource is null || availability is null
             || availability.Check("EXT-HOST-1") is not null || availability.Check("EXT-PARTIES-1") is not null
+            || availability.Check("EXT-SECRETS-1") is not null
             || string.IsNullOrWhiteSpace(identity.ActorUserId) || string.IsNullOrWhiteSpace(identity.TenantId))
         {
             return identity;

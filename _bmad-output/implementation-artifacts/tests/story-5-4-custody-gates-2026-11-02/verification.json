@@ -1,0 +1,126 @@
+{
+  "date": "2026-11-02",
+  "root_head": "6f387d70089b88fef9361c56fa46b0b70cee1b9d",
+  "scope": "Bounded local Human custody availability gate; full Story 5.4 remains in-progress",
+  "local": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-custody-gates-20261102/local",
+    "reported_exit_code": 0,
+    "result": {
+      "LocalContractsVerified": true,
+      "LiveReadinessEstablished": false,
+      "StoryComplete": false,
+      "Mode": "Local",
+      "ExternalOwnerCalls": 0,
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ]
+    },
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1977,
+        "passed": 1977,
+        "failed": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "new_passed_cases": [
+      "Hexalith.Agents.Server.Tests.Story54CustodyAvailabilityTests.TenantAccessStopsBeforeAuthoritySourcesWhenCustodyIsUnavailable",
+      "Hexalith.Agents.Server.Tests.Story54CustodyAvailabilityTests.CallerPartyValidationStopsBeforeIdentityReadWhenCustodyIsUnavailable",
+      "Hexalith.Agents.Server.Tests.Story54CustodyAvailabilityTests.AdministrationRemainsUnelevatedWhenCustodyIsUnavailable(platform: False)",
+      "Hexalith.Agents.Server.Tests.Story54CustodyAvailabilityTests.AdministrationRemainsUnelevatedWhenCustodyIsUnavailable(platform: True)",
+      "Hexalith.Agents.Server.Tests.Story54CustodyAvailabilityTests.ApproverResolutionStopsBeforeCurrentSourceWhenCustodyIsUnavailable"
+    ]
+  },
+  "live": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-custody-gates-20261102/live",
+    "reported_exit_code": 1,
+    "result": {
+      "Blockers": [
+        {
+          "RecordId": "EXT-PARTIES-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-CONV-AI-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-SECRETS-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-HOST-1",
+          "Code": "DependencyNotAvailable"
+        }
+      ],
+      "ExternalCalls": 0,
+      "Mode": "Live",
+      "StoryComplete": false
+    }
+  },
+  "artifact_sha256": {
+    "/tmp/agents-story54-custody-gates-20261102/live/result.json": "a3096cf7e887bade7aebe9b827fc2004d41893460dc3cac0da778d0a55462c1b",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Client.Tests.build.log": "e2722dcbf3b479d601fa0e007383a8509a232e74d6ed815194a2b12a59aa1e11",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Client.Tests.xml": "9d8e7b7271eddacc9ea20f59808105ecbc1571662e89ebc7ed6e50fb39117daa",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Contracts.Tests.build.log": "af21d59e730927ee7326fe7c9148e2aa13162cc5ef9c33779037c469c9d164d6",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Contracts.Tests.xml": "5bf8ad9830f0dc50b9fd34f239da883f472b15a84448016c85fd0e7fef7b4eb5",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Server.Tests.build.log": "7b09a67c2d3da1492b1e100b0aa4bc0d0b2c38d5562f3bc7cef65f8a9fb8a067",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Server.Tests.xml": "c069cda2c6cb8c83196d279ac4617638d9a2d4556e775dad7679eb40e5ccc445",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Tests.build.log": "426c1cfd7796a3da732d35f90a18845427b9aa1f7086a8fcc5311c55561850a8",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.Tests.xml": "592d4bf302a88240b30c617acd0b559cc23c940ab50799e72efa1d87ef0f6d62",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.UI.Tests.build.log": "79f972cd178854ea56d8ffb8e335eea6d3263d3c5356726786a09fe779fdc988",
+    "/tmp/agents-story54-custody-gates-20261102/local/Hexalith.Agents.UI.Tests.xml": "64e3f3200b484a8bf413ed46a57a46867d45a2d65ddd39f5c3562cb71fef3f2d",
+    "/tmp/agents-story54-custody-gates-20261102/local/build-preparation-f0984671e993482bada20e40a9358e0b/source-mapping/catalog-versions.json": "5bfced6b17b81904d16fdbb143a11209eedb2f11e8a0c590547ac82d540031bf",
+    "/tmp/agents-story54-custody-gates-20261102/local/build-preparation-f0984671e993482bada20e40a9358e0b/source-mapping/mapping.json": "d8609fa97d8f2bef2117efbd080083e04e1f7f47f04a16aec533c168d18ea30b",
+    "/tmp/agents-story54-custody-gates-20261102/local/build-preparation.json": "51a5ccd02038f4924e79ae8d00a5fa2512acc5a6cd34242f5f0d842a6a99cef3",
+    "/tmp/agents-story54-custody-gates-20261102/local/build-preparation.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/agents-story54-custody-gates-20261102/local/result.json": "458a45931b77460b7d11bc9c9c69573a76ee9a6e7f9ffeaab78989e643d83214"
+  },
+  "review": {
+    "baseline_diff": "Unavailable: git cannot traverse missing object aea707d6e8ef2c765531f7c7bcee0441fa5f076e from recorded baseline; current HEAD was clean before this slice, so review used the HEAD worktree diff including the new test file."
+  }
+}

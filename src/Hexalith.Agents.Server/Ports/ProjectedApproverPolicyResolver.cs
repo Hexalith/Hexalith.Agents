@@ -24,7 +24,7 @@ public sealed class ProjectedApproverPolicyResolver(ICurrentApproverEvidenceSour
         ArgumentNullException.ThrowIfNull(policy);
         ct.ThrowIfCancellationRequested();
         var results = new List<ApproverSourceResolution>();
-        foreach (string record in new[] { "EXT-HOST-1", "EXT-PARTIES-1", "EXT-CONV-AI-1" })
+        foreach (string record in new[] { "EXT-HOST-1", "EXT-PARTIES-1", "EXT-CONV-AI-1", "EXT-SECRETS-1" })
         {
             if (availability.Check(record) is { } blocker)
             {

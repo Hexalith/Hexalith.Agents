@@ -71,6 +71,11 @@ public sealed class PartiesAgentPartyDirectory : IAgentPartyDirectory
             return new(PartyLinkValidationStatus.Unavailable, null) { Dependency = blocker };
         }
 
+        if (actor is not null && _availability.Check("EXT-SECRETS-1") is { } custodyBlocker)
+        {
+            return new(PartyLinkValidationStatus.Unavailable, null) { Dependency = custodyBlocker };
+        }
+
         if (string.IsNullOrWhiteSpace(tenantId) || string.IsNullOrWhiteSpace(partyId))
         {
             return new(PartyLinkValidationStatus.Unauthorized, null);
