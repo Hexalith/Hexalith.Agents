@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "/home/administrator/projects/hexalith/conversations",
+    "status",
+    "--porcelain"
+  ],
+  "completedAtUtc": "2026-11-02T15:47:20.195556+00:00",
+  "cwd": "/home/administrator/projects/hexalith/agents",
+  "exitCode": 0,
+  "startedAtUtc": "2026-11-02T15:47:19.794699+00:00",
+  "stderr": "",
+  "stdout": " M references/Hexalith.EventStore\n M references/Hexalith.Folders\n M references/Hexalith.FrontComposer\n M references/Hexalith.McpCli\n M references/Hexalith.Memories\n M references/Hexalith.Parties\n M references/Hexalith.Platform\n M references/Hexalith.Projects\n M references/Hexalith.Tenants\n"
+}

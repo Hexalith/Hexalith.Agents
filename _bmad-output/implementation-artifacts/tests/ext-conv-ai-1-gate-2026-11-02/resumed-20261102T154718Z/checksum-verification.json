@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sha256sum",
+    "--check",
+    "SHA256SUMS"
+  ],
+  "cwd": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/ext-conv-ai-1-gate-2026-11-02/resumed-20261102T154718Z",
+  "startedAtUtc": "2026-11-02T15:49:25.201349+00:00",
+  "completedAtUtc": "2026-11-02T15:49:25.206211+00:00",
+  "exitCode": 0,
+  "stdout": "README.md: OK\nobservations.json: OK\nreceipts/agents-head.json: OK\nreceipts/agents-originMain.json: OK\nreceipts/agents-status.json: OK\nreceipts/cluster-context.json: OK\nreceipts/cluster-pods-services-serviceaccounts.json: OK\nreceipts/cluster-workloads.json: OK\nreceipts/conversations-head.json: OK\nreceipts/conversations-originMain.json: OK\nreceipts/conversations-status.json: OK\nreceipts/eventstore-head.json: OK\nreceipts/eventstore-originMain.json: OK\nreceipts/eventstore-status.json: OK\nreceipts/host-pass-path-search.json: OK\nreceipts/parties-head.json: OK\nreceipts/parties-originMain.json: OK\nreceipts/parties-status.json: OK\nreceipts/platform-head.json: OK\nreceipts/platform-originMain.json: OK\nreceipts/platform-status.json: OK\nsnapshots/conversationsPriorBlockers.json: OK\nsnapshots/conversationsQualificationContract.ps1: OK\nsnapshots/conversationsReceiverContract.md: OK\nsnapshots/deploymentInputMap.json: OK\nsnapshots/hostContinuation.md: OK\nsnapshots/hostMissingInputs.json: OK\nsnapshots/hostVerification.json: OK\nsnapshots/partiesContinuation.md: OK\nsnapshots/partiesRecheck.json: OK\nsnapshots/platformOwnerForm.json: OK\nsnapshots/previousGate.md: OK\nsnapshots/protectionOwner.md: OK\nsnapshots/protectionOwnerReference.md: OK\nsnapshots/register.md: OK\nsnapshots/secretsMissingInputs.json: OK\nvalidation.json: OK\n",
+  "stderr": "",
+  "manifestExclusions": [
+    "SHA256SUMS",
+    "checksum-verification.json"
+  ]
+}

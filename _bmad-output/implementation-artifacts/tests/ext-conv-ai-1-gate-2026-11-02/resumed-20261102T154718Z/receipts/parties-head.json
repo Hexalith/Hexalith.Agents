@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "/home/administrator/projects/hexalith/parties",
+    "rev-parse",
+    "HEAD"
+  ],
+  "completedAtUtc": "2026-11-02T15:47:19.595572+00:00",
+  "cwd": "/home/administrator/projects/hexalith/agents",
+  "exitCode": 0,
+  "startedAtUtc": "2026-11-02T15:47:19.593647+00:00",
+  "stderr": "",
+  "stdout": "a419b53cc2087f6b99d301fb98852e72bd50c9fa\n"
+}

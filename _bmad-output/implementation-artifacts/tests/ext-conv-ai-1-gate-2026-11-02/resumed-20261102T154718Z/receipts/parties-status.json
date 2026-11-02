@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "/home/administrator/projects/hexalith/parties",
+    "status",
+    "--porcelain"
+  ],
+  "completedAtUtc": "2026-11-02T15:47:19.790719+00:00",
+  "cwd": "/home/administrator/projects/hexalith/agents",
+  "exitCode": 0,
+  "startedAtUtc": "2026-11-02T15:47:19.597516+00:00",
+  "stderr": "",
+  "stdout": " M _bmad-output/implementation-artifacts/spec-8-10-final-readiness-documentation-and-retirement-gate.md\n M _bmad-output/implementation-artifacts/sprint-status.yaml\n"
+}

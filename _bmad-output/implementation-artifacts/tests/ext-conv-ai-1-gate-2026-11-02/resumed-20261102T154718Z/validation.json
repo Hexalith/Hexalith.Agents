@@ -1,0 +1,97 @@
+{
+  "allPassed": true,
+  "attemptJournalAfter": {},
+  "checks": {
+    "acceptedConversationsBindingStillAbsent": true,
+    "allClusterMetadataCommandsSucceeded": true,
+    "allJsonParses": true,
+    "allLocalMarkdownLinksResolve": true,
+    "allSourceSnapshotsMatchRecordedHashes": true,
+    "attemptJournalUnchanged": true,
+    "exactTwelveVerifiedInputSlotsRemainNull": true,
+    "hostSearchCompletedWithNoMatches": true,
+    "manifestStillAbsent": true,
+    "narrowInstallationAuthorizationRetained": true,
+    "noRuntimeEffectsOrAvailabilityChange": true,
+    "ownerReturnPointersRemainNull": true,
+    "protectionProfileStillAbsent": true,
+    "protectionRemainsUncommitted": true,
+    "registerBytesEqualPushedBaseline": true,
+    "sprintStatusBytesEqualPushedBaseline": true
+  },
+  "localLinks": [
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/tests/ext-conv-ai-1-gate-2026-11-02/resumed-20261102T154718Z/README.md",
+      "target": "observations.json"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../planning-artifacts/external-dependency-register.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/ext-host-1-continuation-2026-11-02/README.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.Parties/docs/implementation/ext-parties-1-v2-continuation-2026-11-02/README.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.Parties/docs/implementation/ext-parties-1-v2-continuation-2026-11-02/observations-recheck.json"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.Conversations/docs/implementation/ext-conv-ai-1-deletion-conformance-receiver.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "../../references/Hexalith.Conversations/docs/implementation/ext-conv-ai-1-gate-recheck-2026-11-02-continuation/README.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "tests/ext-conv-ai-1-gate-2026-11-02/resumed-20261102T154718Z/README.md"
+    },
+    {
+      "exists": true,
+      "source": "_bmad-output/implementation-artifacts/story-5-4-ext-conv-ai-1-gate-continuation-2026-11-02.md",
+      "target": "tests/ext-conv-ai-1-gate-2026-11-02/resumed-20261102T154718Z/observations.json"
+    }
+  ],
+  "observedAtUtc": "2026-11-02T15:49:25.199967+00:00",
+  "preservation": {
+    "register": {
+      "baselineCommit": "d89aaf475081f0139e8453d7d83d4a129392e6c4",
+      "baselineSha256": "1ee2692ea5bf6a0e42921c6dc64a58ebe5738efdbb0424d0345a281fca0b1487",
+      "currentSha256": "1ee2692ea5bf6a0e42921c6dc64a58ebe5738efdbb0424d0345a281fca0b1487",
+      "equal": true,
+      "path": "_bmad-output/planning-artifacts/external-dependency-register.md"
+    },
+    "sprintStatus": {
+      "baselineCommit": "d89aaf475081f0139e8453d7d83d4a129392e6c4",
+      "baselineSha256": "3fb85ed89e8ae0efeb03ea0346b8736bc04df9f9786e262effeab05b9ad7dc47",
+      "currentSha256": "3fb85ed89e8ae0efeb03ea0346b8736bc04df9f9786e262effeab05b9ad7dc47",
+      "equal": true,
+      "path": "_bmad-output/implementation-artifacts/sprint-status.yaml"
+    }
+  },
+  "verificationScope": "Read-only evidence integrity and baseline preservation; no component tests, accepted owner command, runtime qualification or C1-C4 execution"
+}

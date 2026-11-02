@@ -1,0 +1,93 @@
+{
+  "applicationDeploymentConfigurationFound": false,
+  "scopedEvidence": {
+    "searchedRoots": [
+      "/home/administrator/projects/hexalith/platform/deploy",
+      "/home/administrator/projects/hexalith/platform/src",
+      "/home/administrator/projects/hexalith/platform/eng",
+      "/home/administrator/projects/hexalith/conversations/src",
+      "/home/administrator/projects/hexalith/conversations/tools"
+    ],
+    "extensions": [
+      "json",
+      "yaml",
+      "yml",
+      "env"
+    ],
+    "excludedDirectories": [
+      "obj",
+      "bin"
+    ],
+    "searchReceipt": "receipts/application-deployment-config-discovery.json",
+    "knownInstalledManifestPath": "/home/administrator/hexalith-conversations-evidence/ext-conv-ai-1/live-manifest.json",
+    "knownInstalledManifestExists": false
+  },
+  "deploymentTargetConfiguration": "/home/administrator/.kube/hexalith-production",
+  "narrowScopeAuthorizationConfiguration": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json#/extConvAi1InstallationAuthorization",
+  "distinction": "The kubeconfig identifies target/access and the owner form authorizes scope. Neither is an installed Conversations/Parties/conformance-receiver application deployment configuration. No such current configuration was located in this inspected scope.",
+  "ownerReturnLocations": {
+    "identityAndApproverEvidence": "owner-decisions.json#/mvpOperationalInputs/currentIdentityAndApprovers/currentAuthorityAndBindingEvidenceReference",
+    "independentIssuerEvidence": "owner-decisions.json#/mvpOperationalInputs/independentDecisionAuthority/installedIssuerAndPublicTrustEvidenceReference",
+    "currentRolesAndRevocation": "owner-decisions.json#/mvpOperationalInputs/independentDecisionAuthority/currentRolesAndRevocationEvidenceReference",
+    "branchBBindings": "owner-decisions.json#/D8_host/branchBPartiesAndConversationsInstallationBindings"
+  },
+  "missingCompiledProductionBindingsInInspectedSource": [
+    "IConversationAgentAuthority (only Unavailable default)",
+    "IConversationDeletionApprovalVerifier (only Unavailable default)",
+    "ISourcePublicationAuthorityInstallationEvidence (no concrete provider)",
+    "ISourcePublicationAcknowledgementObserver (no concrete provider)",
+    "Executable-host call to AddEventStoreSourcePublicationAuthority with real enrollment and issuer inputs"
+  ],
+  "unboundCurrentInstallationData": {
+    "Hexalith:Conversations:DeletionRuntime": {
+      "Enabled": null,
+      "TenantId": null,
+      "WorkerPrincipalId": null,
+      "ServicePartyId": null,
+      "NamespaceInstallationId": null,
+      "StorageIdentity": null,
+      "GatewayBaseAddress": null,
+      "PlatformWorkloadId": null,
+      "ReceiverPrincipalId": null,
+      "LookupPrincipalId": null,
+      "IdentityReaderPrincipalId": null,
+      "AcceptedTargetVersions": null
+    },
+    "Hexalith:Conversations:DeletionRuntime:LookupIssuer": {
+      "Workload": null,
+      "ClientId": null,
+      "ClientSecretReference": null,
+      "TokenEndpoint": null,
+      "EnableResourceBindingRequests": null
+    },
+    "EventStore:Authentication": {
+      "Authority": null,
+      "TokenEndpoint": null,
+      "ClientId": null,
+      "ClientSecretReference": null,
+      "GrantType": null
+    },
+    "DeletionConformance": {
+      "Enabled": null,
+      "TenantId": null,
+      "TargetVersion": null,
+      "ReceiverPrincipalId": null,
+      "LookupPrincipalId": null,
+      "WorkerPrincipalId": null,
+      "GatewayWorkloadId": null,
+      "StorageIdentity": null,
+      "GatewayBaseAddress": null,
+      "RetainedTargetVersions": null
+    },
+    "receiverSdkTrust": {
+      "EventStore:DomainService:AppId": null,
+      "Authentication:Workload:Audience": null,
+      "Authentication:Workload:AllowedCallers": null,
+      "Authentication:WorkloadJwtBearer": null,
+      "APP_API_TOKEN_reference": null,
+      "DAPR_API_TOKEN_reference": null
+    }
+  },
+  "secretValuesCaptured": false,
+  "configurationValuesWouldNotEstablishEnrollmentOrAuthority": true
+}
