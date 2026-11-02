@@ -278,8 +278,13 @@ if args and pathlib.Path(args[0]).name == "pwsh.dll":
     os.execv(os.environ["READINESS_REAL_DOTNET"], [os.environ["READINESS_REAL_DOTNET"], *args])
 with open(os.environ["READINESS_CALL_LOG"], "a") as log:
     log.write(json.dumps({"cwd": os.getcwd(), "args": args}) + "\n")
-if args and args[0] == "msbuild" and "-getProperty:HexalithEventStoreVersion" in args:
-    print("1.2.3")
+if args and args[0] == "msbuild" and any(arg.startswith("-getProperty:Configuration,") for arg in args):
+    root = next(arg.split("=", 1)[1] for arg in args if arg.startswith("-p:HexalithEventStoreRoot="))
+    print(json.dumps({"Properties": {"Configuration": "Debug", "HexalithSourceMappingMode": "source",
+                                   "HexalithEventStoreFromSource": "true", "HexalithEventStoreRoot": root,
+                                   "HexalithEventStoreVersion": "1.2.3"},
+                      "Items": {"ProjectReference": [{"FullPath": str(pathlib.Path(root) /
+                          "src/Hexalith.EventStore.DomainService/Hexalith.EventStore.DomainService.csproj")}]}}))
     sys.exit(0)
 print("Synthetic path probe stops before every real owner build")
 sys.exit(19)
@@ -309,19 +314,24 @@ sys.exit(19)
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Build failed: Hexalith.EventStore.Contracts.Tests", result.stdout + result.stderr)
         calls = [json.loads(line) for line in capture.read_text().splitlines()]
-        self.assertEqual(len(calls), 2, calls)
-        self.assertEqual(calls[0]["args"][0], "msbuild")
-        self.assertIn("-getProperty:HexalithEventStoreVersion", calls[0]["args"])
+        self.assertEqual(len(calls), 4, calls)
+        for call in calls[:3]:
+            self.assertEqual(call["args"][0], "msbuild")
+            self.assertTrue(any(arg.startswith("-getProperty:Configuration,") for arg in call["args"]))
         self.assertEqual(Path(calls[0]["args"][1]),
+                         PARTIES / "src/Hexalith.Parties/Hexalith.Parties.csproj")
+        self.assertEqual(Path(calls[1]["args"][1]),
                          eventstore / "src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj")
-        self.assertEqual(calls[1]["args"][0], "build")
-        self.assertEqual(Path(calls[1]["cwd"]), eventstore)
-        self.assertEqual(Path(calls[1]["args"][1]), eventstore /
+        self.assertEqual(Path(calls[2]["args"][1]), eventstore /
                          "tests/Hexalith.EventStore.Contracts.Tests/Hexalith.EventStore.Contracts.Tests.csproj")
-        self.assertIn(str(self.caller / "relative-artifacts"), calls[1]["args"])
-        self.assertIn("-p:HexalithMemoriesRoot=" + str(self.caller / "relative-memories"), calls[1]["args"])
-        self.assertIn("-p:HexalithEventStoreRoot=" + str(eventstore), calls[1]["args"])
-        self.assertIn("-p:HexalithEventStoreVersion=1.2.3", calls[1]["args"])
+        self.assertEqual(calls[3]["args"][0], "build")
+        self.assertEqual(Path(calls[3]["cwd"]), eventstore)
+        self.assertEqual(Path(calls[3]["args"][1]), eventstore /
+                         "tests/Hexalith.EventStore.Contracts.Tests/Hexalith.EventStore.Contracts.Tests.csproj")
+        self.assertIn(str(self.caller / "relative-artifacts"), calls[3]["args"])
+        self.assertIn("-p:HexalithMemoriesRoot=" + str(self.caller / "relative-memories"), calls[3]["args"])
+        self.assertIn("-p:HexalithEventStoreRoot=" + str(eventstore), calls[3]["args"])
+        self.assertIn("-p:HexalithEventStoreVersion=1.2.3", calls[3]["args"])
         evidence = self.caller / "relative-evidence"
         self.assertEqual((evidence / "eventstore-version.log").read_text().strip(), "1.2.3")
         self.assertIn("Synthetic path probe", (evidence / "Hexalith.EventStore.Contracts.Tests-build.log").read_text())
