@@ -922,3 +922,8 @@ The original entries above are retained as historical evidence. The following fi
   summary: The per-conversation directory state keeps every permit, each with its full protected Request, plus every acknowledgement and lease. Nothing is pruned, and no test covers two workflows contending on one directory.
   evidence: Review BH (round 2), `ConversationAgentStateState.cs:23-27`. Pruning Request after acknowledgement needs digest-based retry comparison. Decision 2026-11-01: prune state with the Story 8.3 deletion and retention work.
   status: open
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-complete-conversations-internal-catalog.md`
+  summary: The current default Platform source regression graph cannot restore its Tenants dependencies under the selected central package versions.
+  evidence: At Platform c869f1c7, the parent eight-case related selection has three NU1109 restore failures before reader compilation: Tenants requires EventStore 4.0.0/McpCli 2.0.0 while the generated reader pins 3.133.0/1.1.0. All 38 explicitly mapped Conversations catalogue cases pass. Exact XML and restore logs are retained in Conversations docs/implementation/ext-conv-ai-1-internal-catalog-2026-11-02/parent-final-20261102T195034Z-c2fdcdb8c402476d82c8402242adaf8f. Reconcile the published/default source tuple and qualify the resulting SDK cohort; do not suppress downgrades or substitute a different owner selection.
+  status: open

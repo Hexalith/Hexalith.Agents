@@ -1,0 +1,37 @@
+{
+  "observedAt": "2026-11-02T20:05:14.462549+00:00",
+  "scope": "Reviewed source catalogue milestone; full Story5.4 delivery remains blocked.",
+  "pushedSource": {
+    "conversations": "1a013e8f5fd244aaf306a0c6c54bd85b3196a328",
+    "platform": "73d8ac8ea55c4539aa7adb268677c222e00d104c"
+  },
+  "verification": {
+    "server": 1586,
+    "contracts": 648,
+    "domain": 189,
+    "releaseTooling": 28,
+    "releaseToolingSubtests": 3,
+    "conversationsCatalogueEnrollment": 38,
+    "additionalPlatformPassed": 5,
+    "additionalPlatformRestoreFailed": 3,
+    "retainedMembersVerifiedFromFreshReferenceCheckout": 431
+  },
+  "additionalRestoreBlocker": "NU1109: Tenants requires EventStore4.0.0/McpCli2.0.0 versus central3.133.0/1.1.0; raw failures retained.",
+  "independentBlockers": [
+    "EXT-PROTECTION-1 accepted target/date/command/installed profile absent",
+    "EXT-HOST-1 genuine Live passPath:true bound to accepted target/profile absent",
+    "Actual BranchB Party, worker, business approval issuer/public trust, source/publication and lookup enrollments unverified",
+    "Separate target/rollover/lookup receiver installation inputs incomplete",
+    "Verified installed Live manifest and twelve input byte pins absent",
+    "Complete clean-target Conversations replacement and explicit owner acceptance absent"
+  ],
+  "availabilityChanged": false,
+  "liveCohortAttempts": 0,
+  "liveManifestPresent": false,
+  "protectionProfilePresent": false,
+  "registerSha256": "1ee2692ea5bf6a0e42921c6dc64a58ebe5738efdbb0424d0345a281fca0b1487",
+  "sprintSha256": "3fb85ed89e8ae0efeb03ea0346b8736bc04df9f9786e262effeab05b9ad7dc47",
+  "expectedFromUserNow": [],
+  "userRole": "Validate the finished handoff and concrete business decisions; no general approval or technical evidence creation requested.",
+  "nomination": "jpiquot; identity observation is not business approval or an independent authority."
+}

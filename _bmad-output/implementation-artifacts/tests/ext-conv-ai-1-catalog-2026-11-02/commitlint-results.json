@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-11-02T19:39:21.313775+00:00",
+  "results": [
+    {
+      "repository": "conversations",
+      "purpose": "conversations",
+      "message": "feat(routing): declare the complete internal conversations catalog\n",
+      "sha256": "4ef43b86a2c12b58660cbd053c16fb2dfd8156f5d09e11700dc43ab9c8d318ee",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "repository": "platform",
+      "purpose": "platform",
+      "message": "fix(catalog): validate owner adapters before catalog generation\n",
+      "sha256": "6a8719f72f25d9d14bb5ef86191ec67c3c3207a541a75cfaa3be1fe15cc6432b",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "repository": "agents",
+      "purpose": "agents",
+      "message": "docs(agents): record conversations delivery and validation boundaries\n",
+      "sha256": "74a419ed0b29f69743585c8fb3a6ceca89572996c77cddb79a48af5898f1811a",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "repository": "agents",
+      "purpose": "agents-pointers",
+      "message": "build(deps): pin reviewed conversations and platform source\n",
+      "sha256": "4fd5f91d3f44461817b7e73fe3ce6d79f05fcea73fe19dcb47743e9afc68d617",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "repository": "platform",
+      "purpose": "preserve measured source bytes and CRLF policy",
+      "message": "chore(git): preserve conversations verification source bytes\n",
+      "sha256": "7b5e315cc032ee04767f224fd05a9e5fa275bba4779cd9e02ad62a33c410a225",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "validationObservedBeforeCommit": true
+    }
+  ]
+}
