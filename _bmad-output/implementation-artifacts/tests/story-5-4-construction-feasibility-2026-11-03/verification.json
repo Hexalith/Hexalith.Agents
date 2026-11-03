@@ -1,0 +1,357 @@
+{
+  "schema": "agents.ext-protection-1.construction-feasibility-verification/v1",
+  "verifiedAtUtc": "2026-11-03T12:15:40.179662Z",
+  "scope": "Offline document/evidence integrity only. This is not Local, a preparer, source tests, Live, Full, OQ or accepted installed qualification.",
+  "checks": {
+    "blockerReportPrefixUnchanged": true,
+    "blockerReportAppendOnly": true,
+    "preservedInputFingerprintsUnchanged": true,
+    "originalRecovery128MatchManifest": true,
+    "sevenDesignatedPathsStillAbsent": true,
+    "exact28PointersStillNull": true,
+    "noOperationalPointerOmitted": true,
+    "flagsBoundsHostBranchTargetDateUnchanged": true,
+    "D7D9Unchanged": true,
+    "remoteFormMatchesLocalBlobAndOperationalFields": true,
+    "remoteIssueCommentsRemainEmpty": true,
+    "remoteProtectionIssueSearchNoMatch": true,
+    "allIndexedJsonParses": true,
+    "primaryReferences31Distinct": true,
+    "retainedReturnDiscoverySameThreeFiles": true,
+    "allLocalLinksAndFragmentsResolve": true,
+    "whitespaceDiffCheckPassed": true,
+    "requestPreparedUnsent": true
+  },
+  "passed": true,
+  "blockerReportPreservedPrefix": {
+    "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+    "bytes": 48188,
+    "sha256": "53e6e28637d9c6eaaefd73be544ce7e3f06a7de1c07e2847b11c5174e0def187"
+  },
+  "preservedInputFileCount": 40,
+  "originalRecoveryMemberCount": 128,
+  "operationalFields": {
+    "count": 28,
+    "null": 28,
+    "genuineNewDeliveries": 0,
+    "newAcceptedEvidence": 0,
+    "bySection": {
+      "currentOperationalProfile": 6,
+      "backupAndRestore": 6,
+      "maintenancePreservationBaseline": 7,
+      "currentIdentityAndApprovers": 2,
+      "independentDecisionAuthority": 2,
+      "authenticatedIngressAndReplay": 2,
+      "durableDenialAndRecovery": 3
+    }
+  },
+  "localLinks": [
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "story-5-4-ext-secrets-host-continuation-2026-11-03.md#concrete-protection-owner-action-proposals",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "#8-construction-feasibility-investigation--2026-11-03",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../planning-artifacts/external-dependency-register.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/README.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/ext-host-1-continuation-2026-11-02/README.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/ext-protection-1-loop10/README.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/story-5-4-owner-validation-2026-11-02/protection-evidence-scope.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-verifier-protocol.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/inputs.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/remote-provenance.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/deploy/erasure-root/README.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/D2-provisioning-request-2026-10-28.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/src/Hexalith.Platform.Protection/ErasureRootHostComposition.cs",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/AgentsOwningProcessComposition.cs",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/eng/ext-secrets-1/coordinated_packets.py",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/inputs.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/verification.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/primary-sources.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/inputs.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/remote-provenance.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/src/Hexalith.Platform.Protection/ErasureRootCustody.cs",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/src/Hexalith.Platform.Protection/OpenBaoErasureRootStore.cs",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/deploy/erasure-root/README.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../../references/Hexalith.Platform/docs/implementation/story-5-4-owner-validation-2026-11-02/protection-evidence-scope.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "../planning-artifacts/external-dependency-register.md#ext-protection-1--eventstore-payload-protection-engine",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/verification.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+      "target": "../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+      "target": "story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md#8-construction-feasibility-investigation--2026-11-03",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "target": "story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md#8-construction-feasibility-investigation--2026-11-03",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "target": "story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/inputs.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/remote-provenance.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "target": "tests/story-5-4-construction-feasibility-2026-11-03/verification.json",
+      "exists": true,
+      "fragmentMatchesHeading": true
+    }
+  ],
+  "retainedFilenameDiscovery": {
+    "roots": [
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1",
+      "/home/administrator/hexalith-protection-evidence/ext-protection-1"
+    ],
+    "matchingFiles": [
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/runtime-foundations-final-20261017-_bv3fzwb/staged-owner-reference-packets/owner-returned-public-references.template.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/provider-key-installation-20261017T100804405564Z/staged-owner-reference-packets/owner-returned-public-references.template.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/RECEIPT.md",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/metadata-credential-reference.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/preservation-decision.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return-required.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/provider-inventory-resume-20261029T175713722948Z/owner-return-required.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/owner-evidence-followup-20261028T113903884042Z/owner-return-required.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/owner-evidence-followup-20261028T113903884042Z/owner-return-required.final.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/next-baseline-followup-20261028T095507027119Z/owner-return-required.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/owner-acquisition-20261028T131310446398Z/owner-return-discovery.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/owner-acquisition-20261028T131310446398Z/owner-return-required.final.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/provider-inventory-reconciliation-20261029TJ6KL9LyH/owner-return-required.json"
+    ],
+    "genuineReturnFiles": [
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/RECEIPT.md",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/metadata-credential-reference.json",
+      "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/preservation-decision.json"
+    ],
+    "limits": "Filename-scoped discovery plus unchanged canonical form, exact designated paths and issue reads. Does not exclude external or unretained delivery."
+  },
+  "outputs": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "bytes": 76987,
+      "sha256": "622717a122a641593281ac4b1cd08d2fde95e5b811c1ed41b84f5bb6fb19388d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+      "bytes": 20874,
+      "sha256": "36bf51e1d82f577daec4c1b156b4d094ef7449c5cf648f270737505c5fa59ecc"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "bytes": 56120,
+      "sha256": "5135d8885a91476513c10442c09d463b9cacea308f35eff111d901334d92bb7c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-construction-feasibility-2026-11-03/inputs.json",
+      "bytes": 88639,
+      "sha256": "e886195cb310447704b64a8ad11d9392db333951a808ae3582bc0372978f0bce"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-construction-feasibility-2026-11-03/remote-provenance.json",
+      "bytes": 21478,
+      "sha256": "7c5f0012d4ac402244a236765262158c9297864e6793791b0c7797f8531cf3b0"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-construction-feasibility-2026-11-03/primary-sources.json",
+      "bytes": 10324,
+      "sha256": "919ca6815005b68716fc1d014187e1f80016ac5fc1b69c897ad3e9170a869eef"
+    }
+  ],
+  "executionBoundary": {
+    "messagesSent": 0,
+    "provisioningReopened": false,
+    "credentialsIssuedOrRenewed": 0,
+    "resourcesInstalled": 0,
+    "providerClusterOperations": 0,
+    "recoveryRestoreDestructionOperations": 0,
+    "LocalPreparerLiveFullOqInvocations": 0,
+    "attemptReservedResetOrReplaced": false,
+    "acceptedTargetDateProfileChanged": false,
+    "bothPlatformDependenciesAvailable": false
+  },
+  "gitStatusObserved": [
+    " M _bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+    " M _bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+    "?? _bmad-output/implementation-artifacts/story-5-4-ext-protection-1-custodian-integrator-request-2026-11-03.md",
+    "?? _bmad-output/implementation-artifacts/tests/story-5-4-construction-feasibility-2026-11-03/inputs.json",
+    "?? _bmad-output/implementation-artifacts/tests/story-5-4-construction-feasibility-2026-11-03/primary-sources.json",
+    "?? _bmad-output/implementation-artifacts/tests/story-5-4-construction-feasibility-2026-11-03/remote-provenance.json"
+  ]
+}

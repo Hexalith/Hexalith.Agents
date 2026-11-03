@@ -1,0 +1,295 @@
+{
+  "schema": "agents.ext-protection-1.primary-source-review/v1",
+  "reviewedOn": "2026-11-03",
+  "recordedAtUtc": "2026-11-03 12:12:58 UTC",
+  "method": "Primary pages read using web search/open/find. URLs and reviewed sections are references, not archived full-page originals or content-hash attestations.",
+  "installationObserved": false,
+  "qualificationAccepted": false,
+  "sources": [
+    {
+      "id": "M-policy",
+      "claims": [
+        "M"
+      ],
+      "title": "Thales Luna Network HSM 7 partition capabilities and policies",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_partition/policies/partition_capabilities_and_policies.htm",
+      "reviewedSections": "Policies 0\u20137, 31/32 and partition version; selected installation values unknown."
+    },
+    {
+      "id": "M-attrs",
+      "claims": [
+        "M"
+      ],
+      "title": "Thales key attribute defaults",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/sdk/design/attribute_defaults.htm",
+      "reviewedSections": "Management attributes and generated/unwrapped/derived distinctions."
+    },
+    {
+      "id": "M-D-extension",
+      "claims": [
+        "M",
+        "D"
+      ],
+      "title": "Thales Luna extensions to PKCS#11",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/sdk/extensions/safenet_extensions.htm",
+      "reviewedSections": "CA_CloneObject; CA_DestroyMultipleObjects; no qualifying cross-partition re-encrypt identified."
+    },
+    {
+      "id": "M-functions",
+      "claims": [
+        "M"
+      ],
+      "title": "Thales PKCS#11 compliance",
+      "url": "https://www.thalesdocs.com/gphsm/luna/7/docs/network/Content/sdk/pkcs11/pkcs11_standard.htm",
+      "reviewedSections": "C_WrapKey/C_UnwrapKey/C_Encrypt/C_Decrypt support list."
+    },
+    {
+      "id": "M-standard",
+      "claims": [
+        "M",
+        "D"
+      ],
+      "title": "OASIS PKCS #11 base specification v2.40",
+      "url": "https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html",
+      "reviewedSections": "Standard function/handle conventions, output and extraction semantics. This is an identified standard reference, not a claim that all of v2.40 is implemented by Luna."
+    },
+    {
+      "id": "D-delete",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales partition delete command",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/lunash/commands/partition/partition_delete.htm",
+      "reviewedSections": "LunaSH command, authentication and scope."
+    },
+    {
+      "id": "D-admin",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales creating/deleting an application partition",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_hsm/partitions/create_delete.htm",
+      "reviewedSections": "Roles and stored object destruction scope."
+    },
+    {
+      "id": "D-clear-cm",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales LunaCM partition clear",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/lunacm/commands/partition/partition_clear.htm",
+      "reviewedSections": "Objects deleted; partition structure remains."
+    },
+    {
+      "id": "D-clear-sh",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales LunaSH partition clear",
+      "url": "https://www.thalesdocs.com/gphsm/luna/7/docs/network/Content/lunash/commands/partition/partition_clear.htm",
+      "reviewedSections": "Appliance software 7.8.1+ and STC limitation."
+    },
+    {
+      "id": "D-zeroize",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales HSM zeroization",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_hsm/zeroize_reset/zeroization.htm",
+      "reviewedSections": "HSM-wide KEK/volatile/stored-object boundary."
+    },
+    {
+      "id": "D-audit",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales audit logging",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_hsm/audit/audit.htm",
+      "reviewedSections": "Audit role before initialization; HMAC/domain validation; raw record format; log-full behavior."
+    },
+    {
+      "id": "D-audit-events",
+      "claims": [
+        "D"
+      ],
+      "title": "Thales audit categories and HSM events",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_hsm/audit/audit-log_categories_and_hsm_events.htm",
+      "reviewedSections": "Native key-management event correlation."
+    },
+    {
+      "id": "C-dapr",
+      "claims": [
+        "C"
+      ],
+      "title": "Dapr PostgreSQL v2 component",
+      "url": "https://docs.dapr.io/reference/components-reference/supported-state-stores/setup-postgresql-v2/",
+      "reviewedSections": "Actual type/version syntax; schema names and v1 incompatibility. Site presents v1.19."
+    },
+    {
+      "id": "C-dapr-caps",
+      "claims": [
+        "C"
+      ],
+      "title": "Dapr state-store capability matrix",
+      "url": "https://docs.dapr.io/reference/components-reference/supported-state-stores/",
+      "reviewedSections": "PostgreSQL v2 ETags and transactions."
+    },
+    {
+      "id": "C-wal",
+      "claims": [
+        "C"
+      ],
+      "title": "PostgreSQL 18 WAL configuration",
+      "url": "https://www.postgresql.org/docs/18/runtime-config-wal.html",
+      "reviewedSections": "fsync; synchronous_commit modes and selected synchronous standby."
+    },
+    {
+      "id": "C-repl",
+      "claims": [
+        "C"
+      ],
+      "title": "PostgreSQL 18 synchronous replication",
+      "url": "https://www.postgresql.org/docs/18/warm-standby.html#SYNCHRONOUS-REPLICATION",
+      "reviewedSections": "Standby selection, durability and availability boundaries."
+    },
+    {
+      "id": "C-failover",
+      "claims": [
+        "C"
+      ],
+      "title": "PostgreSQL 18 failover",
+      "url": "https://www.postgresql.org/docs/18/warm-standby-failover.html",
+      "reviewedSections": "External failure detection and fencing; failover-witness scope."
+    },
+    {
+      "id": "C-pitr",
+      "claims": [
+        "C"
+      ],
+      "title": "PostgreSQL 18 PITR",
+      "url": "https://www.postgresql.org/docs/18/continuous-archiving.html",
+      "reviewedSections": "Earlier consistent restores/timelines; combined-restore example in packet is an inference."
+    },
+    {
+      "id": "A-insert",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS objects.insert",
+      "url": "https://docs.cloud.google.com/storage/docs/json_api/v1/objects/insert",
+      "reviewedSections": "Upload endpoint, create/overwrite permissions and query parameters."
+    },
+    {
+      "id": "A-preconditions",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS request preconditions",
+      "url": "https://docs.cloud.google.com/storage/docs/request-preconditions",
+      "reviewedSections": "ifGenerationMatch=0 live-version condition."
+    },
+    {
+      "id": "A-get",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS objects.get",
+      "url": "https://docs.cloud.google.com/storage/docs/json_api/v1/objects/get",
+      "reviewedSections": "generation and alt=media exact reads."
+    },
+    {
+      "id": "A-lock",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS Bucket Lock",
+      "url": "https://docs.cloud.google.com/storage/docs/bucket-lock",
+      "reviewedSections": "Retention, metadata, unit interpretation, lien and account limits."
+    },
+    {
+      "id": "A-lock-procedure",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS retention lock procedure",
+      "url": "https://docs.cloud.google.com/storage/docs/using-bucket-lock",
+      "reviewedSections": "JSON POST lockRetentionPolicy with metageneration; read back policy."
+    },
+    {
+      "id": "A-iam",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS IAM roles",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/iam-roles",
+      "reviewedSections": "Object Creator and Object Viewer scopes."
+    },
+    {
+      "id": "A-encryption",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS default encryption",
+      "url": "https://docs.cloud.google.com/storage/docs/encryption/default-keys",
+      "reviewedSections": "Google-managed encryption and authorized reader access."
+    },
+    {
+      "id": "A-cmek",
+      "claims": [
+        "A"
+      ],
+      "title": "GCS CMEK",
+      "url": "https://docs.cloud.google.com/storage/docs/encryption/customer-managed-keys",
+      "reviewedSections": "Loss of decrypt permission/key availability prevents reads."
+    },
+    {
+      "id": "A-consistency",
+      "claims": [
+        "A",
+        "C"
+      ],
+      "title": "GCS consistency",
+      "url": "https://docs.cloud.google.com/storage/docs/consistency",
+      "reviewedSections": "Strong object/list consistency; individual operations versus non-atomic batch."
+    },
+    {
+      "id": "R-login",
+      "claims": [
+        "M",
+        "D"
+      ],
+      "title": "Thales partition login and lockout",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_partition/partition_roles/partition_login.htm",
+      "reviewedSections": "Role lockout and policy-15 recovery boundary."
+    },
+    {
+      "id": "R-reset",
+      "claims": [
+        "M",
+        "D"
+      ],
+      "title": "Thales partition credential reset",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_partition/partition_roles/partition_reset_cred.htm",
+      "reviewedSections": "role resetpw and destructive policy-15 prerequisite."
+    },
+    {
+      "id": "R-capacity",
+      "claims": [
+        "M",
+        "D"
+      ],
+      "title": "Thales application partitions",
+      "url": "https://thalesdocs.com/gphsm/luna/7/docs/network/Content/admin_hsm/partitions/partitions.htm",
+      "reviewedSections": "Model/license/memory-dependent partition capacity; not available allocation."
+    },
+    {
+      "id": "M-other-product",
+      "claims": [
+        "M"
+      ],
+      "title": "Thales ProtectServer 3 Java samples",
+      "url": "https://thalesdocs.com/gphsm/ptk/protectserver3/docs/ps_ptk_docs/ptkj_reference/java_samples/index.html",
+      "reviewedSections": "ReEncrypt sample: different product, not support for Luna cross-partition migration."
+    }
+  ]
+}
