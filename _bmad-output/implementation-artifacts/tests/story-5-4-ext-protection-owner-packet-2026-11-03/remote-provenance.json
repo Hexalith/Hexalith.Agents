@@ -1,0 +1,31 @@
+{
+  "schema": "agents.ext-protection-1.owner-action-remote-provenance/v1",
+  "recordedAtUtc": "2026-11-03 10:38:53 UTC",
+  "readsOnly": true,
+  "platformForm": {
+    "url": "https://github.com/Hexalith/Hexalith.Platform/blob/main/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+    "gitBlob": "660f19ac18d0d20cbfdc0a399830ebea62380410",
+    "classification": "Canonical form, no accepted new operational return"
+  },
+  "platformIssues": [
+    {
+      "url": "https://github.com/Hexalith/Hexalith.Platform/issues/1",
+      "updatedAt": "2026-09-26T23:17:09Z",
+      "commentCount": 0,
+      "commentsReturned": 0,
+      "classification": "Historical September 26 request, no owner delivery"
+    },
+    {
+      "url": "https://github.com/Hexalith/Hexalith.Platform/issues/2",
+      "updatedAt": "2026-09-26T23:17:13Z",
+      "commentCount": 0,
+      "commentsReturned": 0,
+      "classification": "Historical September 26 request, no owner delivery"
+    }
+  ],
+  "outboundMessages": 0,
+  "limitations": [
+    "Upstream form was read at main; content identified by immutable Git blob, not a new accepted commit pair.",
+    "No global claim about unretained external deliveries."
+  ]
+}

@@ -1,0 +1,399 @@
+{
+  "schema": "agents.ext-protection-1.owner-action-packet-verification/v1",
+  "recordedAtUtc": "2026-11-03T10:40:17.998779Z",
+  "outcome": "DocumentIntegrityVerifiedProtectionAndOperationalDeliveriesStillBlocked",
+  "scope": "Offline document, pointer, link and byte-preservation checks only; no source/Local or installed qualification pass.",
+  "reportPrefixPreserved": {
+    "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+    "bytes": 43333,
+    "sha256": "158fbc9f866cc4f1a42a245bd612bc2f215b7636d2818c2d6952b80e4b5cbdf5"
+  },
+  "unchangedAuthorityAndEvidenceFiles": 38,
+  "originalRecoveryManifestMembersVerifiedUnchanged": 128,
+  "ownerReturnFields": [
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/currentAcceptedProfileReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/freshAuthorizedReadinessEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/credentialAndScopeEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/rotationAndRevocationEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/timestampFormatCompatibilityEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/ownerMetadataCredentialRecordReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/backupRetentionSeconds",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/privilegedRestoreSubjectsAndScopedCredentialReferences",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/acceptedRestorePolicyReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/restoreProcedureReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/authorizedRecoveryTestEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/everyRecoveryCopyInventoryAndActualDisposalEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/acceptedPublicPreservationBaselineReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/historicalMetadataProofAndAcceptanceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/freshPublicLeaseKeyAndPolicyEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/furtherSecretWriteCoverageAndDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/memoriesPreservationDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/agentsRegisterPreservationDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/expiredRecoveryPreservationDecisionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentIdentityAndApprovers/currentAuthorityAndBindingEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentIdentityAndApprovers/acceptedIntegrationReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/independentDecisionAuthority/installedIssuerAndPublicTrustEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/independentDecisionAuthority/currentRolesAndRevocationEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/authenticatedIngressAndReplay/installedAdaptersAndAclEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/authenticatedIngressAndReplay/persistedReplayRecoveryEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/acceptedReplicaPlacementAndFailureModelReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/installedWorkerAndAclEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/persistedDenialRecoveryEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    }
+  ],
+  "exact28PointerSetUnchanged": true,
+  "canonicalFormSha256": "a4635da24202e97d5d770fa2d14394c32415f8949bfb9904ca7ea5c221a02596",
+  "canonicalFormGitBlob": "660f19ac18d0d20cbfdc0a399830ebea62380410",
+  "canonicalFormFlags": {
+    "installationAuthorized": false,
+    "qualificationAuthorized": false,
+    "attemptReserved": false,
+    "dependencyAvailable": false
+  },
+  "preserved": {
+    "host": "192.168.1.30",
+    "partiesBranch": "B",
+    "timing": {
+      "L": 300,
+      "S": 30,
+      "O": 600,
+      "H": 86400,
+      "R": 604800
+    },
+    "cohort": "OQ-5.4-1",
+    "existingJournals": "Preserve unchanged",
+    "acceptedPlatformCommit": "abbec4093715c1db854433119b32d4e16df20d08",
+    "acceptedIntegrationDate": "2026-10-08"
+  },
+  "missingPathsStillAbsent": [
+    {
+      "path": "/home/administrator/hexalith-protection-evidence/ext-protection-1/accepted-profile.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/operational-backup-restore-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/operational-backup-restore-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/owner-return",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/provider-inventory-resume-20261029T175713722948Z/owner-return",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/protection-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/protection-owner-return.json",
+      "exists": false
+    }
+  ],
+  "protectionCommitment": {
+    "status": "Uncommitted",
+    "target": "TBD",
+    "integrationDate": "TBD",
+    "command": "TBD"
+  },
+  "platformDependencies": {
+    "EXT-SECRETS-1": "Committed unavailable",
+    "EXT-HOST-1": "Committed unavailable"
+  },
+  "reopeningApproved": false,
+  "independentOperatorOrDeputyAppointed": false,
+  "costDateOrGuaranteeInvented": false,
+  "callsThisTask": {
+    "Local": 0,
+    "preparer": 0,
+    "Live": 0,
+    "Full": 0,
+    "OQ": 0,
+    "credentialIssuanceOrRenewal": 0,
+    "providerOrCluster": 0,
+    "installation": 0,
+    "recovery": 0,
+    "restore": 0,
+    "destruction": 0,
+    "attemptReservationOrReset": 0,
+    "outboundMessage": 0
+  },
+  "outputs": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "bytes": 45426,
+      "sha256": "7819f2f151c16c395d61015c2350f16022ec0fc6d589dddea83e94a9f801f580"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "bytes": 48188,
+      "sha256": "53e6e28637d9c6eaaefd73be544ce7e3f06a7de1c07e2847b11c5174e0def187"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-ext-protection-owner-packet-2026-11-03/inputs.json",
+      "bytes": 71124,
+      "sha256": "750aedbf399f16e6d45b5b241344b896389f6fc4017bcb21d761cfdfb03434d8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-ext-protection-owner-packet-2026-11-03/remote-provenance.json",
+      "bytes": 1215,
+      "sha256": "1af7959f786498d7b5dfecc9b1b67b1ac73407c246eaadafd0bb99cc1ce5603b"
+    }
+  ],
+  "limitations": [
+    "Fingerprints establish byte preservation, not installed attestation truth, authority independence or owner acceptance.",
+    "No new accepted delivery was found in designated local roots, both local forms or fresh Platform #1/#2 reads; external or unretained deliveries are not excluded.",
+    "Software-key deletion, native trim and old-ciphertext refusal do not establish irreversible all-copy erasure."
+  ],
+  "localLinksResolved": 33,
+  "links": [
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "story-5-4-ext-secrets-host-continuation-2026-11-03.md#concrete-protection-owner-action-proposals"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../planning-artifacts/external-dependency-register.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/ext-host-1-continuation-2026-11-02/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/ext-protection-1-loop10/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/story-5-4-owner-validation-2026-11-02/protection-evidence-scope.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-verifier-protocol.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/inputs.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/remote-provenance.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/deploy/erasure-root/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/D2-provisioning-request-2026-10-28.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/src/Hexalith.Platform.Protection/ErasureRootHostComposition.cs"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/AgentsOwningProcessComposition.cs"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/eng/ext-secrets-1/coordinated_packets.py"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/inputs.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/verification.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../planning-artifacts/external-dependency-register.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/ext-host-1-continuation-2026-11-02/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/ext-protection-1-loop10/README.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.Platform/docs/implementation/story-5-4-owner-validation-2026-11-02/protection-evidence-scope.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "tests/story-5-4-protection-prerequisite-recheck-2026-11-03/verification.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "../../references/Hexalith.EventStore/docs/implementation/ext-protection-1-verifier-protocol.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "story-5-4-ext-protection-1-owner-action-packet-2026-11-03.md"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/inputs.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/remote-provenance.json"
+    },
+    {
+      "document": "_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "link": "tests/story-5-4-ext-protection-owner-packet-2026-11-03/verification.json"
+    }
+  ]
+}

@@ -1,0 +1,1200 @@
+{
+  "schema": "agents.ext-protection-1.owner-action-packet-inputs/v1",
+  "recordedAtUtc": "2026-11-03T10:34:21.627579Z",
+  "scope": "Offline document and retained evidence inspection only; fingerprints do not establish acceptance or installation.",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "bytes": 43333,
+      "sha256": "158fbc9f866cc4f1a42a245bd612bc2f215b7636d2818c2d6952b80e4b5cbdf5"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "bytes": 77076,
+      "sha256": "1ee2692ea5bf6a0e42921c6dc64a58ebe5738efdbb0424d0345a281fca0b1487"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "bytes": 16335,
+      "sha256": "50823c6a105d659eac99f103cc4bfe749bd80e49d999fbd001b7b382371dcecf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "bytes": 108946,
+      "sha256": "a4635da24202e97d5d770fa2d14394c32415f8949bfb9904ca7ea5c221a02596"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "bytes": 108946,
+      "sha256": "a4635da24202e97d5d770fa2d14394c32415f8949bfb9904ca7ea5c221a02596"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/README.md",
+      "bytes": 13259,
+      "sha256": "e9f282fffd64c1551af97aa6e8faf923596f0438ffe248e02a5d8f987be01547"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-host-1-continuation-2026-11-02/README.md",
+      "bytes": 7819,
+      "sha256": "0ad85e75883cb090ba319c8bfc352e8da13f4859bc017c6552c741cf9e6cd62d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-protection-1-loop10/README.md",
+      "bytes": 10652,
+      "sha256": "afd8cdc543ce00d6b3e2832b8cdf66d6f2ad734050dc51573f6104d0a79342bf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-owner-validation-2026-11-02/protection-evidence-scope.json",
+      "bytes": 6291,
+      "sha256": "762a74b2bd100da3f1f4bdab25e97602cfce639cf50fdd0b598ef49ce7622a67"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md",
+      "bytes": 154919,
+      "sha256": "d6963d771f6614aac745e9e46d858e64ac723c0bed53d6865b1e4b1737d2f781"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/docs/implementation/ext-protection-1-verifier-protocol.md",
+      "bytes": 31648,
+      "sha256": "4f553f50add56f1689324254ccd47a3f7a7e017b8c7db4cafc3eaa9879ece6c6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/tools/ext-protection-1/plan.json",
+      "bytes": 11271,
+      "sha256": "c1e7759a2687c122dd182aa48f1828e531166c0157a04b2ae0eba35e9ac4d10c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/RECEIPT.md",
+      "bytes": 63935,
+      "sha256": "085db1c09406302f69359de5657c8a71f00be58b7e7efa77155a0a881b31265d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/preservation-decision.json",
+      "bytes": 1724,
+      "sha256": "62feebc1589e2b127aa8b8e6692dd34e4fd0742513d393c567454b54857ffc4d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/metadata-credential-reference.json",
+      "bytes": 627,
+      "sha256": "9eb7de84f3221125baac0fc07d84aaeac7f8b2fd4cb85f70499d9c33d0a4d2ca"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/evidence-manifest.json",
+      "bytes": 17553,
+      "sha256": "46d77631b1f790e6ff4deb06169aea1a884891657afe8ce61531901890fb6e31"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/approval-record.json",
+      "bytes": 358,
+      "sha256": "2d25f7ff360b32688b2bc555e6442ad9a9e1f2cf0ee90c2f709d80e84146970e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/owner-input-blockers.json",
+      "bytes": 3886,
+      "sha256": "01669c898d04d95a30650fb13bdbeb15cbd57af6fd63d3ebecc36411d20c7f94"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/repair-secrets-blocked-inputs.json",
+      "bytes": 2727,
+      "sha256": "a333db4734206fbd6d50f8a25f38aed7edf2e0cfe2199babb31bfae102c87674"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/repair-host-blocked-inputs.json",
+      "bytes": 517,
+      "sha256": "50ecdabb9e82619f7dccc59d61b2336800e7593739350c3b16b18de2c1e8ffb3"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-protection-prerequisite-recheck-2026-11-03/verification.json",
+      "bytes": 17336,
+      "sha256": "7fd1bc876b0461624ea60aa678ff2b2aabe1e0a6cc44cbdaa5545bbf911adc25"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/D2-provisioning-request-2026-10-28.md",
+      "bytes": 19095,
+      "sha256": "9eb7d5d164acbeaec44e3f17e2a562c6753243fbe089747f1758381eeb7ad4e9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/deploy/erasure-root/README.md",
+      "bytes": 12993,
+      "sha256": "f1cefa7f7d85b11dbef950f1ba236c3c9f778201df0f389b84b3eb600329bfd4"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-protection-1-loop7/README.md",
+      "bytes": 9793,
+      "sha256": "78a00e58fee38fdf6d2899c01f1fc2709c2a449ab95c278022779316896ee4aa"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/ext-secrets-1/coordinated_packets.py",
+      "bytes": 25739,
+      "sha256": "b46cab27549a3fdfb2317159905bd91b3e0af59b7660aee5f818003900e9661d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ErasureRootHostComposition.cs",
+      "bytes": 14949,
+      "sha256": "0d25f6c3397329bb00234d035cab27481fcb1fb70c0001facf8812163f047b11"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ErasureRootHostInstallation.cs",
+      "bytes": 2700,
+      "sha256": "2a6af817ca6e5b3fbe590411052f09b28038da969acee798e10241a9cf8cc0fb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ErasureRootInstallation.cs",
+      "bytes": 1176,
+      "sha256": "98911529611bca040b76612590c3919955c976e0356a2376dbc7e761ea0e75fb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ProtectionQualificationRoleInstallation.cs",
+      "bytes": 901,
+      "sha256": "cafab931c548a46f94afd4020b6107069b820c074826b25b0e904f83b8705c6b"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ProtectionQualificationServerInstallation.cs",
+      "bytes": 2087,
+      "sha256": "c1347e5cc5296d485277d41f148f299194cfdc5f65e8c6027fad59ead4fdf83d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ProtectionQualificationServiceScope.cs",
+      "bytes": 1372,
+      "sha256": "1d593ce45ef53b32967e261690d050ab500ad14e9b85496fc3c6e68f3f28dbda"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ProtectionQualificationObserverPermission.cs",
+      "bytes": 2104,
+      "sha256": "3d39ffee2f0f0e848bc878afff6fc63f4d3e87b9c83bd013394953775e05c9c8"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Protection/ProtectionQualificationObserverPermissions.cs",
+      "bytes": 4098,
+      "sha256": "b9d181dbed0bdbbc8474b10f3b78c070488d3b41e9dabeda01fa4b1156129beb"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/AgentsOwningProcessInstallation.cs",
+      "bytes": 899,
+      "sha256": "dbe7916ec26770fb54fe195269896523fa03d4261e63936e9052c858db15000a"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/AgentsOwningProcessComposition.cs",
+      "bytes": 6138,
+      "sha256": "848815a2dc258af8976c8a5ad93b88f9d79a0128846042c9d4573178168c5aee"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/DaprFr34ProtectionEngine.cs",
+      "bytes": 1518,
+      "sha256": "8e18a420e5d8668ef6363621846042397e2c97b93c5f992676f1e336047441b1"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/DaprFr34PersistedReader.cs",
+      "bytes": 627,
+      "sha256": "46727d243b492dc435ef418f68ce8ed43f4c991ae716c5851ae327d8fe8f3c71"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Secrets.Runtime/DaprFr34CanaryAuthority.cs",
+      "bytes": 1902,
+      "sha256": "096cedd06fc15eefb8ac4dd5bdd380c7b624c297f061d1f9eb55ed426ee08f5c"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/src/Hexalith.EventStore.Server/Configuration/InteractionPayloadProtectionServiceCollectionExtensions.cs",
+      "bytes": 4316,
+      "sha256": "c2bf27bef078c26b395d5ef2397ec9fdc024862d043f6bc620409fbc1ef082ee"
+    }
+  ],
+  "ownerReturnFields": [
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/currentAcceptedProfileReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/freshAuthorizedReadinessEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/credentialAndScopeEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/rotationAndRevocationEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/timestampFormatCompatibilityEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/ownerMetadataCredentialRecordReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/backupRetentionSeconds",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/privilegedRestoreSubjectsAndScopedCredentialReferences",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/acceptedRestorePolicyReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/restoreProcedureReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/authorizedRecoveryTestEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/everyRecoveryCopyInventoryAndActualDisposalEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/acceptedPublicPreservationBaselineReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/historicalMetadataProofAndAcceptanceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/freshPublicLeaseKeyAndPolicyEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/furtherSecretWriteCoverageAndDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/memoriesPreservationDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/agentsRegisterPreservationDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/expiredRecoveryPreservationDecisionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentIdentityAndApprovers/currentAuthorityAndBindingEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentIdentityAndApprovers/acceptedIntegrationReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/independentDecisionAuthority/installedIssuerAndPublicTrustEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/independentDecisionAuthority/currentRolesAndRevocationEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/authenticatedIngressAndReplay/installedAdaptersAndAclEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/authenticatedIngressAndReplay/persistedReplayRecoveryEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/acceptedReplicaPlacementAndFailureModelReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/installedWorkerAndAclEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/persistedDenialRecoveryEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    }
+  ],
+  "missingPaths": [
+    {
+      "path": "/home/administrator/hexalith-protection-evidence/ext-protection-1/accepted-profile.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/operational-backup-restore-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/operational-backup-restore-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/owner-return",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/provider-inventory-resume-20261029T175713722948Z/owner-return",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/protection-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/protection-owner-return.json",
+      "exists": false
+    }
+  ],
+  "sourceHeadsObservedNotAccepted": {
+    "/home/administrator/projects/hexalith/agents": "1bbee16b5fb7101ba1e1386d66e0a8ea8bab987f",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform": "73d8ac8ea55c4539aa7adb268677c222e00d104c",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore": "7c93a1234d14c66f5ee85ed48caaee1d30a671f3",
+    "/home/administrator/projects/hexalith/platform": "f90e68a0c0305d18dc2cde8d4d4c856aa5a49725",
+    "/home/administrator/projects/hexalith/eventstore": "b46fa93e2926c9be39096ae76e920d38d338db8d"
+  },
+  "canonicalFormFlags": {
+    "installationAuthorized": false,
+    "qualificationAuthorized": false,
+    "attemptReserved": false,
+    "dependencyAvailable": false
+  },
+  "preserved": {
+    "host": "192.168.1.30",
+    "partiesBranch": "B",
+    "timing": {
+      "L": 300,
+      "S": 30,
+      "O": 600,
+      "H": 86400,
+      "R": 604800
+    },
+    "cohort": "OQ-5.4-1",
+    "existingJournals": "Preserve unchanged",
+    "acceptedPlatformCommit": "abbec4093715c1db854433119b32d4e16df20d08",
+    "acceptedIntegrationDate": "2026-10-08"
+  },
+  "D7": {
+    "owner": "EventStore Maintainer with Governance/protection owners",
+    "completeImmutableSourcePackageAndLockedRestoreReference": null,
+    "installedEngineRolesTrustAndAcceptedProfileReference": null,
+    "actualProfileFileSha256": null,
+    "g1ThroughG7OriginalClosureBundle": null,
+    "independentPhysicalNonRevivalAndSurvivorRecoveryReference": null
+  },
+  "D9": {
+    "owners": [
+      "Platform Maintainer",
+      "EventStore Maintainer"
+    ],
+    "status": "Unresolved; AWS-derived estimates withdrawn",
+    "withdrawnPriorProposal": {
+      "protection": "2026-11-30",
+      "coupledPlatform": "2026-12-03",
+      "earliestCohortWindow": "2026-12-04",
+      "reason": "Estimate based on rejected AWS MVP path"
+    },
+    "actualNonAwsProviderReadinessCompletionRecoveryAndQualificationBoundsReference": null,
+    "ownerConfirmedProtectionDate": null,
+    "ownerConfirmedCoupledPlatformDate": null,
+    "laterExplicitReplacementAcceptanceReference": null,
+    "completeCanonicalPlatformTarget": null,
+    "completeCanonicalProtectionTargetAndPackage": null
+  },
+  "originalRecoveryManifestMembers": [
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/HANDOFF.md",
+      "bytes": 4175,
+      "actualSha256": "295105a4a2834d1bbc349c6a7dccc3ce31f4ca8cf0390c75429af4252b2dcef2",
+      "manifestSha256": "295105a4a2834d1bbc349c6a7dccc3ce31f4ca8cf0390c75429af4252b2dcef2"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/approval-record.json",
+      "bytes": 358,
+      "actualSha256": "2d25f7ff360b32688b2bc555e6442ad9a9e1f2cf0ee90c2f709d80e84146970e",
+      "manifestSha256": "2d25f7ff360b32688b2bc555e6442ad9a9e1f2cf0ee90c2f709d80e84146970e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/blockers.json",
+      "bytes": 4464,
+      "actualSha256": "c3cc5834898bd1480883439f32101620998b6cfcee3268da89e0ab39cb03c908",
+      "manifestSha256": "c3cc5834898bd1480883439f32101620998b6cfcee3268da89e0ab39cb03c908"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/commands.json",
+      "bytes": 1627,
+      "actualSha256": "df64dc8f250f948ab6da193722bb522f456d5f731b508f43f77ee4ac409a223d",
+      "manifestSha256": "df64dc8f250f948ab6da193722bb522f456d5f731b508f43f77ee4ac409a223d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/execution-source-83ec7a63cbb54aca8dd2bf7de61705c3.json",
+      "bytes": 626,
+      "actualSha256": "50ae1438b9fdff11400dad5ac025133e6b12e6f3704153fcd677e54c4c304542",
+      "manifestSha256": "50ae1438b9fdff11400dad5ac025133e6b12e6f3704153fcd677e54c4c304542"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/execution-source-9c4b7c37282c4b549290081998ca05ae.json",
+      "bytes": 780,
+      "actualSha256": "fb2385e416f648e0dfad9f22f1b9bcbcbc11b19c7913ad3b32ab91dfb232f7b3",
+      "manifestSha256": "fb2385e416f648e0dfad9f22f1b9bcbcbc11b19c7913ad3b32ab91dfb232f7b3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/execution-source-e0e949a09af94cd6ab0d79642fb94b75.json",
+      "bytes": 657,
+      "actualSha256": "846e2f1f6f33872fcd5065958962c80327e1b18c3426ea967ab8dbbc941b9714",
+      "manifestSha256": "846e2f1f6f33872fcd5065958962c80327e1b18c3426ea967ab8dbbc941b9714"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-executor-tests.stderr.log",
+      "bytes": 4064,
+      "actualSha256": "a1360e47d8e15a3dc14213c4bf59170cccd55c4d8879614c1996fcc34dd2bacf",
+      "manifestSha256": "a1360e47d8e15a3dc14213c4bf59170cccd55c4d8879614c1996fcc34dd2bacf"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-executor-tests.stdout.log",
+      "bytes": 0,
+      "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "manifestSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-preparer-tests.stderr.log",
+      "bytes": 1630,
+      "actualSha256": "fd549f94717933e5109a1fad44de734c69951bde1fdb730c5947acc5a50aca41",
+      "manifestSha256": "fd549f94717933e5109a1fad44de734c69951bde1fdb730c5947acc5a50aca41"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-preparer-tests.stdout.log",
+      "bytes": 0,
+      "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "manifestSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-test-commands.json",
+      "bytes": 658,
+      "actualSha256": "2a74d74032b12d37e3fcc4da50ed3a2b8bcb40b74e14ecfc35194d2db7649334",
+      "manifestSha256": "2a74d74032b12d37e3fcc4da50ed3a2b8bcb40b74e14ecfc35194d2db7649334"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-tested-source/eng/ext-secrets-1/prepare_expired_hmac_recovery.py",
+      "bytes": 20982,
+      "actualSha256": "6475a12cec40cff6bcd9439e4b0e0c164afa43637935f9ee40b3183d28645ca1",
+      "manifestSha256": "6475a12cec40cff6bcd9439e4b0e0c164afa43637935f9ee40b3183d28645ca1"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-tested-source/eng/ext-secrets-1/recover_expired_hmac.py",
+      "bytes": 51776,
+      "actualSha256": "8d0cabe971331e53ffe9548c908e20f792bde4273d954c70abacfec0a2108adc",
+      "manifestSha256": "8d0cabe971331e53ffe9548c908e20f792bde4273d954c70abacfec0a2108adc"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-tested-source/eng/ext-secrets-1/test_prepare_expired_hmac_recovery.py",
+      "bytes": 7370,
+      "actualSha256": "62df47f02db2338f6a2edacef4de92ac45b69cea279c2bc16d2d6fece685e36e",
+      "manifestSha256": "62df47f02db2338f6a2edacef4de92ac45b69cea279c2bc16d2d6fece685e36e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/final-tested-source/eng/ext-secrets-1/test_recover_expired_hmac.py",
+      "bytes": 22773,
+      "actualSha256": "37006f6d195e8cb6452f836fa0ef5c1fd2defd77729d8943a42398adb15c14e1",
+      "manifestSha256": "37006f6d195e8cb6452f836fa0ef5c1fd2defd77729d8943a42398adb15c14e1"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/first-observe-prepare_expired_hmac_recovery.py.source",
+      "bytes": 20982,
+      "actualSha256": "6475a12cec40cff6bcd9439e4b0e0c164afa43637935f9ee40b3183d28645ca1",
+      "manifestSha256": "6475a12cec40cff6bcd9439e4b0e0c164afa43637935f9ee40b3183d28645ca1"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/first-observe-recover_expired_hmac.py.source",
+      "bytes": 46203,
+      "actualSha256": "77dab2c2176206e85c4453f3edecdf06d7f6a8e5e69a46db0958b7ef321aa636",
+      "manifestSha256": "77dab2c2176206e85c4453f3edecdf06d7f6a8e5e69a46db0958b7ef321aa636"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/first-observe-source-provenance.json",
+      "bytes": 431,
+      "actualSha256": "411d99c1bb92cb5e2ff8aae9ccc1cb0c6a7bebe11b19e40a02af74968be1b16b",
+      "manifestSha256": "411d99c1bb92cb5e2ff8aae9ccc1cb0c6a7bebe11b19e40a02af74968be1b16b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/audit_local_transport.py",
+      "bytes": 64597,
+      "actualSha256": "5d86d4ec46eec1ccbcf93d018594a97bd2c696e9b8a86643e4aeab8d42bbe96b",
+      "manifestSha256": "5d86d4ec46eec1ccbcf93d018594a97bd2c696e9b8a86643e4aeab8d42bbe96b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/authentication_acquisition.py",
+      "bytes": 836,
+      "actualSha256": "9da1b05d2a8fc318d569cebfe784b8d5ecebdcfad63ccf18302121214814eb80",
+      "manifestSha256": "9da1b05d2a8fc318d569cebfe784b8d5ecebdcfad63ccf18302121214814eb80"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/bind_isolated_custody.py",
+      "bytes": 68042,
+      "actualSha256": "4feb949fb96ed80104ac0b1ecc740bec59f7fb380e2aa1feef6301f404cb2013",
+      "manifestSha256": "4feb949fb96ed80104ac0b1ecc740bec59f7fb380e2aa1feef6301f404cb2013"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/bounded_cohort_http.py",
+      "bytes": 6285,
+      "actualSha256": "3bed3b7a26a96223a4a9ddd8d229daec20ab14be46c7a00d46fc90f4ece057fb",
+      "manifestSha256": "3bed3b7a26a96223a4a9ddd8d229daec20ab14be46c7a00d46fc90f4ece057fb"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/bounded_file_io.py",
+      "bytes": 7185,
+      "actualSha256": "d4797d27e461d0c3f3f6346d5e0740eb6b36fbfa70a523e9c9ecce07f646e5e2",
+      "manifestSha256": "d4797d27e461d0c3f3f6346d5e0740eb6b36fbfa70a523e9c9ecce07f646e5e2"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/capture_native_installation.py",
+      "bytes": 10529,
+      "actualSha256": "ac0f6040db0850c2baaf37b8cb58fdb67939a95981e9c7381fc6a9e184431b85",
+      "manifestSha256": "ac0f6040db0850c2baaf37b8cb58fdb67939a95981e9c7381fc6a9e184431b85"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/capture_operational_hmac.py",
+      "bytes": 13848,
+      "actualSha256": "64325183dad26dcae933c8081dcaaa361b04c47f056906fb5d530d619bd9c4bf",
+      "manifestSha256": "64325183dad26dcae933c8081dcaaa361b04c47f056906fb5d530d619bd9c4bf"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/case_driver_inventory.py",
+      "bytes": 1347,
+      "actualSha256": "f191e50d64c37004e5e108c764f447205951ff48a5d7944b9c8bdfa8c3454faa",
+      "manifestSha256": "f191e50d64c37004e5e108c764f447205951ff48a5d7944b9c8bdfa8c3454faa"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/cases.py",
+      "bytes": 10607,
+      "actualSha256": "9998f8d519443af219c1f44fc5f03a15571d38e621811b326a96ee40c0f0ca3c",
+      "manifestSha256": "9998f8d519443af219c1f44fc5f03a15571d38e621811b326a96ee40c0f0ca3c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/check_f1_packets.py",
+      "bytes": 17271,
+      "actualSha256": "7198c8da8aaeddbbd1e4fde8f1197e04361a82b917e30c906d6e5374a75c2aaa",
+      "manifestSha256": "7198c8da8aaeddbbd1e4fde8f1197e04361a82b917e30c906d6e5374a75c2aaa"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/closed_phase_invariants.py",
+      "bytes": 5468,
+      "actualSha256": "219f248b9977c7e09b8d37e4d42acf73fb482b2bc7fda02fc9426e8f5dd249b7",
+      "manifestSha256": "219f248b9977c7e09b8d37e4d42acf73fb482b2bc7fda02fc9426e8f5dd249b7"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/coordinated_packets.py",
+      "bytes": 25739,
+      "actualSha256": "b46cab27549a3fdfb2317159905bd91b3e0af59b7660aee5f818003900e9661d",
+      "manifestSha256": "b46cab27549a3fdfb2317159905bd91b3e0af59b7660aee5f818003900e9661d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/deploy_native_registry.py",
+      "bytes": 9564,
+      "actualSha256": "79f1773a8ddbd1c3b0c8dadaad6b24a8a3e951988483ad8c2487d79948051e63",
+      "manifestSha256": "79f1773a8ddbd1c3b0c8dadaad6b24a8a3e951988483ad8c2487d79948051e63"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/detached_packet_output.py",
+      "bytes": 1640,
+      "actualSha256": "dd6dad505b05e84b3c5ecfe9bc39740ae3bf19d4a3da0abc65f5bbdeb114a618",
+      "manifestSha256": "dd6dad505b05e84b3c5ecfe9bc39740ae3bf19d4a3da0abc65f5bbdeb114a618"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/enroll_native_tenants.py",
+      "bytes": 9151,
+      "actualSha256": "a21650d9c63777ecaf53f54b30b3229e56015e288123ea7e7f6e584646575ef3",
+      "manifestSha256": "a21650d9c63777ecaf53f54b30b3229e56015e288123ea7e7f6e584646575ef3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/enrolled_sqlite.py",
+      "bytes": 6666,
+      "actualSha256": "ff49ed15d17f8849176d4baf9a8ee64d269115d636eb56022c560266f54e733a",
+      "manifestSha256": "ff49ed15d17f8849176d4baf9a8ee64d269115d636eb56022c560266f54e733a"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/enrolled_sqlite_vfs.py",
+      "bytes": 13118,
+      "actualSha256": "474416d055ec16ea32d858532ef8aa44148d2680bd2a9bb6559a889f47715b7e",
+      "manifestSha256": "474416d055ec16ea32d858532ef8aa44148d2680bd2a9bb6559a889f47715b7e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/execution_profile.py",
+      "bytes": 7372,
+      "actualSha256": "5b7291c46d8255bc1e11bff85bc19b83dd2a38b8f20046f46a1ff3e06429bc82",
+      "manifestSha256": "5b7291c46d8255bc1e11bff85bc19b83dd2a38b8f20046f46a1ff3e06429bc82"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/initialize_native_registry.py",
+      "bytes": 14543,
+      "actualSha256": "38428a1abf7b75e84aa0d73b81ad3a88a1a9434bb942b4ff07c41410e2ac9a53",
+      "manifestSha256": "38428a1abf7b75e84aa0d73b81ad3a88a1a9434bb942b4ff07c41410e2ac9a53"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/install_current_inventory.py",
+      "bytes": 15675,
+      "actualSha256": "267faffe29fc23da6dbe95921c3b03860405d020e9f2bf6b694588a0acdb7523",
+      "manifestSha256": "267faffe29fc23da6dbe95921c3b03860405d020e9f2bf6b694588a0acdb7523"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/install_hmac_authority.py",
+      "bytes": 41750,
+      "actualSha256": "04d61c2b05de3ccb6fd96b21599df4e46c7d1df607ed97ec1ad44f813a3d9a6b",
+      "manifestSha256": "04d61c2b05de3ccb6fd96b21599df4e46c7d1df607ed97ec1ad44f813a3d9a6b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/install_isolated_registry.py",
+      "bytes": 24436,
+      "actualSha256": "454cbb5cc0f2b035a3491256795f1531be9d7b9faecaace6ebca07c705f2e79c",
+      "manifestSha256": "454cbb5cc0f2b035a3491256795f1531be9d7b9faecaace6ebca07c705f2e79c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/joint_authority_service.py",
+      "bytes": 44872,
+      "actualSha256": "7876bccc19c99f5863555d3a0f282ee823359e121d6000b8b85335708a4faa57",
+      "manifestSha256": "7876bccc19c99f5863555d3a0f282ee823359e121d6000b8b85335708a4faa57"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/joint_live_phase_runner.py",
+      "bytes": 26438,
+      "actualSha256": "05a1e6f297cfd2a635e8a981472cc2467e25ee07b3958a745ef7aa0cd6c2b47c",
+      "manifestSha256": "05a1e6f297cfd2a635e8a981472cc2467e25ee07b3958a745ef7aa0cd6c2b47c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/launch_inventory.py",
+      "bytes": 12079,
+      "actualSha256": "b6bb8c7f61c6210d586be171271b01761d45ff4f5ebb3dcd6c5d82bbdd72658c",
+      "manifestSha256": "b6bb8c7f61c6210d586be171271b01761d45ff4f5ebb3dcd6c5d82bbdd72658c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/linux_persistent_storage.py",
+      "bytes": 2633,
+      "actualSha256": "a4b606b15fb42a9bcc2a6fa22108bdca1354a3ea12b4ef38fa16fddc09a2f8b2",
+      "manifestSha256": "a4b606b15fb42a9bcc2a6fa22108bdca1354a3ea12b4ef38fa16fddc09a2f8b2"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/maintain_isolated_custody.py",
+      "bytes": 70917,
+      "actualSha256": "1b57ac67498d5eeb65ef613d91d385e151e7a364eeff4d85e0eabf5c0435f609",
+      "manifestSha256": "1b57ac67498d5eeb65ef613d91d385e151e7a364eeff4d85e0eabf5c0435f609"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/native_journal.py",
+      "bytes": 1240,
+      "actualSha256": "d3b4529868d8c313b988b43c17b6bc5eecfbd10e0d38d0d4db8fe6d148b24afb",
+      "manifestSha256": "d3b4529868d8c313b988b43c17b6bc5eecfbd10e0d38d0d4db8fe6d148b24afb"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/observe_provider_metadata.py",
+      "bytes": 5750,
+      "actualSha256": "a25cc01485a6b982eee596705f8ff135cd5180cb9b3694c7e2fb600013078df4",
+      "manifestSha256": "a25cc01485a6b982eee596705f8ff135cd5180cb9b3694c7e2fb600013078df4"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/packet_snapshot.py",
+      "bytes": 1118,
+      "actualSha256": "3b3ecf9c139c5cdaa20899a994898a3f38bd6fe85f07020f0837b0b92cbcd8c4",
+      "manifestSha256": "3b3ecf9c139c5cdaa20899a994898a3f38bd6fe85f07020f0837b0b92cbcd8c4"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/phase_completion_pool.py",
+      "bytes": 10206,
+      "actualSha256": "091c5a6c1a6c28d0e87faf9445f470047423cb7cd8d56b02d5360b7f69b7fd24",
+      "manifestSha256": "091c5a6c1a6c28d0e87faf9445f470047423cb7cd8d56b02d5360b7f69b7fd24"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/preload_isolated_image.py",
+      "bytes": 10620,
+      "actualSha256": "2ea04190c728e60ee11f57f45b91090485377bdeda515f421cbefdfe91e52380",
+      "manifestSha256": "2ea04190c728e60ee11f57f45b91090485377bdeda515f421cbefdfe91e52380"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/prepare_acceptance.py",
+      "bytes": 12293,
+      "actualSha256": "41725a6c962b252aba7db7aa3b510882de630cbf0314a59ac71aedb43726c7cc",
+      "manifestSha256": "41725a6c962b252aba7db7aa3b510882de630cbf0314a59ac71aedb43726c7cc"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/probe_raft_non_revival.py",
+      "bytes": 22601,
+      "actualSha256": "1c668b8fa41dd609dc59ece1aeb02aa87b5902900309a7704d1a42dad25f6fbf",
+      "manifestSha256": "1c668b8fa41dd609dc59ece1aeb02aa87b5902900309a7704d1a42dad25f6fbf"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/protected_archive_observer_fixture.py",
+      "bytes": 4205,
+      "actualSha256": "f9a5660de45cd8a9b92681ced7441b25b20195fbd4af08358d9b9bdb9e725500",
+      "manifestSha256": "f9a5660de45cd8a9b92681ced7441b25b20195fbd4af08358d9b9bdb9e725500"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/protected_logical_archive.py",
+      "bytes": 8621,
+      "actualSha256": "f3a6e14207ca2e24095d4c5bef89532b2aa10d28adde362de51eb531283422d1",
+      "manifestSha256": "f3a6e14207ca2e24095d4c5bef89532b2aa10d28adde362de51eb531283422d1"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/provision_operational_hmac.py",
+      "bytes": 27482,
+      "actualSha256": "f92197d7d95c73fee18b0fff7574ecfa52e364656b5febed7f19e6f90d6d22f5",
+      "manifestSha256": "f92197d7d95c73fee18b0fff7574ecfa52e364656b5febed7f19e6f90d6d22f5"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/provision_registry_identity.py",
+      "bytes": 9693,
+      "actualSha256": "4b565ad05d75aed4d5e7ac8dfa97bd7a7c81e567db34dcce290bba18b6f99c71",
+      "manifestSha256": "4b565ad05d75aed4d5e7ac8dfa97bd7a7c81e567db34dcce290bba18b6f99c71"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/qualify.py",
+      "bytes": 82817,
+      "actualSha256": "8af9b23d0d3bc6dffbecf3d3fccaea7517f294323419900c0b62c0604361d1c3",
+      "manifestSha256": "8af9b23d0d3bc6dffbecf3d3fccaea7517f294323419900c0b62c0604361d1c3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/reconcile_inputs.py",
+      "bytes": 27250,
+      "actualSha256": "eb84d723abd9fd7a204fd1c9eb839d3f1038f78ca355c501e001a14620ba8640",
+      "manifestSha256": "eb84d723abd9fd7a204fd1c9eb839d3f1038f78ca355c501e001a14620ba8640"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/recover_native_aof.py",
+      "bytes": 4770,
+      "actualSha256": "d154a7fd6f82338ef3ce5564c2bd96a1081a98eab2681a28a0e21cab61b55241",
+      "manifestSha256": "d154a7fd6f82338ef3ce5564c2bd96a1081a98eab2681a28a0e21cab61b55241"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/registry_redis.py",
+      "bytes": 2573,
+      "actualSha256": "a1f6ab5b00f4b9c8dbd5ddc6fa54545e5ac770fed5d9d76b94b03170db22eb33",
+      "manifestSha256": "a1f6ab5b00f4b9c8dbd5ddc6fa54545e5ac770fed5d9d76b94b03170db22eb33"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/renew_hmac_data.py",
+      "bytes": 2013,
+      "actualSha256": "5708ac7043776ea34c1ec33251cbf4dd13cbd84f7e73fb84d5be5cb7f4f5a56f",
+      "manifestSha256": "5708ac7043776ea34c1ec33251cbf4dd13cbd84f7e73fb84d5be5cb7f4f5a56f"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/renew_inventory_metadata.py",
+      "bytes": 1391,
+      "actualSha256": "cc498431053216a4be734a5300c00c86694338e884daf340030a3055af11fba2",
+      "manifestSha256": "cc498431053216a4be734a5300c00c86694338e884daf340030a3055af11fba2"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/repair_native_runtime.py",
+      "bytes": 7516,
+      "actualSha256": "3a53231a88143deb5d89986010bc35f9e99700643cb63fd83d0880e8a5834601",
+      "manifestSha256": "3a53231a88143deb5d89986010bc35f9e99700643cb63fd83d0880e8a5834601"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/sqlite_storage_fixture.py",
+      "bytes": 2242,
+      "actualSha256": "a88b9ecf972fb719de2973b3314c3439070d081e02c7b873de8d4dfbcdf1eb76",
+      "manifestSha256": "a88b9ecf972fb719de2973b3314c3439070d081e02c7b873de8d4dfbcdf1eb76"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/sqlite_vfs_abi.py",
+      "bytes": 1137,
+      "actualSha256": "070d7d57e780dd5dcabda8891d3d68582c80298d7681c818515fc97e898615e4",
+      "manifestSha256": "070d7d57e780dd5dcabda8891d3d68582c80298d7681c818515fc97e898615e4"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_audit_local_transport.py",
+      "bytes": 43123,
+      "actualSha256": "d9c9de55193d7bcfed57de7087616c45771fcd58454ae7552d7e7b5b6bb32a01",
+      "manifestSha256": "d9c9de55193d7bcfed57de7087616c45771fcd58454ae7552d7e7b5b6bb32a01"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_bind_isolated_custody.py",
+      "bytes": 30392,
+      "actualSha256": "5b1b6c0532df24aff22c1274e495a8fd3bd648a2c25d6b130403a8442253626e",
+      "manifestSha256": "5b1b6c0532df24aff22c1274e495a8fd3bd648a2c25d6b130403a8442253626e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_bounded_cohort_http.py",
+      "bytes": 9821,
+      "actualSha256": "fefd891ed844a84362ed453f488c9a7b832703d2712770febce632242f5a41bc",
+      "manifestSha256": "fefd891ed844a84362ed453f488c9a7b832703d2712770febce632242f5a41bc"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_case_driver_inventory.py",
+      "bytes": 3306,
+      "actualSha256": "e98df5fac52c3836f336b2cb3f27e3f6160fdba3b6eb44f25e7fdb5c00b15007",
+      "manifestSha256": "e98df5fac52c3836f336b2cb3f27e3f6160fdba3b6eb44f25e7fdb5c00b15007"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_check_f1_packets.py",
+      "bytes": 15632,
+      "actualSha256": "60ae220ee586817f837863ce8c27a24bfa86fe705dfa211ccea0ccf597ec8339",
+      "manifestSha256": "60ae220ee586817f837863ce8c27a24bfa86fe705dfa211ccea0ccf597ec8339"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_closed_phase_invariants.py",
+      "bytes": 2447,
+      "actualSha256": "86b2261db65038d0b2f43a3379cad202e188c516c2cf2608e19d4c7d86d9bbf3",
+      "manifestSha256": "86b2261db65038d0b2f43a3379cad202e188c516c2cf2608e19d4c7d86d9bbf3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_complete_startup_owner.py",
+      "bytes": 5367,
+      "actualSha256": "ce49cd6a6771170702b2111e5a0831a261835b7bb5cac5fbc846c724d12c920e",
+      "manifestSha256": "ce49cd6a6771170702b2111e5a0831a261835b7bb5cac5fbc846c724d12c920e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_coordinated_packets.py",
+      "bytes": 24995,
+      "actualSha256": "7042f152fba9408fa27bb6cb0737bd2acfac97bc2d4f7756a5d7e9f9fdd9d028",
+      "manifestSha256": "7042f152fba9408fa27bb6cb0737bd2acfac97bc2d4f7756a5d7e9f9fdd9d028"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_credential_cleanup.py",
+      "bytes": 5743,
+      "actualSha256": "a942da7e4d81ca84c23f34c7e4203825fff1391110c22354634243d1d82090db",
+      "manifestSha256": "a942da7e4d81ca84c23f34c7e4203825fff1391110c22354634243d1d82090db"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_execution_profile.py",
+      "bytes": 9433,
+      "actualSha256": "b047eb49acb086572789a9aa781f6f6d72b4c6849328c7ef6002906f9a2e5858",
+      "manifestSha256": "b047eb49acb086572789a9aa781f6f6d72b4c6849328c7ef6002906f9a2e5858"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_install_hmac_authority.py",
+      "bytes": 19800,
+      "actualSha256": "301b1d2b6554be74c6f5fe73e2e9cf895d8ec9d7fdc865165f2fa988c0fef18a",
+      "manifestSha256": "301b1d2b6554be74c6f5fe73e2e9cf895d8ec9d7fdc865165f2fa988c0fef18a"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_joint_admission_ordering.py",
+      "bytes": 11512,
+      "actualSha256": "3ba5a81b67280d068e4fccd33513ea00bd29f8a1fa262a0084c9172973c31c6f",
+      "manifestSha256": "3ba5a81b67280d068e4fccd33513ea00bd29f8a1fa262a0084c9172973c31c6f"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_joint_live_phase_runner.py",
+      "bytes": 25480,
+      "actualSha256": "04706f4c5498665170df06f4615c1dd9d90045eb9c9aee5d0fff9ecac40e8a9f",
+      "manifestSha256": "04706f4c5498665170df06f4615c1dd9d90045eb9c9aee5d0fff9ecac40e8a9f"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_launch_inventory.py",
+      "bytes": 9227,
+      "actualSha256": "b7977d7694b8d8219175ef23b96ae1e59897f03d9891e2d9e9a62c00990275a8",
+      "manifestSha256": "b7977d7694b8d8219175ef23b96ae1e59897f03d9891e2d9e9a62c00990275a8"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_maintain_isolated_custody.py",
+      "bytes": 70429,
+      "actualSha256": "a63970b4d8c54bb3e4a9b65bdcf66a8021407be4ed9d5b2ad20acb1dceed260b",
+      "manifestSha256": "a63970b4d8c54bb3e4a9b65bdcf66a8021407be4ed9d5b2ad20acb1dceed260b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_model_audit.py",
+      "bytes": 5520,
+      "actualSha256": "851c8a3dcb9e61bca9a4c47d955455dd5fd76e8afb1f38dac7ab5486e520cae0",
+      "manifestSha256": "851c8a3dcb9e61bca9a4c47d955455dd5fd76e8afb1f38dac7ab5486e520cae0"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_native_local_gate.py",
+      "bytes": 1562,
+      "actualSha256": "564de414fd01c39bf6e4f88a94dcf158d1b82fb52f2dee2a7640601a2fc54016",
+      "manifestSha256": "564de414fd01c39bf6e4f88a94dcf158d1b82fb52f2dee2a7640601a2fc54016"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_native_redis_aof.py",
+      "bytes": 3652,
+      "actualSha256": "8cc23f835a9b05cc3a32cee848dd309edabc04ce9a3ea626276172515a25b55d",
+      "manifestSha256": "8cc23f835a9b05cc3a32cee848dd309edabc04ce9a3ea626276172515a25b55d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_observe_provider_metadata.py",
+      "bytes": 1250,
+      "actualSha256": "4285f3321df1733e5bd90886f50613ebd4937e45e514c044d73d9d27c7b57b47",
+      "manifestSha256": "4285f3321df1733e5bd90886f50613ebd4937e45e514c044d73d9d27c7b57b47"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_operational_hmac_provisioning.py",
+      "bytes": 8752,
+      "actualSha256": "dd0d1963ed470ea94a74985e3f4ee9ad30590ccb25e77aa669d5fde5163b280b",
+      "manifestSha256": "dd0d1963ed470ea94a74985e3f4ee9ad30590ccb25e77aa669d5fde5163b280b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_operational_review.py",
+      "bytes": 17104,
+      "actualSha256": "568b04a945d9deade7ee9fa5457d1788efdc133baf06b224a885e764911ff462",
+      "manifestSha256": "568b04a945d9deade7ee9fa5457d1788efdc133baf06b224a885e764911ff462"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_outer_cohort_uncertainty.py",
+      "bytes": 4528,
+      "actualSha256": "5a101b53e08887147e2e3f65342fba32d4f08a9a462cd580545e128a8ebf0e1c",
+      "manifestSha256": "5a101b53e08887147e2e3f65342fba32d4f08a9a462cd580545e128a8ebf0e1c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass10_boundaries.py",
+      "bytes": 9315,
+      "actualSha256": "b2cc745fbbbc60514351c67f9ae346668c410492a385a7d18cac45ca4b3eb5ca",
+      "manifestSha256": "b2cc745fbbbc60514351c67f9ae346668c410492a385a7d18cac45ca4b3eb5ca"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass12_boundaries.py",
+      "bytes": 9516,
+      "actualSha256": "3a19024e6062209fe17b122f780ce6a4c3cbb1352b425879688d9b55a0595da9",
+      "manifestSha256": "3a19024e6062209fe17b122f780ce6a4c3cbb1352b425879688d9b55a0595da9"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass13_boundaries.py",
+      "bytes": 7892,
+      "actualSha256": "562d842533898f7b073c498765b15f25b341f81dbe41cba330066b1599d78af8",
+      "manifestSha256": "562d842533898f7b073c498765b15f25b341f81dbe41cba330066b1599d78af8"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass15_storage.py",
+      "bytes": 15271,
+      "actualSha256": "7fc43a6b6f1ce1937c3c50bfa9756d12a2c6465631807e2e2a3d33c3a8c2f5c9",
+      "manifestSha256": "7fc43a6b6f1ce1937c3c50bfa9756d12a2c6465631807e2e2a3d33c3a8c2f5c9"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass16_startup_ownership.py",
+      "bytes": 8037,
+      "actualSha256": "2ca70d95896c20806d990851b2b378dd7112301f1d9fdd75d04437f584fd6bc9",
+      "manifestSha256": "2ca70d95896c20806d990851b2b378dd7112301f1d9fdd75d04437f584fd6bc9"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass17_authentication_deadline.py",
+      "bytes": 4949,
+      "actualSha256": "551b7b3e1909264e2f5bdf29ec06caa2e7a5e4e9f07fdc2048d7cdc2c0394f8b",
+      "manifestSha256": "551b7b3e1909264e2f5bdf29ec06caa2e7a5e4e9f07fdc2048d7cdc2c0394f8b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass17_storage_and_permissions.py",
+      "bytes": 2959,
+      "actualSha256": "3d40c3e008c79a3a24b0e592ece600f0ee0a3a343423bb746222bd02d04f2f3d",
+      "manifestSha256": "3d40c3e008c79a3a24b0e592ece600f0ee0a3a343423bb746222bd02d04f2f3d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass18_file_and_sqlite.py",
+      "bytes": 9692,
+      "actualSha256": "e86712ea67c0014121cb56726ba856306126c095222b6a3d67a43ed39eb18b54",
+      "manifestSha256": "e86712ea67c0014121cb56726ba856306126c095222b6a3d67a43ed39eb18b54"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass19_sqlite_and_phase.py",
+      "bytes": 10468,
+      "actualSha256": "764f32a42162dab634b9147326f5f7f849351088062447a275f2f05a1d882625",
+      "manifestSha256": "764f32a42162dab634b9147326f5f7f849351088062447a275f2f05a1d882625"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass23_archive_liability.py",
+      "bytes": 7831,
+      "actualSha256": "11858017c1b34cfcbf06c151d1e6e94f988faa15cea620bf1313a1d08956418b",
+      "manifestSha256": "11858017c1b34cfcbf06c151d1e6e94f988faa15cea620bf1313a1d08956418b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_pass23_packet_boundaries.py",
+      "bytes": 14682,
+      "actualSha256": "cd4c103294f592b2ab6ff74e7138b4ed1f86411962a936fac6443679eea4287d",
+      "manifestSha256": "cd4c103294f592b2ab6ff74e7138b4ed1f86411962a936fac6443679eea4287d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_persisted_phase_observer.py",
+      "bytes": 11566,
+      "actualSha256": "d0b79bb289726146bd9d0ee0d36c10a2e78c61a9b72f1ef65d53bebf1960c649",
+      "manifestSha256": "d0b79bb289726146bd9d0ee0d36c10a2e78c61a9b72f1ef65d53bebf1960c649"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_phase_metadata_recovery.py",
+      "bytes": 2908,
+      "actualSha256": "fef03550a1f061de90a502bd21569469fb6a7eb8e05d62209d5570ccc43278d4",
+      "manifestSha256": "fef03550a1f061de90a502bd21569469fb6a7eb8e05d62209d5570ccc43278d4"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_preload_isolated_image.py",
+      "bytes": 8842,
+      "actualSha256": "4345273d4ce781f184832725160e078a9a4da0fc2c828566279bbf77df27d7a3",
+      "manifestSha256": "4345273d4ce781f184832725160e078a9a4da0fc2c828566279bbf77df27d7a3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_prepare_acceptance.py",
+      "bytes": 13956,
+      "actualSha256": "7a03176c9d62a78b5630a658439ab11d8a0aefe5d3c62ecf73f1de09ead1c0ac",
+      "manifestSha256": "7a03176c9d62a78b5630a658439ab11d8a0aefe5d3c62ecf73f1de09ead1c0ac"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_probe_raft_non_revival.py",
+      "bytes": 23727,
+      "actualSha256": "ea03397c3e21e5f8e561271a74a752236e768bbe70b29ce15262358c0e766f01",
+      "manifestSha256": "ea03397c3e21e5f8e561271a74a752236e768bbe70b29ce15262358c0e766f01"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_qualification_transport.py",
+      "bytes": 8807,
+      "actualSha256": "efc5c7ca272c9a82dd43fbb244f611e2a5d7c87725284d612f75415d1c7fd575",
+      "manifestSha256": "efc5c7ca272c9a82dd43fbb244f611e2a5d7c87725284d612f75415d1c7fd575"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_qualify.py",
+      "bytes": 70485,
+      "actualSha256": "ccf48bc02c98c1ec49e39d0ecbaeba37a3c91f483c3efb123535386f6f982b49",
+      "manifestSha256": "ccf48bc02c98c1ec49e39d0ecbaeba37a3c91f483c3efb123535386f6f982b49"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_reconcile_inputs.py",
+      "bytes": 21581,
+      "actualSha256": "c31f991ac8d46342e3e10f5e6c731b74786995fb6bd57a9ef36037a3793ee376",
+      "manifestSha256": "c31f991ac8d46342e3e10f5e6c731b74786995fb6bd57a9ef36037a3793ee376"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_recovery_proof_deadline.py",
+      "bytes": 6152,
+      "actualSha256": "a749f6166e73c7546c6743d135b5ae62705275ee563a33faedec5efee2389d0a",
+      "manifestSha256": "a749f6166e73c7546c6743d135b5ae62705275ee563a33faedec5efee2389d0a"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_regular_role_mount_layout.py",
+      "bytes": 4592,
+      "actualSha256": "c5a5d5e6f8c5731774d570c348fda5865d07bd2c8a17a8bd2c08285ff399149c",
+      "manifestSha256": "c5a5d5e6f8c5731774d570c348fda5865d07bd2c8a17a8bd2c08285ff399149c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_review_provisioning.py",
+      "bytes": 13391,
+      "actualSha256": "33b32bef3cb736d68667079045dd7c99e4b57c85de7e40683bd6a7472ef88fe3",
+      "manifestSha256": "33b32bef3cb736d68667079045dd7c99e4b57c85de7e40683bd6a7472ef88fe3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_static_elf_structure.py",
+      "bytes": 2688,
+      "actualSha256": "0e3939a5654cf321ca49717feabc9fe8a4fdaeda7166dc952b1628829c65505e",
+      "manifestSha256": "0e3939a5654cf321ca49717feabc9fe8a4fdaeda7166dc952b1628829c65505e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/test_verify_f1.py",
+      "bytes": 7813,
+      "actualSha256": "c4d9fabd449ddc3cc85fd56b8b6adb42f53be050aa284b668edbfea8d40ed07b",
+      "manifestSha256": "c4d9fabd449ddc3cc85fd56b8b6adb42f53be050aa284b668edbfea8d40ed07b"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/verify_csharp_fixture.py",
+      "bytes": 1503,
+      "actualSha256": "f49ad0dfb1f0bc042363cee81730cb2ef921910c08827c4b514175b13f86f719",
+      "manifestSha256": "f49ad0dfb1f0bc042363cee81730cb2ef921910c08827c4b514175b13f86f719"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/verify_f1.py",
+      "bytes": 12503,
+      "actualSha256": "e73c04deec3dc637886a2d6c1d566c84e97454940071255cd8ed2f8c390ea413",
+      "manifestSha256": "e73c04deec3dc637886a2d6c1d566c84e97454940071255cd8ed2f8c390ea413"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/verify_inventory_registry_reads.py",
+      "bytes": 3592,
+      "actualSha256": "16b91b0caa71b71c1b4f39c02c9a050cc7c3a870e318302c471df6356c8a2598",
+      "manifestSha256": "16b91b0caa71b71c1b4f39c02c9a050cc7c3a870e318302c471df6356c8a2598"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/immutable-helper-source/eng/ext-secrets-1/worker_startup_ownership.py",
+      "bytes": 1612,
+      "actualSha256": "90ba87261e645a706dea06cdb04a592cfc7c5cfd07040791e494c17285cfda08",
+      "manifestSha256": "90ba87261e645a706dea06cdb04a592cfc7c5cfd07040791e494c17285cfda08"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/inventory-restricted-registry-observation.json",
+      "bytes": 1132,
+      "actualSha256": "8fe87b975fe86d351646c44b425945c5bd3d569b15f4c59d3ff58162e0dfe207",
+      "manifestSha256": "8fe87b975fe86d351646c44b425945c5bd3d569b15f4c59d3ff58162e0dfe207"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/invocation-spec.md",
+      "bytes": 71721,
+      "actualSha256": "111d9476992d1061188d09697413f58c32d389b71b706976b46207de147598f4",
+      "manifestSha256": "111d9476992d1061188d09697413f58c32d389b71b706976b46207de147598f4"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/native-enrollment-receipts.json",
+      "bytes": 1656,
+      "actualSha256": "e690abe2dbcb1d89e697a7dc4fb191c4d8e2fa48c6fda7446003d2ef9f94e74e",
+      "manifestSha256": "e690abe2dbcb1d89e697a7dc4fb191c4d8e2fa48c6fda7446003d2ef9f94e74e"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/native-helper-pins.json",
+      "bytes": 11107,
+      "actualSha256": "49b422c387ab0b8ecddb66159f1bd3a990053389806611cfc9d8a466e22ac69c",
+      "manifestSha256": "49b422c387ab0b8ecddb66159f1bd3a990053389806611cfc9d8a466e22ac69c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/observation-272273853d4147abb1b870529b07c0a2.json",
+      "bytes": 190163,
+      "actualSha256": "53783521215ee5fa8e4f018d34d10171f032b2d34adc99bb3d446631602effa3",
+      "manifestSha256": "53783521215ee5fa8e4f018d34d10171f032b2d34adc99bb3d446631602effa3"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/observation-5b6e8811e77843879ec9a72c1fc53c99.json",
+      "bytes": 1496,
+      "actualSha256": "a3cb145ab46404c5dd5005ec4212a2fc63f73e2db5044c0aabdd5948c14e35e6",
+      "manifestSha256": "a3cb145ab46404c5dd5005ec4212a2fc63f73e2db5044c0aabdd5948c14e35e6"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/observation-c994258b7ce546528f7441ca148f2019.json",
+      "bytes": 185256,
+      "actualSha256": "445a07c2653ca2bce2f561caddd9fed3ff395c54fb3aa69e4fcef71bbcf163eb",
+      "manifestSha256": "445a07c2653ca2bce2f561caddd9fed3ff395c54fb3aa69e4fcef71bbcf163eb"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/observation-d89f3c6c09754920a69410aa6e062809.json",
+      "bytes": 187317,
+      "actualSha256": "dca536f75ca87609eaf7a932d3a62364a5346766f3401b97a82f58959d5ae1de",
+      "manifestSha256": "dca536f75ca87609eaf7a932d3a62364a5346766f3401b97a82f58959d5ae1de"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/preservation-decision.template.json",
+      "bytes": 2547,
+      "actualSha256": "aef349e44c674fccc5aad9ec50eaaa222813e69c21973723a9fc7829d15688dd",
+      "manifestSha256": "aef349e44c674fccc5aad9ec50eaaa222813e69c21973723a9fc7829d15688dd"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/run.json",
+      "bytes": 345,
+      "actualSha256": "708ed8a6dc8805c962df8c2b321380fb955399c0c9a355c06e47d468c1a56127",
+      "manifestSha256": "708ed8a6dc8805c962df8c2b321380fb955399c0c9a355c06e47d468c1a56127"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/spec-provenance.json",
+      "bytes": 298,
+      "actualSha256": "560e48241b040f9567082219c328eeb5bb3245f4233484152cc306c93ee1c864",
+      "manifestSha256": "560e48241b040f9567082219c328eeb5bb3245f4233484152cc306c93ee1c864"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/verification.json",
+      "bytes": 4597,
+      "actualSha256": "753f06d735ed9e60bf67172adaabce2e9b5210d8d260f073341aff09fa438461",
+      "manifestSha256": "753f06d735ed9e60bf67172adaabce2e9b5210d8d260f073341aff09fa438461"
+    }
+  ],
+  "externalOrUnretainedDeliveriesExcluded": false
+}

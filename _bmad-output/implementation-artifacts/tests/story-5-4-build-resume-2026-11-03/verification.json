@@ -1,0 +1,225 @@
+{
+  "recordedAt": "2026-11-03T06:29:15.516339+00:00",
+  "story": "5.4",
+  "disposition": "in-progress; production owner bindings and full persisted live acceptance remain incomplete",
+  "ownedRepositoryEdits": [],
+  "concurrentExternalWork": "Untracked _bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md appeared during this run; preserved read-only.",
+  "initialLocalAttempt": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-2026-11-03/local",
+    "exitCode": 1,
+    "phase": "build preparation, before owning-project builds",
+    "failure": "BuildPreparationFailed: 2; HXW009: pinned Builds Props/Directory.Packages.props at 8f3ce34436299d4682ff50dc3fe18360a09a88e1 missing from root Builds object store",
+    "producerResult": "/tmp/agents-story54-2026-11-03/local/build-preparation.json",
+    "producerResultSha256": "5f64764dd8533e828ab3747cf2f95273498ed7a7b6b358ff611bef35da5e6529"
+  },
+  "objectRecovery": {
+    "command": "git -c submodule.recurse=false fetch --no-recurse-submodules origin 8f3ce34436299d4682ff50dc3fe18360a09a88e1",
+    "workingDirectory": "/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+    "exitCode": 0,
+    "output": "From https://github.com/Hexalith/Hexalith.Builds; branch 8f3ce34436299d4682ff50dc3fe18360a09a88e1 -> FETCH_HEAD",
+    "checkoutOrGitlinkChanged": false,
+    "nestedSubmoduleCommandRun": false,
+    "provenance": "This exact-commit network fetch had completed before parent steering conveyed the active step-03 no-remote constraint. No later remote operation was performed."
+  },
+  "finalLocalAttempt": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Local -ArtifactsPath /tmp/agents-story54-2026-11-03/local-after-builds-object-recovery",
+    "exitCode": 0,
+    "sdk": "10.0.403",
+    "result": {
+      "StoryComplete": false,
+      "LocalContractsVerified": true,
+      "ExternalOwnerCalls": 0,
+      "LiveReadinessEstablished": false,
+      "Mode": "Local",
+      "Blockers": [
+        {
+          "RecordId": "EXT-PARTIES-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-CONV-AI-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-SECRETS-1",
+          "Code": "DependencyNotAvailable"
+        },
+        {
+          "RecordId": "EXT-HOST-1",
+          "Code": "DependencyNotAvailable"
+        }
+      ]
+    },
+    "projects": [
+      {
+        "project": "Hexalith.Agents.Contracts.Tests",
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "xml": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Contracts.Tests.xml",
+        "xmlSha256": "3127099e90a1375a5e63d0e52de0393314cde8b0f722fdc30ef03703d82e3ea3",
+        "buildLog": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Contracts.Tests.build.log",
+        "buildLogSha256": "bf0412781cce485eb76e58175747c0e911be4cac5c14a124105c9069759c8238",
+        "warningFreeBuild": true,
+        "errorFreeBuild": true,
+        "assemblySha256": "887c3537d5f3740e10e9352b67ce52f94e6e0dc3b86665b796c8323cd056caa8",
+        "pdbSha256": "f964f569770b95b42c51ac459773d7189447372650099434e901c5d35e80d03f"
+      },
+      {
+        "project": "Hexalith.Agents.Client.Tests",
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "xml": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Client.Tests.xml",
+        "xmlSha256": "8df621a130376145955047be6ce1f472725036f0a2dcf3949ab74df2c96531cb",
+        "buildLog": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Client.Tests.build.log",
+        "buildLogSha256": "baa62646c03325b22e5daac0ec6d60ac4095d0bae8f79860e7b135a9d1f5d867",
+        "warningFreeBuild": true,
+        "errorFreeBuild": true,
+        "assemblySha256": "2efb5b5d54aed1114e4f5a0a6dc3e5bb0341b3418ea85dc8677c62ac94095b7d",
+        "pdbSha256": "70044bb9104bc483b4eff599092641593f75a0d19461095bb1e05ef12b8079ab"
+      },
+      {
+        "project": "Hexalith.Agents.Tests",
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "xml": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Tests.xml",
+        "xmlSha256": "c24ea1d817d7d5b3c24eedefb6cbae0c742feb6b2e466e97e3c4479590fdc231",
+        "buildLog": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Tests.build.log",
+        "buildLogSha256": "2a14729706ef397e181d9353dd3384f1bab2a84db2f97f7b7a2099f51d5310f0",
+        "warningFreeBuild": true,
+        "errorFreeBuild": true,
+        "assemblySha256": "959bb5845b408d655c4f4091f89fe93bc3f12ec9561327f1c9fd8aa6e46fddf9",
+        "pdbSha256": "7ffbade7020408416b19277c04099a29be8d2146a05fcedb516bd718b55cd16a"
+      },
+      {
+        "project": "Hexalith.Agents.Server.Tests",
+        "total": 1977,
+        "passed": 1977,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "xml": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Server.Tests.xml",
+        "xmlSha256": "4482b3a5c8eaca272372ff1e640c670d55060dff3ec8960cd71b1a80bf76a45e",
+        "buildLog": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.Server.Tests.build.log",
+        "buildLogSha256": "f3f2323b01549d4f82d487be33a57d33409118aa97d86a3bcc0f68826d7ac60b",
+        "warningFreeBuild": true,
+        "errorFreeBuild": true,
+        "assemblySha256": "4319f3d953d2c322a33175f2723e850277e97d932c1afe6dad340d47e23461fb",
+        "pdbSha256": "efca2f038a8a3b77bfca8ef042f2fc7c910586b382c7a957ce3cea3890a6bef3"
+      },
+      {
+        "project": "Hexalith.Agents.UI.Tests",
+        "total": 1249,
+        "passed": 1249,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "xml": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.UI.Tests.xml",
+        "xmlSha256": "ec1d67e8f60f1e620bb35528137a61725b38adeb64af6d4f6e912e6b4c40877c",
+        "buildLog": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/Hexalith.Agents.UI.Tests.build.log",
+        "buildLogSha256": "411fcb1093dc5652490db425ee2af235f28dd7ff071e0de7053ee80d24251e6f",
+        "warningFreeBuild": true,
+        "errorFreeBuild": true,
+        "assemblySha256": "6cfcb707bd758525776784b6fc3a71341c6bc8dc28735dc9927aaf8587fd5ab6",
+        "pdbSha256": "03a564e19e361c3dc739b93ae24f07ccbe7c886b8b9680644af13e1b21c3fa93"
+      }
+    ],
+    "totalPassed": 6247,
+    "focusedClassPassCountsFromFullRun": {
+      "Story54CurrentEvidenceTests": 37,
+      "Story54BoundaryTests": 27,
+      "Story54CustodyAvailabilityTests": 5,
+      "TenantAuthorityAdmissionOrderingTests": 44,
+      "ApproverEvidenceAdmissionTests": 24,
+      "ApproverAuthorityLifetimeTests": 27,
+      "AuditQueryIsolationTests": 76,
+      "AgentInteractionGateAdmissionTests": 72,
+      "PartiesAgentPartyDirectoryTests": 77
+    },
+    "producerResult": "/tmp/agents-story54-2026-11-03/local-after-builds-object-recovery/build-preparation.json",
+    "producerResultSha256": "b7f5ece6ebf30fd0aa59a4450f9c4c3a4e2e1f839b6be7d95915615990775f15",
+    "producerDiagnosticsPreserved": [
+      "HXW011 missing local Platform release tag",
+      "HXW009 staged/checked-out Builds differs from Platform pin",
+      "HXW010 source CLI version outside Platform range"
+    ]
+  },
+  "liveAttempt": {
+    "command": "pwsh -NoProfile -File ./eng/verify-story-5.4.ps1 -Mode Live -ArtifactsPath /tmp/agents-story54-2026-11-03/live",
+    "exitCode": 1,
+    "result": {
+      "StoryComplete": false,
+      "Mode": "Live",
+      "ExternalCalls": 0,
+      "Blockers": [
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-PARTIES-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-CONV-AI-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-SECRETS-1"
+        },
+        {
+          "Code": "DependencyNotAvailable",
+          "RecordId": "EXT-HOST-1"
+        }
+      ]
+    },
+    "resultSha256": "855632c9a3561a36883c71b310a2a2335555a485a2ad3e54a3f3e04056fc6bb0",
+    "qualificationEstablished": false
+  },
+  "boundedSourceAudit": {
+    "fileCount": 1065,
+    "changedFiles": [],
+    "revisionDrift": {},
+    "before": "/tmp/agents-story54-2026-11-03/retry-selected-inputs-before.json",
+    "after": "/tmp/agents-story54-2026-11-03/retry-selected-inputs-after.json",
+    "beforeSha256": "c5d94421f3f575b6710b55c147513f55e71b92a2f93bbc9e78dd83fba4d2a11d",
+    "afterSha256": "1f54baf48680475ba2095fd0a53573f1d35553bae3fce64913e94592826a229d",
+    "limitation": "Snapshot began after retry process startup during build preparation, before owning-project build logs. Selected root inputs only; excludes generated/transitive compiler input attestation. Clean owning reference statuses and exact before/after revisions are recorded separately."
+  },
+  "revisions": {
+    ".": "1bbee16b5fb7101ba1e1386d66e0a8ea8bab987f",
+    "references/Hexalith.AI.Tools": "1745b6663ad32bb1288167135ed0f979366c53a0",
+    "references/Hexalith.Commons": "11555ace9efcae2928a00122dcba91243e5a8a1a",
+    "references/Hexalith.PolymorphicSerializations": "bce4eb9f45c6b131b960ab4fa39e50ff01e51960",
+    "references/Hexalith.Conversations": "1a013e8f5fd244aaf306a0c6c54bd85b3196a328",
+    "references/Hexalith.EventStore": "7c93a1234d14c66f5ee85ed48caaee1d30a671f3",
+    "references/Hexalith.Memories": "e8956eb5c1bd49297f86702f9606eb9b013bc2f1",
+    "references/Hexalith.Tenants": "a01e89854f711d1a93ae15695b438424c1ed4f0f",
+    "references/Hexalith.Parties": "a419b53cc2087f6b99d301fb98852e72bd50c9fa",
+    "references/Hexalith.Builds": "13f503caecba9f449d84a8e005258626a64edd06",
+    "references/Hexalith.FrontComposer": "07089dcbdad784a1d53037e9cea78d1d7becd8d6",
+    "references/Hexalith.McpCli": "3bc89642ad43305531c4018b75b5e1b9e0681e10",
+    "references/Hexalith.Platform": "73d8ac8ea55c4539aa7adb268677c222e00d104c"
+  },
+  "nonEmptyWorkingTreeStatuses": {
+    ".": "?? _bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md\n"
+  },
+  "remainingAcceptance": [
+    "Installed production contiguous Tenants/current Human/Party/approver source bindings and immutable provisioning.",
+    "Actual accepted current custody/profile, independent decision issuance/trust and full dependency availability.",
+    "Genuine AD-30 principal/operation/scope signature verification, private reserved-system replay credential and persisted ACL/recovery evidence before target-command construction.",
+    "Replicated durable denial spool/recovery worker with accepted replica/failure model and persisted outage/restart/restore/lost-ack outcomes.",
+    "Complete API/UI and deployed cross-tenant lookup/effect/count/message/log/accessibility isolation qualification.",
+    "Full matrix, exact-target owner qualification, full-story review and completion; no owner command ran in this task."
+  ]
+}

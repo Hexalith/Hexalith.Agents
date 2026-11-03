@@ -1,0 +1,389 @@
+{
+  "schema": "agents.story-5.4.protection-prerequisite-recheck/v1",
+  "recordedAtUtc": "2026-11-03T08:57:11.378853Z",
+  "scope": "Read-only authority and retained public evidence inspection; report/evidence output only. Not a Local/source gate, preparer, installed qualification or owner acceptance.",
+  "outcome": "BlockedBeforeProtectionCommitment",
+  "files": [
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/story-5-4-ext-secrets-host-continuation-2026-11-03.md",
+      "bytes": 15006,
+      "sha256": "8c81457a60caccfb5b270f98a349fb956d6eaee91974b5a3eeaf6501c8c205d9"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/external-dependency-register.md",
+      "bytes": 77076,
+      "sha256": "1ee2692ea5bf6a0e42921c6dc64a58ebe5738efdbb0424d0345a281fca0b1487"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-28-mvp-custody.md",
+      "bytes": 16335,
+      "sha256": "50823c6a105d659eac99f103cc4bfe749bd80e49d999fbd001b7b382371dcecf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "bytes": 108946,
+      "sha256": "a4635da24202e97d5d770fa2d14394c32415f8949bfb9904ca7ea5c221a02596"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+      "bytes": 108946,
+      "sha256": "a4635da24202e97d5d770fa2d14394c32415f8949bfb9904ca7ea5c221a02596"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/README.md",
+      "bytes": 13259,
+      "sha256": "e9f282fffd64c1551af97aa6e8faf923596f0438ffe248e02a5d8f987be01547"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-host-1-continuation-2026-11-02/README.md",
+      "bytes": 7819,
+      "sha256": "0ad85e75883cb090ba319c8bfc352e8da13f4859bc017c6552c741cf9e6cd62d"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-protection-1-loop10/README.md",
+      "bytes": 10652,
+      "sha256": "afd8cdc543ce00d6b3e2832b8cdf66d6f2ad734050dc51573f6104d0a79342bf"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-owner-validation-2026-11-02/protection-evidence-scope.json",
+      "bytes": 6291,
+      "sha256": "762a74b2bd100da3f1f4bdab25e97602cfce639cf50fdd0b598ef49ce7622a67"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/docs/implementation/ext-protection-1-owner-acceptance.md",
+      "bytes": 154919,
+      "sha256": "d6963d771f6614aac745e9e46d858e64ac723c0bed53d6865b1e4b1737d2f781"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/docs/implementation/ext-protection-1-verifier-protocol.md",
+      "bytes": 31648,
+      "sha256": "4f553f50add56f1689324254ccd47a3f7a7e017b8c7db4cafc3eaa9879ece6c6"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore/tools/ext-protection-1/plan.json",
+      "bytes": 11271,
+      "sha256": "c1e7759a2687c122dd182aa48f1828e531166c0157a04b2ae0eba35e9ac4d10c"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/RECEIPT.md",
+      "bytes": 63935,
+      "sha256": "085db1c09406302f69359de5657c8a71f00be58b7e7efa77155a0a881b31265d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/preservation-decision.json",
+      "bytes": 1724,
+      "sha256": "62feebc1589e2b127aa8b8e6692dd34e4fd0742513d393c567454b54857ffc4d"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/metadata-transport-correction-20261029-f7Z2ajmP/owner-return/metadata-credential-reference.json",
+      "bytes": 627,
+      "sha256": "9eb7de84f3221125baac0fc07d84aaeac7f8b2fd4cb85f70499d9c33d0a4d2ca"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/evidence-manifest.json",
+      "bytes": 17553,
+      "sha256": "46d77631b1f790e6ff4deb06169aea1a884891657afe8ce61531901890fb6e31"
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/approval-record.json",
+      "bytes": 358,
+      "sha256": "2d25f7ff360b32688b2bc555e6442ad9a9e1f2cf0ee90c2f709d80e84146970e"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/owner-input-blockers.json",
+      "bytes": 3886,
+      "sha256": "01669c898d04d95a30650fb13bdbeb15cbd57af6fd63d3ebecc36411d20c7f94"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/repair-secrets-blocked-inputs.json",
+      "bytes": 2727,
+      "sha256": "a333db4734206fbd6d50f8a25f38aed7edf2e0cfe2199babb31bfae102c87674"
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/ext-secrets-1-operational-security-2026-11-02/repair-host-blocked-inputs.json",
+      "bytes": 517,
+      "sha256": "50ecdabb9e82619f7dccc59d61b2336800e7593739350c3b16b18de2c1e8ffb3"
+    }
+  ],
+  "sourceHeadsObservedNotAccepted": {
+    "/home/administrator/projects/hexalith/agents": "1bbee16b5fb7101ba1e1386d66e0a8ea8bab987f",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform": "73d8ac8ea55c4539aa7adb268677c222e00d104c",
+    "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore": "7c93a1234d14c66f5ee85ed48caaee1d30a671f3",
+    "/home/administrator/projects/hexalith/platform": "f90e68a0c0305d18dc2cde8d4d4c856aa5a49725",
+    "/home/administrator/projects/hexalith/eventstore": "b18a07c8b19fcdfe38678c94ad34766720f7b979"
+  },
+  "missingPaths": [
+    {
+      "path": "/home/administrator/hexalith-protection-evidence/ext-protection-1/accepted-profile.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/operational-backup-restore-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/projects/hexalith/platform/docs/implementation/story-5-4-coupled-delivery-2026-10-25/installation-evidence/operational-backup-restore-owner-return.json",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/expired-hmac-recovery-run-20261029-approved/owner-return",
+      "exists": false
+    },
+    {
+      "path": "/home/administrator/hexalith-secrets-evidence/ext-secrets-1/provider-inventory-resume-20261029T175713722948Z/owner-return",
+      "exists": false
+    }
+  ],
+  "canonicalFormFlags": {
+    "installationAuthorized": false,
+    "qualificationAuthorized": false,
+    "attemptReserved": false,
+    "dependencyAvailable": false
+  },
+  "preserved": {
+    "host": "192.168.1.30",
+    "partiesBranch": "B",
+    "timing": {
+      "L": 300,
+      "S": 30,
+      "O": 600,
+      "H": 86400,
+      "R": 604800
+    },
+    "cohort": "OQ-5.4-1",
+    "existingJournals": "Preserve unchanged",
+    "acceptedPlatformCommit": "abbec4093715c1db854433119b32d4e16df20d08",
+    "acceptedIntegrationDate": "2026-10-08"
+  },
+  "ownerReturnFields": [
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/currentAcceptedProfileReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/freshAuthorizedReadinessEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/credentialAndScopeEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/rotationAndRevocationEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/timestampFormatCompatibilityEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentOperationalProfile/ownerMetadataCredentialRecordReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/backupRetentionSeconds",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/privilegedRestoreSubjectsAndScopedCredentialReferences",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/acceptedRestorePolicyReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/restoreProcedureReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/authorizedRecoveryTestEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/backupAndRestore/everyRecoveryCopyInventoryAndActualDisposalEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/acceptedPublicPreservationBaselineReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/historicalMetadataProofAndAcceptanceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/freshPublicLeaseKeyAndPolicyEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/furtherSecretWriteCoverageAndDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/memoriesPreservationDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/agentsRegisterPreservationDispositionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/maintenancePreservationBaseline/expiredRecoveryPreservationDecisionReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentIdentityAndApprovers/currentAuthorityAndBindingEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/currentIdentityAndApprovers/acceptedIntegrationReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/independentDecisionAuthority/installedIssuerAndPublicTrustEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/independentDecisionAuthority/currentRolesAndRevocationEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/authenticatedIngressAndReplay/installedAdaptersAndAclEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/authenticatedIngressAndReplay/persistedReplayRecoveryEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/acceptedReplicaPlacementAndFailureModelReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/installedWorkerAndAclEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    },
+    {
+      "pointer": "#/mvpOperationalInputs/durableDenialAndRecovery/persistedDenialRecoveryEvidenceReference",
+      "observedValue": null,
+      "acceptedNewEvidenceFound": false
+    }
+  ],
+  "all28NullAndExactSetMatchesHistoricalSnapshot": true,
+  "historicalSnapshotFormSha256": "755c9956d3afd9538ecd508c3fbf77f08712fa2e684cf007c5e9a3c9607a7650",
+  "currentCanonicalFormSha256": "a4635da24202e97d5d770fa2d14394c32415f8949bfb9904ca7ea5c221a02596",
+  "D7": {
+    "owner": "EventStore Maintainer with Governance/protection owners",
+    "completeImmutableSourcePackageAndLockedRestoreReference": null,
+    "installedEngineRolesTrustAndAcceptedProfileReference": null,
+    "actualProfileFileSha256": null,
+    "g1ThroughG7OriginalClosureBundle": null,
+    "independentPhysicalNonRevivalAndSurvivorRecoveryReference": null
+  },
+  "D9": {
+    "owners": [
+      "Platform Maintainer",
+      "EventStore Maintainer"
+    ],
+    "status": "Unresolved; AWS-derived estimates withdrawn",
+    "withdrawnPriorProposal": {
+      "protection": "2026-11-30",
+      "coupledPlatform": "2026-12-03",
+      "earliestCohortWindow": "2026-12-04",
+      "reason": "Estimate based on rejected AWS MVP path"
+    },
+    "actualNonAwsProviderReadinessCompletionRecoveryAndQualificationBoundsReference": null,
+    "ownerConfirmedProtectionDate": null,
+    "ownerConfirmedCoupledPlatformDate": null,
+    "laterExplicitReplacementAcceptanceReference": null,
+    "completeCanonicalPlatformTarget": null,
+    "completeCanonicalProtectionTargetAndPackage": null
+  },
+  "historicalReports": {
+    "candidate": "39c3337d762c2ebfe181725fc9ea906c36a1b075",
+    "secretsMissing": 59,
+    "hostMissing": 18,
+    "rerun": false
+  },
+  "retainedProfileExpiredAt": "2026-10-28T23:51:51.830725+00:00",
+  "originalRecoveryExclusiveDeadline": "2026-10-30T16:53:50Z",
+  "laterWindow": {
+    "notBefore": "2026-11-02T09:00:00Z",
+    "exclusiveDeadline": "2026-11-02T11:00:00Z",
+    "credentialJournalPhase": "NotStarted",
+    "extended": false
+  },
+  "callsThisContinuation": {
+    "Local": 0,
+    "preparer": 0,
+    "Live": 0,
+    "Full": 0,
+    "OQ": 0,
+    "providerOrCluster": 0,
+    "credentialIssuanceOrRenewal": 0,
+    "installation": 0,
+    "restoreOrDestruction": 0,
+    "attemptReservations": 0
+  },
+  "limitations": [
+    "Discovery is limited to the designated local roots, both owner checkouts and stated GitHub sources; external/unretained deliveries are not excluded.",
+    "File hashes prove byte identity, not attestation truth, current installation, authority independence or acceptance.",
+    "The advanced protection construction remains deferred; no procurement or provisioning scope is reopened.",
+    "Software-key deletion does not establish irreversible all-copy erasure; retained ObservedRevival remains controlling."
+  ],
+  "remoteReads": {
+    "platformCommit": "f90e68a0c0305d18dc2cde8d4d4c856aa5a49725",
+    "ownerFormGitBlob": "660f19ac18d0d20cbfdc0a399830ebea62380410",
+    "ownerFormUrl": "https://github.com/Hexalith/Hexalith.Platform/blob/f90e68a0c0305d18dc2cde8d4d4c856aa5a49725/docs/implementation/story-5-4-coupled-delivery-2026-10-25/owner-decisions.json",
+    "eventStoreOwnerAcceptanceGitBlob": "fcad9b4fdf769a2fc0ac0ed73e9de0ee475265e5",
+    "eventStoreOwnerAcceptanceUrl": "https://github.com/Hexalith/Hexalith.EventStore/blob/main/docs/implementation/ext-protection-1-owner-acceptance.md",
+    "platformIssues": [
+      {
+        "url": "https://github.com/Hexalith/Hexalith.Platform/issues/1",
+        "updatedAt": "2026-09-26T23:17:09Z",
+        "commentsReturned": 0,
+        "bodyClassification": "Historical request, no delivery"
+      },
+      {
+        "url": "https://github.com/Hexalith/Hexalith.Platform/issues/2",
+        "updatedAt": "2026-09-26T23:17:13Z",
+        "commentsReturned": 0,
+        "bodyClassification": "Historical request, no delivery"
+      }
+    ],
+    "eventStoreIssueSearch": {
+      "query": "repo:Hexalith/Hexalith.EventStore \"EXT-PROTECTION-1\"",
+      "matches": 0
+    },
+    "ownerFormGitBlobMatchesBothLocalForms": true,
+    "eventStoreOwnerAcceptanceGitBlobMatchesLocal": true
+  }
+}
