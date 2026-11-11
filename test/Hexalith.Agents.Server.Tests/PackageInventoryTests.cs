@@ -97,7 +97,7 @@ public sealed class PackageInventoryTests
 
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/ci.yml"));
         workflow.ShouldContain(
-            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@13f503caecba9f449d84a8e005258626a64edd06");
+            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@163f3d0deac6b0db5ec4bdfcc0934b12e6adb46a");
         workflow.ShouldContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
         workflow.ShouldNotContain("domain-ci.yml@main");
         workflow.ShouldContain("test-platform: microsoft-testing-platform");
@@ -124,7 +124,7 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("npm audit signatures");
         workflow.ShouldContain("persist-credentials: false");
         workflow.ShouldContain("git -C references/Hexalith.Builds rev-parse HEAD");
-        workflow.ShouldContain("13f503caecba9f449d84a8e005258626a64edd06");
+        workflow.ShouldContain("163f3d0deac6b0db5ec4bdfcc0934b12e6adb46a");
         workflow.ShouldNotContain("--recursive");
 
         Match projectList = Regex.Match(
@@ -149,7 +149,7 @@ public sealed class PackageInventoryTests
     [InlineData("\r\n")]
     public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing(string lineEnding)
     {
-        const string approvedBuildsSha = "13f503caecba9f449d84a8e005258626a64edd06";
+        const string approvedBuildsSha = "163f3d0deac6b0db5ec4bdfcc0934b12e6adb46a";
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"))
             .ReplaceLineEndings(lineEnding);
         string releaseConfiguration = File.ReadAllText(ModuleLayout.ResolveModulePath(".releaserc.json"));
@@ -160,26 +160,30 @@ public sealed class PackageInventoryTests
 
         workflow.ShouldContain("workflow_dispatch:");
         workflow.ShouldNotContain("push:");
-        workflow.ShouldContain("environment-name: production");
+        workflow.ShouldContain("environment: production");
         workflow.ShouldContain("DISPATCH_REF");
         workflow.ShouldContain("scripts/verify-release-source.py");
         workflow.ShouldContain("scripts/verify-github-release.py");
         workflow.ShouldContain("timeout-minutes: 45");
-        workflow.ShouldContain($"domain-release.yml@{approvedBuildsSha}");
+        workflow.ShouldContain($"Github/prepare-domain-release@{approvedBuildsSha}");
         workflow.ShouldContain($"builds-execution-sha: {approvedBuildsSha}");
-        workflow.Split(approvedBuildsSha).Length.ShouldBe(3);
+        workflow.Split(approvedBuildsSha).Length.ShouldBe(4);
         using JsonDocument packageManifest = JsonDocument.Parse(
             File.ReadAllText(ModuleLayout.ResolveModulePath("eng/release-packages.json")));
         int packageCount = packageManifest.RootElement.GetProperty("packages").GetArrayLength();
-        Match declaredPackageCount = Regex.Match(workflow, @"(?m)^      expected-package-count: (\d+)\r?$");
+        Match declaredPackageCount = Regex.Match(workflow, @"(?m)^          expected-package-count: (\d+)\r?$");
         declaredPackageCount.Success.ShouldBeTrue();
         int.Parse(declaredPackageCount.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture)
             .ShouldBe(packageCount);
-        workflow.ShouldContain("reserved-version: ${{ needs.plan-release.outputs.version }}");
+        workflow.ShouldContain("HEXALITH_RELEASE_RESERVED_VERSION: ${{ needs.plan-release.outputs.version }}");
         workflow.Split("timeout-minutes: 10").Length.ShouldBe(3);
-        workflow.ShouldContain("publish-containers: false");
+        workflow.ShouldNotContain("publish-containers");
         workflow.ShouldContain("HEXALITH_RELEASE_PUBLISH_ENABLED");
-        workflow.ShouldContain("NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}");
+        workflow.ShouldContain("NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}");
+        workflow.ShouldContain("NuGet/login@8d196754b4036150537f80ac539e15c2f1028841");
+        workflow.ShouldContain("user: ${{ vars.NUGET_TRUSTED_PUBLISHING_USER }}");
+        workflow.ShouldContain("additional-sdk-version: '10.0.404'");
+        workflow.ShouldContain("id-token: write");
         workflow.ShouldNotContain("secrets: inherit");
         workflow.ShouldNotContain("--skip-duplicate");
 
