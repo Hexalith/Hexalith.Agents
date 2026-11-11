@@ -39,6 +39,7 @@ jobs:
       - uses: actions/setup-dotnet@v5.3.0
         with:
           global-json-file: global.json
+          dotnet-version: '10.0.404'
       - name: Recover original archives without release planning
         shell: bash
         env:
