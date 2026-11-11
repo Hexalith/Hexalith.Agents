@@ -30,6 +30,7 @@ VERSION_PATTERN = re.compile(
     r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
 )
 
+# CPM promotes DiagnosticSource 11 above the net10 framework version in the exact affected package closures.
 EXPECTED_DEPENDENCIES = {
     "Hexalith.Agents.Contracts": frozenset(
         {"ByteAether.Ulid", "Hexalith.Commons.UniqueIds", "Hexalith.EventStore.Contracts"}
@@ -78,6 +79,7 @@ EXPECTED_DEPENDENCIES = {
             "StackExchange.Redis",
             "Swashbuckle.AspNetCore.SwaggerUI",
             "System.IdentityModel.Tokens.Jwt",
+            "System.Diagnostics.DiagnosticSource",
         }
     ),
     "Hexalith.Agents": frozenset(
@@ -100,6 +102,7 @@ EXPECTED_DEPENDENCIES = {
             "Microsoft.Extensions.Logging.Abstractions",
             "Microsoft.Extensions.Options",
             "Microsoft.Extensions.Options.ConfigurationExtensions",
+            "System.Diagnostics.DiagnosticSource",
         }
     ),
     "Hexalith.Agents.UI": frozenset(
@@ -140,6 +143,7 @@ EXPECTED_DEPENDENCIES = {
             "NUlid",
             "System.IdentityModel.Tokens.Jwt",
             "System.Reactive",
+            "System.Diagnostics.DiagnosticSource",
         }
     ),
     "Hexalith.Agents.Testing": frozenset(
