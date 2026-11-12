@@ -97,7 +97,7 @@ public sealed class PackageInventoryTests
 
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/ci.yml"));
         workflow.ShouldContain(
-            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@163f3d0deac6b0db5ec4bdfcc0934b12e6adb46a");
+            "Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@6ad5854aa14a9950e1fbfc32d7e27953a1c4b82b");
         workflow.ShouldContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}");
         workflow.ShouldNotContain("domain-ci.yml@main");
         workflow.ShouldContain("test-platform: microsoft-testing-platform");
@@ -124,7 +124,7 @@ public sealed class PackageInventoryTests
         workflow.ShouldContain("npm audit signatures");
         workflow.ShouldContain("persist-credentials: false");
         workflow.ShouldContain("git -C references/Hexalith.Builds rev-parse HEAD");
-        workflow.ShouldContain("163f3d0deac6b0db5ec4bdfcc0934b12e6adb46a");
+        workflow.ShouldContain("6ad5854aa14a9950e1fbfc32d7e27953a1c4b82b");
         workflow.ShouldNotContain("--recursive");
 
         Match projectList = Regex.Match(
@@ -149,7 +149,7 @@ public sealed class PackageInventoryTests
     [InlineData("\r\n")]
     public void ReleaseShouldBeManualProtectedPinnedAndCollisionFailing(string lineEnding)
     {
-        const string approvedBuildsSha = "163f3d0deac6b0db5ec4bdfcc0934b12e6adb46a";
+        const string approvedBuildsSha = "6ad5854aa14a9950e1fbfc32d7e27953a1c4b82b";
         string workflow = File.ReadAllText(ModuleLayout.ResolveModulePath(".github/workflows/release.yml"))
             .ReplaceLineEndings(lineEnding);
         string releaseConfiguration = File.ReadAllText(ModuleLayout.ResolveModulePath(".releaserc.json"));

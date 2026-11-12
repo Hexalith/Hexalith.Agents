@@ -180,35 +180,35 @@
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "build/Hexalith.FrontComposer.Shell.props",
         "sha256": "01abcf003fb124a7d214a8898c2932c11b9aeaf0a8ecbd16bbca184f5d4b859b"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-        "sha256": "8a0e23cf102cb02c023b4e71f3dd652d4ba60d1da55e4946a1d356fc753d391c"
+        "sha256": "ed64ebe7dddb0349129c6078111dbe194a4ed8b88f9dce6e926fcab8ece6ad0a"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
-        "sha256": "62c4aac283d65d69441c3b657ec782cc91f1cde304a45911314c23cef797f962"
+        "sha256": "ca506316ae3bb920e4dbd02cf979c7c2cb2d4369ddfb81bd2d505326c5173acc"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.props",
         "sha256": "df68680fc7100f443386fff25cbc1cc629ee87e990fc9b532d07fbe9e949191c"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "buildTransitive/Hexalith.FrontComposer.Shell.props",
         "sha256": "75096dc345a9d400005e5bbb7020d9544e623bd5ed490c293e728289d7bb4d7c"
       },
@@ -364,35 +364,35 @@
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "build/Hexalith.FrontComposer.Shell.props",
         "sha256": "01abcf003fb124a7d214a8898c2932c11b9aeaf0a8ecbd16bbca184f5d4b859b"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-        "sha256": "8a0e23cf102cb02c023b4e71f3dd652d4ba60d1da55e4946a1d356fc753d391c"
+        "sha256": "ed64ebe7dddb0349129c6078111dbe194a4ed8b88f9dce6e926fcab8ece6ad0a"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
-        "sha256": "62c4aac283d65d69441c3b657ec782cc91f1cde304a45911314c23cef797f962"
+        "sha256": "ca506316ae3bb920e4dbd02cf979c7c2cb2d4369ddfb81bd2d505326c5173acc"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.props",
         "sha256": "df68680fc7100f443386fff25cbc1cc629ee87e990fc9b532d07fbe9e949191c"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "4.7.6",
+        "version": "5.0.0",
         "path": "buildTransitive/Hexalith.FrontComposer.Shell.props",
         "sha256": "75096dc345a9d400005e5bbb7020d9544e623bd5ed490c293e728289d7bb4d7c"
       },
@@ -579,35 +579,35 @@
       "package": "Hexalith.FrontComposer.Shell",
       "path": "build/Hexalith.FrontComposer.Shell.props",
       "sha256": "01abcf003fb124a7d214a8898c2932c11b9aeaf0a8ecbd16bbca184f5d4b859b",
-      "version": "4.7.6"
+      "version": "5.0.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-      "sha256": "8a0e23cf102cb02c023b4e71f3dd652d4ba60d1da55e4946a1d356fc753d391c",
-      "version": "4.7.6"
+      "sha256": "ed64ebe7dddb0349129c6078111dbe194a4ed8b88f9dce6e926fcab8ece6ad0a",
+      "version": "5.0.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
-      "sha256": "62c4aac283d65d69441c3b657ec782cc91f1cde304a45911314c23cef797f962",
-      "version": "4.7.6"
+      "sha256": "ca506316ae3bb920e4dbd02cf979c7c2cb2d4369ddfb81bd2d505326c5173acc",
+      "version": "5.0.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.props",
       "sha256": "df68680fc7100f443386fff25cbc1cc629ee87e990fc9b532d07fbe9e949191c",
-      "version": "4.7.6"
+      "version": "5.0.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "buildTransitive/Hexalith.FrontComposer.Shell.props",
       "sha256": "75096dc345a9d400005e5bbb7020d9544e623bd5ed490c293e728289d7bb4d7c",
-      "version": "4.7.6"
+      "version": "5.0.0"
     },
     {
       "kind": "import",
