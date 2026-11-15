@@ -128,9 +128,27 @@ release. The repository variable `HEXALITH_RELEASE_PUBLISH_ENABLED` must equal
 the string `true` to enable publication. Otherwise the workflow stays green,
 reports the freeze in its job summary, and skips publication and its assertions.
 
-The workflow reserves the semantic-release version, uses the protected
-`production` environment and `NUGET_API_KEY` secret, and packs the six packages
-declared in `eng/release-packages.json`. It validates archives and an isolated
+Both publication workflows use the protected `production` environment and
+NuGet trusted publishing. Set the repository variable
+`NUGET_TRUSTED_PUBLISHING_USER` to the individual policy creator's NuGet.org
+profile username, including for organization-owned packages; do not use the
+organization name. Configure separate GitHub Actions policies for
+`Hexalith/Hexalith.Agents`, one for `release.yml` and one for
+`recover-release.yml`, each matching the `production` environment. Authorize
+both workflow identities to publish all six packages in
+`eng/release-packages.json`: `Hexalith.Agents.Contracts`,
+`Hexalith.Agents.EventStore`, `Hexalith.Agents.Client`, `Hexalith.Agents`,
+`Hexalith.Agents.UI` and `Hexalith.Agents.Testing`.
+
+Each publication job requests `id-token: write`; the pinned `NuGet/login` action
+exchanges that identity for a short-lived publication credential. Only that
+action's output is passed to the publisher scripts as `NUGET_API_KEY`. Stored
+API-key secrets are ignored. A missing or mismatched policy, or a failed login,
+blocks publication; correct the policy/account/workflow/environment match
+before retrying. Disabled publication jobs do not request credentials.
+
+The release workflow reserves the semantic-release version and packs the six
+manifest packages. It validates archives and an isolated
 consumer, proves package versions absent, and rechecks the exact green main
 source before the first push. Publication sends only validated manifest/version
 archives; unrelated files are preserved. It then verifies NuGet presence and the

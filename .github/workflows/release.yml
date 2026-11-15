@@ -137,22 +137,9 @@ jobs:
           expected-package-count: 6
           publication-flag: ${{ vars.HEXALITH_RELEASE_PUBLISH_ENABLED }}
           nuget-user: ${{ vars.NUGET_TRUSTED_PUBLISHING_USER }}
-      - name: Select NuGet authentication
-        id: nuget-auth
-        if: ${{ steps.prepare.outputs.publish-enabled == 'true' }}
-        shell: bash
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -n "${NUGET_API_KEY:-}" ]; then
-            echo "method=api-key" >> "$GITHUB_OUTPUT"
-          else
-            echo "method=trusted-publishing" >> "$GITHUB_OUTPUT"
-          fi
       - name: Authenticate NuGet trusted publishing
         id: nuget-login
-        if: ${{ steps.prepare.outputs.publish-enabled == 'true' && steps.nuget-auth.outputs.method == 'trusted-publishing' }}
+        if: ${{ steps.prepare.outputs.publish-enabled == 'true' }}
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         with:
           user: ${{ vars.NUGET_TRUSTED_PUBLISHING_USER }}
@@ -160,7 +147,7 @@ jobs:
         if: ${{ steps.prepare.outputs.publish-enabled == 'true' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY || steps.nuget-login.outputs.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
           HEXALITH_BUILDS_EXECUTION_SHA: 264e17d3185c87b72b0757dd66a13040793756bb
           HEXALITH_RELEASE_ENVIRONMENT: production
           HEXALITH_RELEASE_SOURCE_BRANCH: main

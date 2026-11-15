@@ -179,7 +179,9 @@ public sealed class PackageInventoryTests
         workflow.Split("timeout-minutes: 10").Length.ShouldBe(3);
         workflow.ShouldNotContain("publish-containers");
         workflow.ShouldContain("HEXALITH_RELEASE_PUBLISH_ENABLED");
-        workflow.ShouldContain("NUGET_API_KEY: ${{ secrets.NUGET_API_KEY || steps.nuget-login.outputs.NUGET_API_KEY }}");
+        workflow.ShouldContain("NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}");
+        workflow.ShouldNotContain("secrets.NUGET_API_KEY");
+        workflow.ShouldNotContain("nuget-auth");
         workflow.ShouldContain("NuGet/login@8d196754b4036150537f80ac539e15c2f1028841");
         workflow.ShouldContain("user: ${{ vars.NUGET_TRUSTED_PUBLISHING_USER }}");
         workflow.ShouldContain("additional-sdk-version: '11.0.100'");

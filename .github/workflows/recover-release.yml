@@ -29,6 +29,7 @@ jobs:
     permissions:
       actions: read
       contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -40,11 +41,33 @@ jobs:
         with:
           global-json-file: global.json
           dotnet-version: '11.0.100'
+      - name: Require exact publication flag and current green recovery source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DISPATCH_REF: ${{ github.ref }}
+          SOURCE_SHA: ${{ inputs.source-sha }}
+          HEXALITH_RELEASE_PUBLISH_ENABLED: ${{ vars.HEXALITH_RELEASE_PUBLISH_ENABLED }}
+        run: |
+          set -euo pipefail
+          test "${HEXALITH_RELEASE_PUBLISH_ENABLED-}" = "true"
+          test "$GITHUB_SHA" = "$SOURCE_SHA"
+          python3 scripts/verify-release-source.py \
+            --repository "$REPOSITORY" \
+            --workflow ci.yml \
+            --dispatch-ref "$DISPATCH_REF" \
+            --dispatch-sha "$SOURCE_SHA"
+      - name: Authenticate NuGet trusted publishing
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_TRUSTED_PUBLISHING_USER }}
       - name: Recover original archives without release planning
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
           HEXALITH_RELEASE_PUBLISH_ENABLED: ${{ vars.HEXALITH_RELEASE_PUBLISH_ENABLED }}
           VERSION: ${{ inputs.version }}
           SOURCE_SHA: ${{ inputs.source-sha }}
