@@ -163,6 +163,11 @@ containing all six original archives and `release-provenance.json` (repository,
 version, exact source SHA/tag, archive byte lengths and SHA-256 hashes). It
 replaces the GitHub publisher plugin so only one release is created. The draft
 is finalized only after complete NuGet content verification; failures retain it.
+Presence verification allows ninety ten-second waits (fifteen minutes), plus
+bounded request time, for NuGet indexing after accepted uploads. If indexing
+still times out, retain the draft and original archives and recover that exact
+release once the feed is available; do not repack or choose a new version merely
+because the accepted uploads are not yet indexed.
 
 To recover a partial push, dispatch `.github/workflows/recover-release.yml` from
 `main` with the original version and source SHA. The protected `production`

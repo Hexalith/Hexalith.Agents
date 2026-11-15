@@ -106,7 +106,8 @@ def recover_inventory(package_ids: tuple[str, ...], version: str, directory: Pat
         for package_id in missing:
             push(directory / f"{package_id}.{version}.nupkg")
     (final_verify or (lambda: VERIFY.verify_publication(package_ids, version,
-        expect="present", package_directory=directory, attempts=12, delay_seconds=10,
+        expect="present", package_directory=directory, attempts=VERIFY.DEFAULT_PRESENCE_ATTEMPTS,
+        delay_seconds=VERIFY.DEFAULT_PRESENCE_DELAY_SECONDS,
         timeout=15, base_url=VERIFY.DEFAULT_REGISTRATION_BASE, package_base_url=VERIFY.DEFAULT_PACKAGE_BASE)))()
 
 

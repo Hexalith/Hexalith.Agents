@@ -253,7 +253,7 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
         def opener(url: str, _timeout: float):
             package_id = "Hexalith.Agents.Client" if "agents.client" in url else "Hexalith.Agents"
             calls[package_id] = calls.get(package_id, 0) + 1
-            if package_id.endswith("Client") and calls[package_id] == 1:
+            if package_id.endswith("Client") and calls[package_id] <= 12:
                 raise missing(url)
             return FakeResponse(leaf(package_id, "1.2.3"))
 
@@ -261,14 +261,14 @@ class VerifyNuGetPublicationTests(unittest.TestCase):
             ("Hexalith.Agents", "Hexalith.Agents.Client"),
             "1.2.3",
             expect="present",
-            attempts=3,
-            delay_seconds=0.25,
+            attempts=VERIFIER.DEFAULT_PRESENCE_ATTEMPTS,
+            delay_seconds=VERIFIER.DEFAULT_PRESENCE_DELAY_SECONDS,
             opener=opener,
             sleeper=sleeps.append,
         )
 
-        self.assertEqual(calls, {"Hexalith.Agents": 1, "Hexalith.Agents.Client": 2})
-        self.assertEqual(sleeps, [0.25])
+        self.assertEqual(calls, {"Hexalith.Agents": 1, "Hexalith.Agents.Client": 13})
+        self.assertEqual(sleeps, [VERIFIER.DEFAULT_PRESENCE_DELAY_SECONDS] * 12)
 
     def test_presence_retries_transient_http_and_transport_failures(self) -> None:
         transient_failures = (

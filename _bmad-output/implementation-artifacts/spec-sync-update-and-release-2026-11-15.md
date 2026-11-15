@@ -2,7 +2,7 @@
 title: 'Synchronize and release Agents with the current SDK and packages'
 type: 'chore'
 created: '2026-11-15'
-status: 'in-review'
+status: 'done'
 baseline_commit: '347e01206dab754a3e21b4169819cad383edc414'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -54,9 +54,9 @@ context:
 - [x] `references/*` -- fetch, reconcile, validate and push pending work; verify remote availability -- make all recorded dependencies reproducible.
 - [x] `global.json`, shared package catalog and npm locks -- verify current registry versions and update owning declarations where needed -- satisfy latest SDK/package request.
 - [x] `Directory.Build.props`, active scripts/tests/consumer policies -- migrate to .NET 11 and fix compatibility -- restore a coherent package graph.
-- [ ] `.github/workflows/*.yml` and contract tests -- align Builds binding and repair failures -- pass current CI without weakening gates.
-- [ ] `eng/release-packages.json` publication lane -- build, test, pack and validate all six packages; commit and push all changes -- release reviewable artifacts.
-- [ ] GitHub/NuGet -- dispatch release after green CI and verify exact version, assets and package contents -- establish publication evidence.
+- [x] `.github/workflows/*.yml` and contract tests -- align Builds binding and repair failures -- pass current CI without weakening gates.
+- [x] `eng/release-packages.json` publication lane -- build, test, pack and validate all six packages; commit and push all changes -- release reviewable artifacts.
+- [x] GitHub/NuGet -- dispatch release after green CI and verify exact version, assets and package contents -- establish publication evidence.
 
 **Acceptance Criteria:**
 - Given synchronized dependencies, when a fresh CI checkout initializes root submodules, then every referenced commit is available remotely and workflow assertions agree.
@@ -72,7 +72,7 @@ context:
 - Fetched Builds tip is afeee370137aaf961451e4f6881a61251273e674. Conversations origin/main already targets net11.0 and SDK 11.0.100; rebase its single existing cleanup commit onto that main, preserving all changes.
 - Implementation handoff performs local synchronization, content changes, dependency installs and disposable validation only; leave commits, pushes, external release dispatch and publication verification to the coordinator after independent review. For local submodule reconciliation, use nonrecursive Git operations. Record remaining coordinator tasks explicitly when returning.
 
-- Authentication update: coordinator confirmed Agents is selected for the existing organization `NUGET_API_KEY` secret. Release selects that inherited secret when present; otherwise it invokes NuGet trusted publishing. Publication gating and authentication failure behavior remain blocking. Credential values are never emitted.
+- Historical authentication attempt, superseded by the trusted-only correction below: coordinator confirmed Agents is selected for the existing organization `NUGET_API_KEY` secret. Release selects that inherited secret when present; otherwise it invokes NuGet trusted publishing. Publication gating and authentication failure behavior remain blocking. Credential values are never emitted.
 
 - Coordinator adjudicated the EventStore 5.1.1 reserved-scope contract: the SDK and server deliberately reject `system` workload command-status scope. Keep runtime authorization unchanged, retain positive exact-domain composition tests using canonical tenant inputs, and add real-composed reserved-system negatives proving no assertion issuance or HTTP access. README records that default provider-catalog system status remains unavailable pending an approved platform route or host reader; the major release must disclose this compatibility limitation.
 - npm compatibility and audit: Platform's latest Conventional Commits preset 10.4.1 requires writer 9+, so its owning override selects writer 9.3.0 with notes-generator 14.1.1. Polymorphic and Platform explicitly omit npm publishing, permitting the existing unused-plugin alias pattern; current audits then report zero vulnerabilities.
@@ -107,7 +107,7 @@ context:
 - Local implementation verification (2026-11-15): SDK 11.0.100; Release/package solution build passed with zero warnings/errors; all five configured projects passed 6,144 tests with zero skips. Story 5.2 focused and full regression evidence passed. The complete Story 5.1 package gate passed shared authority (66 projects, 40 exact archived-project exclusions), the EventStore floor (13 rows at 5.1.1), dependency-mode negative checks, six-package pack/archive validation, and seven isolated consumers against the reviewed executable-asset baseline. Logs: `artifacts/sync-release-2026-11-15/package-gate-verified.log` and `tests-acceptance.log`.
 - Tooling verification: full suite completed 287 tests (285 passed and two pre-existing optional checks skipped) because the isolated tooling workspace lacks the Debug Domain test assembly; the affected package/verifier suite completed 75 tests (73 passed with those same two skips). New authentication/exclusion checks passed. Platform source-release suite passed 82/82; locked installs, registry signatures, and zero-vulnerability npm audits passed for all updated roots. Logs: `tooling.log`, `tooling-affected-final.log`, and `npm-verified.log` in the same artifact directory.
 - Debug/source fallback: Contracts project build and 1,997 tests passed with zero skips. Full source preparation remains blocked by the Platform checkout having no exact release tag at `ddb1c0b141372a66d4a9d9c231d0041afbb7cd0c`, its pinned Builds tuple `e2bbbd0893f586e4d447ef8358ff747ea3d34435` differing from current Builds, and local source-tool version identity; raw diagnostics also reflect the disposable pre-commit gitlink index. Direct full Debug fallback correctly refuses Conversations without the governed source mapping. No proof or source-mapping gate was bypassed. Evidence: `source-mapping-diagnostic.log`, `debug-fallback.log`, and `debug-focused.log`.
-- Coordinator work remains: independently review, commit and push owning submodules, verify their recorded commits remotely, commit/push root main with an appropriate breaking release declaration, wait for exact-source CI/CodeQL/commitlint, dispatch Release, and verify the GitHub assets and all six NuGet packages. No publication is claimed by local validation.
+- Historical coordinator handoff (completed below): independently review, commit and push owning submodules, verify their recorded commits remotely, commit/push root main with an appropriate breaking release declaration, wait for exact-source CI/CodeQL/commitlint, dispatch Release, and verify the GitHub assets and all six NuGet packages. No publication is claimed by local validation.
 
 - Final combined disposable package gate exited 0, including its subsequent complete Story 5.2 verification. `git diff --check` and `git diff --cached --check` passed.
 
@@ -116,3 +116,13 @@ context:
 - Coordinator pushed and remotely verified Commons ab5e92faa3bab1fa43b8ecadd423432dfe652bb2, PolymorphicSerializations 476cfccac3c5ba694a8e0ef11b1157728b9ec093, and Platform d386e36005214f925b391a34684748e6c56728e6. The Platform push reported the authorized pull-request-rule bypass. All twelve root dependencies were fetched without recursion and remotely verified before the parent commit.
 
 - Final synchronization advanced Builds to 264e17d3185c87b72b0757dd66a13040793756bb; its only change after the locally verified afeee370137aaf961451e4f6881a61251273e674 producer is correcting two test expectations from EventStore 5.1.0 to 5.1.1. Catalog and workflow/action implementations are identical. Updated all active workflow/contract pins together. FrontComposer and McpCli also fast-forwarded to their remotely verified tips; Release/package dependencies are unchanged.
+
+## Publication Completion Evidence
+
+- All maintenance and submodule changes were pushed before publication. Trusted-only source `4aa69ee30d30bddd643bdd2221c4b7e0cff7c302` passed [CI](https://github.com/Hexalith/Hexalith.Agents/actions/runs/43761372107), CodeQL and Commitlint.
+- The user's trusted connection enabled successful OIDC authentication and all six accepted NuGet uploads in [Release](https://github.com/Hexalith/Hexalith.Agents/actions/runs/43763217914) attempt 2. Stored-key fallback was removed; the failed stored-key draft v2.0.0 remains unchanged.
+- Published [v2.0.1](https://github.com/Hexalith/Hexalith.Agents/releases/tag/v2.0.1) from that exact source after immutable draft/source/provenance verification and complete remote content comparison. Independent verification confirmed `Hexalith.Agents.Contracts`, `Hexalith.Agents.EventStore`, `Hexalith.Agents.Client`, `Hexalith.Agents`, `Hexalith.Agents.UI`, and `Hexalith.Agents.Testing`, all at `2.0.1`.
+- Release notes disclose the .NET 11 application requirement and the existing provider-catalog terminal-status limitation. Runtime business authorization remains unchanged.
+- The original two-minute presence wait expired during actual NuGet indexing. A narrow follow-up extends the shared bounded wait to fifteen minutes without changing source, credential or archive gates; 25 publication tests and 13 recovery tests pass. The already uploaded packages were verified and finalized from their original archives.
+
+- Completion follow-up: all 12 root-declared submodules are clean, and each reports zero commits outside its origin remote refs. Release workflow attempt 3 completed successfully with all four jobs green, including exact release and NuGet content verification. The bounded indexing configuration and this evidence are recorded separately from the immutable published source.

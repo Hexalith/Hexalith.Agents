@@ -25,6 +25,9 @@ from release_package_integrity import MAX_ARCHIVE_BYTES, expected_archives, pack
 
 DEFAULT_REGISTRATION_BASE = "https://api.nuget.org/v3/registration5-gz-semver2"
 DEFAULT_PACKAGE_BASE = "https://api.nuget.org/v3-flatcontainer"
+# NuGet accepted uploads can take several minutes to become available to consumers.
+DEFAULT_PRESENCE_ATTEMPTS = 91
+DEFAULT_PRESENCE_DELAY_SECONDS = 10.0
 PACKAGE_ID_PATTERN = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,98}[A-Za-z0-9])?$")
 VERSION_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
@@ -354,8 +357,8 @@ def main() -> int:
     parser.add_argument("manifest", type=Path)
     parser.add_argument("version")
     parser.add_argument("--expect", choices=("absent", "present"), required=True)
-    parser.add_argument("--attempts", type=int, default=12)
-    parser.add_argument("--delay-seconds", type=float, default=10.0)
+    parser.add_argument("--attempts", type=int, default=DEFAULT_PRESENCE_ATTEMPTS)
+    parser.add_argument("--delay-seconds", type=float, default=DEFAULT_PRESENCE_DELAY_SECONDS)
     parser.add_argument("--timeout", type=float, default=15.0)
     parser.add_argument("--base-url", default=DEFAULT_REGISTRATION_BASE)
     parser.add_argument("--package-directory", type=Path)

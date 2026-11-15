@@ -2,7 +2,7 @@
 title: 'Require NuGet trusted publishing for release and recovery'
 type: 'bugfix'
 created: '2026-11-15'
-status: 'in-review'
+status: 'done'
 baseline_commit: '23ce124203d14874c6c60196ec2023e86b9db30a'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -44,7 +44,7 @@ context:
 - `tests/tooling/release_authentication_test.py`: replace stored-key-selection tests with regression coverage for both trusted-only publication paths, permission/ordering, guarded execution, and absence of secret/fallback references.
 - `test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs`: update the existing coupled release contract assertion from the rejected secret-fallback expression to the NuGet/login output only, and assert the stored-secret route is absent.
 - `CONTRIBUTING.md`: document required policy owner variable and separate matching workflow policies for release.yml and recover-release.yml, environment production, and all six manifest package identities.
-- `scripts/recover-release-packages.py`, `scripts/verify-release-source.py`: existing immutable recovery/source protections; no script changes are needed.
+- `scripts/recover-release-packages.py`, `scripts/verify-release-source.py`: existing immutable recovery/source protections remain intact; final presence verification shares the bounded indexing defaults with the normal publisher.
 
 ## Tasks & Acceptance
 
@@ -54,7 +54,7 @@ context:
 - [x] `tests/tooling/release_authentication_test.py` -- verify trusted-only wiring, permissions and existing gates -- catch reintroduction of a secret route or unguarded publication.
 - [x] `test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs` -- align the coupled release contract with trusted-only authentication -- keep the maintained C# CI gate consistent with the workflows.
 - [x] `CONTRIBUTING.md` -- describe trusted setup and credentials without stored keys -- make the workflow's required identity explicit.
-- [ ] GitHub/NuGet -- commit, push, run CI and attempt trusted publication -- verify the actual service exchange and package availability.
+- [x] GitHub/NuGet -- commit, push, run CI and attempt trusted publication -- verify the actual service exchange and package availability.
 
 **Acceptance Criteria:**
 - Given an inherited legacy secret, when either workflow is inspected/executed, then no step reads it and publication requires the OIDC action output.
@@ -69,6 +69,8 @@ context:
 - Implementation handoff changes local content and runs focused disposable checks only. The coordinator handles review, commits, pushes, CI, release dispatch, policy blockers and verification.
 
 ## Spec Change Log
+
+- The successful trusted upload exposed the existing two-minute NuGet indexing budget: all six uploads were accepted, but the twelve-attempt presence check timed out. Extend the shared bounded presence budget to ninety ten-second waits (fifteen minutes), use it for recovery as well, and exercise visibility after twelve missing probes plus the existing exhaustion and integrity cases. Preserve the exact source, original archives, authentication and content checks.
 
 - Implementation discovered the maintained C# package-inventory contract also asserted the rejected fallback expression. Added this existing coupled assertion to the Code Map and tasks; preserve all other source, environment, manifest and artifact assertions. This is a narrow consistency correction within the user's trusted-publishing instruction.
 
@@ -94,4 +96,14 @@ context:
 
 - Review patch instruction: preflight recovery flag and exact green main through the existing verifier before NuGet/login, retain every subsequent source/archive gate, and clarify that NUGET_TRUSTED_PUBLISHING_USER names the individual policy creator. These directly enforce the existing frozen requirements without adding a public input or recovery exception.
 
-- Local verification completed: 125 focused tooling tests; serialized Server Release/package build with zero warnings/errors; seven PackageInventoryTests without skips; both workflows passed actionlint. Review patches then passed coordinator reruns of eight authentication, fourteen source-proof and thirteen recovery tests. No product/runtime source or recovery script changed. Remote CI, trusted exchange and package publication remain pending.
+- Local verification completed: 125 focused tooling tests; serialized Server Release/package build with zero warnings/errors; seven PackageInventoryTests without skips; both workflows passed actionlint. Review patches then passed coordinator reruns of eight authentication, fourteen source-proof and thirteen recovery tests. No product/runtime source or recovery script changed. At that local verification stage remote CI, trusted exchange and package publication remained pending; completed results are recorded below.
+
+## Publication Evidence
+
+- Trusted-only source: `4aa69ee30d30bddd643bdd2221c4b7e0cff7c302`. [CI](https://github.com/Hexalith/Hexalith.Agents/actions/runs/43761372107), CodeQL `43761372152`, and Commitlint `43761372053` succeeded at that exact source.
+- After the user configured the connection, [Release](https://github.com/Hexalith/Hexalith.Agents/actions/runs/43763217914) attempt 2 authenticated through NuGet/login and NuGet accepted all six version `2.0.1` uploads. Its presence wait exhausted while NuGet indexed those accepted uploads; no package was repacked, overwritten or assigned another version.
+- Once indexed, `recover-release-packages.py --verify-only` proved the original draft, both source tags, current green main, all seven GitHub assets, original provenance and every remote package's ordinary archive contents. The verified existing draft was then finalized as [v2.0.1](https://github.com/Hexalith/Hexalith.Agents/releases/tag/v2.0.1).
+- Independent public-release verification passed again: exact source/tag, uploaded asset metadata/digests, original provenance and all six downloaded NuGet package contents. Evidence: `artifacts/trusted-nuget-2026-11-15/recovery-verify-only.log` and `independent-publication-verification.log`. The older v2.0.0 draft is retained unchanged.
+- The indexing adjustment passed 25 publication-verifier tests and 13 recovery tests. This includes a package appearing on probe thirteen, bounded exhaustion, collisions, transient transport failures and archive mismatches. Release attempt 3 completed successfully, including the existing workflow's independent post-publication checks.
+
+- Completion follow-up: all 12 root-declared submodules are clean, and each reports zero commits outside its origin remote refs. Release workflow attempt 3 completed successfully with all four jobs green, including exact release and NuGet content verification. The bounded indexing configuration and this evidence are recorded separately from the immutable published source.
