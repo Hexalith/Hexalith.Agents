@@ -30,13 +30,22 @@ VERSION_PATTERN = re.compile(
     r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
 )
 
-# CPM promotes DiagnosticSource 11 above the net10 framework version in the exact affected package closures.
+# Exact .NET 11 package closures; framework-provided dependencies are omitted by packing.
 EXPECTED_DEPENDENCIES = {
     "Hexalith.Agents.Contracts": frozenset(
-        {"ByteAether.Ulid", "Hexalith.Commons.UniqueIds", "Hexalith.EventStore.Contracts"}
+        {
+            "ByteAether.Ulid",
+            "Hexalith.Commons.UniqueIds",
+            "Hexalith.EventStore.Contracts",
+        }
     ),
     "Hexalith.Agents.Client": frozenset(
-        {"ByteAether.Ulid", "Hexalith.Agents.Contracts", "Hexalith.Commons.UniqueIds", "Hexalith.EventStore.Contracts"}
+        {
+            "ByteAether.Ulid",
+            "Hexalith.Agents.Contracts",
+            "Hexalith.Commons.UniqueIds",
+            "Hexalith.EventStore.Contracts",
+        }
     ),
     "Hexalith.Agents.EventStore": frozenset(
         {
@@ -79,7 +88,6 @@ EXPECTED_DEPENDENCIES = {
             "StackExchange.Redis",
             "Swashbuckle.AspNetCore.SwaggerUI",
             "System.IdentityModel.Tokens.Jwt",
-            "System.Diagnostics.DiagnosticSource",
         }
     ),
     "Hexalith.Agents": frozenset(
@@ -92,46 +100,36 @@ EXPECTED_DEPENDENCIES = {
             "Hexalith.EventStore.Contracts",
             "Microsoft.AspNetCore.DataProtection.Abstractions",
             "Microsoft.Extensions.Configuration",
-            "Microsoft.Extensions.Configuration.Abstractions",
             "Microsoft.Extensions.Configuration.Binder",
             "Microsoft.Extensions.DependencyInjection",
-            "Microsoft.Extensions.DependencyInjection.Abstractions",
-            "Microsoft.Extensions.Diagnostics.Abstractions",
-            "Microsoft.Extensions.Hosting.Abstractions",
             "Microsoft.Extensions.Http",
-            "Microsoft.Extensions.Logging.Abstractions",
-            "Microsoft.Extensions.Options",
             "Microsoft.Extensions.Options.ConfigurationExtensions",
-            "System.Diagnostics.DiagnosticSource",
         }
     ),
     "Hexalith.Agents.UI": frozenset(
         {
-            "Hexalith.Agents.Client",
-            "Hexalith.Agents.Contracts",
-            "Hexalith.FrontComposer.Contracts",
-            "Hexalith.FrontComposer.Contracts.UI",
-            "Hexalith.FrontComposer.Shell",
             "ByteAether.Ulid",
             "Fluxor",
             "Fluxor.Blazor.Web",
+            "Hexalith.Agents.Client",
+            "Hexalith.Agents.Contracts",
             "Hexalith.Commons.UniqueIds",
             "Hexalith.EventStore.Contracts",
+            "Hexalith.FrontComposer.Contracts",
+            "Hexalith.FrontComposer.Contracts.UI",
+            "Hexalith.FrontComposer.Shell",
             "Microsoft.AspNetCore.Authentication.OpenIdConnect",
             "Microsoft.AspNetCore.Authorization",
             "Microsoft.AspNetCore.Components.Web",
             "Microsoft.AspNetCore.SignalR.Client",
             "Microsoft.AspNetCore.SignalR.Common",
             "Microsoft.Extensions.Configuration",
-            "Microsoft.Extensions.Configuration.Abstractions",
             "Microsoft.Extensions.Configuration.Binder",
             "Microsoft.Extensions.DependencyInjection",
-            "Microsoft.Extensions.DependencyInjection.Abstractions",
-            "Microsoft.Extensions.Diagnostics.Abstractions",
             "Microsoft.Extensions.Http",
-            "Microsoft.Extensions.Logging.Abstractions",
-            "Microsoft.Extensions.Options",
+            "Microsoft.Extensions.Localization.Abstractions",
             "Microsoft.Extensions.Options.ConfigurationExtensions",
+            "Microsoft.Extensions.Validation",
             "Microsoft.FluentUI.AspNetCore.Components",
             "Microsoft.FluentUI.AspNetCore.Components.Icons",
             "Microsoft.IdentityModel.Abstractions",
@@ -143,11 +141,15 @@ EXPECTED_DEPENDENCIES = {
             "NUlid",
             "System.IdentityModel.Tokens.Jwt",
             "System.Reactive",
-            "System.Diagnostics.DiagnosticSource",
         }
     ),
     "Hexalith.Agents.Testing": frozenset(
-        {"ByteAether.Ulid", "Hexalith.Agents.Contracts", "Hexalith.Commons.UniqueIds", "Hexalith.EventStore.Contracts"}
+        {
+            "ByteAether.Ulid",
+            "Hexalith.Agents.Contracts",
+            "Hexalith.Commons.UniqueIds",
+            "Hexalith.EventStore.Contracts",
+        }
     ),
 }
 
@@ -268,7 +270,13 @@ def read_metadata(package_path: Path) -> PackageMetadata:
         ):
             raise ValueError(f"{package_path.name}: expected one nonempty packaged readme {readme}")
 
-        dependencies = root.findall(".//n:dependency", namespace) if namespace else root.findall(".//dependency")
+        dependency_groups = list(element("dependencies"))
+        group_tag = f"{{{namespace['n']}}}group" if namespace else "group"
+        if (len(dependency_groups) != 1 or dependency_groups[0].tag != group_tag
+                or dependency_groups[0].get("targetFramework") != "net11.0"):
+            raise ValueError(f"{package_path.name}: expected exactly one net11.0 dependency group")
+        group = dependency_groups[0]
+        dependencies = group.findall("n:dependency", namespace) if namespace else group.findall("dependency")
         dependency_entries = tuple(
             sorted(
                 (
@@ -374,9 +382,9 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
     for name in metadata.archive_names:
         normalized_names.append(normalize_archive_path(name))
 
-    expected_dlls = {f"lib/net10.0/{metadata.package_id}.dll".casefold()}
+    expected_dlls = {f"lib/net11.0/{metadata.package_id}.dll".casefold()}
     if metadata.package_id == "Hexalith.Agents.UI":
-        expected_dlls.add("lib/net10.0/fr/hexalith.agents.ui.resources.dll")
+        expected_dlls.add("lib/net11.0/fr/hexalith.agents.ui.resources.dll")
     actual_dlls = {
         name.casefold()
         for name, raw_name in zip(normalized_names, metadata.archive_names, strict=True)

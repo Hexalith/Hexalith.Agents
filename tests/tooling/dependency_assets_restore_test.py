@@ -40,7 +40,7 @@ class DependencyAssetRestoreTests(unittest.TestCase):
                     self.write_package(feed, "Probe.Wrapper", attrs)
                     project = root / "Consumer.csproj"
                     project.write_text('<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup>'
-                        '<TargetFramework>net10.0</TargetFramework><NuGetAudit>false</NuGetAudit>'
+                        '<TargetFramework>net11.0</TargetFramework><NuGetAudit>false</NuGetAudit>'
                         '</PropertyGroup><ItemGroup><PackageReference Include="Probe.Wrapper" Version="1.0.0"/>'
                         '</ItemGroup></Project>', encoding="utf-8")
                     config = root / "NuGet.Config"
@@ -52,7 +52,7 @@ class DependencyAssetRestoreTests(unittest.TestCase):
                     self.run_command(root, "restore", str(project), "--configfile", str(config),
                                      "--packages", str(root / "packages"), "--verbosity", "quiet")
                     assets = json.loads((root / "obj/project.assets.json").read_text())
-                    target = assets["targets"]["net10.0"]["Probe.Leaf/1.0.0"]
+                    target = assets["targets"]["net11.0"]["Probe.Leaf/1.0.0"]
                     selected = "build/Probe.Leaf.targets" in target.get("build", {})
                     self.assertEqual(selected, imports_build)
                     result = self.run_command(root, "msbuild", str(project), "-nologo",
@@ -110,12 +110,12 @@ class DependencyAssetRestoreTests(unittest.TestCase):
             ElementTree.SubElement(metadata, key).text = value
         if attrs is not None:
             dependencies = ElementTree.SubElement(metadata, "dependencies")
-            group = ElementTree.SubElement(dependencies, "group", {"targetFramework": "net10.0"})
+            group = ElementTree.SubElement(dependencies, "group", {"targetFramework": "net11.0"})
             ElementTree.SubElement(group, "dependency", {"id": "Probe.Leaf", "version": "[1.0.0]", **attrs})
             ElementTree.SubElement(group, "dependency", {"id": "Probe.Transitive", "version": "[1.0.0]", **attrs})
         with zipfile.ZipFile(feed / f"{package_id}.1.0.0.nupkg", "w") as archive:
             archive.writestr(f"{package_id}.nuspec", ElementTree.tostring(package))
-            archive.writestr("lib/net10.0/_._", b"")
+            archive.writestr("lib/net11.0/_._", b"")
             if package_id == "Probe.Leaf":
                 archive.writestr("build/Probe.Leaf.targets", '<Project><PropertyGroup>'
                     '<ProbeBuildImported>Present</ProbeBuildImported></PropertyGroup>'

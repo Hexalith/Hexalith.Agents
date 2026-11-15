@@ -22,8 +22,8 @@ public sealed class BuildContractConformanceTests
     {
         XDocument props = XDocument.Load(ModuleLayout.RootFile("Directory.Build.props"));
 
-        PropertyValue(props, "TargetFramework").ShouldBe("net10.0");
-        PropertyValue(props, "LangVersion").ShouldBe("14");
+        PropertyValue(props, "TargetFramework").ShouldBe("net11.0");
+        PropertyValue(props, "LangVersion").ShouldBe("15");
         PropertyValue(props, "Nullable").ShouldBe("enable");
         PropertyValue(props, "ImplicitUsings").ShouldBe("enable");
         PropertyValue(props, "TreatWarningsAsErrors").ShouldBe("true");
@@ -119,10 +119,17 @@ public sealed class BuildContractConformanceTests
     [Fact]
     public void RootCheckoutShouldLoadTheSharedEventStoreVersion()
     {
-        XDocument catalog = XDocument.Load(ModuleLayout.RootFile(
-            "references/Hexalith.Builds/Props/Directory.Packages.props"));
-        string sharedVersion = PropertyValue(catalog, "HexalithEventStoreVersion")
-            ?? throw new InvalidOperationException("The shared catalog must select Hexalith.EventStore.");
+        using JsonDocument sharedEvaluation = EvaluateMsBuild(
+            ModuleLayout.RootFile("references/Hexalith.Builds/Props/Directory.Packages.props"),
+            "-getProperty:HexalithEventStoreVersion",
+            "-getProperty:HexalithVersionsLoaded",
+            "-p:Configuration=Release",
+            "-p:UseHexalithProjectReferences=false",
+            "/nr:false");
+        JsonElement sharedProperties = sharedEvaluation.RootElement.GetProperty("Properties");
+        sharedProperties.GetProperty("HexalithVersionsLoaded").GetString().ShouldBe("true");
+        string sharedVersion = sharedProperties.GetProperty("HexalithEventStoreVersion").GetString()
+            ?? throw new InvalidOperationException("The effective shared catalog must select Hexalith.EventStore.");
         using JsonDocument evaluation = EvaluateMsBuild(
             ModuleLayout.SourceProjectFile("Hexalith.Agents.EventStore"),
             "-getProperty:HexalithVersionsLoaded",

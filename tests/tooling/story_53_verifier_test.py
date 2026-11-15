@@ -110,7 +110,7 @@ class Story53VerifierTests(unittest.TestCase):
         self.log = self.root / "runner-calls.jsonl"
         self.assemblies = []
         for project in PROJECTS:
-            assembly = self.root / project / "bin" / "Debug" / "net10.0" / (Path(project).name + ".dll")
+            assembly = self.root / project / "bin" / "Debug" / "net11.0" / (Path(project).name + ".dll")
             assembly.parent.mkdir(parents=True)
             assembly.touch()
             self.assemblies.append(assembly)
@@ -328,7 +328,7 @@ class Story53RealRunnerCompatibilityTests(unittest.TestCase):
 
     def test_native_selectors_and_real_summary_format(self) -> None:
         project = "test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj"
-        assembly = ROOT / "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll"
+        assembly = ROOT / "test/Hexalith.Agents.Tests/bin/Debug/net11.0/Hexalith.Agents.Tests.dll"
         if not assembly.is_file():
             self.skipTest("Build the Domain assembly first: dotnet build " + project + " --configuration Debug")
         harness = r'''

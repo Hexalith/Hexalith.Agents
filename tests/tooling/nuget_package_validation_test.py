@@ -48,16 +48,57 @@ class NuGetPackageValidationTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, "unrecognized dependency asset metadata"):
                         self.validate(write_package(Path(directory), mutate=mutate))
 
+    def test_requires_the_net11_dependency_group_framework(self) -> None:
+        for namespaced in (False, True):
+            for framework in (None, "", "net10.0", "net99.0"):
+                with self.subTest(namespaced=namespaced, framework=framework), tempfile.TemporaryDirectory() as directory:
+                    def mutate(metadata):
+                        group = metadata.find("dependencies/group")
+                        if framework is None:
+                            group.attrib.pop("targetFramework")
+                        else:
+                            group.set("targetFramework", framework)
+                    with self.assertRaisesRegex(ValueError, "exactly one net11.0 dependency group"):
+                        self.validate(write_package(Path(directory), namespaced=namespaced, mutate=mutate))
+
+    def test_rejects_additional_dependency_framework_groups(self) -> None:
+        for namespaced in (False, True):
+            for framework in (None, "net11.0", "net99.0"):
+                for move_dependency in (False, True):
+                    with self.subTest(namespaced=namespaced, framework=framework, move_dependency=move_dependency), \
+                            tempfile.TemporaryDirectory() as directory:
+                        def mutate(metadata):
+                            dependencies = metadata.find("dependencies")
+                            group = dependencies.find("group")
+                            attributes = {} if framework is None else {"targetFramework": framework}
+                            additional = ElementTree.SubElement(dependencies, "group", attributes)
+                            if move_dependency:
+                                dependency = group.find("dependency")
+                                group.remove(dependency)
+                                additional.append(dependency)
+                        with self.assertRaisesRegex(ValueError, "exactly one net11.0 dependency group"):
+                            self.validate(write_package(Path(directory), namespaced=namespaced, mutate=mutate))
+
+    def test_rejects_ungrouped_dependencies(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            def mutate(metadata):
+                dependencies = metadata.find("dependencies")
+                group = dependencies.find("group")
+                dependencies.remove(group)
+                dependencies.extend(group)
+            with self.assertRaisesRegex(ValueError, "exactly one net11.0 dependency group"):
+                self.validate(write_package(Path(directory), mutate=mutate))
+
     def test_valid_metadata_and_harmless_current_directory_prefixes(self) -> None:
         for namespaced in (False, True):
             for prefix in ("", "./", "././"):
                 with self.subTest(namespaced=namespaced, prefix=prefix), tempfile.TemporaryDirectory() as directory:
                     path = write_package(Path(directory), namespaced=namespaced,
-                        dll_path=f"{prefix}lib/net10.0/Hexalith.Agents.Contracts.dll")
+                        dll_path=f"{prefix}lib/net11.0/Hexalith.Agents.Contracts.dll")
                     self.validate(path)
 
     def test_rejects_traversal_and_rooted_paths_before_normalization(self) -> None:
-        dll = "lib/net10.0/Hexalith.Agents.Contracts.dll"
+        dll = "lib/net11.0/Hexalith.Agents.Contracts.dll"
         paths = (
             f"../{dll}", f"../../{dll}", f"./../{dll}", f"folder/../{dll}",
             f"..\\..\\{dll.replace('/', chr(92))}", f"/{dll}", f"\\{dll}",
@@ -71,7 +112,7 @@ class NuGetPackageValidationTests(unittest.TestCase):
     def test_leading_dots_are_not_stripped_from_dll_paths(self) -> None:
         for prefix in (".", ".../"):
             with self.subTest(prefix=prefix), tempfile.TemporaryDirectory() as directory:
-                path = write_package(Path(directory), dll_path=f"{prefix}lib/net10.0/Hexalith.Agents.Contracts.dll")
+                path = write_package(Path(directory), dll_path=f"{prefix}lib/net11.0/Hexalith.Agents.Contracts.dll")
                 with self.assertRaisesRegex(ValueError, "DLL inventory mismatch"):
                     self.validate(path)
 
@@ -83,7 +124,7 @@ class NuGetPackageValidationTests(unittest.TestCase):
 
     def test_directory_entries_cannot_satisfy_the_dll_inventory(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            path = write_package(Path(directory), dll_path="lib/net10.0/Hexalith.Agents.Contracts.dll/")
+            path = write_package(Path(directory), dll_path="lib/net11.0/Hexalith.Agents.Contracts.dll/")
             with self.assertRaisesRegex(ValueError, "DLL inventory mismatch"):
                 self.validate(path)
 
@@ -121,7 +162,7 @@ class NuGetPackageValidationTests(unittest.TestCase):
                 self.validate(write_package(Path(directory), readme=None, extra_assets={"README.md/": b"directory data"}))
 
     def test_rejects_duplicate_normalized_dll_entries(self) -> None:
-        dll = "lib/net10.0/Hexalith.Agents.Contracts.dll"
+        dll = "lib/net11.0/Hexalith.Agents.Contracts.dll"
         for duplicate in (dll, f"./{dll}", dll.upper()):
             with self.subTest(duplicate=duplicate), tempfile.TemporaryDirectory() as directory:
                 with warnings.catch_warnings():
@@ -153,7 +194,7 @@ class NuGetPackageValidationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             paths = write_inventory(root)
-            corrupt_archive_member(paths[-1], f"lib/net10.0/{PACKAGE_IDS[-1]}.dll")
+            corrupt_archive_member(paths[-1], f"lib/net11.0/{PACKAGE_IDS[-1]}.dll")
             result = self.run_cli(root, "--publication-version", VERSION)
             self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
             self.assertEqual(result.stdout, "")

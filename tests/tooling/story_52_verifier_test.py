@@ -138,11 +138,11 @@ class Story52VerifierTests(unittest.TestCase):
         self.log = self.root / "runner-calls.jsonl"
         self.assemblies = []
         for project in PROJECTS:
-            assembly = self.root / project / "bin" / "Debug" / "net10.0" / (Path(project).name + ".dll")
+            assembly = self.root / project / "bin" / "Debug" / "net11.0" / (Path(project).name + ".dll")
             assembly.parent.mkdir(parents=True)
             assembly.touch()
             self.assemblies.append(assembly)
-            release_assembly = self.root / project / "bin" / "Release" / "net10.0" / assembly.name
+            release_assembly = self.root / project / "bin" / "Release" / "net11.0" / assembly.name
             release_assembly.parent.mkdir(parents=True)
             release_assembly.touch()
         for relative, needle in BINDINGS.items():
@@ -271,7 +271,7 @@ class Story52VerifierTests(unittest.TestCase):
             self.assertIn("-failSkips", call)
 
     def test_release_regression_rejects_server_count_below_package_floor(self) -> None:
-        assembly = self.root / PROJECTS[3] / "bin/Release/net10.0/Hexalith.Agents.Server.Tests.dll"
+        assembly = self.root / PROJECTS[3] / "bin/Release/net11.0/Hexalith.Agents.Server.Tests.dll"
         result = self.run_verifier(
             "below-floor", "all::" + str(assembly), configuration="Release"
         )
@@ -475,7 +475,7 @@ class Story52RealRunnerCompatibilityTests(unittest.TestCase):
 
     def test_native_selectors_and_real_summary_format(self) -> None:
         project = "test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj"
-        assembly = ROOT / "test/Hexalith.Agents.Tests/bin/Debug/net10.0/Hexalith.Agents.Tests.dll"
+        assembly = ROOT / "test/Hexalith.Agents.Tests/bin/Debug/net11.0/Hexalith.Agents.Tests.dll"
         if not assembly.is_file():
             self.skipTest("Build the Domain assembly first: dotnet build " + project + " --configuration Debug")
         harness = r'''

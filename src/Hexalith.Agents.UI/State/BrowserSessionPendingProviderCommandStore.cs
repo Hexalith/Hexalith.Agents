@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -42,8 +43,7 @@ public sealed class BrowserSessionPendingProviderCommandStore(
             List<PendingProviderCommand> pending = await ReadAsync(key, cancellationToken).ConfigureAwait(false);
             pending.RemoveAll(item => item.Family == command.Family && item.ResourceKey == command.ResourceKey);
             pending.Add(command);
-            await javascript.InvokeVoidAsync("sessionStorage.setItem", cancellationToken,
-                key, JsonSerializer.Serialize(pending)).ConfigureAwait(false);
+            await WriteAsync(key, pending, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -61,8 +61,7 @@ public sealed class BrowserSessionPendingProviderCommandStore(
             List<PendingProviderCommand> pending = await ReadAsync(key, cancellationToken).ConfigureAwait(false);
             pending.RemoveAll(item => item.Family == family && item.ResourceKey == resourceKey
                 && item.Acceptance.MessageId == messageId);
-            await javascript.InvokeVoidAsync("sessionStorage.setItem", cancellationToken,
-                key, JsonSerializer.Serialize(pending)).ConfigureAwait(false);
+            await WriteAsync(key, pending, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -70,6 +69,7 @@ public sealed class BrowserSessionPendingProviderCommandStore(
         }
     }
 
+    [SuppressMessage("Usage", "BL0013", Justification = "Every operation reads the current authentication state; this service does not cache a principal or render authentication-dependent UI.")]
     private async Task<string> GetScopedStorageKeyAsync()
     {
         AuthenticationState state = await authentication.GetAuthenticationStateAsync().ConfigureAwait(false);
@@ -94,10 +94,30 @@ public sealed class BrowserSessionPendingProviderCommandStore(
 
     private async Task<List<PendingProviderCommand>> ReadAsync(string key, CancellationToken cancellationToken)
     {
-        string? json = await javascript.InvokeAsync<string?>("sessionStorage.getItem", cancellationToken, key)
-            .ConfigureAwait(false);
-        return string.IsNullOrWhiteSpace(json)
-            ? []
-            : JsonSerializer.Deserialize<List<PendingProviderCommand>>(json) ?? [];
+        try
+        {
+            string? json = await javascript.InvokeAsync<string?>("sessionStorage.getItem", cancellationToken, key)
+                .ConfigureAwait(false);
+            return string.IsNullOrWhiteSpace(json)
+                ? []
+                : JsonSerializer.Deserialize<List<PendingProviderCommand>>(json) ?? [];
+        }
+        catch (JSException exception)
+        {
+            throw new InvalidOperationException("Pending governance commands could not be read from browser session storage.", exception);
+        }
+    }
+
+    private async Task WriteAsync(string key, List<PendingProviderCommand> pending, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await javascript.InvokeVoidAsync("sessionStorage.setItem", cancellationToken,
+                key, JsonSerializer.Serialize(pending)).ConfigureAwait(false);
+        }
+        catch (JSException exception)
+        {
+            throw new InvalidOperationException("Pending governance commands could not be saved to browser session storage.", exception);
+        }
     }
 }

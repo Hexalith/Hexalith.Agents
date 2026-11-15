@@ -107,7 +107,7 @@ foreach ($name in $projects) {
         }
     }
     if ((Get-Content $buildLog -Raw) -notmatch '(?m)^\s*0 Warning\(s\)\s*$') { throw "WarningGateFailed: $name" }
-    $assembly = Join-Path $root "test/$name/bin/Debug/net10.0/$name.dll"
+    $assembly = Join-Path $root "test/$name/bin/Debug/net11.0/$name.dll"
     $xml = Join-Path $ArtifactsPath "$name.xml"
     & dotnet $assembly -result-xml $xml
     if ($LASTEXITCODE -ne 0) { throw "TestsFailed: $name" }

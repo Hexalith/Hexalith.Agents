@@ -118,7 +118,7 @@ function Invoke-TestGate {
     )
 
     $assembly = [IO.Path]::GetFileNameWithoutExtension($Project)
-    $path = Join-Path $root ([IO.Path]::Combine([IO.Path]::GetDirectoryName($Project), 'bin', 'Debug', 'net10.0', "$assembly.dll"))
+    $path = Join-Path $root ([IO.Path]::Combine([IO.Path]::GetDirectoryName($Project), 'bin', 'Debug', 'net11.0', "$assembly.dll"))
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         throw "Gate '$Name' requires built test assembly '$path'."
     }

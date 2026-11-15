@@ -1,0 +1,480 @@
+{
+  "date": "2026-11-15",
+  "story": "5.4",
+  "status": "in-progress",
+  "storyComplete": false,
+  "implementationSourceChanged": false,
+  "dependencyContractsAndStatusesChanged": false,
+  "frozenIntentAndAcceptanceChanged": false,
+  "primaryCommands": [
+    {
+      "mode": "Local",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/hexalith-job.P8wDH8Fc/artifacts/local"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 44.92
+    },
+    {
+      "mode": "Live",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Live",
+        "-ArtifactsPath",
+        "/tmp/hexalith-job.P8wDH8Fc/artifacts/live"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.61
+    }
+  ],
+  "fallbackCommands": [
+    {
+      "name": "release-package-domain-build",
+      "command": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj",
+        "--configuration",
+        "Release",
+        "-m:1",
+        "-p:NuGetAudit=false",
+        "-p:MinVerVersionOverride=1.0.0",
+        "--nologo"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.12
+    },
+    {
+      "name": "tooling-tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/tooling",
+        "-p",
+        "story_54_verifier_test.py",
+        "-v"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 11.17
+    },
+    {
+      "name": "overlay-preparation",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj",
+        "--configuration",
+        "Debug",
+        "--no-launch-profile",
+        "--verbosity",
+        "quiet",
+        "--",
+        "prepare-build",
+        "--manifest",
+        "/tmp/hexalith-job.hFI7Gr7x/agents/module/hexalith.module-manifest.v2.json",
+        "--mode",
+        "source",
+        "--workspace",
+        "/tmp/hexalith-job.hFI7Gr7x/preparation",
+        "--output",
+        "json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 44.28
+    },
+    {
+      "name": "net11-Hexalith.Agents.Contracts.Tests-build",
+      "command": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Contracts.Tests/Hexalith.Agents.Contracts.Tests.csproj",
+        "--configuration",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.1
+    },
+    {
+      "name": "net11-Hexalith.Agents.Tests-build",
+      "command": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj",
+        "--configuration",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.48
+    },
+    {
+      "name": "net11-TrustedEnvelopeReplayTests",
+      "command": [
+        "dotnet",
+        "/tmp/hexalith-job.hFI7Gr7x/agents/test/Hexalith.Agents.Tests/bin/Debug/net11.0/Hexalith.Agents.Tests.dll",
+        "-class",
+        "Hexalith.Agents.Tests.TrustedEnvelopeReplayTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-build-resume-2026-11-15/fallback/TrustedEnvelopeReplayTests.xml"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32
+    },
+    {
+      "name": "net11-SecurityEventLogTests",
+      "command": [
+        "dotnet",
+        "/tmp/hexalith-job.hFI7Gr7x/agents/test/Hexalith.Agents.Tests/bin/Debug/net11.0/Hexalith.Agents.Tests.dll",
+        "-class",
+        "Hexalith.Agents.Tests.SecurityEventLogTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-build-resume-2026-11-15/fallback/SecurityEventLogTests.xml"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.35
+    },
+    {
+      "name": "net11-AgentApproverPolicyTests",
+      "command": [
+        "dotnet",
+        "/tmp/hexalith-job.hFI7Gr7x/agents/test/Hexalith.Agents.Tests/bin/Debug/net11.0/Hexalith.Agents.Tests.dll",
+        "-class",
+        "Hexalith.Agents.Tests.AgentApproverPolicyTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/story-5-4-build-resume-2026-11-15/fallback/AgentApproverPolicyTests.xml"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38
+    },
+    {
+      "name": "net11-Hexalith.Agents.Server.Tests-build",
+      "command": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+        "--configuration",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0",
+        "--nologo"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.58
+    }
+  ],
+  "revisions": {
+    "root": "347e01206dab754a3e21b4169819cad383edc414",
+    "references/Hexalith.AI.Tools": "17a37d83db193f0b7494c1b931fd1e82a67c1424",
+    "references/Hexalith.Commons": "fbf4e94233821f6ca336af91a06feaaeb7a16855",
+    "references/Hexalith.PolymorphicSerializations": "e97b56930e213f674b64c157551f499b0473ec43",
+    "references/Hexalith.Conversations": "81d35798c1f358cacfac7bf61e32576941746089",
+    "references/Hexalith.EventStore": "2dcf708cbab0d4ad0cf72f947d0b0a1444e251a1",
+    "references/Hexalith.Memories": "1306a0f84cf78160a192be6bc341798fe32427d4",
+    "references/Hexalith.Tenants": "d73267fdbe84d09ccddf0a6492390e32d8938405",
+    "references/Hexalith.Parties": "5dacf507003d861e6ed935a4298cafb34b5f6e9a",
+    "references/Hexalith.Builds": "39973bfccb26ae98a3d25856a8f85950fecdf02a",
+    "references/Hexalith.FrontComposer": "38856d023dedd7c49da69b1cdb2fc54396f22f38",
+    "references/Hexalith.McpCli": "0795509fca063aaf2fd8dba8ac7a8213b57485a2",
+    "references/Hexalith.Platform": "ddb1c0b141372a66d4a9d9c231d0041afbb7cd0c"
+  },
+  "localGate": {
+    "status": "failed-before-tests",
+    "buildsSucceeded": 0,
+    "testsExecuted": 0,
+    "blocker": "NU1201: Agents and its test projects target net10.0; installed EventStore.Contracts targets net11.0."
+  },
+  "releasePackageFallback": {
+    "status": "failed-before-tests",
+    "errors": 158,
+    "affectedContractsFiles": 121,
+    "files": [
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentActivated.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentApproverPolicyConfigured.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentConfigurationUpdated.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentContentSafetyPolicyConfigured.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentCreated.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentDisabled.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentLaunchReadinessRecorded.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentPartyIdentityLinked.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentPartyIdentityReplaced.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentProductionLikeGenerationEnabled.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentProviderModelSelected.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/AgentResponseModeConfigured.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentActivationBlockedRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentActivationConfigurationVersionMismatchRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentAdministrationDeniedRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentAlreadyExistsRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentLaunchReadinessRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentLifecycleStateAlreadySetRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentNotFoundRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentPartyIdentityAlreadyLinkedRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentPartyIdentityLinkRejected.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentProductionLikeGenerationBlockedRejection.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/AgentProviderModelSelectionRejected.cs",
+      "src/Hexalith.Agents.Contracts/Agent/Events/Rejections/InvalidAgentConfigurationRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/AutomaticInteractionFact.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentCallAccepted.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentInteractionAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentInteractionContextBlocked.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentInteractionContextReady.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentInteractionGateFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentOutputGenerated.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentOutputGenerationFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentResponsePosted.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/AgentResponsePostingFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ApproverResolutionRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/BudgetDispositionDecided.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/BudgetReservationAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/BudgetReservationRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/CapacityAdmissionAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/CapacityAdmissionRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ContextReadRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ConversationMembershipRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ConversationPostingRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ConversationPostingSuppressedByDeletion.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/GeneratedVersionRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/GenerationFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/InteractionPreAcceptanceFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/InteractionRequested.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/OpenInteractionLeaseAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/OpenInteractionLeaseRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/PermittedAgentInteractionCreated.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/PreProviderCapacityDispositionDecided.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/PromptSafetyRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyAbandoned.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyAbandonmentFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyApprovalFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyApproved.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyCreated.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyCreationFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyEditFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyEdited.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyExpired.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyPosted.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyPostingFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyPostingPending.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyRegenerated.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyRegenerationFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyRejected.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProposedAgentReplyRejectionFailed.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProviderInvocationAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/ProviderInvocationNotAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/RateAdmissionAuthorized.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/RateAdmissionRecorded.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/AgentInteractionAlreadyRequestedRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/AgentInteractionContextNotBuildableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/AgentInteractionGateNotEvaluableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/AgentOutputNotGeneratableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/AgentResponseNotPostableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/AutomaticInteractionRejected.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/InvalidAgentInteractionRequestRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotAbandonableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotApprovableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotCreatableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotEditableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotExpirableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotRegeneratableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/Rejections/ProposedAgentReplyNotRejectableRejection.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/StartSuppressedByDeletion.cs",
+      "src/Hexalith.Agents.Contracts/AgentInteraction/Events/WorkflowStartCheckpoint.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/ConversationDeletionClosingEntered.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/ConversationDirectoryRejected.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/ConversationEffectCommitted.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/ConversationEffectLeaseAcquired.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/ConversationEffectLeaseCancelled.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/ConversationEffectLeaseSettled.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/InteractionCreationAcknowledged.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/Events/InteractionCreationPermitted.cs",
+      "src/Hexalith.Agents.Contracts/ConversationAgentState/InteractionPermit.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/ProviderDataHandlingDecided.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/ProviderModelEntryCreated.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/ProviderModelEntryDisabled.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/ProviderModelEntryEnabled.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/ProviderModelEntryMetadataUpdated.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/InvalidProviderDataHandlingRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/InvalidProviderModelMetadataRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/InvalidProviderModelPricingRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderCatalogAdministrationDeniedRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderModelCapabilityVersionRegressedRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderModelEntryAlreadyExistsRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderModelEntryLifecycleStateAlreadySetRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderModelEntryNotFoundRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderModelEntryStaleRevisionRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/ProviderModelLifecycleRevisionRejected.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/TenantProviderGovernanceRejected.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/Rejections/UnsafeProviderConfigurationInputRejection.cs",
+      "src/Hexalith.Agents.Contracts/ProviderCatalog/Events/TenantProviderModelEnablementSet.cs",
+      "src/Hexalith.Agents.Contracts/SecurityEventLog/SecurityEventRecorded.cs",
+      "src/Hexalith.Agents.Contracts/SecurityEventLog/SecurityEventRejected.cs",
+      "src/Hexalith.Agents.Contracts/TrustedEnvelopeReplay/TrustedEnvelopeFirstSeen.cs",
+      "src/Hexalith.Agents.Contracts/TrustedEnvelopeReplay/TrustedEnvelopeReplayRejected.cs",
+      "src/Hexalith.Agents.Contracts/obj/Release/net10.0/Hexalith.Agents.Contracts.GlobalUsings.g.cs"
+    ],
+    "observedDiagnostics": [
+      "CS0234 missing Hexalith.EventStore namespace",
+      "CS0246 missing IEventPayload and IRejectionEvent"
+    ],
+    "note": "Separate current catalog/package failure; this does not establish that these APIs are missing from the installed source.",
+    "fileListScope": "Compiler-reported Contracts files, including generated obj files; unique line-anchored paths."
+  },
+  "toolingTests": {
+    "methodCount": 6,
+    "passed": 6,
+    "failed": 0
+  },
+  "disposableNet11Diagnostic": {
+    "productionSupportPolicyChanged": false,
+    "overlayOnly": "Agents Directory.Build.props TargetFramework net10.0 -> net11.0",
+    "warningFreeBuilds": [
+      "Hexalith.Agents.Contracts.Tests",
+      "Hexalith.Agents.Tests"
+    ],
+    "focusedTests": {
+      "AgentApproverPolicyTests": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "SecurityEventLogTests": {
+        "total": 13,
+        "passed": 13,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "TrustedEnvelopeReplayTests": {
+        "total": 9,
+        "passed": 9,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "totalPassed": 45,
+    "serverBlocker": "NU1201 in installed Conversations.Contracts and Conversations.Client: net10.0 projects reference net11.0 EventStore/Commons sources.",
+    "limits": "No Server or UI tests ran. An Agents-only target change cannot restore the full Local gate; this diagnostic is not full-story verification."
+  },
+  "liveGate": {
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ],
+    "ExternalCalls": 0,
+    "StoryComplete": false,
+    "Mode": "Live"
+  },
+  "preservation": {
+    "selectedRootInputs": 1065,
+    "sourceDrift": [],
+    "scope": "Tracked root src/test/eng/module inputs and selected root configuration/register files. No complete transitive/generated-input attestation."
+  },
+  "remainingAcceptance": [
+    "Installed current Tenants/Parties/Conversations and immutable provisioning bindings",
+    "Genuine AD-30 signature/principal/operation/scope verification and private replay registration before target-command construction",
+    "Replicated durable denial spool and restricted recovery worker",
+    "Persisted private ACL, restart/restore/lost-ack/recovery and cross-tenant isolation matrix",
+    "Passing maintained five-project Local gate after compatible owner source and package delivery",
+    "Exact-target Available owner deliveries and complete live acceptance"
+  ],
+  "actionsNotPerformed": [
+    "Owner compatibility commands",
+    "Remote Git operations",
+    "Deployment or maintenance",
+    "Dependency status changes",
+    "Production source edits",
+    "Full-story review"
+  ],
+  "disposableWorkspaces": "Both run-with-temp jobs completed and removed their local clones/build outputs. Only useful evidence remains.",
+  "evidenceArchive": {
+    "path": "evidence.tar.gz",
+    "sha256": "c2b062f0606f60af22d7a88ef7800f43ddb97f00b3d334a4eace28c8c5e4a2a0"
+  },
+  "artifactSha256": {
+    "clone.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "inputs-after.json": "5719003f7a113ec63383a99f5c9393e792b2ae60dc8d7b1088dd5934ad5d4f20",
+    "assembly-hashes.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "run.json": "07cf28617012e5d187cb83b1eee8f60ed805d57feddcd8b5590ccca4efede83f",
+    "revisions.json": "7cbcfd35e30308e98f55076ea9dd704423d4ea1dde946b5cf4398a4e5f39f340",
+    "live.log": "c290c3d6063e1749199f191d2af4bb4c933aaf969ad381b4dc54e15193de60d4",
+    "inputs-before.json": "5719003f7a113ec63383a99f5c9393e792b2ae60dc8d7b1088dd5934ad5d4f20",
+    "local.log": "e019a260c712aa072e9779c956f31146d194992ae1077d1beea2d6bd8b34a506",
+    "inputs-final.json": "5719003f7a113ec63383a99f5c9393e792b2ae60dc8d7b1088dd5934ad5d4f20",
+    "fallback/clone.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fallback/net11-AgentApproverPolicyTests.log": "3eab18ab2ee57c3fa0941cba87aa66db45ca5a19915034d5b9dd8df61ceb8642",
+    "fallback/net11-Hexalith.Agents.Tests-build.log": "0d3290f391924b18acc95767a91009ea16f42f2037d0e6b9e9a9f959538a2bdf",
+    "fallback/net11-TrustedEnvelopeReplayTests.log": "92a1251fa1480a0517c7a24d8014995c5b33b5e41e681be84c8919576ba10615",
+    "fallback/net11-Hexalith.Agents.Contracts.Tests-build.log": "be91001373f33d6e3eb1a5c2ee726dbee9b29ba41eb7c8d23e1bb9d4034113c2",
+    "fallback/commands.json": "aa408e5cbdeb04f8f1fd860af97065d70d8bd204abd573ca4d1ae7d6d0489458",
+    "fallback/overlay-preparation.json": "4c9ccda921bebe2b6733fd2f292c83bd2f539a97908de784e26c2d85f128dcea",
+    "fallback/release-package-domain-build.log": "54443bb1bd3c750b7bc89836825da7e642b7ab79c823097795bddda0c5653eb9",
+    "fallback/tooling-tests.log": "4c8ed430638535b7ded085aa6de8f728e03d1b5534173895711e21b838b76a5a",
+    "fallback/TrustedEnvelopeReplayTests.xml": "c88b3136bd3312336676fdb9dce4bec943a8dfd6c2122d0af47a33ec40f3bead",
+    "fallback/overlay.json": "b840b481e982c02a6ed556fa029fee9a59243b38d1d1346e60ac5b3f51a38f77",
+    "fallback/SecurityEventLogTests.xml": "018e39b590969509464eb42e27cf08580a134028e5c4e0f1594b563f530b9156",
+    "fallback/overlay-preparation.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fallback/net11-Hexalith.Agents.Server.Tests-build.log": "aec5f55069c403a6555241a87c51c1414a3cf8ca2f5a88b6dbfb04f37e199be2",
+    "fallback/net11-SecurityEventLogTests.log": "8331d20d1cef83ef94f1e5af9b735d7d60d079a7e13fa1b424c1c764c6e8879f",
+    "fallback/AgentApproverPolicyTests.xml": "bd8ab686a63c4d0a5492cbd0060a29bacd338edf88d747fe94295378753d9e95",
+    "live/result.json": "a1124adba856cdcd5f085b54a42c5c32873f72c4857b112c7781e08aa33fb938",
+    "local/build-preparation.json": "6e4afba0ace69a76f07aaa7c1c49723111a44a1735a3a7893d736e32766b38f2",
+    "local/Hexalith.Agents.Contracts.Tests.build.log": "542020f85c8888a89f2fa056d9b39eba49f62e531ed3e657fa03c40c9f3fe6c8",
+    "local/build-preparation.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "specPreservation": {
+    "frontmatterUnchanged": true,
+    "frozenIntentUnchanged": true,
+    "tasksAndAcceptanceUnchanged": true,
+    "frozenIntentSha256": "a20faa6ebe5cdc5b92024d0e5bbb3644dd65e53964d2e5f8cdce4c153c1e3668"
+  },
+  "jobsFinished": {
+    "primaryRunWithTemp": true,
+    "fallbackRunWithTemp": true,
+    "subprocessRunAwaitedAllCommands": true
+  },
+  "independentVerification": {
+    "archiveAndAllArtifactHashesMatch": true,
+    "focusedXmlCountsMatch": true,
+    "toolingLogPassed": true,
+    "liveResultMatches": true,
+    "disposableWorkspacesRemoved": true
+  }
+}

@@ -34,7 +34,7 @@ class PublishReleasePackagesTests(unittest.TestCase):
             elif fault == "invalid":
                 paths[-1].write_bytes(b"bad archive")
             elif fault == "corrupt assembly":
-                corrupt_archive_member(paths[-1], f"lib/net10.0/{PACKAGE_IDS[-1]}.dll")
+                corrupt_archive_member(paths[-1], f"lib/net11.0/{PACKAGE_IDS[-1]}.dll")
             elif fault == "oversized":
                 with paths[-1].open("r+b") as archive:
                     archive.truncate(65 * 1024 * 1024)

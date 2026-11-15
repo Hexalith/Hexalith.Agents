@@ -25,12 +25,22 @@ public sealed class AgentSetupStatusIssuerTests
     /// <summary>Only the exact declared domain obtains independently configured status credentials.</summary>
     [Theory]
     [InlineData("tenant-a", "agent", true)]
-    [InlineData("system", "provider-catalog", true)]
+    [InlineData("tenant-a", "provider-catalog", true)]
     [InlineData("tenant-a", "tenant-provider-enablement", true)]
     [InlineData("tenant-a", "agent", false)]
-    [InlineData("system", "provider-catalog", false)]
+    [InlineData("tenant-a", "provider-catalog", false)]
     [InlineData("tenant-a", "tenant-provider-enablement", false)]
-    public async Task ComposedReaderUsesTheRealExactDomainIssuer(string tenant, string domain, bool credentials)
+    public Task ComposedReaderUsesTheRealExactDomainIssuer(string tenant, string domain, bool credentials)
+        => AssertComposedReaderAsync(tenant, domain, credentials, credentials);
+
+    /// <summary>The SDK rejects reserved system scope before HTTP transport even with valid credentials.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public Task ReservedSystemStatusScopeStaysUnavailableWithTheRealIssuer(bool credentials)
+        => AssertComposedReaderAsync("system", "provider-catalog", credentials, expectedRead: false);
+
+    private static async Task AssertComposedReaderAsync(string tenant, string domain, bool credentials, bool expectedRead)
     {
         IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -65,7 +75,7 @@ public sealed class AgentSetupStatusIssuerTests
         CommandStatusQueryResponse? status = await reader.ReadAsync(tenant, domain, "message", "correlation",
             TestContext.Current.CancellationToken);
 
-        if (credentials)
+        if (expectedRead)
         {
             status.ShouldNotBeNull().IsRejected.ShouldBeTrue();
             handler.Path.ShouldBe($"/api/v1/commands/status/workload/{tenant}/message");

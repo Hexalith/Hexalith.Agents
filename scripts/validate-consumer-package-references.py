@@ -154,7 +154,7 @@ def validate_consumer(package_directory: Path, identities: list[tuple[str, str]]
         )
         project = directory / "PackageConsumer.csproj"
         project.write_text(
-            "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n"
+            "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net11.0</TargetFramework>\n"
             "    <Nullable>enable</Nullable>\n    <ImplicitUsings>enable</ImplicitUsings>\n"
             "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>\n  </PropertyGroup>\n  <ItemGroup>\n"
             f"{package_references}\n  </ItemGroup>\n</Project>\n",

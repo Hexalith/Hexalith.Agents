@@ -1,2 +1,7 @@
 # Authored C# tests use CRLF, as required by .editorconfig.
 test/Hexalith.Agents.Server.Tests/PackageInventoryTests.cs whitespace=cr-at-eol
+src/Hexalith.Agents.UI/State/BrowserSessionPendingProviderCommandStore.cs whitespace=cr-at-eol
+test/Hexalith.Agents.UI.Tests/PendingProviderCommandStoreTests.cs whitespace=cr-at-eol
+test/Hexalith.Agents.UI.Tests/InMemorySessionStorageJsRuntime.cs whitespace=cr-at-eol
+test/Hexalith.Agents.Server.Tests/AgentSetupCompositionTests.cs whitespace=cr-at-eol
+test/Hexalith.Agents.Server.Tests/AgentSetupStatusIssuerTests.cs whitespace=cr-at-eol

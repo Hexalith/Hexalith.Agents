@@ -5,6 +5,7 @@ using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.UI.State;
 
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 using NSubstitute;
 
@@ -61,6 +62,63 @@ public sealed class PendingProviderCommandStoreTests
 
         authentication.GetAuthenticationStateAsync().Returns(State("operator", null));
         await Should.ThrowAsync<InvalidOperationException>(() => store.LoadAsync());
+    }
+
+    [Fact]
+    public async Task StorageReadFailureStaysClosedAndPreservesItsCause()
+    {
+        var failure = new JSException("Session storage denied.");
+        var javascript = new InMemorySessionStorageJsRuntime { ReadFailure = failure };
+        AuthenticationStateProvider authentication = Substitute.For<AuthenticationStateProvider>();
+        authentication.GetAuthenticationStateAsync().Returns(State("alice", "tenant-a"));
+        var store = new BrowserSessionPendingProviderCommandStore(javascript, authentication);
+
+        InvalidOperationException exception = await Should.ThrowAsync<InvalidOperationException>(() => store.LoadAsync());
+
+        exception.InnerException.ShouldBeSameAs(failure);
+        exception.Message.ShouldContain("could not be read");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StorageWriteFailureStaysClosedAndRetainsPendingIdentity(bool remove)
+    {
+        var javascript = new InMemorySessionStorageJsRuntime();
+        AuthenticationStateProvider authentication = Substitute.For<AuthenticationStateProvider>();
+        authentication.GetAuthenticationStateAsync().Returns(State("alice", "tenant-a"));
+        var store = new BrowserSessionPendingProviderCommandStore(javascript, authentication);
+        var submitted = new PendingProviderCommand("ProviderCatalogMutation", "openai/gpt-x", "tenant-a",
+            new ProviderCatalogCommandAcceptance("openai", "gpt-x", "msg-alice", "corr-alice",
+                AgentSetupTruthState.Submitted));
+        await store.SaveAsync(submitted);
+        javascript.RejectWrites = true;
+
+        InvalidOperationException exception = await Should.ThrowAsync<InvalidOperationException>(() => remove
+            ? store.RemoveAsync(submitted.Family, submitted.ResourceKey, submitted.Acceptance.MessageId)
+            : store.SaveAsync(submitted));
+
+        exception.InnerException.ShouldBeOfType<JSException>();
+        exception.Message.ShouldContain("could not be saved");
+        (await store.LoadAsync()).ShouldHaveSingleItem().Acceptance.MessageId.ShouldBe("msg-alice");
+    }
+
+    [Fact]
+    public async Task SameStoreReadsTheCurrentPrincipalOnEachOperation()
+    {
+        var javascript = new InMemorySessionStorageJsRuntime();
+        AuthenticationStateProvider authentication = Substitute.For<AuthenticationStateProvider>();
+        authentication.GetAuthenticationStateAsync().Returns(State("alice", "tenant-a"));
+        var store = new BrowserSessionPendingProviderCommandStore(javascript, authentication);
+        var submitted = new PendingProviderCommand("ProviderCatalogMutation", "openai/gpt-x", "tenant-a",
+            new ProviderCatalogCommandAcceptance("openai", "gpt-x", "msg-alice", "corr-alice",
+                AgentSetupTruthState.Submitted));
+        await store.SaveAsync(submitted);
+
+        authentication.GetAuthenticationStateAsync().Returns(State("bob", "tenant-a"));
+        (await store.LoadAsync()).ShouldBeEmpty();
+        authentication.GetAuthenticationStateAsync().Returns(State("alice", "tenant-a"));
+        (await store.LoadAsync()).ShouldHaveSingleItem().Acceptance.MessageId.ShouldBe("msg-alice");
     }
 
     private static Task<AuthenticationState> State(string userId, string? tenantId, bool platformOperator = false)

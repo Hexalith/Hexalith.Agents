@@ -101,7 +101,7 @@ public sealed class PackageVersionCentralizationTests
                 $"""
                 <Project Sdk="Microsoft.NET.Sdk">
                   <PropertyGroup>
-                    <TargetFramework>net10.0</TargetFramework>
+                    <TargetFramework>net11.0</TargetFramework>
                   </PropertyGroup>
                   <ItemGroup>
                     <PackageReference Include="Shouldly"{packageReferenceMetadata} />

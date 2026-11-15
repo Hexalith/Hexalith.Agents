@@ -52,7 +52,7 @@ def write_package(
         "type": policy["RepositoryType"], "url": policy["RepositoryUrl"], "commit": "a" * 40,
     })
     dependencies = ElementTree.SubElement(metadata, "dependencies")
-    group = ElementTree.SubElement(dependencies, "group", {"targetFramework": "net10.0"})
+    group = ElementTree.SubElement(dependencies, "group", {"targetFramework": "net11.0"})
     for dependency_id in sorted(VALIDATOR.EXPECTED_DEPENDENCIES[package_id]):
         dependency_version = version if dependency_id in VALIDATOR.EXPECTED_DEPENDENCIES else "1.0.0"
         ElementTree.SubElement(group, "dependency", {"id": dependency_id, "version": dependency_version,
@@ -65,9 +65,9 @@ def write_package(
     path = directory / f"{package_id}.{version}.nupkg"
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr(f"{package_id}.nuspec", ElementTree.tostring(root, encoding="utf-8"))
-        archive.writestr(dll_path or f"lib/net10.0/{package_id}.dll", b"fixture assembly")
+        archive.writestr(dll_path or f"lib/net11.0/{package_id}.dll", b"fixture assembly")
         if package_id == "Hexalith.Agents.UI":
-            archive.writestr("lib/net10.0/fr/Hexalith.Agents.UI.resources.dll", b"fixture resources")
+            archive.writestr("lib/net11.0/fr/Hexalith.Agents.UI.resources.dll", b"fixture resources")
         if readme is not None:
             archive.writestr(policy["PackageReadmeFile"], readme)
         for name, content in (extra_assets or {}).items():

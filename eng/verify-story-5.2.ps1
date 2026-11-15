@@ -152,12 +152,12 @@ function Assert-EventStorePackageFloor {
 # The focused Story 5.2 evidence: each class list names the suites that prove one acceptance criterion.
 $focusedSuites = @(
     @{
-        Assembly = "test/Hexalith.Agents.Contracts.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Contracts.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Contracts.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Contracts.Tests.dll"
         Classes  = @('Hexalith.Agents.Contracts.Tests.AgentOperationContractsTests')
         Gate     = 'AC1 additive receipt contracts, named effects, and legacy payload compatibility'
     },
     @{
-        Assembly = "test/Hexalith.Agents.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Tests.dll"
         Classes  = @(
             'Hexalith.Agents.Tests.AgentStateReplayTests',
             'Hexalith.Agents.Tests.AgentLifecycleConfigurationVersionTests',
@@ -166,7 +166,7 @@ $focusedSuites = @(
         Gate = 'AC1 aggregate replay, result payload, and configuration-version determinism'
     },
     @{
-        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Server.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Server.Tests.dll"
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentAdministrationOrchestratorTests',
             'Hexalith.Agents.Server.Tests.AgentProviderSelectionOrchestratorTests',
@@ -177,12 +177,12 @@ $focusedSuites = @(
         Gate = 'AC1/AC3 live dispatch and safe command-result mapping'
     },
     @{
-        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Server.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Server.Tests.dll"
         Classes  = @('Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests')
         Gate = 'AC1/AC2/AC5 gateway admission, exact replay, and reserved-extension trust'
     },
     @{
-        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Server.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Server.Tests.dll"
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentActivationApproverRevalidationTests',
             'Hexalith.Agents.Server.Tests.EventStoreAgentAdministrationOperationsTests'
@@ -190,7 +190,7 @@ $focusedSuites = @(
         Gate = 'AC4/AC6/AC7 activation version fence and fail-closed retry lanes'
     },
     @{
-        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Server.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Server.Tests.dll"
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentSetupProjectionTests',
             'Hexalith.Agents.Server.Tests.AgentSetupQueryHandlerTests',
@@ -200,7 +200,7 @@ $focusedSuites = @(
         Gate = 'AC2/AC3 verified caller, current tenant authority, and persisted setup truth'
     },
     @{
-        Assembly = "test/Hexalith.Agents.UI.Tests/bin/$Configuration/net10.0/Hexalith.Agents.UI.Tests.dll"
+        Assembly = "test/Hexalith.Agents.UI.Tests/bin/$Configuration/net11.0/Hexalith.Agents.UI.Tests.dll"
         Classes  = @(
             'Hexalith.Agents.UI.Tests.AgentConfigurationTests',
             'Hexalith.Agents.UI.Tests.AgentsClientSetupGatewayTests'
@@ -208,7 +208,7 @@ $focusedSuites = @(
         Gate = 'AC3/AC4 FrontComposer truth flow and retained activation attempt'
     },
     @{
-        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Server.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Server.Tests.dll"
         Methods = @(
             @{ Name = 'Hexalith.Agents.Server.Tests.VerifiedSetupQueryCallerTests.DispatcherUsesVerifiedHumanWithoutReplacingTransportIdentity'; MinimumExpectedTests = 12 },
             @{ Name = 'Hexalith.Agents.Server.Tests.TenantAuthorityAdmissionOrderingTests.AdministrationAuthorityIsRecheckedAfterTheRoleAwait'; MinimumExpectedTests = 4 },
@@ -221,7 +221,7 @@ $focusedSuites = @(
 # Gate 4a: the composition suites that resolve the real containers. A deferred-only host must fail these.
 $compositionSuites = @(
     @{
-        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net10.0/Hexalith.Agents.Server.Tests.dll"
+        Assembly = "test/Hexalith.Agents.Server.Tests/bin/$Configuration/net11.0/Hexalith.Agents.Server.Tests.dll"
         Classes  = @(
             'Hexalith.Agents.Server.Tests.AgentSetupCompositionTests',
             'Hexalith.Agents.Server.Tests.HttpAgentAdministrationContextProviderTests',
@@ -230,7 +230,7 @@ $compositionSuites = @(
         Gate = 'AC1/AC5 the server container resolves live dispatch and trusted gateway composition'
     },
     @{
-        Assembly = "test/Hexalith.Agents.UI.Tests/bin/$Configuration/net10.0/Hexalith.Agents.UI.Tests.dll"
+        Assembly = "test/Hexalith.Agents.UI.Tests/bin/$Configuration/net11.0/Hexalith.Agents.UI.Tests.dll"
         Classes  = @('Hexalith.Agents.UI.Tests.AgentsUiCompositionTests')
         Gate     = 'AC3/AC4 the FrontComposer container resolves the live setup gateway only when an Agent target is named'
     }
@@ -423,7 +423,7 @@ try {
 
     foreach ($testProject in $testProjects) {
         $assembly = [IO.Path]::GetFileNameWithoutExtension($testProject.Path)
-        $path = [IO.Path]::Combine([IO.Path]::GetDirectoryName($testProject.Path), 'bin', $Configuration, 'net10.0', "$assembly.dll")
+        $path = [IO.Path]::Combine([IO.Path]::GetDirectoryName($testProject.Path), 'bin', $Configuration, 'net11.0', "$assembly.dll")
         Invoke-TestGate -Name "regression — $($testProject.Path)" -Assembly $path -MinimumExpectedTests $testProject.MinimumExpectedTests
     }
 

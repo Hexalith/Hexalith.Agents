@@ -24,7 +24,7 @@ class ReleasePackageIntegrityTests(unittest.TestCase):
             original = write_package(root)
             expected = INTEGRITY.package_contents(original, "Hexalith.Agents.Contracts", VERSION)
             self.assertEqual(set(expected), {"Hexalith.Agents.Contracts.nuspec", "README.md",
-                                            "lib/net10.0/Hexalith.Agents.Contracts.dll"})
+                                            "lib/net11.0/Hexalith.Agents.Contracts.dll"})
             signed = write_package(root, extra_assets={".signature.p7s": b"repository signature fixture"})
             self.assertEqual(INTEGRITY.package_contents(signed, "Hexalith.Agents.Contracts", VERSION), expected)
             changed = write_package(root, readme=b"substitution")
@@ -65,7 +65,7 @@ class ReleasePackageIntegrityTests(unittest.TestCase):
             for package_id, version in (("Hexalith.Agents.Client", VERSION), ("Hexalith.Agents.Contracts", "9.9.9")):
                 with self.subTest(package_id=package_id, version=version), self.assertRaisesRegex(ValueError, "package identity"):
                     INTEGRITY.package_contents(path, package_id, version)
-            corrupt_archive_member(path, "lib/net10.0/Hexalith.Agents.Contracts.dll")
+            corrupt_archive_member(path, "lib/net11.0/Hexalith.Agents.Contracts.dll")
             with self.assertRaisesRegex(ValueError, "corrupt archive member"):
                 INTEGRITY.package_contents(path, "Hexalith.Agents.Contracts", VERSION)
 

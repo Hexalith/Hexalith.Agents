@@ -273,7 +273,7 @@ public sealed class AgentSetupCompositionTests
 
     [Theory]
     [InlineData("tenant", "agent", "correlation-agent")]
-    [InlineData(ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain, "correlation-provider")]
+    [InlineData("tenant", ProviderCatalogAggregate.Domain, "correlation-provider")]
     [InlineData("tenant", TenantProviderEnablementAggregate.Domain, "correlation-enablement")]
     public async Task ComposedStatusReaderPreservesExactScopeAndSdkCapability(string tenant, string domain, string correlation)
     {
@@ -313,6 +313,31 @@ public sealed class AgentSetupCompositionTests
         handler.Assertion.ShouldBe("host-assertion");
         handler.DaprAppId.ShouldBe("eventstore-runtime");
         await source.Received(2).IssueAsync(EventStoreGatewayWorkloadOperations.CommandStatus, tenant, domain, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReservedSystemStatusScopeDoesNotIssueCredentialsOrReachHttp()
+    {
+        var services = new ServiceCollection();
+        var handler = new CommandStatusResponseHandler();
+        IEventStoreGatewayWorkloadAssertionSource source = Substitute.For<IEventStoreGatewayWorkloadAssertionSource>();
+        services.AddScoped<IEventStoreGatewayWorkloadAssertionSource>(_ => source);
+        IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Agents:EventStore:BaseUrl"] = "https://gateway.example",
+            ["Agents:EventStore:AppId"] = "eventstore-runtime",
+        }).Build();
+        services.AddAgentSetupServices(configuration);
+        services.AddHttpClient<IEventStoreGatewayClient, EventStoreGatewayClient>().ConfigurePrimaryHttpMessageHandler(() => handler);
+        using ServiceProvider provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        using IServiceScope operation = provider.CreateScope();
+        IAgentCommandStatusReader reader = operation.ServiceProvider.GetRequiredService<IAgentCommandStatusReader>();
+
+        (await reader.ReadAsync(ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain,
+            "message", "correlation", TestContext.Current.CancellationToken)).ShouldBeNull();
+
+        handler.Requests.ShouldBe(0);
+        await source.DidNotReceiveWithAnyArgs().IssueAsync(default!, default!, default!, default);
     }
 
     [Theory]

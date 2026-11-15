@@ -927,3 +927,19 @@ The original entries above are retained as historical evidence. The following fi
   summary: The current default Platform source regression graph cannot restore its Tenants dependencies under the selected central package versions.
   evidence: At Platform c869f1c7, the parent eight-case related selection has three NU1109 restore failures before reader compilation: Tenants requires EventStore 4.0.0/McpCli 2.0.0 while the generated reader pins 3.133.0/1.1.0. All 38 explicitly mapped Conversations catalogue cases pass. Exact XML and restore logs are retained in Conversations docs/implementation/ext-conv-ai-1-internal-catalog-2026-11-02/parent-final-20261102T195034Z-c2fdcdb8c402476d82c8402242adaf8f. Reconcile the published/default source tuple and qualify the resulting SDK cohort; do not suppress downgrades or substitute a different owner selection.
   status: open
+
+- source_spec: `spec-sync-update-and-release-2026-11-15.md`
+  summary: Provide an approved provider-catalog platform command-status reader or gate writes until terminal status can be observed.
+  evidence: Initial main already selects EventStore 5.1.1, which rejects reserved system status; the default reader therefore returns no terminal evidence. README and the maintenance real-SDK refusal tests document this pre-existing gap.
+
+- source_spec: `spec-sync-update-and-release-2026-11-15.md`
+  summary: Revalidate browser pending-command identity scope across in-flight semaphore and JavaScript awaits.
+  evidence: BrowserSessionPendingProviderCommandStore captures the storage key before awaits in initial main; a suspended interop/principal-change test is needed to settle the desired read/write transition behavior.
+
+- source_spec: `spec-sync-update-and-release-2026-11-15.md`
+  summary: Retain an unresolved provider command when its first browser persistence fails after backend submission.
+  evidence: Existing ProviderCatalog UI submits before writing the pending browser identity; a failure on the first save can leave refresh without the retained lock. The maintenance error wrapper preserves the failure but does not redesign recovery.
+
+- source_spec: `spec-sync-update-and-release-2026-11-15.md`
+  summary: Reject invalid persisted pending-command JSON shapes without treating them as an empty pending list.
+  evidence: The pre-existing JsonSerializer.Deserialize<List<PendingProviderCommand>>(json) ?? [] accepts JSON null and does not validate null elements; add corruption tests and fail-closed shape validation in the owning lifecycle change.

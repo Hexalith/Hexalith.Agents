@@ -58,7 +58,7 @@ foreach ($lane in $lanes) {
             Tee-Object -FilePath $buildLog
         if ($LASTEXITCODE -ne 0) { throw "BuildFailed: $lane/$name ($buildLog)" }
         if ((Get-Content $buildLog -Raw) -notmatch '(?m)^\s*0 Warning\(s\)\s*$') { throw "WarningGateFailed: $lane/$name" }
-        $assembly = Join-Path $root "test/$name/bin/$configuration/net10.0/$name.dll"
+        $assembly = Join-Path $root "test/$name/bin/$configuration/net11.0/$name.dll"
         $xml = Join-Path $lanePath "$name.xml"
         & dotnet $assembly -result-xml $xml 2>&1 | Tee-Object -FilePath (Join-Path $lanePath "$name.log")
         if ($LASTEXITCODE -ne 0) { throw "TestsFailed: $lane/$name" }
