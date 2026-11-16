@@ -89,11 +89,13 @@ development_status:
   # Story 5.1's shared catalog now supplies published EventStore 3.106.0 and the floor/Release/package lanes pass, closing DW-20 without a local override. Story 5.2 was marked done on 2026-09-23 with these items carried as deferred work: the external Platform gateway must consume Hexalith.Agents.EventStore and explicitly register it (DW-21), the deferred status reader remains host-overridable until Story 5.6 proves reachability, and immutable ProvisionHexa/link retirement remains deferred.
   5-3-govern-provider-models-and-pricing-through-live-operations: done  # 2026-09-27 group 2 slice 2 (migration/projections/queries/reader) review: 17 patches applied, story gate passed; all review groups complete. NC-5.3-PLATFORM-CATALOG-SCOPE stays open pending complete legacy inventory, DW-21, and live Dapr sidecar evidence.
   5-4-prove-trusted-principal-tenant-party-and-approver-readiness: in-progress
+  # blocked by missing platform
   5-5-publish-authoritative-readiness-and-provider-state-contracts: backlog
   5-6-compose-agents-in-the-platform-owned-production-like-host: backlog
   5-7-activate-hexa-only-when-setup-gates-pass: backlog
   5-8-protect-sensitive-agent-content-at-the-eventstore-boundary: backlog
   5-9-reject-prohibited-cost-control-postures-at-readiness-recording: backlog
+  # blocked by 5.5/5.7
   5-10-retire-prohibited-safety-and-caller-policy-inputs: backlog
   epic-5-retrospective: optional
   epic-6: in-progress
