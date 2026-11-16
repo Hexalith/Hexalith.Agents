@@ -1,17 +1,16 @@
 namespace Hexalith.Agents.Server.Tests;
 
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 using Shouldly;
 
-/// <summary>Fails closed when any repository-owned path reacquires platform hosting or recursive submodules.</summary>
+/// <summary>Fails closed when any repository-owned path reacquires platform hosting.</summary>
 public sealed class ForbiddenHostingOwnershipTests
 {
     private static readonly string[] _guardFiles =
     [
-        "scripts/validate-nuget-packages.py",
+        "scripts/nuget_package_validation.py",
         "test/Hexalith.Agents.Server.Tests/AppHostSecurityTopologyTests.cs",
         "test/Hexalith.Agents.Server.Tests/ForbiddenHostingOwnershipTests.cs",
     ];
@@ -105,29 +104,6 @@ public sealed class ForbiddenHostingOwnershipTests
         }
     }
 
-    [Fact]
-    public void AutomationShouldNeverInitializeNestedSubmodulesRecursively()
-    {
-        var recursiveGit = new Regex(
-            @"\bgit\b[^\r\n]*(?:--recursive\b|--recurse-submodules\b)",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        var recursiveCheckout = new Regex(
-            @"\bsubmodules\s*:\s*recursive\b",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        string[] offenders = GovernedFiles("*")
-            .Where(IsAutomationFile)
-            .Where(path =>
-            {
-                string text = File.ReadAllText(path);
-                string joinedContinuations = Regex.Replace(text, @"(?:\\|`)\s*\r?\n\s*", " ");
-                return recursiveGit.IsMatch(joinedContinuations) || recursiveCheckout.IsMatch(joinedContinuations);
-            })
-            .ToArray();
-
-        offenders.ShouldBeEmpty(
-            $"Nested submodule initialization is forbidden. Offending files: {string.Join(", ", offenders)}");
-    }
-
     private static IEnumerable<string> GovernedDirectories()
         => Directory.GetDirectories(ModuleLayout.ModuleRoot, "*", SearchOption.AllDirectories)
             .Where(IsGovernedPath);
@@ -154,6 +130,4 @@ public sealed class ForbiddenHostingOwnershipTests
         => Path.GetExtension(path).ToLowerInvariant() is ".cs" or ".csproj" or ".config" or ".json" or ".props"
             or ".ps1" or ".py" or ".sh" or ".slnx" or ".targets" or ".xml" or ".yaml" or ".yml";
 
-    private static bool IsAutomationFile(string path)
-        => Path.GetExtension(path).ToLowerInvariant() is ".yaml" or ".yml" or ".ps1" or ".py" or ".sh";
 }

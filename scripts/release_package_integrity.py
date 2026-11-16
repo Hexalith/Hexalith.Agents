@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import hashlib
-import importlib
 import zipfile
 import zlib
 from pathlib import Path
 from xml.etree import ElementTree
 
 
-VALIDATOR = importlib.import_module("validate-nuget-packages")
+import nuget_package_validation as VALIDATOR
 MAX_ARCHIVE_BYTES = VALIDATOR.MAX_ARCHIVE_BYTES
 MAX_CONTENT_BYTES = VALIDATOR.MAX_CONTENT_BYTES
 MAX_MEMBERS = VALIDATOR.MAX_MEMBERS

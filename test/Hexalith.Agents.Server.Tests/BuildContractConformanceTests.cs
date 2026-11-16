@@ -29,11 +29,7 @@ public sealed class BuildContractConformanceTests
         PropertyValue(props, "TreatWarningsAsErrors").ShouldBe("true");
         PropertyValue(props, "NuGetAudit").ShouldBe("true");
         PropertyValue(props, "NuGetAuditMode").ShouldBe("all");
-        string warningsNotAsErrors = PropertyValue(props, "WarningsNotAsErrors")!;
-        warningsNotAsErrors.ShouldContain("NU1901");
-        warningsNotAsErrors.ShouldContain("NU1902");
-        warningsNotAsErrors.ShouldNotContain("NU1903");
-        warningsNotAsErrors.ShouldNotContain("NU1904");
+        PropertyValue(props, "WarningsNotAsErrors").ShouldBeNull();
     }
 
     [Fact]
@@ -56,10 +52,14 @@ public sealed class BuildContractConformanceTests
         exemptions.ShouldContain("NU1902");
         exemptions.ShouldNotContain("NU1903");
         exemptions.ShouldNotContain("NU1904");
+        exemptions.ShouldNotContain("NU1900");
+        exemptions.ShouldNotContain("NU1905");
         string[] suppressed = (properties.GetProperty("NoWarn").GetString() ?? string.Empty)
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         suppressed.ShouldNotContain("NU1903");
         suppressed.ShouldNotContain("NU1904");
+        suppressed.ShouldNotContain("NU1900");
+        suppressed.ShouldNotContain("NU1905");
     }
 
     [Fact]
@@ -203,8 +203,7 @@ public sealed class BuildContractConformanceTests
                 out int exitCode,
                 "-NoProfile",
                 "-File",
-                ModuleLayout.RootFile("eng/verify-story-5.2.ps1"),
-                "-PackageFloorOnly",
+                ModuleLayout.RootFile("eng/verify-eventstore-package-floor.ps1"),
                 "-PackageFloorProjectPath",
                 projectPath);
 
@@ -239,7 +238,7 @@ public sealed class BuildContractConformanceTests
                 $"""<Project><ItemGroup><PackageVersion Include="{onlyPackage}" Version="3.128.3" /></ItemGroup></Project>""");
 
             string output = RunProcess("pwsh", out int exitCode, "-NoProfile", "-File",
-                ModuleLayout.RootFile("eng/verify-story-5.2.ps1"), "-PackageFloorOnly", "-PackageFloorProjectPath", projectPath);
+                ModuleLayout.RootFile("eng/verify-eventstore-package-floor.ps1"), "-PackageFloorProjectPath", projectPath);
 
             exitCode.ShouldNotBe(0);
             output.ShouldContain("Missing required workload-status capability package row:");
@@ -348,6 +347,33 @@ public sealed class BuildContractConformanceTests
         sdk.GetProperty("rollForward").GetString().ShouldNotBeNullOrWhiteSpace();
         global.RootElement.GetProperty("test").GetProperty("runner").GetString()
             .ShouldBe("Microsoft.Testing.Platform");
+    }
+
+    [Theory]
+    [InlineData("FailReleaseWithHexalithProjectReferences", "Release", "Release builds must use package references for external Hexalith libraries.")]
+    [InlineData("FailPackWithHexalithProjectReferences", "Debug", "Package creation must not use external Hexalith project references.")]
+    [InlineData("CheckSourceDependencies", "Debug", "Source dependency 'references/Hexalith.EventStore' is missing.")]
+    public void SourceDependencyTargetsShouldRejectInvalidModesWithoutBuilding(
+        string target, string configuration, string diagnostic)
+    {
+        string missingRoot = Path.Combine(Path.GetTempPath(), $"missing-eventstore-{Guid.NewGuid():N}");
+        string output = RunDotNet(out int exitCode,
+            "msbuild", ModuleLayout.SourceProjectFile("Hexalith.Agents.Contracts"), "-nologo",
+            $"-target:{target}", $"-p:Configuration={configuration}",
+            "-p:UseHexalithProjectReferences=true", "-p:UseNuGetDeps=false",
+            $"-p:HexalithEventStoreRoot={missingRoot}", "-p:HexalithEventStoreFromSource=false", "/nr:false");
+
+        exitCode.ShouldNotBe(0, output);
+        output.ShouldContain(diagnostic);
+    }
+
+    [Fact]
+    public void EffectiveEventStorePackagesShouldSatisfyTheStableCapabilityFloor()
+    {
+        string output = RunProcess("pwsh", out int exitCode, "-NoProfile", "-File",
+            ModuleLayout.RootFile("eng/verify-eventstore-package-floor.ps1"));
+        exitCode.ShouldBe(0, output);
+        output.ShouldContain("Gate: EventStore package floor");
     }
 
     private static string? PropertyValue(XDocument document, string localName)

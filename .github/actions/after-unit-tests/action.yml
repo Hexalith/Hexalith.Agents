@@ -1,0 +1,8 @@
+name: Agents package consumers
+description: Validate six public packages and isolated consumers from built Release output
+runs:
+  using: composite
+  steps:
+    - name: Validate built Agents packages and consumers
+      shell: bash
+      run: python3 scripts/check-built-packages.py

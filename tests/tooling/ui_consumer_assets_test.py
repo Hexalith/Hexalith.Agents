@@ -3,14 +3,28 @@ import copy
 import importlib.util
 from pathlib import Path
 import unittest
+import tempfile
+import sys
 
 SOURCE = Path(__file__).resolve().parents[2] / "scripts/validate-consumer-package-references.py"
+sys.path.insert(0, str(SOURCE.parent))
 SPEC = importlib.util.spec_from_file_location("ui_consumer_assets", SOURCE)
 CONSUMER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(CONSUMER)
 
 
 class UiConsumerAssetsTests(unittest.TestCase):
+    def test_only_exact_empty_scratch_build_imports_are_generated_assets(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "Directory.Build.props"
+            path.write_bytes(b"<Project />\n")
+            receipt = CONSUMER.executable_asset_receipt({"libraries": {}}, root / "packages", [], [str(path)], root)
+            self.assertEqual([{"path": "Directory.Build.props"}], receipt["generatedImports"])
+            path.write_bytes(b"<Project><Target Name='Unexpected' /></Project>\n")
+            with self.assertRaisesRegex(ValueError, "unowned executable consumer asset"):
+                CONSUMER.executable_asset_receipt({"libraries": {}}, root / "packages", [], [str(path)], root)
+
     def fixture(self):
         actual = {"kind": "import", "package": "Hexalith.Agents.UI", "version": "1.2.3",
                   "path": "buildTransitive/Hexalith.Agents.UI.targets", "sha256": "a" * 64}

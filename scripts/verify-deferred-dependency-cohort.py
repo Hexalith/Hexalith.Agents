@@ -432,7 +432,7 @@ def current(experiment):
         outputs = Path(resolved[project]["evaluation"]["targetDir"])
         (experiment.evidence / ("integration-output-hashes-" + configuration + ".json")).write_text(json.dumps({
             str(path.relative_to(outputs)): digest(path.read_bytes()) for path in outputs.rglob("*") if path.is_file()}, indent=2) + "\n")
-    experiment.run("package-floor", ["pwsh", "-NoProfile", "-File", "eng/verify-story-5.2.ps1", "-PackageFloorOnly"], repo)
+    experiment.run("package-floor", ["pwsh", "-NoProfile", "-File", "eng/verify-eventstore-package-floor.ps1"], repo)
     server = "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj"
     # Preserve the default broad source failure independently of mapped integration.
     experiment.run("server-default-source", ["dotnet", "build", server, "-c", "Debug", "-m:1",

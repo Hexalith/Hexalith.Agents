@@ -43,3 +43,11 @@ _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20
 _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision6-current-review-20261009T075124Z/source/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj
 _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/source/platform/src/Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj
 _bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/resumed-20261008T171001Z/root-revision7-current-review-20261009T094345Z/source/platform/tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj
+
+# Frozen foreign Platform evidence outside the Agents product and consumer graph.
+_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/coordinator-final-dependencies/platform/catalog/20261116T134852Z-668b8b128a6b4ff098a9ce224c0649ed/artifacts/platform-components/catalog-reader/Hexalith.Platform.CatalogBuilder.csproj
+_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/coordinator-final-dependencies/platform/local-inputs/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj
+_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/platform-corrected/platform/catalog/20261116T123849Z-724c847ff7be495aacb4b30f5f9942c3/artifacts/platform-components/catalog-reader/Hexalith.Platform.CatalogBuilder.csproj
+_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/platform-corrected/platform/local-inputs/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj
+_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/platform-final-correction/platform/catalog/20261116T124513Z-deb728e7995344b9a55088ff50964492/artifacts/platform-components/catalog-reader/Hexalith.Platform.CatalogBuilder.csproj
+_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/platform-final-correction/platform/local-inputs/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj

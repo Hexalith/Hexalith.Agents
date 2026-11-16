@@ -14,7 +14,6 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsPackable)' == 'true'">

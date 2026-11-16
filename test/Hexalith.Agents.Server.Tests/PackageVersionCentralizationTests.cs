@@ -15,6 +15,47 @@ using Shouldly;
 public sealed class PackageVersionCentralizationTests
 {
     private const int ProcessTimeoutMilliseconds = 120_000;
+    // The whole repository validator evaluates each project and its authoritative catalog.
+    private const int RepositoryValidationTimeoutMilliseconds = 600_000;
+
+    [Fact]
+    public async Task WholeRepositoryShouldHaveOnePackageVersionAuthorityAsync()
+    {
+        string exclusions = string.Join(';', File.ReadAllLines(ModuleLayout.RootFile("eng/package-authority-exclusions.txt"))
+            .Where(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith('#')));
+        ProcessStartInfo startInfo = new()
+        {
+            FileName = "pwsh",
+            WorkingDirectory = ModuleLayout.ModuleRoot,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        foreach (string argument in new[]
+        {
+            "-NoProfile", "-File",
+            ModuleLayout.RootFile("references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1"),
+            "-RepositoryRoot", ModuleLayout.ModuleRoot,
+            "-CatalogPath", ModuleLayout.RootFile("references/Hexalith.Builds/Props/Directory.Packages.props"),
+            "-ExcludedPath", exclusions,
+        })
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        using Process process = new() { StartInfo = startInfo };
+        process.Start().ShouldBeTrue();
+        Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
+        Task<string> standardError = process.StandardError.ReadToEndAsync();
+        if (!process.WaitForExit(RepositoryValidationTimeoutMilliseconds))
+        {
+            process.Kill(entireProcessTree: true);
+            throw new TimeoutException("Whole-repository package authority validation timed out.");
+        }
+
+        string output = await standardOutput + await standardError;
+        process.ExitCode.ShouldBe(0, output);
+    }
 
     [Fact]
     public void NoProjectShouldDeclareInlinePackageReferenceVersions()
