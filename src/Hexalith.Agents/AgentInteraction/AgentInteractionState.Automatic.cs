@@ -80,7 +80,8 @@ public sealed partial class AgentInteractionState
         AutomaticFacts.Add(fact.Step, fact); AutomaticRevision = fact.Revision;
         if (fact.Step == AutomaticInteractionStep.GeneratedVersionRecorded) { Status = AgentInteractionStatus.Generated; }
         if (fact.Step == AutomaticInteractionStep.ConversationPostingRecorded) { Status = fact.Outcome == AutomaticInteractionOutcome.Posted ? AgentInteractionStatus.Posted : AgentInteractionStatus.PostingFailed; }
-        if (fact.Step is AutomaticInteractionStep.InteractionPreAcceptanceFailed or AutomaticInteractionStep.StartSuppressedByDeletion) { Status = AgentInteractionStatus.Blocked; }
+        if (fact.Step is AutomaticInteractionStep.InteractionPreAcceptanceFailed or AutomaticInteractionStep.StartSuppressedByDeletion
+            or AutomaticInteractionStep.ProviderInvocationNotAuthorized or AutomaticInteractionStep.PreProviderCapacityDispositionDecided) { Status = AgentInteractionStatus.Blocked; }
         if (fact.Step == AutomaticInteractionStep.GenerationFailed)
         {
             Status = fact.FailureKind is AutomaticInteractionFailureKind.OutputSafetyDenied or AutomaticInteractionFailureKind.OutputSafetyUnavailable

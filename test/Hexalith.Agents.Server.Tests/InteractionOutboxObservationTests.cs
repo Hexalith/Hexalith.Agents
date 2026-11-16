@@ -45,11 +45,11 @@ public sealed class InteractionOutboxObservationTests
     public async Task CancellationInterruptsObservationOfAnAcceptedButInvisibleAppend()
     {
         var fixture = new AutomaticInteractionReplayFixture(); var dispatcher = Substitute.For<IAgentCommandDispatcher>(); int submitted = 0;
+        using var cancellation = new CancellationTokenSource();
         dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>()).Returns(call =>
-        { submitted++; return Task.FromResult(new SubmitCommandResponse("accepted", MessageId: call.ArgAt<AgentCommandIntent>(0).MessageId)); });
+        { submitted++; cancellation.CancelAfter(TimeSpan.FromMilliseconds(75)); return Task.FromResult(new SubmitCommandResponse("accepted", MessageId: call.ArgAt<AgentCommandIntent>(0).MessageId)); });
         var recovery = new InteractionOutboxRecoveryOrchestrator(fixture, fixture, dispatcher, fixture);
         var intake = new AutomaticInteractionIntakeOrchestrator(fixture, Substitute.For<IAgentDependencyAvailability>(), fixture, fixture, dispatcher, recovery);
-        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(75));
         await Should.ThrowAsync<OperationCanceledException>(() => intake.ExecuteAsync(fixture.Request, cancellation.Token));
         submitted.ShouldBe(1); fixture.Directory.ShouldBeNull(); fixture.Interaction.ShouldBeNull(); fixture.Scheduled.ShouldBeEmpty();
     }

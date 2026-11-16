@@ -39,6 +39,44 @@ public sealed class AutomaticInteractionPublicStatusTests
         JsonSerializer.Serialize(restored.AutomaticFacts[AutomaticInteractionStep.GeneratedVersionRecorded]).ShouldBe(JsonSerializer.Serialize(generated));
     }
 
+    [Theory]
+    [InlineData(AutomaticInteractionStep.ProviderInvocationNotAuthorized)]
+    [InlineData(AutomaticInteractionStep.PreProviderCapacityDispositionDecided)]
+    public void TerminalProviderRefusalsStayPubliclyBlockedThroughDispositionsAndReplay(AutomaticInteractionStep step)
+    {
+        var state = Created();
+        var fact = new AutomaticInteractionFact(step, new string('b', 64),
+            step == AutomaticInteractionStep.PreProviderCapacityDispositionDecided ? AutomaticInteractionOutcome.CancelNoInvocation : AutomaticInteractionOutcome.Blocked, 2);
+        if (step == AutomaticInteractionStep.ProviderInvocationNotAuthorized) { state.Apply(new ProviderInvocationNotAuthorized(fact)); }
+        else { state.Apply(new PreProviderCapacityDispositionDecided(fact)); }
+        AssertBlocked(state);
+        state.Apply(new BudgetDispositionDecided(new(AutomaticInteractionStep.BudgetDispositionDecided, new string('c', 64), AutomaticInteractionOutcome.NotInvoked, 3)));
+        AssertBlocked(state);
+        var restored = JsonSerializer.Deserialize<AgentInteractionState>(JsonSerializer.Serialize(state)).ShouldNotBeNull();
+        AssertBlocked(restored);
+        restored.AutomaticFacts[step].ShouldBe(fact);
+
+        static void AssertBlocked(AgentInteractionState inspected)
+        {
+            AgentInteractionAuditInspection.GetStatus(inspected, true).View.ShouldNotBeNull().Status.ShouldBe(AgentInteractionStatus.Blocked);
+            AgentInteractionAuditInspection.GetStatus(inspected, false).View.ShouldBeNull();
+        }
+    }
+
+    [Theory]
+    [InlineData(AutomaticInteractionFailureKind.ProviderError, AgentInteractionStatus.GenerationFailed)]
+    [InlineData(AutomaticInteractionFailureKind.OutputSafetyDenied, AgentInteractionStatus.Blocked)]
+    [InlineData(AutomaticInteractionFailureKind.OutputSafetyUnavailable, AgentInteractionStatus.Blocked)]
+    public void GenerationFailuresKeepTheirPhasePinnedSafetyMapping(AutomaticInteractionFailureKind kind, AgentInteractionStatus expected)
+    {
+        var state = Created();
+        state.Apply(new ProviderInvocationAuthorized(new(AutomaticInteractionStep.ProviderInvocationAuthorized, new string('b', 64), AutomaticInteractionOutcome.Authorized, 2,
+            OutputAuthority: new(1, new string('c', 64), AgentInteractionStatus.Blocked, "reason", "metric", "disposition", 1, new string('d', 64)))));
+        state.Apply(new GenerationFailed(new(AutomaticInteractionStep.GenerationFailed, new string('e', 64), AutomaticInteractionOutcome.Failed, 3, FailureKind: kind)));
+        var restored = JsonSerializer.Deserialize<AgentInteractionState>(JsonSerializer.Serialize(state)).ShouldNotBeNull();
+        AgentInteractionAuditInspection.GetStatus(restored, true).View.ShouldNotBeNull().Status.ShouldBe(expected);
+    }
+
     private static AgentInteractionState Created()
     {
         var p = ConversationDirectoryTestData.Permit(); var e = ConversationDirectoryTestData.Envelope() with { Domain = "agent-interaction", AggregateId = p.AgentInteractionId };

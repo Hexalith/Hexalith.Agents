@@ -11,7 +11,7 @@ public sealed class AutomaticInteractionWorkflow : Workflow<WorkflowExecutionSta
     {
         ArgumentNullException.ThrowIfNull(context); WorkflowExecutionStateValidation.Validate(input);
         if (context.InstanceId != input.AgentInteractionId) { throw new ArgumentException("WorkflowInstanceMismatch", nameof(input)); }
-        var retry = new WorkflowTaskOptions(new WorkflowRetryPolicy(100, TimeSpan.FromSeconds(1), maxRetryInterval: TimeSpan.FromMinutes(1)));
+        var retry = new WorkflowTaskOptions(new WorkflowRetryPolicy(100, TimeSpan.FromSeconds(1), backoffCoefficient: 2, maxRetryInterval: TimeSpan.FromMinutes(1)));
         WorkflowExecutionState state = input;
         while (state.Status == WorkflowExecutionStatus.Running)
         {

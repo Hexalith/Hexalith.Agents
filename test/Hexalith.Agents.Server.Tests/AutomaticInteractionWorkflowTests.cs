@@ -21,6 +21,14 @@ public sealed class AutomaticInteractionWorkflowTests
         context.CallActivityAsync<WorkflowExecutionState>(nameof(ExecuteAutomaticInteractionStepActivity), Arg.Any<WorkflowExecutionState>(), Arg.Any<WorkflowTaskOptions>())
             .Returns(call => fixture.Steps().ExecuteAsync((WorkflowExecutionState)call[1], CancellationToken.None));
         var result = await new AutomaticInteractionWorkflow().RunAsync(context, fixture.Input);
+        var calls = context.ReceivedCalls().Where(c => c.GetMethodInfo().Name == "CallActivityAsync").ToArray();
+        calls.ShouldNotBeEmpty();
+        foreach (var call in calls)
+        {
+            var retry = ((WorkflowTaskOptions)call.GetArguments()[2]!).RetryPolicy.ShouldNotBeNull();
+            retry.MaxNumberOfAttempts.ShouldBe(100); retry.FirstRetryInterval.ShouldBe(TimeSpan.FromSeconds(1));
+            retry.BackoffCoefficient.ShouldBe(2); retry.MaxRetryInterval.ShouldBe(TimeSpan.FromMinutes(1));
+        }
         result.Status.ShouldBe(WorkflowExecutionStatus.Completed);
         var observed = fixture.Effects.Observed;
         observed.IndexOf(AutomaticInteractionStep.RateAdmissionRecorded).ShouldBeLessThan(observed.IndexOf(AutomaticInteractionStep.ContextReadRecorded));

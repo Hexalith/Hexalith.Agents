@@ -1,0 +1,351 @@
+{
+  "baseline": "902c3bcbb0f4ac6762b869aea7753dae9831e0d4",
+  "evidenceLevel": 2,
+  "liveAcceptanceEstablished": false,
+  "packageGate": {
+    "command": "pwsh -NoProfile -File eng/verify-story-6.1.ps1 -DependencyMode Package -ArtifactsPath <retained-output>",
+    "exitCode": 0,
+    "total": 6465,
+    "projects": {
+      "Hexalith.Agents.Client.Tests": {
+        "passed": 7,
+        "xmlSha256": "b286f3c1134f99084f728e05682034c0a494d7772226dcda4cfdf419579fa752",
+        "buildLogSha256": "f354f9753a23c22de92984ee6e6cdfe6b5a207fece9b0306c42d4fca608ba16c",
+        "buildWarnings": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "passed": 2005,
+        "xmlSha256": "ff0d36a1b8f30d6994951006d96cf21e278ccabcca87b7745f544b71267bebf1",
+        "buildLogSha256": "a8196613e6629fc271eed5f39208c5757dc3f2fcd22f28c4f9d33e0b19e99748",
+        "buildWarnings": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "passed": 2044,
+        "xmlSha256": "880b412b247aaf39b1fc4cb4b1372bbdcd71ea2cdf8cf030d031fb6823715c19",
+        "buildLogSha256": "408c62da3e006fdcbbe32b8edf9c92ea89d6a1ea3998baaeeaabc7b10bcda2f2",
+        "buildWarnings": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "passed": 1047,
+        "xmlSha256": "142ff713150ca3f64d0ce0fbba8f99a29cd307376be38abe76c05f057bba6f45",
+        "buildLogSha256": "86d1f97df27557812d9e7aeca96a389e6bc72bfc72254edd6a9bf75d7ec7f5d8",
+        "buildWarnings": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "passed": 1362,
+        "xmlSha256": "ee2ab01e228a6312a7aea7a04dbd6c8acff62044b9ffbc6f7cd96618faecea24",
+        "buildLogSha256": "aa1609b665673c0690bce32632ccc68c1c9ab67dc08a6d895e84fb13545f024f",
+        "buildWarnings": 0
+      }
+    }
+  },
+  "selectedControls": {
+    "source": "Final full native XML",
+    "passed": 73,
+    "requiredMethodCaseCounts": {
+      "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.GenerationFailuresKeepTheirPhasePinnedSafetyMapping": 3,
+      "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.PreAcceptanceFailureIsPubliclyBlocked": 3,
+      "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.UnsuccessfulPostIsPubliclyPostingFailedAndPreservesGeneratedContent": 3,
+      "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.TerminalProviderRefusalsStayPubliclyBlockedThroughDispositionsAndReplay": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.EveryCheckpointReturnsTheRecordedOutcomeAndDispatchesAtMostOneCommand": 1,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.AnUnobservedOrRejectedAppendExhaustsPacedObservationWithoutAcceptingUnrelatedRevisions": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.TerminalRefusalsRemainBlockedAfterRealDispositionsSettlementAndReplay": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.DirectoryOnlyTransitionsWaitForTheirExactLeaseFact": 3,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.DelayedInteractionAppendIsObservedBeforeReturningItsExactOutcome": 1,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.ObservationPreservesCallerCancellation": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.CancellationAtTheExactMatchingObservationStillPropagates": 2,
+      "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.OneUninterruptedActivityGeneratesOnceAndRecordsTheExactMutationResult": 3,
+      "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.ClosingDuringGenerationDiscardsOnlyTheLosingMutation": 3,
+      "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.ClosingBeforeProposalCommitDiscardsGeneratedOutputAndSettlesTheProvider": 1,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionWorkflowTests.SingleOwnerCallsActivitiesInFr8OrderAndConfirmationStopsAfterVersion": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionWorkflowTests.WorkflowInstanceMustExactlyMatchTheInteraction": 1,
+      "Hexalith.Agents.Server.Tests.GenerationFailureProviderLeaseTests.AFailedLookupAfterMutationCommitRecordsItsExactNegativeResultAndSettlesBothLeases": 2,
+      "Hexalith.Agents.Server.Tests.GenerationFailureProviderLeaseTests.FailureDoesNotInventAVersionOrRetainIncompleteOutput": 1,
+      "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests.RawDependencyExceptionBecomesOnlyASafeRetryCode": 2,
+      "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests.InvalidInputsLogOnlyAPlaceholder": 3,
+      "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests.DiagnosticSinkFailuresAlsoBecomeOnlyASafeRetryCode": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionSubmissionRecoveryTests.AnotherInteractionWinningTheDirectoryRevisionDoesNotPoisonEveryLaterSubmission": 1,
+      "Hexalith.Agents.Server.Tests.InteractionOutboxObservationTests.CancellationInterruptsObservationOfAnAcceptedButInvisibleAppend": 1,
+      "Hexalith.Agents.Server.Tests.InteractionOutboxObservationTests.DelayedOwnerVisibilityConvergesWithoutRepeatedSubmission": 1,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionRestartIntegrationTests.CrashBeforeOrAfterEveryCommandCheckpointConvergesToTheIdenticalPersistedEndState": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests.RecordedPostSuppressionSurvivesLostAcknowledgementAndRestart": 1,
+      "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests.AutomaticModeRecordsAWinningGeneratedMutationThenSuppressesPostingWithoutAcquiringANewLease": 1,
+      "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests.PostingCommitAndClosingConvergeWithoutChangingTheGeneratedVersion": 4,
+      "Hexalith.Agents.Server.Tests.GeneratedOutputDiscardedWhenProposalMutationCommitLosesTests.OnlyTheWinningMutationCommitCanPersistOutputAfterClosing": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.RejectedOrPermanentlyInvisibleInteractionResultRequiresSafeRetry": 2,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.DivergentGeneratedOwnerFactCannotAcknowledgeTheLosingProtectedResult": 3,
+      "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.CancellationCleanupObservesOnlyItsExactCancelledOrCommitWonLease": 4,
+      "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.DelayedGenerationTransitionsKeepOneEffectAndTheEntireProtectedResult": 3,
+      "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.CancelledGenerationObservationReplaysItsExactPartialStateAndRecovers": 3,
+      "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.MissingSetupCheckpointFailsWithItsNameInsteadOfSpinning": 1
+    }
+  },
+  "codeSha256": {
+    "src/Hexalith.Agents.Server/Application/Activities/ExecuteAutomaticInteractionStepActivity.cs": "28b33f841934b1d3b09bb0b678eac9003296ead3372d5019747b8c3b8ce1e61f",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionStepOrchestrator.cs": "1cdeb2d877f0d8e7abb53e50bdbf54b0aed24cdf238dd2b49d840728567c31d1",
+    "src/Hexalith.Agents.Server/Application/Workflows/AutomaticInteractionWorkflow.cs": "268a7c8f80faaa88f3c660a87c200afb1e1dd82c617178645a6a029bd262d784",
+    "src/Hexalith.Agents/AgentInteraction/AgentInteractionState.Automatic.cs": "6bde339c98df0173a506151d38605e4aace2e27cfe29de362982a578049ece96",
+    "test/Hexalith.Agents.Server.Tests/AllowAllAutomaticInteractionEffects.cs": "e76b347f72ab3827819520a569f46185737f94cdc57849342a28b647f5646e2f",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionActivityTestLogger.cs": "b4b018401830bfd3cd3bccf5cee02557fcc0f82a36cc2d6eaee7dd1c7d2dcad3",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionCheckpointAgreementTests.cs": "84e9ba3ee14ab7faa7a96f29b4ac26fcacb70f6a9908d4dbdfb255d6121a18a3",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionReplayFixture.cs": "08758f49ebe067564621c5d1ae9fa325ce7a794f986b261bf4a6b8ca2f3863c1",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionSubmissionRecoveryTests.cs": "d3c93d253bc08f56145061f6f56e789520076ec2e6f019319aa9d3a7832e9ebb",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionWorkflowTests.cs": "de33ecdd4ebb2d23940e3dec48b1248ca4f658d88507a2634ea0dcfcaf113a5a",
+    "test/Hexalith.Agents.Server.Tests/GeneratedOutputDiscardedWhenProposalMutationCommitLosesTests.cs": "eebba17ba24d5fda5a6000167a3df811e4e0230c241ed493acd9cbc7a4eab403",
+    "test/Hexalith.Agents.Server.Tests/GeneratedProposalMutationLeaseTests.cs": "c42cbf77d47d113906d37d43280f0ceed47c77a5571db626aab623015f540118",
+    "test/Hexalith.Agents.Server.Tests/GenerationFailureProviderLeaseTests.cs": "181b1a8a66189bd1ad1bb64c2f449e5f23fc05c88d361bab72c5c521808ba683",
+    "test/Hexalith.Agents.Server.Tests/InteractionOutboxObservationTests.cs": "5b5faff80a10ad9b88e79dec553955baf513ad007d553e4e349998001e567605",
+    "test/Hexalith.Agents.Server.Tests/WorkflowActivityFailureSafetyTests.cs": "447621c6a06b173eaf96343296ff3e26499e266a6f969cb62d03d1276ad4ea9b",
+    "test/Hexalith.Agents.Tests/AutomaticInteractionPublicStatusTests.cs": "d18532467e389f6e0cf0666739725ecd521bfc185a27660e3aa4c87c4776bcea"
+  },
+  "review": {
+    "layers": [
+      "blind-hunter",
+      "edge-case-hunter",
+      "verification-gap"
+    ],
+    "status": "complete",
+    "patched": [
+      "BH-2",
+      "BH-3",
+      "BH-4",
+      "BH-5",
+      "BH-6",
+      "BH-7",
+      "BH-8",
+      "BH-9",
+      "BH-10",
+      "VG-1"
+    ],
+    "deferred": [
+      "BH-1"
+    ],
+    "reviewCasesInFinalFullGate": 38
+  },
+  "sourceGate": {
+    "status": "BlockedBeforeAgentsCompilation",
+    "testsExecuted": 0,
+    "evidence": "/home/administrator/verification/agents-workflow-hardening-20261116/coordinator-source-01",
+    "builds": {
+      "Hexalith.Agents.Tests": {
+        "command": [
+          "dotnet",
+          "build",
+          "test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj",
+          "-c",
+          "Debug",
+          "-m:1",
+          "-p:UseHexalithProjectReferences=true",
+          "-p:MinVerVersionOverride=1.0.0",
+          "-p:UseSharedCompilation=false",
+          "--disable-build-servers",
+          "--nologo"
+        ],
+        "exitCode": 1,
+        "logSha256": "a51c93d6dc49646291cff1e0359e5abecd3f29eff179953d10b53608553be4fe"
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "command": [
+          "dotnet",
+          "build",
+          "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+          "-c",
+          "Debug",
+          "-m:1",
+          "-p:UseHexalithProjectReferences=true",
+          "-p:MinVerVersionOverride=1.0.0",
+          "-p:UseSharedCompilation=false",
+          "--disable-build-servers",
+          "--nologo"
+        ],
+        "exitCode": 1,
+        "logSha256": "02708d712d6fb38df18f6bb8968aa9a0bb3d1b803a257117a4a50163ab118406"
+      }
+    },
+    "blockers": [
+      "EventStore.Contracts ProductionProfileValidationResult.Authorization and Qualification: CA1822",
+      "Conversations requires the Platform tool-selected source mapping"
+    ]
+  },
+  "reproduction": {
+    "artifacts": "/home/administrator/projects/hexalith/agents/artifacts/workflow-hardening-verification.Bmbm3J9Q",
+    "commandSha256": "87f3252d86f2a9d92568bde5c9d22acf02472f9ec6679c18e44ca420086c6e0e",
+    "exitCode": 0,
+    "scratchRemoved": true
+  },
+  "ciLimitations": {
+    "source": "902c3bcbb0f4ac6762b869aea7753dae9831e0d4",
+    "runUrl": "https://github.com/Hexalith/Hexalith.Agents/actions/runs/43950635060",
+    "policyJobId": 133591850919,
+    "failedStep": "Require the pinned Builds workflow source",
+    "productBuildAndUnitJob": "success",
+    "workflowBuildsPin": "264e17d3185c87b72b0757dd66a13040793756bb",
+    "actualBuildsHead": "fdda17c0a4538b0f7c99f813c20ca24b49006530",
+    "ciCdAdopted": false,
+    "missingReferencedFiles": [
+      "package.json",
+      "eng/verify-story.ps1",
+      "eng/verify-story-5.2.ps1"
+    ]
+  },
+  "gitDelivery": "Authorized coordinator push after local commit",
+  "preReviewEvidence": {
+    "baseline": "902c3bcbb0f4ac6762b869aea7753dae9831e0d4",
+    "evidenceLevel": 2,
+    "liveAcceptanceEstablished": false,
+    "packageGate": {
+      "command": "pwsh -NoProfile -File eng/verify-story-6.1.ps1 -DependencyMode Package -ArtifactsPath <retained-output>",
+      "exitCode": 0,
+      "total": 6449,
+      "projects": {
+        "Hexalith.Agents.Client.Tests": {
+          "passed": 7,
+          "xmlSha256": "ed0877be212cf9176182a4f4ff4b79e654b4f5b0c759eef4c49a7615562e915a",
+          "buildWarnings": 0
+        },
+        "Hexalith.Agents.Contracts.Tests": {
+          "passed": 2005,
+          "xmlSha256": "0a5f6629b7f475376ed73ea0658853db7d66ebf1cbf1225da04c7716d9208346",
+          "buildWarnings": 0
+        },
+        "Hexalith.Agents.Server.Tests": {
+          "passed": 2028,
+          "xmlSha256": "68987bced03d77d0f2838c8cfad4f6693a479e1f157b65d156d940d6731ed670",
+          "buildWarnings": 0
+        },
+        "Hexalith.Agents.Tests": {
+          "passed": 1047,
+          "xmlSha256": "9537dfa7e46a6672bb3a44b0615c769616786706aacbc110a3c61d8b9613bd95",
+          "buildWarnings": 0
+        },
+        "Hexalith.Agents.UI.Tests": {
+          "passed": 1362,
+          "xmlSha256": "f4f14862f5ebdf1c0138cf0d5acdd3176ca5744404bb893408aaac0e424da5ac",
+          "buildWarnings": 0
+        }
+      }
+    },
+    "focused": {
+      "Hexalith.Agents.Tests": {
+        "passed": 11,
+        "classes": {
+          "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests": 11
+        },
+        "methods": {
+          "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.GenerationFailuresKeepTheirPhasePinnedSafetyMapping": 3,
+          "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.PreAcceptanceFailureIsPubliclyBlocked": 3,
+          "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.UnsuccessfulPostIsPubliclyPostingFailedAndPreservesGeneratedContent": 3,
+          "Hexalith.Agents.Tests.AutomaticInteractionPublicStatusTests.TerminalProviderRefusalsStayPubliclyBlockedThroughDispositionsAndReplay": 2
+        }
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "passed": 46,
+        "classes": {
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests": 13,
+          "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests": 7,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionWorkflowTests": 3,
+          "Hexalith.Agents.Server.Tests.GenerationFailureProviderLeaseTests": 3,
+          "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests": 7,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionSubmissionRecoveryTests": 1,
+          "Hexalith.Agents.Server.Tests.InteractionOutboxObservationTests": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionRestartIntegrationTests": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests": 6,
+          "Hexalith.Agents.Server.Tests.GeneratedOutputDiscardedWhenProposalMutationCommitLosesTests": 2
+        },
+        "methods": {
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.EveryCheckpointReturnsTheRecordedOutcomeAndDispatchesAtMostOneCommand": 1,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.AnUnobservedOrRejectedAppendExhaustsPacedObservationWithoutAcceptingUnrelatedRevisions": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.TerminalRefusalsRemainBlockedAfterRealDispositionsSettlementAndReplay": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.DirectoryOnlyTransitionsWaitForTheirExactLeaseFact": 3,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.DelayedInteractionAppendIsObservedBeforeReturningItsExactOutcome": 1,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.ObservationPreservesCallerCancellation": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionCheckpointAgreementTests.CancellationAtTheExactMatchingObservationStillPropagates": 2,
+          "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.OneUninterruptedActivityGeneratesOnceAndRecordsTheExactMutationResult": 3,
+          "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.ClosingDuringGenerationDiscardsOnlyTheLosingMutation": 3,
+          "Hexalith.Agents.Server.Tests.GeneratedProposalMutationLeaseTests.ClosingBeforeProposalCommitDiscardsGeneratedOutputAndSettlesTheProvider": 1,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionWorkflowTests.SingleOwnerCallsActivitiesInFr8OrderAndConfirmationStopsAfterVersion": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionWorkflowTests.WorkflowInstanceMustExactlyMatchTheInteraction": 1,
+          "Hexalith.Agents.Server.Tests.GenerationFailureProviderLeaseTests.AFailedLookupAfterMutationCommitRecordsItsExactNegativeResultAndSettlesBothLeases": 2,
+          "Hexalith.Agents.Server.Tests.GenerationFailureProviderLeaseTests.FailureDoesNotInventAVersionOrRetainIncompleteOutput": 1,
+          "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests.RawDependencyExceptionBecomesOnlyASafeRetryCode": 2,
+          "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests.InvalidInputsLogOnlyAPlaceholder": 3,
+          "Hexalith.Agents.Server.Tests.WorkflowActivityFailureSafetyTests.DiagnosticSinkFailuresAlsoBecomeOnlyASafeRetryCode": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionSubmissionRecoveryTests.AnotherInteractionWinningTheDirectoryRevisionDoesNotPoisonEveryLaterSubmission": 1,
+          "Hexalith.Agents.Server.Tests.InteractionOutboxObservationTests.CancellationInterruptsObservationOfAnAcceptedButInvisibleAppend": 1,
+          "Hexalith.Agents.Server.Tests.InteractionOutboxObservationTests.DelayedOwnerVisibilityConvergesWithoutRepeatedSubmission": 1,
+          "Hexalith.Agents.Server.Tests.AutomaticInteractionRestartIntegrationTests.CrashBeforeOrAfterEveryCommandCheckpointConvergesToTheIdenticalPersistedEndState": 2,
+          "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests.RecordedPostSuppressionSurvivesLostAcknowledgementAndRestart": 1,
+          "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests.AutomaticModeRecordsAWinningGeneratedMutationThenSuppressesPostingWithoutAcquiringANewLease": 1,
+          "Hexalith.Agents.Server.Tests.AutomaticPostingClosingRecoveryTests.PostingCommitAndClosingConvergeWithoutChangingTheGeneratedVersion": 4,
+          "Hexalith.Agents.Server.Tests.GeneratedOutputDiscardedWhenProposalMutationCommitLosesTests.OnlyTheWinningMutationCommitCanPersistOutputAfterClosing": 2
+        }
+      }
+    },
+    "codeSha256": {
+      "src/Hexalith.Agents.Server/Application/Activities/ExecuteAutomaticInteractionStepActivity.cs": "28b33f841934b1d3b09bb0b678eac9003296ead3372d5019747b8c3b8ce1e61f",
+      "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionStepOrchestrator.cs": "1cdeb2d877f0d8e7abb53e50bdbf54b0aed24cdf238dd2b49d840728567c31d1",
+      "src/Hexalith.Agents.Server/Application/Workflows/AutomaticInteractionWorkflow.cs": "268a7c8f80faaa88f3c660a87c200afb1e1dd82c617178645a6a029bd262d784",
+      "src/Hexalith.Agents/AgentInteraction/AgentInteractionState.Automatic.cs": "6bde339c98df0173a506151d38605e4aace2e27cfe29de362982a578049ece96",
+      "test/Hexalith.Agents.Server.Tests/AutomaticInteractionActivityTestLogger.cs": "b4b018401830bfd3cd3bccf5cee02557fcc0f82a36cc2d6eaee7dd1c7d2dcad3",
+      "test/Hexalith.Agents.Server.Tests/AutomaticInteractionCheckpointAgreementTests.cs": "a623a13c7f23fca647c3e33183d201d309a388d818b3949c0cfcd2604da478a7",
+      "test/Hexalith.Agents.Server.Tests/AutomaticInteractionReplayFixture.cs": "cd5dfe3f285ee1444c29a840a33170affc58c258c2e447720c848338612fea11",
+      "test/Hexalith.Agents.Server.Tests/AutomaticInteractionSubmissionRecoveryTests.cs": "d3c93d253bc08f56145061f6f56e789520076ec2e6f019319aa9d3a7832e9ebb",
+      "test/Hexalith.Agents.Server.Tests/AutomaticInteractionWorkflowTests.cs": "de33ecdd4ebb2d23940e3dec48b1248ca4f658d88507a2634ea0dcfcaf113a5a",
+      "test/Hexalith.Agents.Server.Tests/GeneratedProposalMutationLeaseTests.cs": "5886b6c22f9c605fff4597ff77c4b68d87eddd78faa063a0fa56c417c8475544",
+      "test/Hexalith.Agents.Server.Tests/GenerationFailureProviderLeaseTests.cs": "181b1a8a66189bd1ad1bb64c2f449e5f23fc05c88d361bab72c5c521808ba683",
+      "test/Hexalith.Agents.Server.Tests/InteractionOutboxObservationTests.cs": "5b5faff80a10ad9b88e79dec553955baf513ad007d553e4e349998001e567605",
+      "test/Hexalith.Agents.Server.Tests/WorkflowActivityFailureSafetyTests.cs": "447621c6a06b173eaf96343296ff3e26499e266a6f969cb62d03d1276ad4ea9b",
+      "test/Hexalith.Agents.Tests/AutomaticInteractionPublicStatusTests.cs": "d18532467e389f6e0cf0666739725ecd521bfc185a27660e3aa4c87c4776bcea"
+    },
+    "durableEvidence": "/home/administrator/verification/agents-workflow-hardening-20261116",
+    "finalRun": "final-06",
+    "sourceRun": "source-final-02",
+    "review": "Coordinator independent review pending",
+    "gitDelivery": "Coordinator work",
+    "sourceGate": {
+      "status": "BlockedBeforeAgentsCompilation",
+      "testsExecuted": 0,
+      "exitCode": 1,
+      "builds": {
+        "source-Hexalith.Agents.Tests-build": {
+          "command": [
+            "dotnet",
+            "build",
+            "test/Hexalith.Agents.Tests/Hexalith.Agents.Tests.csproj",
+            "-c",
+            "Debug",
+            "-m:1",
+            "-p:UseHexalithProjectReferences=true",
+            "-p:MinVerVersionOverride=1.0.0",
+            "-p:UseSharedCompilation=false",
+            "--disable-build-servers",
+            "--nologo"
+          ],
+          "exitCode": 1,
+          "logSha256": "bdf6bcce4cb1b4dea8f87d3981436b023e3ea58cf3f1bbdcd4a8ebabccb6f4eb"
+        },
+        "source-Hexalith.Agents.Server.Tests-build": {
+          "command": [
+            "dotnet",
+            "build",
+            "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+            "-c",
+            "Debug",
+            "-m:1",
+            "-p:UseHexalithProjectReferences=true",
+            "-p:MinVerVersionOverride=1.0.0",
+            "-p:UseSharedCompilation=false",
+            "--disable-build-servers",
+            "--nologo"
+          ],
+          "exitCode": 1,
+          "logSha256": "4b993a9ac74f0d886c8be0ad0534f1020bcd57e64482003d9129a1dcbbc0a564"
+        }
+      },
+      "blockers": [
+        "EventStore.Contracts ProductionProfileValidationResult.Authorization and Qualification: CA1822",
+        "Conversations requires the Platform tool-selected source mapping"
+      ]
+    }
+  }
+}

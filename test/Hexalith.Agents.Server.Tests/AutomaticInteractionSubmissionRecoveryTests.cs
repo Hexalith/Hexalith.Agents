@@ -3,6 +3,7 @@ using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ConversationAgentState;
 using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
 using Hexalith.Agents.Contracts.Security;
+using Hexalith.Agents.Server.Application.Activities;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Workflows;
 using Hexalith.Agents.Server.Ports;
@@ -52,7 +53,13 @@ public sealed class AutomaticInteractionSubmissionRecoveryTests
         });
         var steps = new AutomaticInteractionStepOrchestrator(fixture, fixture, dispatcher, fixture.Effects);
         WorkflowExecutionState result = fixture.Input;
-        for (int n = 0; n < 100 && stale is null; n++) { result = await steps.ExecuteAsync(result, CancellationToken.None); }
+        bool retryRequired = false;
+        for (int n = 0; n < 100 && stale is null; n++)
+        {
+            try { result = await steps.ExecuteAsync(result, CancellationToken.None); }
+            catch (AutomaticInteractionCheckpointUnavailableException) when (stale is not null) { retryRequired = true; }
+        }
+        retryRequired.ShouldBeTrue();
         stale.ShouldNotBeNull();
         int beforeReplay = fixture.Dispatches.Count;
         var exact = JsonSerializer.Deserialize<AcquireConversationEffectLease>(stale.Payload).ShouldNotBeNull();

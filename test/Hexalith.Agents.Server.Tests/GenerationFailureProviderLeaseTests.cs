@@ -25,9 +25,8 @@ public sealed class GenerationFailureProviderLeaseTests
     public async Task AFailedLookupAfterMutationCommitRecordsItsExactNegativeResultAndSettlesBothLeases(bool restart)
     {
         var fixture = new AutomaticInteractionReplayFixture(); await fixture.StartAsync();
-        await fixture.ReserveUntilAsync(ConversationEffectKind.ProposalMutation);
+        await fixture.PauseGenerationAsync(afterCommit: true);
         fixture.Effects.Observed.Count(s => s == AutomaticInteractionStep.GeneratedVersionRecorded).ShouldBeGreaterThan(0);
-        await fixture.Steps().ExecuteAsync(fixture.Input, CancellationToken.None);
         var mutation = fixture.Directory!.Leases.Values.Single(l => l.Kind == ConversationEffectKind.ProposalMutation);
         mutation.Status.ShouldBe(ConversationEffectLeaseStatus.CommittedToEffect);
         fixture.Effects.FailAt = AutomaticInteractionStep.GeneratedVersionRecorded;

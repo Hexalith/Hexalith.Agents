@@ -50,6 +50,12 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
     internal bool DirectoryReady { get; set; } = true;
     /// <summary>Gets or sets asynchronous receipt behavior, retaining rejections in the owner event history.</summary>
     internal bool PersistRejections { get; set; }
+    /// <summary>Gets or sets a hook for races and pauses before the next owner append.</summary>
+    internal Func<AgentCommandIntent, Task>? BeforeDispatchAsync { get; set; }
+    /// <summary>Gets or sets an injected authoritative directory observation.</summary>
+    internal Func<CancellationToken, Task<ConversationAgentStateState?>>? DirectoryObservationAsync { get; set; }
+    /// <summary>Gets or sets an injected authoritative interaction observation.</summary>
+    internal Func<CancellationToken, Task<AgentInteractionState?>>? InteractionObservationAsync { get; set; }
     /// <summary>Gets or sets response mode.</summary>
     internal AgentResponseMode Mode { get; set; } = AgentResponseMode.Automatic;
     /// <summary>Gets the exact AD-29 interaction identity.</summary>
@@ -68,6 +74,16 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
     {
         var availability = Substitute.For<IAgentDependencyAvailability>();
         return new AutomaticInteractionIntakeOrchestrator(this, availability, this, this, this, Recovery()).ExecuteAsync(Request, CancellationToken.None);
+    }
+    /// <summary>Advances setup with a finite bound and names the owner fact that never appeared.</summary>
+    internal async Task AdvanceUntilAsync(AutomaticInteractionStep checkpoint)
+    {
+        for (int n = 0; n < 128; n++)
+        {
+            if (Interaction?.AutomaticFacts.ContainsKey(checkpoint) == true) { return; }
+            await Steps().ExecuteAsync(Input, CancellationToken.None);
+        }
+        throw new InvalidOperationException($"FixtureCheckpointMissing:{checkpoint}");
     }
     /// <summary>Drives deterministic checkpoints to a terminal state with a finite test-only bound.</summary>
     internal async Task<WorkflowExecutionState> CompleteAsync()
@@ -92,12 +108,29 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
     /// <summary>Reserves a particular phase then pauses before its commit.</summary>
     internal async Task ReserveUntilAsync(ConversationEffectKind kind)
     {
+        if (kind == ConversationEffectKind.ProposalMutation) { await PauseGenerationAsync(afterCommit: false); return; }
         for (int n = 0; n < 100; n++)
         {
             if (Directory?.Leases.Values.Any(l => l.Kind == kind && l.Status == ConversationEffectLeaseStatus.Reserved) == true) { return; }
             (await Steps().ExecuteAsync(Input, CancellationToken.None)).Status.ShouldBe(WorkflowExecutionStatus.Running);
         }
         throw new InvalidOperationException("FixtureReservationMissing");
+    }
+    /// <summary>Simulates an interrupted generation activity before its mutation commit or result append.</summary>
+    internal async Task PauseGenerationAsync(bool afterCommit)
+    {
+        BeforeDispatchAsync = intent =>
+        {
+            bool mutationReserved = Directory?.Leases.Values.Any(l => l.Kind == ConversationEffectKind.ProposalMutation && l.Status == ConversationEffectLeaseStatus.Reserved) == true;
+            if (afterCommit ? intent.CommandType == "RecordAutomaticInteractionStep" && Interaction?.AutomaticFacts.ContainsKey(AutomaticInteractionStep.ProviderInvocationAuthorized) == true
+                : intent.CommandType == "CommitConversationEffect" && mutationReserved)
+            { BeforeDispatchAsync = null; throw new AutomaticInteractionInjectedCrash(); }
+            return Task.CompletedTask;
+        };
+        try { await CompleteAsync(); }
+        catch (AutomaticInteractionInjectedCrash) { return; }
+        finally { BeforeDispatchAsync = null; }
+        throw new InvalidOperationException("FixtureGenerationPauseMissing");
     }
     /// <summary>Closes the same authoritative directory.</summary>
     internal async Task CloseAsync()
@@ -107,12 +140,13 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
             new Hexalith.Agents.Contracts.ConversationAgentState.Commands.EnterConversationDeletionClosing("tenant-a", "conversation-a", new string('d', 64), Directory.Revision), CancellationToken.None);
     }
     /// <inheritdoc />
-    public Task<SubmitCommandResponse> DispatchAsync(AgentCommandIntent intent, CancellationToken ct)
+    public async Task<SubmitCommandResponse> DispatchAsync(AgentCommandIntent intent, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         int index = Dispatches.Count; Dispatches.Add(intent);
         bool crash = FaultAt == index;
         if (crash && !CrashAfterAppend) { FaultAt = null; throw new AutomaticInteractionInjectedCrash(); }
+        if (BeforeDispatchAsync is { } beforeDispatch) { await beforeDispatch(intent); }
         Type contract = typeof(AgentsSecurityIdentity).Assembly.GetTypes().Single(t => t.Name == intent.CommandType);
         object command = JsonSerializer.Deserialize(intent.Payload, contract).ShouldNotBeNull();
         CommandEnvelope envelope = new(intent.MessageId, intent.TenantId, intent.Domain, intent.AggregateId, intent.CommandType, intent.Payload,
@@ -128,14 +162,16 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
             else { Interaction ??= new(); Interaction.Apply((dynamic)item); _interactionEvents.Add(Clone(item)); }
         }
         if (crash) { FaultAt = null; throw new AutomaticInteractionInjectedCrash(); }
-        return Task.FromResult(new SubmitCommandResponse(intent.CorrelationId, MessageId: intent.MessageId));
+        return new SubmitCommandResponse(intent.CorrelationId, MessageId: intent.MessageId);
     }
     /// <inheritdoc />
     Task<ConversationAgentStateState?> IConversationAgentStateReader.ReadAsync(string tenantId, string conversationId, CancellationToken ct)
-        => Task.FromResult(tenantId == Tenant && conversationId == Conversation ? Directory : null);
+        => tenantId == Tenant && conversationId == Conversation
+            ? DirectoryObservationAsync?.Invoke(ct) ?? Task.FromResult(Directory) : Task.FromResult<ConversationAgentStateState?>(null);
     /// <inheritdoc />
     Task<AgentInteractionState?> IAgentInteractionStateReader.ReadAsync(string tenantId, string interactionId, CancellationToken ct)
-        => Task.FromResult(tenantId == Tenant && interactionId == InteractionId ? Interaction : null);
+        => tenantId == Tenant && interactionId == InteractionId
+            ? InteractionObservationAsync?.Invoke(ct) ?? Task.FromResult(Interaction) : Task.FromResult<AgentInteractionState?>(null);
     /// <inheritdoc />
     public Task EnsureScheduledAsync(WorkflowExecutionState input, CancellationToken ct)
     {

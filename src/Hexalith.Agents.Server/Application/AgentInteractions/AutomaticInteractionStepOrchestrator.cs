@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Hexalith.Agents.AgentInteraction;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
@@ -5,12 +6,13 @@ using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.ConversationAgentState;
 using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
 using Hexalith.Agents.Contracts.Security;
+using Hexalith.Agents.Server.Application.Activities;
 using Hexalith.Agents.Server.Application.Workflows;
 using Hexalith.Agents.Server.Ports;
 
 namespace Hexalith.Agents.Server.Application.AgentInteractions;
 
-/// <summary>One read/authorize/effect/result checkpoint per activity; replay returns recorded EventStore truth.</summary>
+/// <summary>Owner checkpoints with one generation activity; replay returns recorded EventStore truth.</summary>
 public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentStateReader directoryReader, IAgentInteractionStateReader interactionReader,
     IAgentCommandDispatcher dispatcher, IAutomaticInteractionStepEffects effects)
 {
@@ -24,7 +26,7 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
         AutomaticInteractionStep.GeneratedVersionRecorded, AutomaticInteractionStep.ConversationPostingRecorded,
     ];
 
-    /// <summary>Re-reads exact state, performs only committed effects, and dispatches at most one trusted command.</summary>
+    /// <summary>Re-reads exact state and observes one command, except generation which also acquires and commits its mutation lease.</summary>
     public async Task<WorkflowExecutionState> ExecuteAsync(WorkflowExecutionState input, CancellationToken ct)
     {
         WorkflowExecutionStateValidation.Validate(input); ct.ThrowIfCancellationRequested();
@@ -109,11 +111,10 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
                 return await RefreshAsync().ConfigureAwait(false);
             }
         }
-        AutomaticInteractionEffectResult? generation = null;
         if (next == AutomaticInteractionStep.GeneratedVersionRecorded)
         {
             var provider = directory.Leases.Values.Single(l => l.AgentInteractionId == input.AgentInteractionId && l.Kind == ConversationEffectKind.ProviderInvocation && l.Status == ConversationEffectLeaseStatus.CommittedToEffect);
-            generation = await effects.ExecuteAsync(next, interaction, provider, ct).ConfigureAwait(false);
+            AutomaticInteractionEffectResult generation = await effects.ExecuteAsync(next, interaction, provider, ct).ConfigureAwait(false);
             if (generation.Outcome != AutomaticInteractionOutcome.Allowed || generation.Output is null)
             {
                 if (generation.FailureKind == AutomaticInteractionFailureKind.Unknown) { throw new InvalidOperationException("GenerationFailureClassificationRequired"); }
@@ -122,6 +123,29 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
                 await RecordAsync(AutomaticInteractionStep.GenerationFailed, new(AutomaticInteractionOutcome.Failed, generation.DependencyRecordId, FailureKind: generation.FailureKind), mutation?.Status == ConversationEffectLeaseStatus.CommittedToEffect ? mutation : provider).ConfigureAwait(false);
                 return await RefreshAsync().ConfigureAwait(false);
             }
+            // Keep the protected result local to this activity while observing the exact mutation capability.
+            string operationId = Operation(next);
+            string leaseId = ConversationAgentStateIdentity.Lease(input.TenantId, input.ConversationId, input.AgentInteractionId,
+                ConversationEffectKind.ProposalMutation, next.ToString(), operationId);
+            directory.Leases.TryGetValue(leaseId, out var mutationLease);
+            if (mutationLease is null && directory.DeletionRequestId is null)
+            {
+                mutationLease = new(leaseId, input.AgentInteractionId, ConversationEffectKind.ProposalMutation, next.ToString(), operationId,
+                    input.AgentInteractionId, permit.Permit.DirectoryEpoch.EpochId, ConversationEffectLeaseStatus.Reserved, 0, 0, false);
+                await SendDirectoryAsync(new AcquireConversationEffectLease(mutationLease, directory.Revision), leaseId).ConfigureAwait(false);
+                directory.Leases.TryGetValue(leaseId, out mutationLease);
+            }
+            if (mutationLease?.Status == ConversationEffectLeaseStatus.Reserved && directory.DeletionRequestId is null)
+            {
+                await SendDirectoryAsync(new CommitConversationEffect(leaseId, input.AgentInteractionId, input.AgentInteractionId, directory.Revision), leaseId).ConfigureAwait(false);
+                directory.Leases.TryGetValue(leaseId, out mutationLease);
+            }
+            if (mutationLease?.Status == ConversationEffectLeaseStatus.CommittedToEffect)
+            { await RecordAsync(next, generation, mutationLease).ConfigureAwait(false); }
+            else if (directory.DeletionRequestId is not null && mutationLease?.CommitRevision is not > 0)
+            { await RecordAsync(AutomaticInteractionStep.GenerationFailed, new(AutomaticInteractionOutcome.Discarded), provider).ConfigureAwait(false); }
+            else { throw new AutomaticInteractionCheckpointUnavailableException(); }
+            return await RefreshAsync().ConfigureAwait(false);
         }
         AutomaticInteractionStep leaseStep = AgentInteractionAggregate.LeaseOperationStep(next);
         ConversationEffectKind kind = AgentInteractionAggregate.LeaseKind(next);
@@ -164,7 +188,7 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
         { outcome = new(AutomaticInteractionOutcome.Allowed); }
         else if (next is AutomaticInteractionStep.OpenInteractionLeaseAuthorized or AutomaticInteractionStep.BudgetReservationAuthorized or AutomaticInteractionStep.CapacityAdmissionAuthorized)
         { outcome = new(AutomaticInteractionOutcome.Authorized); }
-        else { outcome = generation ?? await effects.ExecuteAsync(next, interaction, phaseLease, ct).ConfigureAwait(false); }
+        else { outcome = await effects.ExecuteAsync(next, interaction, phaseLease, ct).ConfigureAwait(false); }
         if (next == AutomaticInteractionStep.ProviderInvocationAuthorized && (outcome.Outcome != AutomaticInteractionOutcome.Authorized || outcome.Authority?.IsEffective() != true))
         { next = AutomaticInteractionStep.ProviderInvocationNotAuthorized; outcome = new(AutomaticInteractionOutcome.Blocked, outcome.DependencyRecordId); }
         else if (next == AutomaticInteractionStep.RateAdmissionAuthorized && outcome.Outcome != AutomaticInteractionOutcome.Authorized)
@@ -173,7 +197,34 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
         return await RefreshAsync().ConfigureAwait(false);
 
         string Operation(AutomaticInteractionStep step) => AgentsSecurityIdentity.Derive("interaction-step", input.TenantId, input.AgentInteractionId, step.ToString());
-        Task SendDirectoryAsync(object command, string operationId) => InteractionCommandDispatch.SendAsync(dispatcher, input.TenantId, ConversationAgentStateIdentity.Domain, directoryId, operationId, command, ct);
+        async Task SendDirectoryAsync(object command, string operationId)
+        {
+            // A submission receipt or an unrelated revision is not evidence that this transition won.
+            await InteractionCommandDispatch.SendAsync(dispatcher, input.TenantId, ConversationAgentStateIdentity.Domain, directoryId, operationId, command, ct).ConfigureAwait(false);
+            await ObserveAsync(async () =>
+            {
+                var observed = await directoryReader.ReadAsync(input.TenantId, input.ConversationId, ct).ConfigureAwait(false);
+                if (observed is null || observed.TenantId != input.TenantId || observed.ConversationId != input.ConversationId) { return false; }
+                bool found = command switch
+                {
+                    AcquireConversationEffectLease acquire => observed.Leases.TryGetValue(acquire.Lease.LeaseId, out var lease)
+                        ? lease with { Status = acquire.Lease.Status, CommitRevision = 0, ResultRevision = 0, MustSettle = false } == acquire.Lease
+                        : observed.DeletionRequestId is not null,
+                    CommitConversationEffect commit => observed.Leases.TryGetValue(commit.LeaseId, out var lease)
+                        && lease.AgentInteractionId == commit.AgentInteractionId && lease.WorkflowInstanceId == commit.WorkflowInstanceId
+                        && (lease.CommitRevision > 0 || lease.Status == ConversationEffectLeaseStatus.CancelledBeforeCommit || observed.DeletionRequestId is not null),
+                    SettleConversationEffectLease settle => observed.Leases.TryGetValue(settle.LeaseId, out var lease)
+                        && lease.AgentInteractionId == settle.AgentInteractionId && lease.WorkflowInstanceId == settle.WorkflowInstanceId
+                        && lease.Status == ConversationEffectLeaseStatus.Settled && lease.CommitRevision == settle.CommitRevision && lease.ResultRevision == settle.ResultRevision,
+                    CancelConversationEffectLease cancel => observed.Leases.TryGetValue(cancel.LeaseId, out var lease)
+                        && lease.AgentInteractionId == cancel.AgentInteractionId && lease.WorkflowInstanceId == cancel.WorkflowInstanceId
+                        && (lease.Status == ConversationEffectLeaseStatus.CancelledBeforeCommit || lease.CommitRevision > 0),
+                    _ => false,
+                };
+                if (found) { directory = observed; }
+                return found;
+            }).ConfigureAwait(false);
+        }
         async Task RecordAsync(AutomaticInteractionStep step, AutomaticInteractionEffectResult outcome, ConversationEffectLease? lease)
         {
             var fact = new AutomaticInteractionFact(step, Operation(step), outcome.Outcome, interaction.AutomaticRevision + 1,
@@ -182,13 +233,34 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
                 DirectoryClosingRevision: step == AutomaticInteractionStep.ConversationPostingSuppressedByDeletion ? directory.DeletionClosingRevision : 0);
             await InteractionCommandDispatch.SendAsync(dispatcher, input.TenantId, "agent-interaction", input.AgentInteractionId, fact.OperationId,
                 new RecordAutomaticInteractionStep(input.TenantId, input.AgentInteractionId, fact, interaction.AutomaticRevision), ct).ConfigureAwait(false);
+            string expected = JsonSerializer.Serialize(fact with { Revision = 0 });
+            await ObserveAsync(async () =>
+            {
+                var observed = await interactionReader.ReadAsync(input.TenantId, input.AgentInteractionId, ct).ConfigureAwait(false);
+                if (observed?.PermittedCreation?.Permit.TenantId != input.TenantId || observed.AgentInteractionId != input.AgentInteractionId
+                    || !observed.AutomaticFacts.TryGetValue(step, out var recorded) || JsonSerializer.Serialize(recorded with { Revision = 0 }) != expected) { return false; }
+                interaction = observed;
+                return true;
+            }).ConfigureAwait(false);
         }
-        async Task<WorkflowExecutionState> RefreshAsync()
+        async Task ObserveAsync(Func<Task<bool>> observed)
         {
-            var observed = await interactionReader.ReadAsync(input.TenantId, input.AgentInteractionId, ct).ConfigureAwait(false);
-            return input with { EventRevision = observed?.AutomaticRevision ?? input.EventRevision, Status = WorkflowExecutionStatus.Running,
-                Outcome = observed?.AutomaticFacts.Count > 0 ? AutomaticInteractionPolicy.Decide(observed.AutomaticFacts.Values.MaxBy(f => f.Revision)!) : AutomaticInteractionOutcome.Unknown };
+            for (int checkpoint = 0; checkpoint < 64; checkpoint++)
+            {
+                ct.ThrowIfCancellationRequested();
+                bool matched = await observed().ConfigureAwait(false);
+                ct.ThrowIfCancellationRequested();
+                if (matched) { return; }
+                if (checkpoint < 63) { await Task.Delay(TimeSpan.FromMilliseconds(Math.Min(200, 25 * (checkpoint + 1))), ct).ConfigureAwait(false); }
+            }
+            ct.ThrowIfCancellationRequested();
+            throw new AutomaticInteractionCheckpointUnavailableException();
         }
+        Task<WorkflowExecutionState> RefreshAsync() => Task.FromResult(input with
+        {
+            EventRevision = interaction.AutomaticRevision, Status = WorkflowExecutionStatus.Running,
+            Outcome = interaction.AutomaticFacts.Count > 0 ? AutomaticInteractionPolicy.Decide(interaction.AutomaticFacts.Values.MaxBy(f => f.Revision)!) : AutomaticInteractionOutcome.Unknown,
+        });
     }
     private static bool IsTerminal(AgentInteractionState interaction) => interaction.AutomaticFacts.Keys.Any(step => step is AutomaticInteractionStep.StartSuppressedByDeletion
         or AutomaticInteractionStep.InteractionPreAcceptanceFailed or AutomaticInteractionStep.ProviderInvocationNotAuthorized or AutomaticInteractionStep.GenerationFailed or AutomaticInteractionStep.ConversationPostingRecorded

@@ -19,6 +19,8 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
     internal bool AuthorityAvailable { get; set; } = true;
     /// <summary>Gets or sets a malformed authority test fixture.</summary>
     internal ProviderOutputAuthority? AuthorityOverride { get; set; }
+    /// <summary>Gets or sets an exact protected generation result for envelope-preservation controls.</summary>
+    internal AutomaticInteractionEffectResult? GenerationResultOverride { get; set; }
     /// <summary>Gets the executed effect order.</summary>
     internal List<AutomaticInteractionStep> Observed { get; } = [];
     /// <summary>Gets the immutable Provider attempt identities.</summary>
@@ -56,7 +58,7 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
         if (step == AutomaticInteractionStep.GeneratedVersionRecorded)
         {
             interaction.AutomaticFacts.ShouldContainKey(AutomaticInteractionStep.ProviderInvocationAuthorized); Attempts.Add(creation.AttemptId);
-            return Task.FromResult(new AutomaticInteractionEffectResult(AutomaticInteractionOutcome.Allowed,
+            return Task.FromResult(GenerationResultOverride ?? new AutomaticInteractionEffectResult(AutomaticInteractionOutcome.Allowed,
                 Output: new(creation.Permit.Request.Target, JsonSerializer.SerializeToElement(new { FixtureSealed = "allowed-output" })), ContentDigest: new string('d', 64), DigestKeyVersion: "fixture-digest-v1"));
         }
         if (step == AutomaticInteractionStep.ConversationPostingRecorded)
