@@ -635,6 +635,12 @@ public sealed class EventStoreProviderCatalogOperations(
                 IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null);
         }
 
+        if (_statusReader?.SupportsScope(ProviderCatalogIdentity.PlatformTenantId, ProviderCatalogAggregate.Domain) != true)
+        {
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Failed(AgentOperationErrorCode.Unavailable,
+                IsCanonicalUlid(options?.CorrelationId) ? options!.CorrelationId : null);
+        }
+
         string correlationId = options?.CorrelationId ?? _identityFactory.NewCorrelationId();
         if (!IsCanonicalUlid(correlationId))
         {

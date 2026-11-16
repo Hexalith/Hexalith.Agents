@@ -6,7 +6,7 @@ public interface IPendingProviderCommandStore
     /// <summary>Loads pending identities for the current browser session.</summary>
     Task<IReadOnlyList<PendingProviderCommand>> LoadAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Retains a submitted command until its exact terminal outcome is known.</summary>
+    /// <summary>Persists a prepared intention before submission or acknowledges its exact receipt; retains it until exact terminal truth.</summary>
     Task SaveAsync(PendingProviderCommand command, CancellationToken cancellationToken = default);
 
     /// <summary>Removes a command only after exact terminal truth is known.</summary>

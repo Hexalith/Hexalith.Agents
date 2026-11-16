@@ -1,0 +1,22 @@
+{
+  "src/Hexalith.Agents.Server/Application/Agents/EventStoreProviderCatalogOperations.cs": "a68bd59b5ad8250da0355142c8590bc5205d1c77b086b1e9ba190e84b509528d",
+  "src/Hexalith.Agents.Server/Ports/EventStoreAgentCommandStatusReader.cs": "406fd1e53f80fbe5bfbb24acec6474177086416440d0da43339d2ac9068cb1b4",
+  "src/Hexalith.Agents.Server/Ports/IAgentCommandStatusReader.cs": "cd440368d51383d47836d27392aa0351e531d04f7230c4cecb26ccb9e231fae0",
+  "src/Hexalith.Agents.UI/Components/Pages/ProviderCatalog.razor": "d1323c523bf4b05bdc42384f3af0d0beb34b9928fd0924386b4c26220305b091",
+  "src/Hexalith.Agents.UI/Components/Pages/TenantProviderCatalog.razor": "dc56a53b8815f15ec3f70ea5515a065b5b8fdf611538b0d8680b1c342b0e108f",
+  "src/Hexalith.Agents.UI/Services/Gateways/AgentsClientProviderCatalogGateway.cs": "63272f5eda28f9412c54f27ca1d719ce2dade4e467ab217cbda43d5b2eb9aaa4",
+  "src/Hexalith.Agents.UI/Services/Gateways/IProviderCatalogGateway.cs": "2c12d0752da8debf548bab9f98d79416badf8603c2b5bdc5c7d38ba95574c692",
+  "src/Hexalith.Agents.UI/State/BrowserSessionPendingProviderCommandStore.cs": "4c356d7e35358da35ef1d777cb57d2697f760c83f5b577a3d47bdfc7e2f0bb68",
+  "src/Hexalith.Agents.UI/State/IPendingProviderCommandStore.cs": "4be1b57aca1a0739a9d6b74b1806e57d4b583d964af6d9667f93088a7334c164",
+  "src/Hexalith.Agents.UI/State/PendingProviderCommand.cs": "86d38c4867a54c96e9447b1971954ed25e493a80081a81c1f1c6307acf1c0293",
+  "test/Hexalith.Agents.Server.Tests/CapableProviderCommandStatusReader.cs": "4ee0e35e57c87698eac7589b318ecfb16ff6c71b8f669e5d5850d57f8c3ce645",
+  "test/Hexalith.Agents.Server.Tests/EventStoreProviderCatalogOperationsTests.cs": "525e20018a4cef13f33ac8fe9b123bf57f1d633fe692aa2a3fffc5b4e167d8b5",
+  "test/Hexalith.Agents.Server.Tests/ProviderCatalogAuthorityLifetimeTests.cs": "a5f89e00ae6a5f10002c7e3cbc31e26f7ce095af4befe798d92d3794132f7865",
+  "test/Hexalith.Agents.UI.Tests/AgentsClientProviderCatalogGatewayTests.cs": "361b1ad7f7633444f51a12b21b8602aaec422bf33e5e86e9299489cae3418442",
+  "test/Hexalith.Agents.UI.Tests/AgentsTestContext.cs": "34bd9c0e0cef5f76831d9dda0f17b80246ad985974c4bce46eb3497d31adf26b",
+  "test/Hexalith.Agents.UI.Tests/InMemorySessionStorageJsRuntime.cs": "96e3530b85677ebbacad67582b744b606f940d1839f2ec0995fd1da93506f259",
+  "test/Hexalith.Agents.UI.Tests/PendingProviderCommandStoreTests.cs": "4598ca6bca2e0526cc1b660123968ca253e5a1dc67d623f413acbd45ca4ef967",
+  "test/Hexalith.Agents.UI.Tests/ProviderCatalogGovernanceUiTests.cs": "03fc45ee26bee5120e85fe389e93853491e778f8d0c2c8f8e8e9f7c33d6eedc0",
+  "test/Hexalith.Agents.UI.Tests/ProviderCatalogUiTests.cs": "a7a018538b1f971fb0d14bedb0d5345c509223c839f6fb42259bb14d62bd1686",
+  "test/Hexalith.Agents.UI.Tests/ProviderRecoveryUiTests.cs": "88a9acdb2c4d88a549f1839735b24aa40b5ee27dca9e8834ea5bf6f4d967855b"
+}

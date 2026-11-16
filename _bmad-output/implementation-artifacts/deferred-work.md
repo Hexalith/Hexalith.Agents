@@ -891,6 +891,9 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-bind-caller-party-validation-to-current-human-authority.md`
   summary: Restore explicit Conversation denominator and dedicated enrolled service-Party constraints in the generated Epic 5 agent context.
   evidence: Review FB9 compared the regenerated context with baseline 98c4dda: the prior context named open/undeleted Conversations over [from,to), including zero-call Conversations, and a dedicated enrolled Conversations service Party. Accepted planning/full owner contracts remain unchanged; this agent-context correction is deferred under the build workflow rule.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-provider-recovery-and-context-items.md` — Restores the accepted 2026-10-08 creation-window denominator (currently open/undeleted, CreatedAt in [from,to), including zero Agent Calls) and the dedicated Conversations-owned service Party with explicit tenant enrollment/current machine binding. Context verification preserves the existing unavailable dependency qualification.
+  evidence_record: [Provider recovery verification](tests/provider-recovery-2026-11-16/README.md)
 
 ## Deferred from: code review of spec-6-1-start-and-recover-an-automatic-interaction.md (2026-11-01)
 
@@ -931,15 +934,32 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `spec-sync-update-and-release-2026-11-15.md`
   summary: Provide an approved provider-catalog platform command-status reader or gate writes until terminal status can be observed.
   evidence: Initial main already selects EventStore 5.1.1, which rejects reserved system status; the default reader therefore returns no terminal evidence. README and the maintenance real-SDK refusal tests document this pre-existing gap.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-provider-recovery-and-context-items.md` — Adds an explicit exact-scope capability defaulting to refusal. Platform catalog create/update/enable/disable authorize before checking capability and return Unavailable without dispatch for SDK/deferred readers; explicitly capable hosts retain governed receipt/projection confirmation.
+  evidence_record: [Provider recovery verification](tests/provider-recovery-2026-11-16/README.md)
 
 - source_spec: `spec-sync-update-and-release-2026-11-15.md`
   summary: Revalidate browser pending-command identity scope across in-flight semaphore and JavaScript awaits.
   evidence: BrowserSessionPendingProviderCommandStore captures the storage key before awaits in initial main; a suspended interop/principal-change test is needed to settle the desired read/write transition behavior.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-provider-recovery-and-context-items.md` — Captures subject/tenant key and authentication generation, guards gate and interop completion, detects change-back, and unsubscribes on disposal. Suspended load/save/remove and delivered-old-key-write tests refuse stale disclosure or redirected writes; an already delivered old-key JS write cannot be rolled back.
+  evidence_record: [Provider recovery verification](tests/provider-recovery-2026-11-16/README.md)
 
 - source_spec: `spec-sync-update-and-release-2026-11-15.md`
   summary: Retain an unresolved provider command when its first browser persistence fails after backend submission.
   evidence: Existing ProviderCatalog UI submits before writing the pending browser identity; a failure on the first save can leave refresh without the retained lock. The maintenance error wrapper preserves the failure but does not redesign recovery.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-provider-recovery-and-context-items.md` — All catalog, tenant-enablement and terms writes persist canonical prepared identities before dispatch and carry them through public client options. Failed first save submits nothing; transport ambiguity, receipt-save failure and mismatched receipts retain the exact lock across refresh. Prepared intentions do not claim accepted effects.
+  evidence_record: [Provider recovery verification](tests/provider-recovery-2026-11-16/README.md)
 
 - source_spec: `spec-sync-update-and-release-2026-11-15.md`
   summary: Reject invalid persisted pending-command JSON shapes without treating them as an empty pending list.
   evidence: The pre-existing JsonSerializer.Deserialize<List<PendingProviderCommand>>(json) ?? [] accepts JSON null and does not validate null elements; add corruption tests and fail-closed shape validation in the owning lifecycle change.
+
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-provider-recovery-and-context-items.md` — Rejects malformed roots/members, noncanonical identities, invalid versions/enums/resource scopes and conflicting duplicate locks without clearing state. Load/save/remove corruption controls and valid legacy/empty-array controls pass; saving a replacement identity cannot overwrite an unresolved lock.
+  evidence_record: [Provider recovery verification](tests/provider-recovery-2026-11-16/README.md)
+
+- source_spec: `spec-five-deferred-provider-recovery-and-context-items.md`
+  summary: Coordinate browser pending-command read/modify/write atomically across overlapping store instances or circuits sharing one session-storage scope.
+  evidence: Independent review BH-7: both baseline and current stores use an instance-local semaphore around separate getItem/setItem calls. Two instances can read the same list and overwrite distinct pending additions. This predates the selected authentication-await correction; a browser-atomic transaction or shared cross-instance coordination and deterministic interleaving regression are required before claiming this concurrency property.

@@ -5,6 +5,7 @@
 @inject IProviderCatalogGateway Gateway
 @inject TimeProvider TimeProvider
 @inject IPendingProviderCommandStore PendingCommands
+@inject IUlidFactory UlidFactory
 
 @using Hexalith.Agents.Contracts.ProviderCatalog.Commands
 
@@ -227,7 +228,7 @@
                         else if (PendingSelectedEnablement || _enablementTruth is not null)
                         {
                             <FluentText aria-live="polite" data-testid="agents-provider-catalog-enablement-truth">
-                                @Localizer[$"Agents.ProviderCatalog.Truth.Stage.{_enablementTruth ?? "AuthoritativePending"}"]
+                                @Localizer[$"Agents.ProviderCatalog.Truth.Stage.{_enablementTruth ?? SelectedEnablementPendingTruth ?? "Unknown"}"]
                             </FluentText>
                         }
                     </FluentStack>
@@ -414,6 +415,10 @@
 
     private bool PendingSelectedEnablement => SelectedEnablementKey is { } key && _pendingEnablementCommands.ContainsKey(key);
 
+    private string? SelectedEnablementPendingTruth => SelectedEnablementKey is { } key
+        && _pendingEnablementCommands.TryGetValue(key, out PendingProviderCommand? pending)
+            ? pending.IsPrepared ? "Unknown" : "AuthoritativePending" : null;
+
     private IReadOnlyList<ProviderCatalogEntryView> VisibleRows
         => _result is { Status: ProviderCatalogInspectionStatus.Success }
             ? (_selectableOnly
@@ -455,8 +460,11 @@
                     {
                         _pendingCatalogCommands[pending.ResourceKey] = (pending.Acceptance,
                             pending.ExpectedCapabilityVersion, pending.ExpectedStatus);
-                        _pendingWrite ??= ProviderCatalogWriteResult.Submitted(pending.Acceptance);
-                        _writeTruth = AgentSetupTruthState.AuthoritativePending;
+                        if (!pending.IsPrepared)
+                        {
+                            _pendingWrite ??= ProviderCatalogWriteResult.Submitted(pending.Acceptance);
+                        }
+                        _writeTruth = pending.IsPrepared ? AgentSetupTruthState.Unknown : AgentSetupTruthState.AuthoritativePending;
                     }
                     else if (pending.Family == EnablementPendingFamily)
                     {
@@ -467,7 +475,7 @@
                                 entry.ProviderId == pending.Acceptance.ProviderId
                                 && entry.ModelId == pending.Acceptance.ModelId);
                             _enablementTenantId = pending.TenantId;
-                            _enablementTruth = "AuthoritativePending";
+                            _enablementTruth = pending.IsPrepared ? null : "AuthoritativePending";
                         }
                     }
                 }
@@ -506,7 +514,7 @@
         _enablementWrite = null;
         _enablementExpectedRevision = "0";
         _enablementEnabled = true;
-        _enablementTruth = PendingSelectedEnablement ? "AuthoritativePending" : null;
+        _enablementTruth = SelectedEnablementPendingTruth;
     }
 
     private async Task SubmitEnablementAsync()
@@ -538,30 +546,33 @@
             string providerId = _enablementEntry.ProviderId;
             string modelId = _enablementEntry.ModelId;
             string pendingKey = $"{tenantId}:{ProviderCatalogIdentity.EntryId(providerId, modelId)}";
+            var command = new SetTenantProviderModelEnablement(tenantId, providerId, modelId, _enablementEnabled, revision,
+                _enablementEnabled ? _enablementEntry.DataHandling : null);
+            PendingProviderCommand prepared = PendingProviderCommand.Prepare(EnablementPendingFamily, pendingKey, tenantId,
+                providerId, modelId, UlidFactory.NewUlid(), UlidFactory.NewUlid());
+            await PendingCommands.SaveAsync(prepared, _lifetimeCancellation.Token);
+            _pendingEnablementCommands[pendingKey] = prepared;
             _enablementWrite = await Gateway.SetTenantEnablementAsync(
-                new SetTenantProviderModelEnablement(tenantId, providerId,
-                    modelId, _enablementEnabled, revision,
-                    _enablementEnabled ? _enablementEntry.DataHandling : null),
+                command, prepared.Acceptance,
                 _lifetimeCancellation.Token).ConfigureAwait(false);
+            if (_enablementWrite.Status != AgentSetupWriteStatus.Submitted || !prepared.Matches(_enablementWrite.Acceptance))
+            {
+                _enablementWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
+                _enablementTruth = null;
+                return;
+            }
             if (_enablementWrite.Status is AgentSetupWriteStatus.Submitted)
             {
-                _enablementTruth = _enablementWrite.Acceptance?.TruthState == AgentSetupTruthState.ProjectionConfirmed
-                    ? "ProjectionConfirmed" : "Submitted";
-                if (_enablementTruth == "ProjectionConfirmed")
-                {
-                    return;
-                }
-
-                ProviderCatalogCommandAcceptance? acceptance = _enablementWrite.Acceptance;
-                if (acceptance is null)
-                {
-                    _enablementWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
-                    return;
-                }
-
-                PendingProviderCommand pending = new(EnablementPendingFamily, pendingKey, tenantId, acceptance);
-                _pendingEnablementCommands[pendingKey] = pending;
+                ProviderCatalogCommandAcceptance acceptance = _enablementWrite.Acceptance!;
+                PendingProviderCommand pending = prepared with { Acceptance = acceptance, IsPrepared = false };
                 await PendingCommands.SaveAsync(pending, _lifetimeCancellation.Token);
+                _pendingEnablementCommands[pendingKey] = pending;
+                _enablementTruth = acceptance.TruthState.ToString();
+                if (acceptance.TruthState == AgentSetupTruthState.ProjectionConfirmed)
+                {
+                    await RemovePendingEnablementAsync(pendingKey, acceptance.MessageId);
+                    return;
+                }
 
                 await RequestRenderAsync(_lifetimeCancellation.Token);
                 using CancellationTokenSource timeout = new(ProjectionPollingTimeout, TimeProvider);
@@ -572,7 +583,7 @@
                     while (true)
                     {
                         AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                            tenantId, acceptance.MessageId, polling.Token).ConfigureAwait(false);
+                            tenantId, acceptance.MessageId, acceptance.CorrelationId, polling.Token).ConfigureAwait(false);
                         if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
                         {
                             await RemovePendingEnablementAsync(pendingKey, acceptance.MessageId);
@@ -613,7 +624,8 @@
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _storeUnavailable = true;
-            _enablementTruth = "AuthoritativePending";
+            _enablementTruth = null;
+            _enablementWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
         }
         finally
         {
@@ -634,7 +646,7 @@
         try
         {
             AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                pending.TenantId, messageId, _lifetimeCancellation.Token).ConfigureAwait(false);
+                pending.TenantId, messageId, pending.Acceptance.CorrelationId, _lifetimeCancellation.Token).ConfigureAwait(false);
             if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
             {
                 await RemovePendingEnablementAsync(key, messageId);
@@ -651,6 +663,7 @@
                 await RemovePendingEnablementAsync(key, messageId);
                 if (selected)
                 {
+                    _enablementWrite = ProviderCatalogWriteResult.Submitted(pending.Acceptance with { TruthState = AgentSetupTruthState.ProjectionConfirmed });
                     _enablementTruth = "ProjectionConfirmed";
                 }
                 return;
@@ -665,18 +678,19 @@
                 await RemovePendingEnablementAsync(key, messageId);
                 if (selected)
                 {
+                    _enablementWrite = ProviderCatalogWriteResult.Submitted(pending.Acceptance with { TruthState = AgentSetupTruthState.ProjectionConfirmed });
                     _enablementTruth = "ProjectionConfirmed";
                 }
             }
             else if (selected)
             {
-                _enablementTruth = "AuthoritativePending";
+                _enablementTruth = pending.IsPrepared ? "Unknown" : "AuthoritativePending";
             }
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _storeUnavailable = true;
-            _enablementTruth = "AuthoritativePending";
+            _enablementTruth = pending.IsPrepared ? "Unknown" : "AuthoritativePending";
         }
         finally
         {
@@ -797,85 +811,62 @@
         string providerId = _providerId;
         string modelId = _modelId;
         int? expectedCapabilityVersion = _editing ? _expectedCapabilityVersion + 1 : 1;
-        return SubmitAsync(
-            async ct =>
-            {
-                bool requiresTerms = (_editing
-                        ? _editingEntry is { Status: ProviderModelStatus.Enabled } or { DataHandling: not null }
-                        : _createEnabled)
-                    || !string.IsNullOrWhiteSpace(_retentionDays)
-                    || !string.IsNullOrWhiteSpace(_processingRegions)
-                    || !string.IsNullOrWhiteSpace(_termsReference)
-                    || _trainingUse;
-                ProviderDataHandlingRecord? dataHandling = null;
-                if (!TryBuildPricing(out ProviderModelPricing? pricing) || pricing is null
-                    || requiresTerms && (!TryBuildDataHandling(out dataHandling) || dataHandling is null)
-                    || !TryBuildLimits(out int contextWindow, out int maxOutput, out ProviderModelTimeoutPolicy? timeout)
-                    || timeout is null)
-                {
-                    return ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
-                }
+        bool requiresTerms = (_editing
+                ? _editingEntry is { Status: ProviderModelStatus.Enabled } or { DataHandling: not null }
+                : _createEnabled)
+            || !string.IsNullOrWhiteSpace(_retentionDays)
+            || !string.IsNullOrWhiteSpace(_processingRegions)
+            || !string.IsNullOrWhiteSpace(_termsReference)
+            || _trainingUse;
+        ProviderDataHandlingRecord? dataHandling = null;
+        if (!TryBuildPricing(out ProviderModelPricing? pricing) || pricing is null
+            || requiresTerms && (!TryBuildDataHandling(out dataHandling) || dataHandling is null)
+            || !TryBuildLimits(out int contextWindow, out int maxOutput, out ProviderModelTimeoutPolicy? timeout)
+            || timeout is null)
+        {
+            _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed);
+            return Task.CompletedTask;
+        }
 
-                string? configurationReference = _clearConfigurationReference
-                    ? null
-                    : string.IsNullOrWhiteSpace(_configurationReference)
-                        ? _editingEntry?.ConfigurationReferenceId
-                        : _configurationReference.Trim();
-                ProviderModelCapabilityFlags flags = ProviderModelCapabilityFlags.None;
-                if (_supportsStreaming)
-                {
-                    flags |= ProviderModelCapabilityFlags.Streaming;
-                }
-                if (_supportsToolCalling)
-                {
-                    flags |= ProviderModelCapabilityFlags.ToolCalling;
-                }
-                if (_supportsVision)
-                {
-                    flags |= ProviderModelCapabilityFlags.Vision;
-                }
-                if (_supportsStructuredOutput)
-                {
-                    flags |= ProviderModelCapabilityFlags.StructuredOutput;
-                }
-                bool supportsTextGeneration = _supportsTextGeneration;
+        string? configurationReference = _clearConfigurationReference
+            ? null
+            : string.IsNullOrWhiteSpace(_configurationReference)
+                ? _editingEntry?.ConfigurationReferenceId
+                : _configurationReference.Trim();
+        ProviderModelCapabilityFlags flags = ProviderModelCapabilityFlags.None;
+        if (_supportsStreaming)
+        {
+            flags |= ProviderModelCapabilityFlags.Streaming;
+        }
+        if (_supportsToolCalling)
+        {
+            flags |= ProviderModelCapabilityFlags.ToolCalling;
+        }
+        if (_supportsVision)
+        {
+            flags |= ProviderModelCapabilityFlags.Vision;
+        }
+        if (_supportsStructuredOutput)
+        {
+            flags |= ProviderModelCapabilityFlags.StructuredOutput;
+        }
+        bool supportsTextGeneration = _supportsTextGeneration;
 
-                if (_editing)
-                {
-                    return await Gateway.UpdateAsync(
-                        new UpdateProviderModelEntry(
-                            providerId,
-                            modelId,
-                            _displayLabel,
-                            supportsTextGeneration,
-                            contextWindow,
-                            maxOutput,
-                            timeout,
-                            flags,
-                            configurationReference,
-                            pricing,
-                            _expectedCapabilityVersion,
-                            dataHandling,
-                            _declareTightening),
-                        ct).ConfigureAwait(false);
-                }
-
-                return await Gateway.CreateAsync(
-                    new CreateProviderModelEntry(
-                        providerId,
-                        modelId,
-                        _displayLabel,
-                        Enabled: _createEnabled,
-                        supportsTextGeneration,
-                        contextWindow,
-                        maxOutput,
-                        timeout,
-                        flags,
-                        configurationReference,
-                        pricing,
-                        dataHandling),
-                    ct).ConfigureAwait(false);
-            },
+        Func<ProviderCatalogCommandAcceptance, CancellationToken, Task<ProviderCatalogWriteResult>> write;
+        if (_editing)
+        {
+            var command = new UpdateProviderModelEntry(providerId, modelId, _displayLabel, supportsTextGeneration,
+                contextWindow, maxOutput, timeout, flags, configurationReference, pricing, _expectedCapabilityVersion,
+                dataHandling, _declareTightening);
+            write = (identity, ct) => Gateway.UpdateAsync(command, identity, ct);
+        }
+        else
+        {
+            var command = new CreateProviderModelEntry(providerId, modelId, _displayLabel, _createEnabled,
+                supportsTextGeneration, contextWindow, maxOutput, timeout, flags, configurationReference, pricing, dataHandling);
+            write = (identity, ct) => Gateway.CreateAsync(command, identity, ct);
+        }
+        return SubmitAsync(write,
             providerId,
             modelId,
             expectedCapabilityVersion,
@@ -884,16 +875,16 @@
 
     private Task SubmitLifecycleAsync(ProviderCatalogEntryView entry, bool enable)
         => SubmitAsync(
-            ct => enable
-                ? Gateway.EnableAsync(new EnableProviderModelEntry(entry.ProviderId, entry.ModelId, entry.LifecycleRevision), ct)
-                : Gateway.DisableAsync(new DisableProviderModelEntry(entry.ProviderId, entry.ModelId, entry.LifecycleRevision), ct),
+            (identity, ct) => enable
+                ? Gateway.EnableAsync(new EnableProviderModelEntry(entry.ProviderId, entry.ModelId, entry.LifecycleRevision), identity, ct)
+                : Gateway.DisableAsync(new DisableProviderModelEntry(entry.ProviderId, entry.ModelId, entry.LifecycleRevision), identity, ct),
             entry.ProviderId,
             entry.ModelId,
             expectedCapabilityVersion: null,
             expectedStatus: enable ? ProviderModelStatus.Enabled : ProviderModelStatus.Disabled);
 
     private async Task SubmitAsync(
-        Func<CancellationToken, Task<ProviderCatalogWriteResult>> write,
+        Func<ProviderCatalogCommandAcceptance, CancellationToken, Task<ProviderCatalogWriteResult>> write,
         string providerId,
         string modelId,
         int? expectedCapabilityVersion,
@@ -912,42 +903,47 @@
         }
 
         _busy = true;
-        ProviderCatalogWriteResult? writeResult = null;
+        PendingProviderCommand prepared = PendingProviderCommand.Prepare(CatalogPendingFamily, entryKey, "system",
+            providerId, modelId, UlidFactory.NewUlid(), UlidFactory.NewUlid(), expectedCapabilityVersion, expectedStatus);
         try
         {
             CancellationToken cancellationToken = _lifetimeCancellation.Token;
-            writeResult = await write(cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
+            await PendingCommands.SaveAsync(prepared, cancellationToken);
+            _pendingCatalogCommands[entryKey] = (prepared.Acceptance, expectedCapabilityVersion, expectedStatus);
+            ProviderCatalogWriteResult writeResult = await write(prepared.Acceptance, cancellationToken).WaitAsync(cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
-            _pendingWrite = writeResult;
-            if (_pendingWrite.Status is AgentSetupWriteStatus.Submitted)
+            if (writeResult.Status != AgentSetupWriteStatus.Submitted || !prepared.Matches(writeResult.Acceptance))
             {
-                _writeTruth = _pendingWrite.Acceptance?.TruthState ?? AgentSetupTruthState.Submitted;
-                _editorOpen = false;
-                await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
-                if (_writeTruth != AgentSetupTruthState.ProjectionConfirmed
-                    && _pendingWrite.Acceptance is { } acceptance)
-                {
-                    _pendingCatalogCommands[entryKey] = (acceptance, expectedCapabilityVersion, expectedStatus);
-                    await PendingCommands.SaveAsync(new PendingProviderCommand(CatalogPendingFamily,
-                        entryKey, "system", acceptance, expectedCapabilityVersion, expectedStatus), cancellationToken);
-                    await RefreshAfterWriteAsync(providerId, modelId, expectedCapabilityVersion,
-                        expectedStatus, acceptance, cancellationToken).ConfigureAwait(false);
-                }
+                _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
+                _writeTruth = AgentSetupTruthState.Unknown;
+                return;
             }
+            ProviderCatalogCommandAcceptance acceptance = writeResult.Acceptance!;
+            await PendingCommands.SaveAsync(prepared with { Acceptance = acceptance, IsPrepared = false }, cancellationToken);
+            _pendingCatalogCommands[entryKey] = (acceptance, expectedCapabilityVersion, expectedStatus);
+            _pendingWrite = writeResult;
+            _writeTruth = acceptance.TruthState;
+            if (acceptance.TruthState == AgentSetupTruthState.ProjectionConfirmed)
+            {
+                await RemovePendingCatalogAsync(providerId, modelId, acceptance.MessageId, cancellationToken);
+                _editorOpen = false;
+                return;
+            }
+            _editorOpen = false;
+            await RequestRenderAsync(cancellationToken).ConfigureAwait(false);
+            await RefreshAfterWriteAsync(providerId, modelId, expectedCapabilityVersion,
+                expectedStatus, acceptance, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (_disposed)
         {
         }
         catch (Exception)
         {
-            if (!_disposed && writeResult is { Status: AgentSetupWriteStatus.Submitted })
+            if (!_disposed)
             {
                 _storeUnavailable = true;
-                _writeTruth = AgentSetupTruthState.AuthoritativePending;
-            }
-            else if (!_disposed)
-            {
-                _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.Unavailable);
+                _writeTruth = AgentSetupTruthState.Unknown;
+                _pendingWrite = ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
             }
         }
         finally
@@ -976,7 +972,7 @@
             while (true)
             {
                 AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                    "system", acceptance.MessageId, pollingCancellation.Token).ConfigureAwait(false);
+                    "system", acceptance.MessageId, acceptance.CorrelationId, pollingCancellation.Token).ConfigureAwait(false);
                 if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
                 {
                     await RemovePendingCatalogAsync(providerId, modelId, acceptance.MessageId, cancellationToken);
@@ -1026,7 +1022,7 @@
         {
             ProviderCatalogCommandAcceptance acceptance = pending.Acceptance;
             AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                "system", acceptance.MessageId, _lifetimeCancellation.Token).ConfigureAwait(false);
+                "system", acceptance.MessageId, acceptance.CorrelationId, _lifetimeCancellation.Token).ConfigureAwait(false);
             if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
             {
                 await RemovePendingCatalogAsync(acceptance.ProviderId, acceptance.ModelId,
@@ -1040,6 +1036,7 @@
             {
                 await RemovePendingCatalogAsync(acceptance.ProviderId, acceptance.ModelId,
                     acceptance.MessageId, _lifetimeCancellation.Token);
+                _pendingWrite = ProviderCatalogWriteResult.Submitted(acceptance with { TruthState = AgentSetupTruthState.ProjectionConfirmed });
                 _writeTruth = AgentSetupTruthState.ProjectionConfirmed;
                 return;
             }
@@ -1051,17 +1048,20 @@
             {
                 await RemovePendingCatalogAsync(acceptance.ProviderId, acceptance.ModelId,
                     acceptance.MessageId, _lifetimeCancellation.Token);
+                _pendingWrite = ProviderCatalogWriteResult.Submitted(acceptance with { TruthState = AgentSetupTruthState.ProjectionConfirmed });
                 _writeTruth = AgentSetupTruthState.ProjectionConfirmed;
             }
             else
             {
-                _writeTruth = AgentSetupTruthState.AuthoritativePending;
+                _writeTruth = acceptance.TruthState == AgentSetupTruthState.Unknown
+                    ? AgentSetupTruthState.Unknown : AgentSetupTruthState.AuthoritativePending;
             }
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _storeUnavailable = true;
-            _writeTruth = AgentSetupTruthState.AuthoritativePending;
+            _writeTruth = pending.Acceptance.TruthState == AgentSetupTruthState.Unknown
+                ? AgentSetupTruthState.Unknown : AgentSetupTruthState.AuthoritativePending;
         }
         finally
         {
@@ -1073,6 +1073,7 @@
     {
         await PendingCommands.RemoveAsync(EnablementPendingFamily, key, messageId, _lifetimeCancellation.Token);
         _pendingEnablementCommands.Remove(key);
+        _storeUnavailable = false;
     }
 
     private async Task RemovePendingCatalogAsync(string providerId, string modelId,
@@ -1081,6 +1082,7 @@
         string key = ProviderCatalogIdentity.EntryId(providerId, modelId);
         await PendingCommands.RemoveAsync(CatalogPendingFamily, key, messageId, cancellationToken);
         _pendingCatalogCommands.Remove(key);
+        _storeUnavailable = false;
     }
 
     private async Task<bool> LoadAfterWriteAsync(

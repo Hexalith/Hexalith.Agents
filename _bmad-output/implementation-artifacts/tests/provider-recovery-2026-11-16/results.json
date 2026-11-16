@@ -1,0 +1,46 @@
+{
+  "harness_exit": 1,
+  "harness_status": "source-blocked",
+  "runnable_tests": "passed",
+  "total_passed": 5244,
+  "suites": {
+    "package-Server": {
+      "total": 1888,
+      "passed": 1888,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "source-Client": {
+      "total": 7,
+      "passed": 7,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "source-Contracts": {
+      "total": 2005,
+      "passed": 2005,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    },
+    "source-UI": {
+      "total": 1344,
+      "passed": 1344,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0
+    }
+  },
+  "source_blocker": "Conversations requires the Platform tool-selected source mapping; validation does not resolve dependency mappings.",
+  "whitespace_command": "git -c core.whitespace=cr-at-eol diff --check",
+  "whitespace_exit": 0,
+  "context_assertions_passed": 13,
+  "no_live_owner_qualification": true,
+  "coordinator_review_fixes_verified": true
+}

@@ -112,6 +112,15 @@ public abstract class AgentsTestContext : FrontComposerTestBase
         Authorization = AddAuthorization();
     }
 
+    /// <summary>Uses the fixed receipt identities expected by a catalog interaction fixture.</summary>
+    protected void UseCatalogIdentities(params string[] values)
+    {
+        var factory = Substitute.For<Hexalith.FrontComposer.Contracts.Lifecycle.IUlidFactory>();
+        int index = 0;
+        factory.NewUlid().Returns(_ => values[index++ % values.Length]);
+        Services.AddSingleton(factory);
+    }
+
     /// <summary>The substituted Agent status/configuration read gateway.</summary>
     protected IAgentSetupGateway SetupGateway { get; } = Substitute.For<IAgentSetupGateway>();
 

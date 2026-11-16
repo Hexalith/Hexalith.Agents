@@ -1,0 +1,16 @@
+{
+  "total": 156,
+  "passed": 156,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "not-run": 0,
+  "classes": {
+    "Hexalith.Agents.UI.Tests.AgentsClientProviderCatalogGatewayTests": 29,
+    "Hexalith.Agents.UI.Tests.PendingProviderCommandStoreTests": 52,
+    "Hexalith.Agents.UI.Tests.ProviderCatalogGovernanceUiTests": 38,
+    "Hexalith.Agents.UI.Tests.ProviderCatalogTests": 9,
+    "Hexalith.Agents.UI.Tests.ProviderCatalogUiTests": 7,
+    "Hexalith.Agents.UI.Tests.ProviderRecoveryUiTests": 21
+  }
+}

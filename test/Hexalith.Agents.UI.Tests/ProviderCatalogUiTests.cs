@@ -38,7 +38,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
 
         await cut.Find("[data-testid='agents-provider-catalog-save']").ClickAsync(new MouseEventArgs());
 
-        await CatalogGateway.DidNotReceive().CreateAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<CancellationToken>());
+        await CatalogGateway.DidNotReceive().CreateAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>());
         cut.Find("[data-testid='agents-provider-catalog-truth']").TextContent
             .ShouldContain("Agents.ProviderCatalog.Write.Status.ValidationFailed");
     }
@@ -46,14 +46,15 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
     [Fact]
     public async Task Platform_operator_can_submit_scoped_tenant_enablement()
     {
+        UseCatalogIdentities("msg-tenant", "corr-tenant");
         var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1);
         ProviderCatalogEntryView entry = AgentUiTestData.Entry("openai", "gpt-x") with { DataHandling = terms };
         CatalogGateway.ListEntriesAsync(Arg.Any<bool>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogInspectionResult.Success([entry])));
-        CatalogGateway.SetTenantEnablementAsync(Arg.Any<SetTenantProviderModelEnablement>(), Arg.Any<CancellationToken>())
+        CatalogGateway.SetTenantEnablementAsync(Arg.Any<SetTenantProviderModelEnablement>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
                 "openai", "gpt-x", "msg-tenant", "corr-tenant", AgentSetupTruthState.Submitted))));
-        CatalogGateway.GetCommandOutcomeAsync("tenant-a", "msg-tenant", Arg.Any<CancellationToken>())
+        CatalogGateway.GetCommandOutcomeAsync("tenant-a", "msg-tenant", Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteStatus.AwaitingProjection));
         CatalogGateway.GetTenantEnablementAsync("tenant-a", "openai", "gpt-x", Arg.Any<CancellationToken>())
             .Returns(
@@ -83,7 +84,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
                 && command.ProviderId == "openai" && command.ModelId == "gpt-x"
                 && command.Enabled && command.ExpectedRevision == 2
                 && command.CurrentTerms == terms),
-            Arg.Any<CancellationToken>());
+            Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>());
         cut.Find("[data-testid='agents-provider-catalog-enablement-truth']").TextContent
             .ShouldContain("Agents.ProviderCatalog.Truth.Stage.ProjectionConfirmed");
     }
@@ -107,6 +108,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
     [Fact]
     public async Task Tenant_admin_confirms_the_exact_terms_fields_and_justification()
     {
+        UseCatalogIdentities("msg-decision", "corr-decision");
         var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v2", 2);
         var entry = new TenantProviderCatalogEntryView("openai", "gpt-x", "OpenAI GPT-x", true,
             true, true, 128_000, 16_000, new ProviderModelTimeoutPolicy(30_000, 3),
@@ -126,10 +128,10 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
                 Task.FromResult(new TenantProviderCatalogInspectionResult(ProviderCatalogInspectionStatus.Success, [confirmed])),
                 Task.FromResult(new TenantProviderCatalogInspectionResult(ProviderCatalogInspectionStatus.Success, [confirmedOwn],
                     ProjectedCommandMessageIds: ["msg-decision"])));
-        CatalogGateway.DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(), Arg.Any<CancellationToken>())
+        CatalogGateway.DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(new ProviderCatalogCommandAcceptance(
                 "openai", "gpt-x", "msg-decision", "corr-decision", AgentSetupTruthState.Submitted))));
-        CatalogGateway.GetCommandOutcomeAsync("current", "msg-decision", Arg.Any<CancellationToken>())
+        CatalogGateway.GetCommandOutcomeAsync("current", "msg-decision", Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteStatus.AwaitingProjection));
 
         IRenderedComponent<TenantProviderCatalog> cut = RenderPage<TenantProviderCatalog>();
@@ -149,13 +151,14 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
                 && decision.ModelId == "gpt-x" && decision.DataHandlingVersion == 2
                 && decision.Accepted && decision.Justification == "Approved after review"
                 && decision.ExpectedRevision == 3 && decision.ConfirmedTerms == terms),
-            Arg.Any<CancellationToken>());
+            Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>());
         cut.Markup.ShouldNotContain(SentinelReference);
     }
 
     [Fact]
     public async Task A_submitted_create_polls_until_projection_confirmed()
     {
+        UseCatalogIdentities("msg-1", "corr-1");
         ProviderCatalogInspectionResult empty = ProviderCatalogInspectionResult.Success([]);
         ProviderCatalogInspectionResult pendingMiss = ProviderCatalogInspectionResult.NotFound() with
         {
@@ -181,7 +184,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
             .Returns(
                 Task.FromResult(pendingMiss),
                 Task.FromResult(confirmed));
-        CatalogGateway.CreateAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<CancellationToken>())
+        CatalogGateway.CreateAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(
                 new ProviderCatalogCommandAcceptance(
                     "openai",
@@ -189,7 +192,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
                     "msg-1",
                     "corr-1",
                     AgentSetupTruthState.Submitted))));
-        CatalogGateway.GetCommandOutcomeAsync("system", "msg-1", Arg.Any<CancellationToken>())
+        CatalogGateway.GetCommandOutcomeAsync("system", "msg-1", Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteStatus.AwaitingProjection));
 
         IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
@@ -222,13 +225,14 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
             cut.Markup.ShouldNotContain("Callable");
         });
 
-        await CatalogGateway.Received().CreateAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<CancellationToken>());
+        await CatalogGateway.Received().CreateAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>());
         await CatalogGateway.Received().GetEntryAsync("openai", "gpt-x", 1, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Disable_polls_until_the_row_status_matches()
     {
+        UseCatalogIdentities("msg-2", "corr-2");
         ProviderCatalogEntryView enabled = AgentUiTestData.Entry("openai", "gpt-x");
         ProviderCatalogEntryView disabled = enabled with
         {
@@ -258,7 +262,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
             .Returns(
                 Task.FromResult(enabledList),
                 Task.FromResult(disabledConfirmed));
-        CatalogGateway.DisableAsync(Arg.Any<DisableProviderModelEntry>(), Arg.Any<CancellationToken>())
+        CatalogGateway.DisableAsync(Arg.Any<DisableProviderModelEntry>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ProviderCatalogWriteResult.Submitted(
                 new ProviderCatalogCommandAcceptance(
                     "openai",
@@ -266,7 +270,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
                     "msg-2",
                     "corr-2",
                     AgentSetupTruthState.Submitted))));
-        CatalogGateway.GetCommandOutcomeAsync("system", "msg-2", Arg.Any<CancellationToken>())
+        CatalogGateway.GetCommandOutcomeAsync("system", "msg-2", Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(AgentSetupWriteStatus.AwaitingProjection));
 
         IRenderedComponent<ProviderCatalog> cut = RenderPage<ProviderCatalog>();
@@ -282,7 +286,7 @@ public sealed class ProviderCatalogUiTests : AgentsTestContext
         Clock.Advance(TimeSpan.FromMilliseconds(200));
         await submission;
 
-        await CatalogGateway.Received().DisableAsync(Arg.Any<DisableProviderModelEntry>(), Arg.Any<CancellationToken>());
+        await CatalogGateway.Received().DisableAsync(Arg.Any<DisableProviderModelEntry>(), Arg.Any<ProviderCatalogCommandAcceptance>(), Arg.Any<CancellationToken>());
         await CatalogGateway.Received().GetEntryAsync("openai", "gpt-x", null, Arg.Any<CancellationToken>());
         await CatalogGateway.DidNotReceive().GetEntryAsync("openai", "gpt-x", 1, Arg.Any<CancellationToken>());
     }

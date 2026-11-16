@@ -139,6 +139,34 @@ public sealed class EventStoreProviderCatalogOperationsTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task UnsupportedStatusScopePreventsEveryPlatformMutation(bool sdk)
+    {
+        IAgentCommandStatusReader reader = sdk ? new EventStoreAgentCommandStatusReader(_ => _gateway) : new DeferredAgentCommandStatusReader();
+        IProviderCatalogOperations operations = Operations(statusReader: reader);
+        reader.SupportsScope("system", "provider-catalog").ShouldBeFalse();
+        (await operations.CreateEntryAsync(CreateCommand())).Status.ShouldBe(AgentOperationStatus.Unavailable);
+        (await operations.UpdateEntryAsync(new UpdateProviderModelEntry("openai", "gpt", "model", true, 1000, 100, new ProviderModelTimeoutPolicy(30_000, 3),
+            ProviderModelCapabilityFlags.None, "config", new ProviderModelPricing("USD", 1m, 1m, 1), 1))).Status.ShouldBe(AgentOperationStatus.Unavailable);
+        (await operations.EnableEntryAsync(new EnableProviderModelEntry("openai", "gpt"))).Status.ShouldBe(AgentOperationStatus.Unavailable);
+        (await operations.DisableEntryAsync(new DisableProviderModelEntry("openai", "gpt"))).Status.ShouldBe(AgentOperationStatus.Unavailable);
+        _submitted.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task AuthorizationPrecedesCapabilityDisclosure()
+    {
+        IAgentCommandStatusReader reader = Substitute.For<IAgentCommandStatusReader>();
+        _contextProvider.GetContext().Returns(new AgentAdministrationContext(TenantId, "user", IsAgentsAdmin: false));
+        (await Operations(statusReader: reader).CreateEntryAsync(CreateCommand())).Status.ShouldBe(AgentOperationStatus.NotAuthorized);
+        (await Operations(statusReader: reader).UpdateEntryAsync(new UpdateProviderModelEntry("openai", "gpt", "model", true,
+            1000, 100, new ProviderModelTimeoutPolicy(30_000, 3), ProviderModelCapabilityFlags.None, "config", new ProviderModelPricing("USD", 1m, 1m, 1), 1))).Status.ShouldBe(AgentOperationStatus.NotAuthorized);
+        reader.DidNotReceiveWithAnyArgs().SupportsScope(default!, default!);
+        _submitted.ShouldBeEmpty();
+    }
+
     public static TheoryData<string, bool, string> InvalidProviderWriteIdentities()
     {
         TheoryData<string, bool, string> data = [];
@@ -1239,7 +1267,7 @@ public sealed class EventStoreProviderCatalogOperationsTests
             new ProviderCatalogAdministrationOrchestrator(dispatcher),
             store ?? _store,
             Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }),
-            identityFactory ?? new AgentCommandIdentityFactory(), clock, _gateway, statusReader);
+            identityFactory ?? new AgentCommandIdentityFactory(), clock, _gateway, statusReader ?? new CapableProviderCommandStatusReader(_gateway));
     }
 
     private void SeedProjectedEntry(int capabilityVersion)

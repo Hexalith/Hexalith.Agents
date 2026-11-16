@@ -9,6 +9,11 @@ internal sealed class EventStoreAgentCommandStatusReader(
     Func<string, IEventStoreGatewayClient> gatewayFactory) : IAgentCommandStatusReader
 {
     /// <inheritdoc />
+    public bool SupportsScope(string tenantId, string domain)
+        => !string.IsNullOrWhiteSpace(tenantId) && !string.IsNullOrWhiteSpace(domain)
+            && !string.Equals(tenantId, "system", StringComparison.Ordinal);
+
+    /// <inheritdoc />
     public Task<bool?> WasRejectedAsync(string messageId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

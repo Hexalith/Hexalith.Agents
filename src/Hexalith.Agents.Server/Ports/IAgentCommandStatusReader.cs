@@ -10,6 +10,12 @@ namespace Hexalith.Agents.Server.Ports;
 /// </summary>
 public interface IAgentCommandStatusReader
 {
+    /// <summary>Reports explicit support for observing terminal truth in the exact command scope.</summary>
+    /// <param name="tenantId">The authorized command tenant.</param>
+    /// <param name="domain">The exact command domain.</param>
+    /// <returns>True only when the host can observe terminal status in this scope.</returns>
+    bool SupportsScope(string tenantId, string domain) => false;
+
     /// <summary>Reads whether the dispatched command was domain-rejected.</summary>
     /// <param name="messageId">The canonical command message identity from the receipt.</param>
     /// <param name="ct">The cancellation token.</param>

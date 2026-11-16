@@ -115,6 +115,7 @@ public sealed class ProviderCatalogAuthorityLifetimeTests
     [InlineData(null, AgentSetupTruthState.Submitted)]
     public async Task AcceptedProviderAcknowledgementSurvivesAuthorityExpiry(string? effect, AgentSetupTruthState expected)
     {
+        _status.SupportsScope("system", "provider-catalog").Returns(true);
         DateTimeOffset deadline = _clock.Now.AddSeconds(30);
         Configure("none", "current");
         _context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(call => new AgentAdministrationContext(
@@ -132,7 +133,7 @@ public sealed class ProviderCatalogAuthorityLifetimeTests
 
         result.Value.ShouldNotBeNull().TruthState.ShouldBe(expected);
         result.Value.MessageId.ShouldBe(MessageId);
-        _status.ReceivedCalls().ShouldBeEmpty();
+        _status.ReceivedCalls().Count().ShouldBe(1); // Capability is checked before dispatch; expired authority prevents later status reads.
     }
 
     /// <summary>Refreshing a nested context cannot extend the operation's originating authority deadline.</summary>

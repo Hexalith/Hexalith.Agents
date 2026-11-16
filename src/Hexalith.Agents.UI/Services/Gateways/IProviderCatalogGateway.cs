@@ -17,6 +17,11 @@ public interface IProviderCatalogGateway
     Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
         string targetTenantId, string messageId, CancellationToken cancellationToken);
 
+    /// <summary>Reads terminal truth for the original exact message and correlation identities.</summary>
+    Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
+        string targetTenantId, string messageId, string correlationId, CancellationToken cancellationToken)
+        => Task.FromResult(AgentSetupWriteStatus.UnableToVerify);
+
     /// <summary>Reads platform-authorized tenant enablement for write confirmation.</summary>
     Task<TenantProviderEnablementInspectionResult> GetTenantEnablementAsync(
         string tenantId, string providerId, string modelId, CancellationToken cancellationToken);
@@ -78,4 +83,28 @@ public interface IProviderCatalogGateway
     /// <param name="cancellationToken">Cancellation token for the in-flight write.</param>
     /// <returns>The structured write result.</returns>
     Task<ProviderCatalogWriteResult> DisableAsync(DisableProviderModelEntry command, CancellationToken cancellationToken);
+    /// <summary>Submits a write using its previously persisted exact identity; unsupported bindings refuse dispatch.</summary>
+    Task<ProviderCatalogWriteResult> CreateAsync(CreateProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+        => Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+
+    /// <summary>Submits a write using its previously persisted exact identity; unsupported bindings refuse dispatch.</summary>
+    Task<ProviderCatalogWriteResult> UpdateAsync(UpdateProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+        => Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+
+    /// <summary>Submits a write using its previously persisted exact identity; unsupported bindings refuse dispatch.</summary>
+    Task<ProviderCatalogWriteResult> EnableAsync(EnableProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+        => Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+
+    /// <summary>Submits a write using its previously persisted exact identity; unsupported bindings refuse dispatch.</summary>
+    Task<ProviderCatalogWriteResult> DisableAsync(DisableProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+        => Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+
+    /// <summary>Submits a write using its previously persisted exact identity; unsupported bindings refuse dispatch.</summary>
+    Task<ProviderCatalogWriteResult> SetTenantEnablementAsync(SetTenantProviderModelEnablement command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+        => Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+
+    /// <summary>Submits a write using its previously persisted exact identity; unsupported bindings refuse dispatch.</summary>
+    Task<ProviderCatalogWriteResult> DecideDataHandlingAsync(DecideProviderDataHandling command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+        => Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify));
+
 }

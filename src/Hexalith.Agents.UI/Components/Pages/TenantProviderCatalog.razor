@@ -5,6 +5,7 @@
 @inject IProviderCatalogGateway Gateway
 @inject TimeProvider TimeProvider
 @inject IPendingProviderCommandStore PendingCommands
+@inject IUlidFactory UlidFactory
 
 @using Hexalith.Agents.Contracts.ProviderCatalog.Commands
 
@@ -147,12 +148,12 @@
     private bool _pendingRestoring = true;
     private bool _storeUnavailable;
     private const string PendingFamily = "DataHandlingAcceptance";
-    private readonly Dictionary<string, string> _pendingDecisionMessageIds = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, PendingProviderCommand> _pendingDecisions = new(StringComparer.Ordinal);
 
     private string? SelectedKey => _selected is null
         ? null : ProviderCatalogIdentity.EntryId(_selected.ProviderId, _selected.ModelId);
 
-    private bool PendingSelectedDecision => SelectedKey is { } key && _pendingDecisionMessageIds.ContainsKey(key);
+    private bool PendingSelectedDecision => SelectedKey is { } key && _pendingDecisions.ContainsKey(key);
 
     protected override async Task OnInitializedAsync()
     {
@@ -173,7 +174,7 @@
             {
                 if (pending.Family == PendingFamily)
                 {
-                    _pendingDecisionMessageIds[pending.ResourceKey] = pending.Acceptance.MessageId;
+                    _pendingDecisions[pending.ResourceKey] = pending;
                 }
             }
         }
@@ -231,7 +232,8 @@
                             || !ProviderDataHandlingPolicy.SameSnapshot(previousTerms, currentTerms)))
                     {
                         _justification = string.Empty;
-                        _truth = PendingSelectedDecision ? "AuthoritativePending" : null;
+                        _truth = SelectedKey is { } key && _pendingDecisions.TryGetValue(key, out PendingProviderCommand? pending)
+                            ? pending.IsPrepared ? "Unknown" : "AuthoritativePending" : null;
                         _writeFailure = null;
                     }
                     _selected = replacement;
@@ -263,7 +265,8 @@
     {
         _selected = entry;
         _justification = string.Empty;
-        _truth = PendingSelectedDecision ? "AuthoritativePending" : null;
+        _truth = SelectedKey is { } key && _pendingDecisions.TryGetValue(key, out PendingProviderCommand? pending)
+            ? pending.IsPrepared ? "Unknown" : "AuthoritativePending" : null;
         _writeFailure = null;
     }
 
@@ -280,17 +283,31 @@
         {
             var command = new DecideProviderDataHandling(_selected.ProviderId, _selected.ModelId,
                 terms.DataHandlingVersion, accepted, _justification.Trim(), _selected.TenantRevision, terms, default);
-            ProviderCatalogWriteResult write = await Gateway.DecideDataHandlingAsync(command, _lifetime.Token);
-            _truth = write.Status is AgentSetupWriteStatus.Submitted
-                ? write.Acceptance?.TruthState == AgentSetupTruthState.ProjectionConfirmed ? "ProjectionConfirmed" : "Submitted"
-                : null;
-            _writeFailure = write.Status is AgentSetupWriteStatus.Submitted ? null : write.Status;
-            if (write is { Status: AgentSetupWriteStatus.Submitted, Acceptance: { TruthState: not AgentSetupTruthState.ProjectionConfirmed } acceptance })
+            string decisionKey = ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId);
+            PendingProviderCommand prepared = PendingProviderCommand.Prepare(PendingFamily, decisionKey, "current",
+                command.ProviderId, command.ModelId, UlidFactory.NewUlid(), UlidFactory.NewUlid());
+            await PendingCommands.SaveAsync(prepared, _lifetime.Token);
+            _pendingDecisions[decisionKey] = prepared;
+            ProviderCatalogWriteResult write = await Gateway.DecideDataHandlingAsync(command, prepared.Acceptance, _lifetime.Token);
+            if (write.Status != AgentSetupWriteStatus.Submitted || !prepared.Matches(write.Acceptance))
             {
-                string decisionKey = ProviderCatalogIdentity.EntryId(command.ProviderId, command.ModelId);
-                _pendingDecisionMessageIds[decisionKey] = acceptance.MessageId;
-                await PendingCommands.SaveAsync(new PendingProviderCommand(PendingFamily, decisionKey,
-                    "current", acceptance), _lifetime.Token);
+                _truth = null;
+                _writeFailure = AgentSetupWriteStatus.UnableToVerify;
+                return;
+            }
+            _truth = "Submitted";
+            _writeFailure = null;
+            if (write is { Status: AgentSetupWriteStatus.Submitted, Acceptance: { } acceptance })
+            {
+                PendingProviderCommand acknowledged = prepared with { Acceptance = acceptance, IsPrepared = false };
+                await PendingCommands.SaveAsync(acknowledged, _lifetime.Token);
+                _pendingDecisions[decisionKey] = acknowledged;
+                if (acceptance.TruthState == AgentSetupTruthState.ProjectionConfirmed)
+                {
+                    await RemovePendingDecisionAsync(decisionKey, acceptance.MessageId);
+                    _truth = "ProjectionConfirmed";
+                    return;
+                }
                 await InvokeAsync(StateHasChanged);
                 using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(8), TimeProvider);
                 using CancellationTokenSource polling = CancellationTokenSource.CreateLinkedTokenSource(
@@ -300,7 +317,7 @@
                     while (true)
                     {
                         AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                            "current", acceptance.MessageId, polling.Token);
+                            "current", acceptance.MessageId, acceptance.CorrelationId, polling.Token);
                         if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
                         {
                             await RemovePendingDecisionAsync(decisionKey, acceptance.MessageId);
@@ -343,7 +360,8 @@
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _storeUnavailable = true;
-            _truth = "AuthoritativePending";
+            _truth = null;
+            _writeFailure = AgentSetupWriteStatus.UnableToVerify;
         }
         finally
         {
@@ -353,16 +371,17 @@
 
     private async Task CheckPendingDecisionAsync()
     {
-        if (_busy || SelectedKey is not { } key || !_pendingDecisionMessageIds.TryGetValue(key, out string? messageId))
+        if (_busy || SelectedKey is not { } key || !_pendingDecisions.TryGetValue(key, out PendingProviderCommand? pending))
         {
             return;
         }
 
+        string messageId = pending.Acceptance.MessageId;
         _busy = true;
         try
         {
             AgentSetupWriteStatus outcome = await Gateway.GetCommandOutcomeAsync(
-                "current", messageId, _lifetime.Token);
+                "current", messageId, pending.Acceptance.CorrelationId, _lifetime.Token);
             if (outcome is AgentSetupWriteStatus.Rejected or AgentSetupWriteStatus.Unavailable)
             {
                 await RemovePendingDecisionAsync(key, messageId);
@@ -374,6 +393,7 @@
             if (outcome is AgentSetupWriteStatus.AlreadyApplied)
             {
                 await RemovePendingDecisionAsync(key, messageId);
+                _writeFailure = null;
                 _truth = "ProjectionConfirmed";
                 return;
             }
@@ -386,17 +406,19 @@
                 await RemovePendingDecisionAsync(key, messageId);
                 _selected = _result.Entries.FirstOrDefault(item =>
                     ProviderCatalogIdentity.EntryId(item.ProviderId, item.ModelId) == key);
+                _writeFailure = null;
                 _truth = "ProjectionConfirmed";
             }
             else
             {
-                _truth = "AuthoritativePending";
+                _truth = pending.IsPrepared ? "Unknown" : "AuthoritativePending";
             }
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _storeUnavailable = true;
-            _truth = "AuthoritativePending";
+            _truth = pending.IsPrepared ? "Unknown" : null;
+            _writeFailure = AgentSetupWriteStatus.UnableToVerify;
         }
         finally
         {
@@ -407,7 +429,8 @@
     private async Task RemovePendingDecisionAsync(string key, string messageId)
     {
         await PendingCommands.RemoveAsync(PendingFamily, key, messageId, _lifetime.Token);
-        _pendingDecisionMessageIds.Remove(key);
+        _pendingDecisions.Remove(key);
+        _storeUnavailable = false;
     }
 
     public void Dispose()

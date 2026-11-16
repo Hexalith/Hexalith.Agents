@@ -26,6 +26,87 @@ public sealed class AgentsClientProviderCatalogGatewayTests
     public AgentsClientProviderCatalogGatewayTests() => _client.ProviderCatalog.Returns(_operations);
 
     [Theory]
+    [InlineData("create", false)]
+    [InlineData("create", true)]
+    [InlineData("update", false)]
+    [InlineData("update", true)]
+    [InlineData("enable", false)]
+    [InlineData("enable", true)]
+    [InlineData("disable", false)]
+    [InlineData("disable", true)]
+    [InlineData("enablement", false)]
+    [InlineData("enablement", true)]
+    [InlineData("decision", false)]
+    [InlineData("decision", true)]
+    public async Task PreparedWritePassesCanonicalOptionsAndRefusesMismatchedAcceptance(string operation, bool mismatch)
+    {
+        var identity = new ProviderCatalogCommandAcceptance("openai", "gpt", "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "01ARZ3NDEKTSV4RRFFQ69G5FAW", AgentSetupTruthState.Unknown);
+        AgentOperationResult<ProviderCatalogCommandAcceptance> Accept(AgentOperationOptions options)
+        {
+            options.IdempotencyKey.ShouldBe(identity.MessageId);
+            options.CorrelationId.ShouldBe(identity.CorrelationId);
+            return AgentOperationResult<ProviderCatalogCommandAcceptance>.Succeeded(new("openai", "gpt",
+                mismatch ? "01ARZ3NDEKTSV4RRFFQ69G5FAX" : options.IdempotencyKey!, options.CorrelationId!, AgentSetupTruthState.Submitted));
+        }
+        _operations.CreateEntryAsync(Arg.Any<CreateProviderModelEntry>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call => Accept(call.Arg<AgentOperationOptions>()));
+        _operations.UpdateEntryAsync(Arg.Any<UpdateProviderModelEntry>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call => Accept(call.Arg<AgentOperationOptions>()));
+        _operations.EnableEntryAsync(Arg.Any<EnableProviderModelEntry>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call => Accept(call.Arg<AgentOperationOptions>()));
+        _operations.DisableEntryAsync(Arg.Any<DisableProviderModelEntry>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call => Accept(call.Arg<AgentOperationOptions>()));
+        _operations.SetTenantEnablementAsync(Arg.Any<SetTenantProviderModelEnablement>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call => Accept(call.Arg<AgentOperationOptions>()));
+        _operations.DecideDataHandlingAsync(Arg.Any<DecideProviderDataHandling>(), Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(call => Accept(call.Arg<AgentOperationOptions>()));
+        var pricing = new ProviderModelPricing("USD", 1m, 1m, 1);
+        var terms = new ProviderDataHandlingRecord(14, false, ["EU"], "terms-v1", 1);
+        ProviderCatalogWriteResult result = operation switch
+        {
+            "create" => await Gateway().CreateAsync(new("openai", "gpt", "Model", true, true, 1000, 100,
+                new(30_000, 3), ProviderModelCapabilityFlags.None, null, pricing), identity, CancellationToken.None),
+            "update" => await Gateway().UpdateAsync(new("openai", "gpt", "Model", true, 1000, 100,
+                new(30_000, 3), ProviderModelCapabilityFlags.None, null, pricing, 1), identity, CancellationToken.None),
+            "enable" => await Gateway().EnableAsync(new("openai", "gpt"), identity, CancellationToken.None),
+            "disable" => await Gateway().DisableAsync(new("openai", "gpt"), identity, CancellationToken.None),
+            "enablement" => await Gateway().SetTenantEnablementAsync(new("tenant-a", "openai", "gpt", false, 0, null), identity, CancellationToken.None),
+            _ => await Gateway().DecideDataHandlingAsync(new("openai", "gpt", 1, true, "Reviewed", 0, terms, default), identity, CancellationToken.None),
+        };
+        result.Status.ShouldBe(mismatch ? AgentSetupWriteStatus.UnableToVerify : AgentSetupWriteStatus.Submitted);
+        if (!mismatch)
+        {
+            result.Acceptance.ShouldNotBeNull().MessageId.ShouldBe(identity.MessageId);
+            result.Acceptance.CorrelationId.ShouldBe(identity.CorrelationId);
+        }
+        _operations.ReceivedCalls().ShouldHaveSingleItem().GetArguments()[1].ShouldBeOfType<AgentOperationOptions>()
+            .ShouldBe(new AgentOperationOptions(identity.CorrelationId, identity.MessageId));
+    }
+
+    [Fact]
+    public async Task RecoveryPollingBindsTheOriginalCorrelation()
+    {
+        const string correlation = "01ARZ3NDEKTSV4RRFFQ69G5FAW";
+        _operations.GetCommandWriteOutcomeAsync("system", "message", Arg.Any<AgentOperationOptions>(), Arg.Any<CancellationToken>())
+            .Returns(AgentOperationResult<AgentSetupWriteOutcome>.Succeeded(AgentSetupWriteOutcome.AlreadyApplied));
+        (await Gateway().GetCommandOutcomeAsync("system", "message", correlation, CancellationToken.None))
+            .ShouldBe(AgentSetupWriteStatus.AlreadyApplied);
+        await _operations.Received(1).GetCommandWriteOutcomeAsync("system", "message",
+            Arg.Is<AgentOperationOptions>(options => options.CorrelationId == correlation), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeferredPreparedBindingRefusesSafely()
+    {
+        IProviderCatalogGateway deferred = new DeferredProviderCatalogGateway();
+        ProviderCatalogWriteResult result = await deferred.DisableAsync(new("openai", "gpt"),
+            new("openai", "gpt", "01ARZ3NDEKTSV4RRFFQ69G5FAV", "01ARZ3NDEKTSV4RRFFQ69G5FAW", AgentSetupTruthState.Unknown),
+            CancellationToken.None);
+        result.Status.ShouldBe(AgentSetupWriteStatus.UnableToVerify);
+    }
+
+    [Theory]
     [InlineData(AgentOperationErrorCode.NotAuthorized, AgentSetupWriteStatus.NotAuthorized)]
     [InlineData(AgentOperationErrorCode.NotFound, AgentSetupWriteStatus.NotFound)]
     [InlineData(AgentOperationErrorCode.ValidationFailed, AgentSetupWriteStatus.ValidationFailed)]

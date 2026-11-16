@@ -19,11 +19,20 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
     private readonly IAgentsClient _client = client ?? throw new ArgumentNullException(nameof(client));
 
     /// <inheritdoc />
-    public async Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
+    public Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
         string targetTenantId, string messageId, CancellationToken cancellationToken)
+        => ReadCommandOutcomeAsync(targetTenantId, messageId, null, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<AgentSetupWriteStatus> GetCommandOutcomeAsync(
+        string targetTenantId, string messageId, string correlationId, CancellationToken cancellationToken)
+        => ReadCommandOutcomeAsync(targetTenantId, messageId, correlationId, cancellationToken);
+
+    private async Task<AgentSetupWriteStatus> ReadCommandOutcomeAsync(
+        string targetTenantId, string messageId, string? correlationId, CancellationToken cancellationToken)
     {
         AgentOperationResult<AgentSetupWriteOutcome> result = await _client.ProviderCatalog
-            .GetCommandWriteOutcomeAsync(targetTenantId, messageId, cancellationToken: cancellationToken)
+            .GetCommandWriteOutcomeAsync(targetTenantId, messageId, new AgentOperationOptions(correlationId), cancellationToken)
             .ConfigureAwait(false);
         return result.IsSuccess && result.Value is { } status
             ? status switch
@@ -133,6 +142,113 @@ public sealed class AgentsClientProviderCatalogGateway(IAgentsClient client) : I
         ArgumentNullException.ThrowIfNull(command);
         return WriteAsync(ct => _client.ProviderCatalog.DisableEntryAsync(command, cancellationToken: ct), cancellationToken);
     }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> CreateAsync(CreateProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(identity);
+        if (identity.ProviderId != command.ProviderId || identity.ModelId != command.ModelId
+            || identity.TruthState != AgentSetupTruthState.Unknown
+            || !IsCanonicalIdentity(identity.MessageId) || !IsCanonicalIdentity(identity.CorrelationId))
+        {
+            return Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        }
+        return WritePreparedAsync(identity, ct => _client.ProviderCatalog.CreateEntryAsync(command,
+            new AgentOperationOptions(identity.CorrelationId, identity.MessageId), ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> UpdateAsync(UpdateProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(identity);
+        if (identity.ProviderId != command.ProviderId || identity.ModelId != command.ModelId
+            || identity.TruthState != AgentSetupTruthState.Unknown
+            || !IsCanonicalIdentity(identity.MessageId) || !IsCanonicalIdentity(identity.CorrelationId))
+        {
+            return Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        }
+        return WritePreparedAsync(identity, ct => _client.ProviderCatalog.UpdateEntryAsync(command,
+            new AgentOperationOptions(identity.CorrelationId, identity.MessageId), ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> EnableAsync(EnableProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(identity);
+        if (identity.ProviderId != command.ProviderId || identity.ModelId != command.ModelId
+            || identity.TruthState != AgentSetupTruthState.Unknown
+            || !IsCanonicalIdentity(identity.MessageId) || !IsCanonicalIdentity(identity.CorrelationId))
+        {
+            return Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        }
+        return WritePreparedAsync(identity, ct => _client.ProviderCatalog.EnableEntryAsync(command,
+            new AgentOperationOptions(identity.CorrelationId, identity.MessageId), ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> DisableAsync(DisableProviderModelEntry command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(identity);
+        if (identity.ProviderId != command.ProviderId || identity.ModelId != command.ModelId
+            || identity.TruthState != AgentSetupTruthState.Unknown
+            || !IsCanonicalIdentity(identity.MessageId) || !IsCanonicalIdentity(identity.CorrelationId))
+        {
+            return Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        }
+        return WritePreparedAsync(identity, ct => _client.ProviderCatalog.DisableEntryAsync(command,
+            new AgentOperationOptions(identity.CorrelationId, identity.MessageId), ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> SetTenantEnablementAsync(SetTenantProviderModelEnablement command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(identity);
+        if (identity.ProviderId != command.ProviderId || identity.ModelId != command.ModelId
+            || identity.TruthState != AgentSetupTruthState.Unknown
+            || !IsCanonicalIdentity(identity.MessageId) || !IsCanonicalIdentity(identity.CorrelationId))
+        {
+            return Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        }
+        return WritePreparedAsync(identity, ct => _client.ProviderCatalog.SetTenantEnablementAsync(command,
+            new AgentOperationOptions(identity.CorrelationId, identity.MessageId), ct), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ProviderCatalogWriteResult> DecideDataHandlingAsync(DecideProviderDataHandling command, ProviderCatalogCommandAcceptance identity, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(identity);
+        if (identity.ProviderId != command.ProviderId || identity.ModelId != command.ModelId
+            || identity.TruthState != AgentSetupTruthState.Unknown
+            || !IsCanonicalIdentity(identity.MessageId) || !IsCanonicalIdentity(identity.CorrelationId))
+        {
+            return Task.FromResult(ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.ValidationFailed));
+        }
+        return WritePreparedAsync(identity, ct => _client.ProviderCatalog.DecideDataHandlingAsync(command,
+            new AgentOperationOptions(identity.CorrelationId, identity.MessageId), ct), cancellationToken);
+    }
+
+    private static async Task<ProviderCatalogWriteResult> WritePreparedAsync(
+        ProviderCatalogCommandAcceptance identity,
+        Func<CancellationToken, ValueTask<AgentOperationResult<ProviderCatalogCommandAcceptance>>> write,
+        CancellationToken cancellationToken)
+    {
+        ProviderCatalogWriteResult result = await WriteAsync(write, cancellationToken).ConfigureAwait(false);
+        return result.Status != AgentSetupWriteStatus.Submitted
+            || result.Acceptance is { TruthState: AgentSetupTruthState.Submitted or AgentSetupTruthState.AuthoritativePending or AgentSetupTruthState.ProjectionConfirmed } acceptance
+                && acceptance.ProviderId == identity.ProviderId && acceptance.ModelId == identity.ModelId
+                && acceptance.MessageId == identity.MessageId && acceptance.CorrelationId == identity.CorrelationId
+            ? result : ProviderCatalogWriteResult.Failed(AgentSetupWriteStatus.UnableToVerify);
+    }
+
+    private static bool IsCanonicalIdentity(string? value)
+        => value is { Length: 26 } && NUlid.Ulid.TryParse(value, out NUlid.Ulid parsed)
+            && string.Equals(value, parsed.ToString(), StringComparison.Ordinal);
 
     private static ProviderCatalogInspectionResult ToReadResult(AgentOperationStatus status)
         => status switch
