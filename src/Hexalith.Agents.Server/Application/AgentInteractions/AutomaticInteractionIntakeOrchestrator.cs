@@ -1,6 +1,7 @@
 using Hexalith.Agents.Contracts.ConversationAgentState;
 using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
 using Hexalith.Agents.Contracts.Security;
+using Hexalith.Agents.Server.Application.Workflows;
 using Hexalith.Agents.Server.Ports;
 
 namespace Hexalith.Agents.Server.Application.AgentInteractions;
@@ -14,7 +15,8 @@ public sealed class AutomaticInteractionIntakeOrchestrator(
     public async Task<AutomaticInteractionIntakeResult> ExecuteAsync(AutomaticInteractionIntakeRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request); ct.ThrowIfCancellationRequested();
-        if (request.TenantId != request.AuthenticatedTenantId || !request.IsPerson || string.IsNullOrWhiteSpace(request.ActorId)
+        if (!WorkflowExecutionStateValidation.IsOpaqueId(request.TenantId) || !WorkflowExecutionStateValidation.IsOpaqueId(request.ConversationId)
+            || request.TenantId != request.AuthenticatedTenantId || !request.IsPerson || string.IsNullOrWhiteSpace(request.ActorId)
             || string.IsNullOrWhiteSpace(request.CallerPartyId) || string.IsNullOrWhiteSpace(request.ClientIdempotencyKey)) { return new(AutomaticInteractionIntakeStatus.NotFound); }
         AutomaticInteractionGateResult gates = await gate.EvaluateAsync(request, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
@@ -32,9 +34,10 @@ public sealed class AutomaticInteractionIntakeOrchestrator(
         string id = ConversationAgentStateIdentity.Interaction(request.TenantId, request.AgentId, request.ConversationId, request.CallerPartyId, request.ClientIdempotencyKey);
         var permit = new InteractionPermit(request.TenantId, request.ConversationId, id, request.AgentId, request.CallerPartyId, request.ClientIdempotencyKey,
             ConversationAgentStateIdentity.Permit(request.TenantId, id), ConversationAgentStateIdentity.CreationOutbox(request.TenantId, id), request.RequestDigest, gates.Snapshot, epoch, request.Request, request.DigestKeyVersion);
+        long expectedRevision = directory?.Revision ?? 0;
         await InteractionCommandDispatch.SendAsync(dispatcher, request.TenantId, ConversationAgentStateIdentity.Domain,
             ConversationAgentStateIdentity.Directory(request.TenantId, request.ConversationId), permit.PermitId,
-            new RegisterInteractionPermit(permit, directory?.Revision ?? 0), ct).ConfigureAwait(false);
-        return await recovery.RecoverAsync(request.TenantId, request.ConversationId, id, ct, expectedPermit: permit).ConfigureAwait(false);
+            new RegisterInteractionPermit(permit, expectedRevision), ct).ConfigureAwait(false);
+        return await recovery.RecoverAsync(request.TenantId, request.ConversationId, id, ct, expectedPermit: permit, expectedRevision).ConfigureAwait(false);
     }
 }

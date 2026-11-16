@@ -22,4 +22,8 @@ public enum AutomaticInteractionIntakeStatus
     Scheduled = 6,
     /// <summary>StartSuppressedByDeletion outcome.</summary>
     StartSuppressedByDeletion = 7,
+    /// <summary>The recorded protected intent differs from the submitted request.</summary>
+    Conflict = 8,
+    /// <summary>The exact durable owner needs recovery or its checkpoint could not be observed.</summary>
+    RecoveryRequired = 9,
 }

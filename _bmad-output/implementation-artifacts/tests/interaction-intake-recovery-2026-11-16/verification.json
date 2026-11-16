@@ -1,0 +1,57 @@
+{
+  "baselineCommit": "895039d8513363424882b3b7d64bca574fddc43b",
+  "platformCommit": "fecdcbc309e19c95808673ff7c5549d993b19b76",
+  "agentsReleasePackageTests": {
+    "Contracts": 2005,
+    "Client": 7,
+    "Domain": 1042,
+    "Server": 1924,
+    "UI": 1352
+  },
+  "agentsTestCount": 6330,
+  "platformCustodyTests": 806,
+  "platformSourcePropagationControls": 29,
+  "isolatedPackageConsumers": 7,
+  "reviewLayers": 3,
+  "preExistingReviewFindingsDeferred": 1,
+  "sourceInputs": {
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "858c510b27f98bd5eee9d20c6407afe99bea58914742959cd6768550ba259b18",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/InteractionOutboxRecoveryOrchestrator.cs": "c3a9e1aa74580ad5973ca478ee59e1783929640f3a146a5bf9e58b6c831a7f5f",
+    "src/Hexalith.Agents.Server/Application/Workflows/WorkflowExecutionStateValidation.cs": "3f25bfeb3f023e8b029f870d90ccde9d78f7a55b0f06216981c53bfa191be17d",
+    "src/Hexalith.Agents.Server/Ports/AutomaticInteractionIntakeStatus.cs": "2aa34e42d77cfd5741a6a682e6bb16ab2c9e5094900e7106dd1c9c95310e5988",
+    "src/Hexalith.Agents/AgentInteraction/AgentInteractionAggregate.Automatic.cs": "a64e42ebf6c2f047b0580fa467cd2e7e346a81e050eafa1177b244477edc5e7d",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeIntentTests.cs": "4a7072767fb0e7d43d6936577886411c3af776aa9a20f604aaca3689e7c64163",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeRecoveryTests.cs": "4bd3aa1b14f3fb2a41dd2d6f39278c43392fb05065cb85728a39a6d53dc109ff",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionReplayFixture.cs": "570c5b6e927fdd6d1394ca71f93bd66b753b90c00e708253b430a05b38b8b816",
+    "test/Hexalith.Agents.Tests/InteractionPermitCreationOutboxTests.cs": "8b23aea6cb46b1b0dc6685692249d8643041a3a2710dd20fbd7854c48a6a6589",
+    ".editorconfig": "9b69e7ed76c4b3b66fa21a8c0705a72c5e2498563528fb235818d6ee7fec7651",
+    "global.json": "5feaf50426a6c5554654e326bedd2f6c6273f13b948b1ec6e11e12cae68f9f05",
+    "Directory.Build.props": "1f395e00b79dab2d9e859a7d35d06c64823aeab94d308249f775628a7d2d738d",
+    "Directory.Packages.props": "daf86cc006cb48c38719c93b29322a9bb1c96f5d5564b39a7b3efcc9b41a7348",
+    "test/Directory.Build.props": "55a13306b236604ecf29f8c4fe0f752b20961487dbf2e6c993c3767c5e636621"
+  },
+  "evidenceHashes": {
+    "standalone/agents-package-ci-gate.log": "074989df5aab90975313b1c7580a3882d2139095cf8e1b15353d4ed71c30eacf",
+    "standalone/agents-story52-gate.log": "f4a050a397c04a18f796ce85f54896048128f6e797b9f7c6cb4a7633f97d3235",
+    "standalone/platform-custody-package-full.xml": "007a72d9f780bab2cb4419a1302128ad5c4151ed124f4bde5d7ce7d6cbb5071c",
+    "platform-metadata-complete/controls/result.json": "b4a4941d73aa5d9a940823e8f33e28b18e92661446f53e5be54d48078438ea4a",
+    "matrix-verification-final.json": "87c45355e76f31c7d2da12dab27465a0adb26f89de19a72fb2a0ec2042a2c02d",
+    "real-runner-compatibility.json": "421a66a2ed703ae203b2a103fe9a23f28b82d56f1ba426dd341ea32c4d86d93d",
+    "standalone/agents-tooling-root.log": "a77c562b0e2205d9d2767267464dcd25e470ebeaba7e369f2911363e19a1e0e4"
+  },
+  "tooling": {
+    "total": 338,
+    "passed": 336,
+    "defaultDiscoverySkips": 2,
+    "separateRealRunnerCompatibilityPasses": 2
+  },
+  "baselineHostedCiFailure": "https://github.com/Hexalith/Hexalith.Agents/actions/runs/43890214742/job/133379065623",
+  "platformRemotelyVerified": true,
+  "reviewPatchesVerified": [
+    "scheduler-refusal cancellation",
+    "paced retries",
+    "repeat/lag/Closing contention",
+    "cached terminal rejection",
+    "protected-content and frozen-metadata conflict coverage"
+  ]
+}

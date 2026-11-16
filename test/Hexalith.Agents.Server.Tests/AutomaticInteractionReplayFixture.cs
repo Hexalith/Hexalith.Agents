@@ -48,6 +48,8 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
     internal bool LoseScheduleAcknowledgement { get; set; }
     /// <summary>Gets or sets fixture readiness.</summary>
     internal bool DirectoryReady { get; set; } = true;
+    /// <summary>Gets or sets asynchronous receipt behavior, retaining rejections in the owner event history.</summary>
+    internal bool PersistRejections { get; set; }
     /// <summary>Gets or sets response mode.</summary>
     internal AgentResponseMode Mode { get; set; } = AgentResponseMode.Automatic;
     /// <summary>Gets the exact AD-29 interaction identity.</summary>
@@ -118,8 +120,8 @@ internal sealed class AutomaticInteractionReplayFixture : IAgentCommandDispatche
         DomainResult result = intent.Domain == ConversationAgentStateIdentity.Domain
             ? ConversationAgentStateAggregate.Handle((dynamic)command, Directory, envelope)
             : AgentInteractionAggregate.Handle((dynamic)command, Interaction, envelope);
-        if (result.IsRejection) { throw new InvalidOperationException("Rejected:" + JsonSerializer.Serialize(result.Events)); }
-        if (result.Events.Count > 0) { AcceptedCommandIds.Add(intent.MessageId); }
+        if (result.IsRejection && !PersistRejections) { throw new InvalidOperationException("Rejected:" + JsonSerializer.Serialize(result.Events)); }
+        if (result.Events.Count > 0 && !result.IsRejection) { AcceptedCommandIds.Add(intent.MessageId); }
         foreach (IEventPayload item in result.Events)
         {
             if (intent.Domain == ConversationAgentStateIdentity.Domain) { Directory ??= new(); Directory.Apply((dynamic)item); _directoryEvents.Add(Clone(item)); }

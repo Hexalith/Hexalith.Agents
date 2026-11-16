@@ -23,7 +23,7 @@ public partial class AgentInteractionAggregate
         {
             return JsonSerializer.Serialize(existing.Permit) == JsonSerializer.Serialize(p) && existing.PermitRevision == command.PermitRevision ? DomainResult.NoOp() : AutomaticReject(AutomaticInteractionRejectionReason.DivergentDuplicate);
         }
-        if (state is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
+        if (state is { IsRequested: true }) { return AutomaticReject(AutomaticInteractionRejectionReason.LegacyStream); }
         if (p.Snapshot is null || p.DirectoryEpoch is null || p.DirectoryEpoch.TenantId != p.TenantId || string.IsNullOrWhiteSpace(p.DirectoryEpoch.EpochId)
             || !AutomaticDigest(p.RequestDigest) || string.IsNullOrWhiteSpace(p.DigestKeyVersion) || string.IsNullOrWhiteSpace(p.AgentId) || string.IsNullOrWhiteSpace(p.CallerPartyId) || string.IsNullOrWhiteSpace(p.ClientIdempotencyKey)
             || command.ExpectedRevision != 0 || command.PermitRevision <= 0 || p.PermitId != ConversationAgentStateIdentity.Permit(p.TenantId, p.AgentInteractionId)

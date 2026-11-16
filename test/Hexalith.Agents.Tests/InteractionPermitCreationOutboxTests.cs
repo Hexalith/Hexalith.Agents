@@ -38,8 +38,26 @@ public sealed class InteractionPermitCreationOutboxTests
     {
         var p = ConversationDirectoryTestData.Permit();
         var envelope = ConversationDirectoryTestData.Envelope() with { Domain = "agent-interaction", AggregateId = p.AgentInteractionId };
-        AgentInteractionAggregate.Handle(new CreatePermittedAgentInteraction(p, 1, 0), new AgentInteractionState { IsRequested = true }, envelope).IsRejection.ShouldBeTrue();
-        AgentInteractionAggregate.Handle(new CreatePermittedAgentInteraction(p, 1, 0), new AgentInteractionState(), envelope).IsRejection.ShouldBeTrue();
+        var state = new AgentInteractionState();
+        state.Apply(new InteractionRequested(p.AgentInteractionId, p.AgentId, p.CallerPartyId, p.ConversationId, p.Snapshot, "legacy-plaintext", p.ClientIdempotencyKey));
+        AgentInteractionAggregate.Handle(new CreatePermittedAgentInteraction(p, 1, 0), state, envelope).Events.Single()
+            .ShouldBeOfType<AutomaticInteractionRejected>().Reason.ShouldBe(AutomaticInteractionRejectionReason.LegacyStream);
+    }
+    [Fact]
+    public void RejectionOnlyHistoryCanAppendAndReplayTheExactPermittedCreation()
+    {
+        var p = ConversationDirectoryTestData.Permit();
+        var envelope = ConversationDirectoryTestData.Envelope() with { Domain = "agent-interaction", AggregateId = p.AgentInteractionId };
+        var command = new CreatePermittedAgentInteraction(p, 1, 0);
+        var state = new AgentInteractionState();
+        var rejection = AgentInteractionAggregate.Handle(command with { ExpectedRevision = 1 }, null, envelope).Events.Single().ShouldBeOfType<AutomaticInteractionRejected>();
+        state.Apply(rejection); state.IsRequested.ShouldBeFalse(); state.AutomaticRevision.ShouldBe(0);
+        var created = AgentInteractionAggregate.Handle(command, state, envelope).Events.Single().ShouldBeOfType<PermittedAgentInteractionCreated>();
+        state.Apply(created);
+        var replayed = new AgentInteractionState(); replayed.Apply(rejection); replayed.Apply(created);
+        JsonSerializer.Serialize(replayed).ShouldBe(JsonSerializer.Serialize(state));
+        replayed.PermittedCreation.ShouldBe(created); replayed.IsRequested.ShouldBeTrue(); replayed.AutomaticRevision.ShouldBe(1);
+        AgentInteractionAggregate.Handle(command, replayed, envelope).IsNoOp.ShouldBeTrue();
     }
     [Theory]
     [InlineData(false)]

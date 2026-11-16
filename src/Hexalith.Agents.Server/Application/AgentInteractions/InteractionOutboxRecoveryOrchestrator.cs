@@ -18,21 +18,34 @@ public sealed class InteractionOutboxRecoveryOrchestrator(IConversationAgentStat
         => RecoverAsync(tenantId, conversationId, interactionId, ct, expectedPermit: null);
 
     /// <summary>Intake-only recovery also verifies the exact submitted protected intent before consuming its outboxes.</summary>
-    internal async Task<AutomaticInteractionIntakeResult> RecoverAsync(string tenantId, string conversationId, string interactionId, CancellationToken ct, InteractionPermit? expectedPermit)
+    internal async Task<AutomaticInteractionIntakeResult> RecoverAsync(string tenantId, string conversationId, string interactionId, CancellationToken ct, InteractionPermit? expectedPermit, long submittedPermitRevision = 0)
     {
+        ct.ThrowIfCancellationRequested();
+        if (!WorkflowExecutionStateValidation.IsOpaqueId(tenantId) || !WorkflowExecutionStateValidation.IsOpaqueId(conversationId)) { return new(AutomaticInteractionIntakeStatus.NotFound); }
         string? lastObservation = null;
         for (int checkpoint = 0; checkpoint < 64; checkpoint++)
         {
             ct.ThrowIfCancellationRequested();
             var directory = await directoryReader.ReadAsync(tenantId, conversationId, ct).ConfigureAwait(false);
-            if (directory is not null && (directory.TenantId != tenantId || directory.ConversationId != conversationId)) { return new(AutomaticInteractionIntakeStatus.NotFound); }
+            if (directory is not null && directory.Revision != 0 && (directory.TenantId != tenantId || directory.ConversationId != conversationId)) { return new(AutomaticInteractionIntakeStatus.NotFound); }
             if (directory is null || !directory.Permits.TryGetValue(interactionId, out var permit))
             {
                 if (expectedPermit is null) { return new(AutomaticInteractionIntakeStatus.NotFound); }
+                if (directory?.DeletionRequestId is not null) { return new(AutomaticInteractionIntakeStatus.ConversationClosing); }
+                // A newer owner revision needs a fresh submission identity; unchanged visibility only needs observation.
+                if (directory is not null && directory.Revision > submittedPermitRevision)
+                {
+                    submittedPermitRevision = directory.Revision;
+                    await InteractionCommandDispatch.SendAsync(dispatcher, tenantId, ConversationAgentStateIdentity.Domain,
+                        ConversationAgentStateIdentity.Directory(tenantId, conversationId), expectedPermit.PermitId,
+                        new RegisterInteractionPermit(expectedPermit, submittedPermitRevision), ct).ConfigureAwait(false);
+                    await ObserveAsync().ConfigureAwait(false);
+                    continue;
+                }
                 await ObserveAsync().ConfigureAwait(false); continue;
             }
             // Accepted gateway receipts can precede a rejection or append. Only this exact recorded intent may succeed.
-            if (expectedPermit is not null && JsonSerializer.Serialize(permit.Permit) != JsonSerializer.Serialize(expectedPermit)) { throw new InvalidOperationException("DivergentDuplicate"); }
+            if (expectedPermit is not null && JsonSerializer.Serialize(permit.Permit) != JsonSerializer.Serialize(expectedPermit)) { return new(AutomaticInteractionIntakeStatus.Conflict, interactionId); }
             var interaction = await interactionReader.ReadAsync(tenantId, interactionId, ct).ConfigureAwait(false);
             string observation = $"{directory.Revision}:{interaction?.AutomaticRevision ?? 0}";
             if (observation == lastObservation) { await ObserveAsync().ConfigureAwait(false); continue; }
@@ -46,7 +59,7 @@ public sealed class InteractionOutboxRecoveryOrchestrator(IConversationAgentStat
                 continue;
             }
             var creation = interaction.PermittedCreation;
-            if (creation.Permit.PermitId != permit.Permit.PermitId || creation.Permit.RequestDigest != permit.Permit.RequestDigest || creation.Permit.TenantId != tenantId) { throw new InvalidOperationException("DivergentDuplicate"); }
+            if (JsonSerializer.Serialize(creation.Permit) != JsonSerializer.Serialize(permit.Permit) || creation.PermitRevision != permit.Revision) { return new(AutomaticInteractionIntakeStatus.Conflict, interactionId); }
             if (!directory.Acknowledgements.ContainsKey(interactionId))
             {
                 await InteractionCommandDispatch.SendAsync(dispatcher, tenantId, ConversationAgentStateIdentity.Domain, directoryId, creation.DirectoryAcknowledgementOutboxId,
@@ -81,11 +94,13 @@ public sealed class InteractionOutboxRecoveryOrchestrator(IConversationAgentStat
             }
             var input = new WorkflowExecutionState(tenantId, conversationId, interactionId, new ProtectedContentReference(tenantId, interactionId, creation.Revision, permit.Permit.RequestDigest),
                 interaction.AutomaticRevision, WorkflowExecutionStatus.Running);
-            await scheduler.EnsureScheduledAsync(input, ct).ConfigureAwait(false);
+            try { await scheduler.EnsureScheduledAsync(input, ct).ConfigureAwait(false); }
+            catch (InvalidOperationException exception) when (exception.Message == "InteractionWorkflowRecoveryRequired")
+            { ct.ThrowIfCancellationRequested(); return new(AutomaticInteractionIntakeStatus.RecoveryRequired, interactionId); }
             return new(AutomaticInteractionIntakeStatus.Scheduled, interactionId);
 
             Task ObserveAsync() => Task.Delay(TimeSpan.FromMilliseconds(Math.Min(200, 25 * (checkpoint + 1))), ct);
         }
-        throw new InvalidOperationException("AuthoritativeCheckpointNotObserved");
+        return new(AutomaticInteractionIntakeStatus.RecoveryRequired, interactionId);
     }
 }

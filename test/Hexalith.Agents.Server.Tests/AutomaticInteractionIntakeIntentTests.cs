@@ -34,8 +34,8 @@ public sealed class AutomaticInteractionIntakeIntentTests
         var recovery = new InteractionOutboxRecoveryOrchestrator(fixture, fixture, dispatcher, fixture);
         var intake = new AutomaticInteractionIntakeOrchestrator(fixture, availability, fixture, fixture, dispatcher, recovery);
         var request = fixture.Request with { RequestDigest = new string('b', 64) };
-        var failure = await Should.ThrowAsync<InvalidOperationException>(() => intake.ExecuteAsync(request, CancellationToken.None));
-        failure.Message.ShouldBe("DivergentDuplicate");
+        var result = await intake.ExecuteAsync(request, CancellationToken.None);
+        result.Status.ShouldBe(AutomaticInteractionIntakeStatus.Conflict); result.AgentInteractionId.ShouldBe(fixture.InteractionId);
         JsonSerializer.Serialize(fixture.Directory.Permits[fixture.InteractionId].Permit).ShouldBe(original);
         fixture.AcceptedCommandIds.Count.ShouldBe(accepted); fixture.Scheduled.Count.ShouldBe(scheduled); fixture.Effects.Posts.ShouldBeEmpty();
     }
