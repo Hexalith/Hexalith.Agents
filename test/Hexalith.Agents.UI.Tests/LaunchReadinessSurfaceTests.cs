@@ -9,6 +9,9 @@ using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.UI.Components.Pages;
 using Hexalith.Agents.UI.Components.Shared;
 using Hexalith.Agents.UI.Services.Gateways;
+using Hexalith.FrontComposer.Shell.Components.Icons;
+
+using Microsoft.FluentUI.AspNetCore.Components;
 
 using NSubstitute;
 
@@ -177,4 +180,36 @@ public sealed class LaunchReadinessSurfaceTests : AgentsTestContext
     }
 
     private IRenderedComponent<LaunchReadiness> RenderLaunchReadiness() => RenderPage<LaunchReadiness>();
+
+    [Theory]
+    [InlineData(4, "ReportingOnlyMonitoring", false)]
+    [InlineData(5, "AcceptedLaunchRisk", false)]
+    [InlineData(4, "ReportingOnlyMonitoring", true)]
+    [InlineData(5, "AcceptedLaunchRisk", true)]
+    public void HistoricalProhibitedPostureShowsMigrationBlockerAndDisablesEnablement(int ordinal, string name, bool enabled)
+    {
+        var view = AgentUiTestData.LaunchReadinessView(
+            blockers: [AgentLaunchReadinessBlocker.ProhibitedCostControlPosture], productionLikeGenerationEnabled: enabled)
+            with { CostPosture = (CostControlPosture)ordinal };
+        LaunchReadinessGateway.GetLaunchReadinessAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(AgentUiTestData.LaunchReadinessResultSuccess(view)));
+
+        IRenderedComponent<LaunchReadiness> cut = RenderLaunchReadiness();
+
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("[data-testid='agents-launch-readiness-blocker-ProhibitedCostControlPosture']").TextContent
+                .ShouldContain("Agents.LaunchReadiness.Blocker.ProhibitedCostControlPosture");
+            cut.Find("[data-testid='agents-launch-readiness-cost-posture']").TextContent.Trim()
+                .ShouldBe($"Agents.LaunchReadiness.CostPosture.{name}");
+            cut.Find("[data-testid='agents-launch-readiness-enable-button']").HasAttribute("disabled").ShouldBeTrue();
+            FluentBadge badge = cut.FindComponent<LaunchReadinessPanel>().FindComponents<FluentBadge>()[0].Instance;
+            badge.Color.ShouldBe(BadgeColor.Severe);
+            badge.IconStart.ShouldNotBeNull().GetType().ShouldBe(FcFluentIcons.Warning16().GetType());
+            cut.Find("[data-testid='agents-launch-readiness-panel-enablement']").TextContent.ShouldContain(enabled
+                ? "Agents.LaunchReadiness.ProductionLike.HistoricallyEnabledBlocked"
+                : "Agents.LaunchReadiness.ProductionLike.Blocked");
+        });
+    }
+
 }

@@ -28,6 +28,7 @@ public static class LaunchReadinessPresentation
             AgentLaunchReadinessBlocker.MissingAutomaticLatencyTarget => RecoveryActionGroup.FixPolicy,
             AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget => RecoveryActionGroup.FixPolicy,
             AgentLaunchReadinessBlocker.MissingCostControlPosture => RecoveryActionGroup.FixPolicy,
+            AgentLaunchReadinessBlocker.ProhibitedCostControlPosture => RecoveryActionGroup.FixPolicy,
             AgentLaunchReadinessBlocker.UnresolvedAuditGovernance => RecoveryActionGroup.InspectAudit,
             _ => RecoveryActionGroup.FixPolicy,
         };

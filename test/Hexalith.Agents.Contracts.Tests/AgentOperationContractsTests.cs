@@ -652,7 +652,8 @@ public sealed class AgentOperationContractsTests
             (AgentLaunchReadinessBlocker.MissingAutomaticLatencyTarget, 5),
             (AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget, 6),
             (AgentLaunchReadinessBlocker.MissingCostControlPosture, 7),
-            (AgentLaunchReadinessBlocker.UnresolvedAuditGovernance, 8));
+            (AgentLaunchReadinessBlocker.UnresolvedAuditGovernance, 8),
+            (AgentLaunchReadinessBlocker.ProhibitedCostControlPosture, 9));
 
         Pin(
             (AgentReadinessStatus.Unknown, 0),
@@ -1032,4 +1033,22 @@ public sealed class AgentOperationContractsTests
         Unknown = 0,
         Ready = 1,
     }
+
+    [Theory]
+    [InlineData(4, "ReportingOnlyMonitoring")]
+    [InlineData(5, "AcceptedLaunchRisk")]
+    public void OperationEnvelopePreservesHistoricalCostPostureAndDistinctBlocker(int ordinal, string name)
+    {
+        var view = new AgentLaunchReadinessView([], [], (CostControlPosture)ordinal, 7, true, true, true,
+            [AgentLaunchReadinessBlocker.ProhibitedCostControlPosture]);
+        var original = AgentOperationResult<AgentLaunchReadinessView>.Succeeded(view);
+        string json = JsonSerializer.Serialize(original);
+        json.ShouldContain($"\"CostPosture\":\"{name}\"");
+        json.ShouldContain("\"ProhibitedCostControlPosture\"");
+        var decoded = JsonSerializer.Deserialize<AgentOperationResult<AgentLaunchReadinessView>>(json).ShouldNotBeNull();
+        decoded.Value.ShouldNotBeNull().CostPosture.ShouldBe((CostControlPosture)ordinal);
+        decoded.Value.Blockers.ShouldBe([AgentLaunchReadinessBlocker.ProhibitedCostControlPosture]);
+        decoded.Value.ProductionLikeGenerationEnabled.ShouldBeTrue();
+    }
+
 }

@@ -654,6 +654,8 @@
   <data name="Agents.LaunchReadiness.Panel.Label" xml:space="preserve"><value>État de la préparation au lancement</value></data>
   <data name="Agents.LaunchReadiness.ProductionLike.Label" xml:space="preserve"><value>Génération en conditions de production</value></data>
   <data name="Agents.LaunchReadiness.ProductionLike.Enabled" xml:space="preserve"><value>Activée</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.Blocked" xml:space="preserve"><value>Bloquée par la politique actuelle de préparation</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.HistoricallyEnabledBlocked" xml:space="preserve"><value>Activée auparavant — bloquée par la politique actuelle de préparation</value></data>
   <data name="Agents.LaunchReadiness.ProductionLike.Disabled" xml:space="preserve"><value>Non activée</value></data>
   <data name="Agents.LaunchReadiness.Prerequisites.Label" xml:space="preserve"><value>Prérequis de lancement</value></data>
   <data name="Agents.LaunchReadiness.ContentSafety.Label" xml:space="preserve"><value>Politique de sécurité du contenu</value></data>
@@ -681,8 +683,8 @@
   <data name="Agents.LaunchReadiness.CostPosture.Quotas" xml:space="preserve"><value>Quotas</value></data>
   <data name="Agents.LaunchReadiness.CostPosture.Budgets" xml:space="preserve"><value>Budgets</value></data>
   <data name="Agents.LaunchReadiness.CostPosture.ProviderModelLimits" xml:space="preserve"><value>Limites du fournisseur/modèle</value></data>
-  <data name="Agents.LaunchReadiness.CostPosture.ReportingOnlyMonitoring" xml:space="preserve"><value>Surveillance par rapports uniquement</value></data>
-  <data name="Agents.LaunchReadiness.CostPosture.AcceptedLaunchRisk" xml:space="preserve"><value>Risque de lancement accepté</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.ReportingOnlyMonitoring" xml:space="preserve"><value>Historique — surveillance par rapports uniquement (interdite)</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.AcceptedLaunchRisk" xml:space="preserve"><value>Historique — risque de lancement accepté (interdit)</value></data>
   <data name="Agents.LaunchReadiness.Classification.Unknown" xml:space="preserve"><value>Non classée</value></data>
   <data name="Agents.LaunchReadiness.Classification.Primary" xml:space="preserve"><value>Métrique primaire</value></data>
   <data name="Agents.LaunchReadiness.Classification.Secondary" xml:space="preserve"><value>Métrique secondaire</value></data>
@@ -695,6 +697,7 @@
   <data name="Agents.LaunchReadiness.Blocker.MissingAutomaticLatencyTarget" xml:space="preserve"><value>Aucun objectif de latence pour le mode de réponse automatique n'est enregistré.</value></data>
   <data name="Agents.LaunchReadiness.Blocker.MissingConfirmationLatencyTarget" xml:space="preserve"><value>Aucun objectif de latence pour le mode de réponse avec confirmation n'est enregistré.</value></data>
   <data name="Agents.LaunchReadiness.Blocker.MissingCostControlPosture" xml:space="preserve"><value>Aucune posture de maîtrise des coûts n'est enregistrée.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.ProhibitedCostControlPosture" xml:space="preserve"><value>La posture de coût historique est interdite. Enregistrez des quotas, des budgets ou des limites de fournisseur/modèle avec contrôle effectif avant d’activer la génération.</value></data>
   <data name="Agents.LaunchReadiness.Blocker.UnresolvedAuditGovernance" xml:space="preserve"><value>La gouvernance des preuves d'audit n'est pas résolue.</value></data>
   <data name="Agents.LaunchReadiness.Enable.Label" xml:space="preserve"><value>Activer la génération en conditions de production</value></data>
   <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Activer la génération en conditions de production</value></data>

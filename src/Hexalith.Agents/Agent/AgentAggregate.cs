@@ -611,7 +611,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
         }
 
-        // Structural validation + normalization only — launch-readiness values are self-contained Agent state (AD-3):
+        // Current cost-policy validation + structural normalization — launch-readiness values are self-contained Agent state (AD-3):
         // there is no external dependency to resolve and no trusted verdict. The reason is a safe classification and
         // never echoes a configured value (AD-14).
         string? reason = ValidateAndNormalizeLaunchReadiness(command.Readiness, out AgentLaunchReadiness normalized);
@@ -661,15 +661,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             return DomainResult.Rejection([new AgentNotFoundRejection(agentId)]);
         }
 
-        // Re-enabling an already-enabled Agent is a deterministic no-op (AD-13) — no duplicate event, no version bump.
-        if (state.ProductionLikeGenerationEnabled)
-        {
-            return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
-        }
-
         // The launch-readiness gate is a pure state check (AD-3): content safety, the in-force context policy, launch
-        // metrics, per-mode latency targets, and cost posture are read straight from recorded Agent state (an
-        // empty/invalid readiness was rejected at recording time, so present ≡ valid). The only externally-resolved
+        // metrics, per-mode latency targets, and cost posture are read straight from recorded Agent state (the
+        // historical readiness is retained but must still satisfy current policy). The only externally-resolved
         // input — whether the Agents audit-evidence governance is resolved — is fed back through the trusted
         // server-populated extension; a direct-gateway enable that did not resolve it carries no trusted flag, parses
         // to false, and fails closed with UnresolvedAuditGovernance, so generation stays disabled (AC4; AD-12).
@@ -679,8 +673,14 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
                 hasContextPolicy: !string.IsNullOrWhiteSpace(state.LaunchReadiness?.ContextPolicyReference),
                 readiness: state.LaunchReadiness,
                 auditGovernanceResolved: ReadAuditGovernanceResolved(envelope));
-        return blockers.Count > 0
-            ? DomainResult.Rejection([new AgentProductionLikeGenerationBlockedRejection(agentId, blockers)])
+        if (blockers.Count > 0)
+        {
+            return DomainResult.Rejection([new AgentProductionLikeGenerationBlockedRejection(agentId, blockers)]);
+        }
+
+        // Only currently valid readiness can make a retry an idempotent success.
+        return state.ProductionLikeGenerationEnabled
+            ? AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion)
             : AgentSetupDomainResult.Applied(
                 [new AgentProductionLikeGenerationEnabled(agentId, state.ConfigurationVersion + 1)],
                 state.ConfigurationVersion + 1);
@@ -958,9 +958,9 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             && a.RestrictedOutputCategories.SequenceEqual(b.RestrictedOutputCategories, StringComparer.Ordinal);
     }
 
-    // Structurally validates and normalizes a launch-readiness payload (Story 4.4 AC2, AC3). Recording validates only
-    // well-formedness — presence/completeness of the gate inputs (at least one metric, both per-mode latency targets, a
-    // context-policy reference) is the launch-readiness gate's concern, not recording's. Each PRESENT metric must be
+    // Validates current cost policy and normalizes a launch-readiness payload (Story 4.4 AC2, AC3). Beyond the
+    // permitted cost posture, recording checks well-formedness — presence/completeness of the gate inputs (at least one
+    // metric, both per-mode latency targets, a context-policy reference) is the launch-readiness gate's concern, not recording's. Each PRESENT metric must be
     // complete (a concrete classification + all five governance descriptors); each PRESENT latency target must name a
     // concrete mode with a positive target and a mode may appear at most once; the cost posture must be explicitly
     // recorded (AC3). Storing reads no sibling module (AD-3). Returns a safe rejection reason (never echoing a
@@ -973,6 +973,14 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         if (readiness is null)
         {
             return "Launch readiness is required.";
+        }
+
+        // Check current cost policy before normalizing descriptors or considering equality with historical state.
+        if (AgentLaunchReadinessPolicy.GetCostPostureBlocker(readiness.CostPosture) is { } costBlocker)
+        {
+            return costBlocker == AgentLaunchReadinessBlocker.ProhibitedCostControlPosture
+                ? "The cost-control posture is prohibited. Record quotas, budgets, or Provider/model limits instead."
+                : "A recognized cost-control posture must be specified.";
         }
 
         IReadOnlyList<LaunchMetricDefinition> sourceMetrics = readiness.Metrics ?? [];
@@ -1035,11 +1043,6 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
             }
 
             normalizedTargets.Add(target);
-        }
-
-        if (readiness.CostPosture == CostControlPosture.Unknown)
-        {
-            return "A cost-control posture must be specified.";
         }
 
         string? costNote = NormalizeOptionalText(readiness.CostPostureNote);

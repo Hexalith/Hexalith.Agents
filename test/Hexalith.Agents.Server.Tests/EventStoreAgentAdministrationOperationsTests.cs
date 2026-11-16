@@ -1054,4 +1054,22 @@ public sealed class EventStoreAgentAdministrationOperationsTests
             IsSelectableForNewActiveUse: true,
             CapabilityVersion: 1,
             new ProviderModelPricing("USD", 0.002m, 0.008m, 1));
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(999)]
+    public async Task ReadinessPreparationDoesNotMakeDeferredPublicOperationsAvailable(int ordinal)
+    {
+        AgentOperationResult recorded = await Operations().RecordLaunchReadinessAsync(
+            new RecordAgentLaunchReadiness(new AgentLaunchReadiness([], [], (CostControlPosture)ordinal, null, "full-conversation-v1")));
+        AgentOperationResult enabled = await Operations().EnableProductionLikeGenerationAsync(new EnableProductionLikeGeneration());
+        recorded.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        enabled.Status.ShouldBe(AgentOperationStatus.Unavailable);
+        await _gateway.DidNotReceiveWithAnyArgs().SubmitCommandAsync(default!, default);
+    }
+
 }

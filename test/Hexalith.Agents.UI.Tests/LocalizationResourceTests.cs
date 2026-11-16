@@ -470,6 +470,8 @@ public sealed class LocalizationResourceTests
         yield return "Agents.LaunchReadiness.Panel.Label";
         yield return "Agents.LaunchReadiness.ProductionLike.Label";
         yield return "Agents.LaunchReadiness.ProductionLike.Enabled";
+        yield return "Agents.LaunchReadiness.ProductionLike.Blocked";
+        yield return "Agents.LaunchReadiness.ProductionLike.HistoricallyEnabledBlocked";
         yield return "Agents.LaunchReadiness.ProductionLike.Disabled";
         yield return "Agents.LaunchReadiness.Prerequisites.Label";
         yield return "Agents.LaunchReadiness.ContentSafety.Label";
@@ -518,4 +520,24 @@ public sealed class LocalizationResourceTests
 
         missing.ShouldBeEmpty($"the French .resx is missing whole strings for: {string.Join(", ", missing)}");
     }
+
+    [Theory]
+    [InlineData("en", "prohibited", "Historical", "quotas", "budgets", "Provider/model limits")]
+    [InlineData("fr", "interdite", "Historique", "quotas", "budgets", "fournisseur/modèle")]
+    public void ProhibitedCostPosturesHaveHistoricalLabelsAndActionableMigrationGuidance(
+        string culture, string prohibited, string historical, string quotas, string budgets, string limits)
+    {
+        var language = CultureInfo.GetCultureInfo(culture);
+        string guidance = _resources.GetString("Agents.LaunchReadiness.Blocker.ProhibitedCostControlPosture", language).ShouldNotBeNull();
+        guidance.ShouldContain(prohibited);
+        guidance.ShouldContain(quotas);
+        guidance.ShouldContain(budgets);
+        guidance.ShouldContain(limits);
+        foreach (string name in new[] { "ReportingOnlyMonitoring", "AcceptedLaunchRisk" })
+        {
+            _resources.GetString($"Agents.LaunchReadiness.CostPosture.{name}", language).ShouldNotBeNull()
+                .ShouldContain(historical);
+        }
+    }
+
 }

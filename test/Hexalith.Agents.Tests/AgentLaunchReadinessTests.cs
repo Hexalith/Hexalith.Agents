@@ -460,4 +460,191 @@ public sealed class AgentLaunchReadinessTests
 
         AgentLaunchReadinessPolicy.IsMetricComplete(metric).ShouldBeTrue();
     }
+
+    [Theory]
+    [InlineData(4)] // Retained ReportingOnlyMonitoring identity.
+    [InlineData(5)] // Retained AcceptedLaunchRisk identity.
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(999)]
+    public void InvalidCostPosturesRejectRecordingIncludingHistoricalIdenticalRetries(int ordinal)
+    {
+        var readiness = SampleLaunchReadiness with { CostPosture = (CostControlPosture)ordinal };
+        foreach (bool historicalRetry in new[] { false, true })
+        {
+            AgentState state = StateWith(ValidCreate());
+            if (historicalRetry)
+            {
+                state.Apply(new AgentLaunchReadinessRecorded(AgentId, readiness, 7, 12));
+            }
+            int version = state.ConfigurationVersion;
+            int readinessVersion = state.LaunchReadinessVersion;
+            AgentLaunchReadiness? previous = state.LaunchReadiness;
+            RecordAgentLaunchReadiness command = RecordCommand(readiness);
+
+            DomainResult result = AgentAggregate.Handle(command, state, Envelope(command));
+
+            result.IsRejection.ShouldBeTrue();
+            result.IsNoOp.ShouldBeFalse();
+            result.Events.Count.ShouldBe(1);
+            var rejection = result.Events[0].ShouldBeOfType<AgentLaunchReadinessRejection>();
+            if (ordinal is 4 or 5)
+            {
+                rejection.Reason.ShouldContain("prohibited");
+                rejection.Reason.ShouldContain("quotas, budgets, or Provider/model limits");
+            }
+            ApplyAll(state, result);
+            state.ConfigurationVersion.ShouldBe(version);
+            state.LaunchReadinessVersion.ShouldBe(readinessVersion);
+            state.LaunchReadiness.ShouldBeSameAs(previous);
+        }
+    }
+
+    [Theory]
+    [InlineData(CostControlPosture.Quotas)]
+    [InlineData(CostControlPosture.Budgets)]
+    [InlineData(CostControlPosture.ProviderModelLimits)]
+    public void AcceptedCostPosturesRecordAndRetryIdempotentlyButKeepRemainingGates(CostControlPosture posture)
+    {
+        AgentState state = StateWith(ValidCreate());
+        RecordAgentLaunchReadiness command = RecordCommand(SampleLaunchReadiness with { CostPosture = posture });
+        DomainResult recorded = AgentAggregate.Handle(command, state, Envelope(command));
+        recorded.IsSuccess.ShouldBeTrue();
+        ApplyAll(state, recorded);
+        int version = state.ConfigurationVersion;
+        AgentAggregate.Handle(command, state, Envelope(command)).IsNoOp.ShouldBeTrue();
+        state.ConfigurationVersion.ShouldBe(version);
+        DomainResult enabled = AgentAggregate.Handle(new EnableProductionLikeGeneration(), state, EnableEnvelope());
+        enabled.Events[0].ShouldBeOfType<AgentProductionLikeGenerationBlockedRejection>()
+            .Blockers.ShouldContain(AgentLaunchReadinessBlocker.MissingContentSafetyPolicy);
+
+        AgentState ready = StateLaunchReady(ValidCreate(), SampleLaunchReadiness with { CostPosture = posture });
+        DomainResult accepted = AgentAggregate.Handle(new EnableProductionLikeGeneration(), ready, EnableEnvelope(true));
+        accepted.IsSuccess.ShouldBeTrue();
+        ApplyAll(ready, accepted);
+        int enabledVersion = ready.ConfigurationVersion;
+        AgentAggregate.Handle(new EnableProductionLikeGeneration(), ready, EnableEnvelope(true)).IsNoOp.ShouldBeTrue();
+        ready.ConfigurationVersion.ShouldBe(enabledVersion);
+    }
+
+    [Theory]
+    [InlineData(4, AgentLaunchReadinessBlocker.ProhibitedCostControlPosture)]
+    [InlineData(5, AgentLaunchReadinessBlocker.ProhibitedCostControlPosture)]
+    [InlineData(0, AgentLaunchReadinessBlocker.MissingCostControlPosture)]
+    [InlineData(-1, AgentLaunchReadinessBlocker.MissingCostControlPosture)]
+    [InlineData(999, AgentLaunchReadinessBlocker.MissingCostControlPosture)]
+    public void LegacyInvalidPosturesBlockBothInspectionsAndEnablementEvenWhenAlreadyEnabled(
+        int ordinal, AgentLaunchReadinessBlocker expected)
+    {
+        foreach (bool alreadyEnabled in new[] { false, true })
+        {
+            AgentState state = StateLaunchReady(ValidCreate(), SampleLaunchReadiness with { CostPosture = (CostControlPosture)ordinal });
+            if (alreadyEnabled)
+            {
+                state.Apply(new AgentProductionLikeGenerationEnabled(AgentId, state.ConfigurationVersion + 1));
+            }
+            int version = state.ConfigurationVersion;
+            int readinessVersion = state.LaunchReadinessVersion;
+            AgentLaunchReadinessView inspection = AgentLaunchReadinessInspection
+                .GetLaunchReadiness(state, true, true).Readiness.ShouldNotBeNull();
+            inspection.CostPosture.ShouldBe((CostControlPosture)ordinal);
+            inspection.ProductionLikeGenerationEnabled.ShouldBe(alreadyEnabled);
+            inspection.Blockers.ShouldBe([expected]);
+            AgentInspection.GetStatus(state, true).Agent.ShouldNotBeNull().LaunchReadinessBlockers
+                .ShouldBe(inspection.Blockers);
+
+            DomainResult result = AgentAggregate.Handle(new EnableProductionLikeGeneration(), state, EnableEnvelope(true));
+            result.IsRejection.ShouldBeTrue();
+            result.IsNoOp.ShouldBeFalse();
+            result.Events[0].ShouldBeOfType<AgentProductionLikeGenerationBlockedRejection>().Blockers.ShouldBe(inspection.Blockers);
+            ApplyAll(state, result);
+            state.ConfigurationVersion.ShouldBe(version);
+            state.LaunchReadinessVersion.ShouldBe(readinessVersion);
+            state.ProductionLikeGenerationEnabled.ShouldBe(alreadyEnabled);
+            state.LaunchReadiness.ShouldNotBeNull().CostPosture.ShouldBe((CostControlPosture)ordinal);
+        }
+    }
+
+    [Theory]
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(0)]
+    [InlineData(999)]
+    public void UnauthorizedInvalidPosturesDenyBeforeInspectionOrMutation(int ordinal)
+    {
+        AgentState state = StateLaunchReady(ValidCreate(), SampleLaunchReadiness with { CostPosture = (CostControlPosture)ordinal });
+        state.Apply(new AgentProductionLikeGenerationEnabled(AgentId, state.ConfigurationVersion + 1));
+        int version = state.ConfigurationVersion;
+        RecordAgentLaunchReadiness command = RecordCommand(state.LaunchReadiness);
+        foreach (AgentState? candidate in new AgentState?[] { state, null })
+        {
+            AgentAggregate.Handle(command, candidate, Envelope(command, isAgentsAdmin: false)).Events[0]
+                .ShouldBeOfType<AgentAdministrationDeniedRejection>();
+            AgentAggregate.Handle(new EnableProductionLikeGeneration(), candidate, EnableEnvelope(isAgentsAdmin: false)).Events[0]
+                .ShouldBeOfType<AgentAdministrationDeniedRejection>();
+            AgentLaunchReadinessInspection.GetLaunchReadiness(candidate, false, true).Readiness.ShouldBeNull();
+            AgentInspection.GetStatus(candidate, false).Agent.ShouldBeNull();
+        }
+        state.ConfigurationVersion.ShouldBe(version);
+    }
+
+    [Fact]
+    public void AlreadyEnabledMissingReadinessStillEvaluatesAllBlockers()
+    {
+        AgentState state = StateWith(ValidCreate());
+        state.Apply(new AgentProductionLikeGenerationEnabled(AgentId, 2));
+        DomainResult result = AgentAggregate.Handle(new EnableProductionLikeGeneration(), state, EnableEnvelope(true));
+        result.Events[0].ShouldBeOfType<AgentProductionLikeGenerationBlockedRejection>()
+            .Blockers.ShouldContain(AgentLaunchReadinessBlocker.MissingCostControlPosture);
+        state.ConfigurationVersion.ShouldBe(2);
+    }
+
+    [Theory]
+    [InlineData(4, CostControlPosture.Quotas)]
+    [InlineData(4, CostControlPosture.Budgets)]
+    [InlineData(4, CostControlPosture.ProviderModelLimits)]
+    [InlineData(5, CostControlPosture.Quotas)]
+    [InlineData(5, CostControlPosture.Budgets)]
+    [InlineData(5, CostControlPosture.ProviderModelLimits)]
+    public void HistoricalProhibitedPosturesMigrateToEveryAcceptedControlWithIdempotentRetries(int historical, CostControlPosture accepted)
+    {
+        foreach (bool alreadyEnabled in new[] { false, true })
+        {
+            AgentState state = StateLaunchReady(ValidCreate(), SampleLaunchReadiness with { CostPosture = (CostControlPosture)historical });
+            if (alreadyEnabled)
+            {
+                state.Apply(new AgentProductionLikeGenerationEnabled(AgentId, state.ConfigurationVersion + 1));
+            }
+            int previousVersion = state.ConfigurationVersion;
+            int previousReadinessVersion = state.LaunchReadinessVersion;
+            AgentLaunchReadinessInspection.GetLaunchReadiness(state, true, true).Readiness.ShouldNotBeNull().Blockers
+                .ShouldBe([AgentLaunchReadinessBlocker.ProhibitedCostControlPosture]);
+            RecordAgentLaunchReadiness command = RecordCommand(SampleLaunchReadiness with { CostPosture = accepted });
+
+            DomainResult result = AgentAggregate.Handle(command, state, Envelope(command));
+
+            result.IsSuccess.ShouldBeTrue();
+            AgentLaunchReadinessRecorded recorded = result.Events.ShouldHaveSingleItem().ShouldBeOfType<AgentLaunchReadinessRecorded>();
+            recorded.ConfigurationVersion.ShouldBe(previousVersion + 1);
+            recorded.LaunchReadinessVersion.ShouldBe(previousReadinessVersion + 1);
+            ApplyAll(state, result);
+            state.LaunchReadiness.ShouldNotBeNull().CostPosture.ShouldBe(accepted);
+            state.ProductionLikeGenerationEnabled.ShouldBe(alreadyEnabled);
+            AgentLaunchReadinessInspection.GetLaunchReadiness(state, true, true).Readiness.ShouldNotBeNull().Blockers.ShouldBeEmpty();
+            AgentInspection.GetStatus(state, true).Agent.ShouldNotBeNull().LaunchReadinessBlockers.ShouldBeEmpty();
+            AgentAggregate.Handle(command, state, Envelope(command)).IsNoOp.ShouldBeTrue();
+            state.ConfigurationVersion.ShouldBe(previousVersion + 1);
+            state.LaunchReadinessVersion.ShouldBe(previousReadinessVersion + 1);
+            DomainResult enabled = AgentAggregate.Handle(new EnableProductionLikeGeneration(), state, EnableEnvelope(true));
+            if (alreadyEnabled)
+            {
+                enabled.IsNoOp.ShouldBeTrue();
+            }
+            else
+            {
+                enabled.Events.ShouldHaveSingleItem().ShouldBeOfType<AgentProductionLikeGenerationEnabled>();
+            }
+        }
+    }
+
 }

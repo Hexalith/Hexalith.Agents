@@ -41,9 +41,12 @@ public enum AgentLaunchReadinessBlocker
     /// <summary>No explicit Confirmation Response Mode latency target is recorded (AC3).</summary>
     MissingConfirmationLatencyTarget = 6,
 
-    /// <summary>No cost-control posture is recorded (AC3).</summary>
+    /// <summary>The recorded cost-control posture is absent or unrecognized (AC3).</summary>
     MissingCostControlPosture = 7,
 
     /// <summary>The Agents audit-evidence governance is unresolved (AC1; consumes the Story 4.2 audit-governance launch-readiness blocker).</summary>
     UnresolvedAuditGovernance = 8,
+
+    /// <summary>A historical prohibited cost posture requires replacement with quotas, budgets, or Provider/model limits.</summary>
+    ProhibitedCostControlPosture = 9,
 }

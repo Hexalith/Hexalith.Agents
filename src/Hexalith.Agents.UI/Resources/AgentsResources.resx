@@ -654,6 +654,8 @@
   <data name="Agents.LaunchReadiness.Panel.Label" xml:space="preserve"><value>Launch-readiness status</value></data>
   <data name="Agents.LaunchReadiness.ProductionLike.Label" xml:space="preserve"><value>Production-like generation</value></data>
   <data name="Agents.LaunchReadiness.ProductionLike.Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.Blocked" xml:space="preserve"><value>Blocked by current readiness policy</value></data>
+  <data name="Agents.LaunchReadiness.ProductionLike.HistoricallyEnabledBlocked" xml:space="preserve"><value>Previously enabled — blocked by current readiness policy</value></data>
   <data name="Agents.LaunchReadiness.ProductionLike.Disabled" xml:space="preserve"><value>Not enabled</value></data>
   <data name="Agents.LaunchReadiness.Prerequisites.Label" xml:space="preserve"><value>Launch prerequisites</value></data>
   <data name="Agents.LaunchReadiness.ContentSafety.Label" xml:space="preserve"><value>Content Safety Policy</value></data>
@@ -681,8 +683,8 @@
   <data name="Agents.LaunchReadiness.CostPosture.Quotas" xml:space="preserve"><value>Quotas</value></data>
   <data name="Agents.LaunchReadiness.CostPosture.Budgets" xml:space="preserve"><value>Budgets</value></data>
   <data name="Agents.LaunchReadiness.CostPosture.ProviderModelLimits" xml:space="preserve"><value>Provider/model limits</value></data>
-  <data name="Agents.LaunchReadiness.CostPosture.ReportingOnlyMonitoring" xml:space="preserve"><value>Reporting-only monitoring</value></data>
-  <data name="Agents.LaunchReadiness.CostPosture.AcceptedLaunchRisk" xml:space="preserve"><value>Accepted launch risk</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.ReportingOnlyMonitoring" xml:space="preserve"><value>Historical — reporting-only monitoring (prohibited)</value></data>
+  <data name="Agents.LaunchReadiness.CostPosture.AcceptedLaunchRisk" xml:space="preserve"><value>Historical — accepted launch risk (prohibited)</value></data>
   <data name="Agents.LaunchReadiness.Classification.Unknown" xml:space="preserve"><value>Unclassified</value></data>
   <data name="Agents.LaunchReadiness.Classification.Primary" xml:space="preserve"><value>Primary metric</value></data>
   <data name="Agents.LaunchReadiness.Classification.Secondary" xml:space="preserve"><value>Secondary metric</value></data>
@@ -695,6 +697,7 @@
   <data name="Agents.LaunchReadiness.Blocker.MissingAutomaticLatencyTarget" xml:space="preserve"><value>No Automatic Response Mode latency target is recorded.</value></data>
   <data name="Agents.LaunchReadiness.Blocker.MissingConfirmationLatencyTarget" xml:space="preserve"><value>No Confirmation Response Mode latency target is recorded.</value></data>
   <data name="Agents.LaunchReadiness.Blocker.MissingCostControlPosture" xml:space="preserve"><value>No cost-control posture is recorded.</value></data>
+  <data name="Agents.LaunchReadiness.Blocker.ProhibitedCostControlPosture" xml:space="preserve"><value>The historical cost posture is prohibited. Record enforced quotas, budgets, or Provider/model limits before enabling generation.</value></data>
   <data name="Agents.LaunchReadiness.Blocker.UnresolvedAuditGovernance" xml:space="preserve"><value>Audit-evidence governance is unresolved.</value></data>
   <data name="Agents.LaunchReadiness.Enable.Label" xml:space="preserve"><value>Enable production-like generation</value></data>
   <data name="Agents.LaunchReadiness.Enable.Button" xml:space="preserve"><value>Enable production-like generation</value></data>

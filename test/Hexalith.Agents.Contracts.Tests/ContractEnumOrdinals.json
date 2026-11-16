@@ -21,7 +21,8 @@
     "MissingAutomaticLatencyTarget": 5,
     "MissingConfirmationLatencyTarget": 6,
     "MissingCostControlPosture": 7,
-    "UnresolvedAuditGovernance": 8
+    "UnresolvedAuditGovernance": 8,
+    "ProhibitedCostControlPosture": 9
   },
   "Hexalith.Agents.Contracts.Agent.AgentLifecycleStatus": {
     "Unknown": 0,

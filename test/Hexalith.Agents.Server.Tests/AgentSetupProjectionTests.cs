@@ -454,4 +454,120 @@ public sealed class AgentSetupProjectionTests
 
     private static DateTimeOffset Timestamp(long sequence)
         => new DateTimeOffset(2026, 6, 24, 12, 0, 0, TimeSpan.Zero).AddSeconds(sequence);
+
+    [Theory]
+    [InlineData(4, "ReportingOnlyMonitoring", false)]
+    [InlineData(5, "AcceptedLaunchRisk", false)]
+    [InlineData(4, "ReportingOnlyMonitoring", true)]
+    [InlineData(5, "AcceptedLaunchRisk", true)]
+    public async Task HistoricalProhibitedPosturesPersistFaithfullyInIncrementalAndFullReplay(int ordinal, string name, bool numeric)
+    {
+        var readiness = new AgentLaunchReadiness([], [], (CostControlPosture)ordinal, null, "full-conversation-v1");
+        ProjectionEventDto recorded = Event(nameof(AgentLaunchReadinessRecorded), 2,
+            new AgentLaunchReadinessRecorded(AgentId, readiness, 7, 12));
+        if (numeric)
+        {
+            recorded = recorded with
+            {
+                Payload = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(recorded.Payload)
+                    .Replace($"\"{name}\"", ordinal.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)),
+            };
+        }
+        ProjectionEventDto enabled = Event(nameof(AgentProductionLikeGenerationEnabled), 3,
+            new AgentProductionLikeGenerationEnabled(AgentId, 13));
+        (await ProjectAsync(Created())).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        (await ProjectAsync(recorded, enabled)).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        AgentSetupReadModel incremental = Persisted();
+        incremental.LaunchReadiness.ShouldNotBeNull().CostPosture.ShouldBe((CostControlPosture)ordinal);
+        incremental.LaunchReadinessVersion.ShouldBe(7);
+        incremental.ConfigurationVersion.ShouldBe(13);
+        incremental.LastSequenceNumber.ShouldBe(3);
+        incremental.ProductionLikeGenerationEnabled.ShouldBeTrue();
+        (await ProjectAsync(Created(), recorded, enabled)).Status.ShouldBe(ProjectionDispatchStatus.AlreadyCompleted);
+        Persisted().ShouldBeEquivalentTo(incremental);
+
+        DomainProjectionRebuildPlan plan = await Handler().PrepareRebuildAsync(
+            Request(Created(), recorded, enabled), "rebuild-cost", CancellationToken.None);
+        var rebuilt = new FakeReadModelStore();
+        _ = await rebuilt.ExecuteAsync(new global::Hexalith.EventStore.Client.Projections.ReadModelBatch(
+            new global::Hexalith.EventStore.Client.Projections.ReadModelBatchScope(
+                StoreName, TenantId, AgentSetupReadModelAddresses.Domain, AgentId, AgentSetupReadModelAddresses.ProjectionName, "rebuild-cost"),
+            plan.Operations), CancellationToken.None);
+        AgentSetupReadModel persistedReplay = rebuilt.Snapshot<AgentSetupReadModel>(StoreName, Key).ShouldNotBeNull();
+        persistedReplay.ShouldBeEquivalentTo(incremental);
+        var state = AgentSetupProjectionFold.ToState(persistedReplay, TenantId, AgentId);
+        global::Hexalith.Agents.Agent.AgentInspection.GetStatus(state, true).Agent.ShouldNotBeNull().LaunchReadinessBlockers
+            .ShouldContain(AgentLaunchReadinessBlocker.ProhibitedCostControlPosture);
+        global::Hexalith.Agents.Agent.AgentLaunchReadinessInspection.GetLaunchReadiness(state, true, true).Readiness
+            .ShouldNotBeNull().Blockers.ShouldContain(AgentLaunchReadinessBlocker.ProhibitedCostControlPosture);
+    }
+
+    [Theory]
+    [InlineData("\"FutureCostPosture\"")]
+    [InlineData("999")]
+    public async Task UnknownCostPosturesPersistAndRemainBlockedAfterIncrementalAndFullReplay(string costJson)
+    {
+        string costMember = $"\"costPosture\":{costJson},";
+        var recorded = Event(nameof(AgentLaunchReadinessRecorded), 2,
+            new AgentLaunchReadinessRecorded(AgentId, new AgentLaunchReadiness([], [], CostControlPosture.Unknown, null, "context"), 7, 12))
+            with
+            {
+                Payload = Encoding.UTF8.GetBytes("{\"agentId\":\"hexa\",\"readiness\":{" + costMember +
+                    "\"metrics\":[],\"latencyTargets\":[],\"costPostureNote\":null,\"contextPolicyReference\":\"context\"}," +
+                    "\"launchReadinessVersion\":7,\"configurationVersion\":12}"),
+            };
+        (await ProjectAsync(Created())).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        (await ProjectAsync(recorded)).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        AgentSetupReadModel incremental = Persisted();
+        AssertUnknownCostPosture(incremental);
+
+        DomainProjectionRebuildPlan plan = await Handler().PrepareRebuildAsync(
+            Request(Created(), recorded), "rebuild-unknown-cost", CancellationToken.None);
+        var rebuilt = new FakeReadModelStore();
+        _ = await rebuilt.ExecuteAsync(new global::Hexalith.EventStore.Client.Projections.ReadModelBatch(
+            new global::Hexalith.EventStore.Client.Projections.ReadModelBatchScope(
+                StoreName, TenantId, AgentSetupReadModelAddresses.Domain, AgentId, AgentSetupReadModelAddresses.ProjectionName, "rebuild-unknown-cost"),
+            plan.Operations), CancellationToken.None);
+        AgentSetupReadModel full = rebuilt.Snapshot<AgentSetupReadModel>(StoreName, Key).ShouldNotBeNull();
+        full.ShouldBeEquivalentTo(incremental);
+        AssertUnknownCostPosture(full);
+    }
+
+    private static void AssertUnknownCostPosture(AgentSetupReadModel persisted)
+    {
+        persisted.LaunchReadiness.ShouldNotBeNull().CostPosture.ShouldBe(CostControlPosture.Unknown);
+        persisted.LaunchReadinessVersion.ShouldBe(7);
+        persisted.ConfigurationVersion.ShouldBe(12);
+        persisted.LastSequenceNumber.ShouldBe(2);
+        var state = AgentSetupProjectionFold.ToState(persisted, TenantId, AgentId);
+        global::Hexalith.Agents.Agent.AgentInspection.GetStatus(state, true).Agent.ShouldNotBeNull().LaunchReadinessBlockers
+            .ShouldContain(AgentLaunchReadinessBlocker.MissingCostControlPosture);
+        global::Hexalith.Agents.Agent.AgentLaunchReadinessInspection.GetLaunchReadiness(state, true, true).Readiness
+            .ShouldNotBeNull().Blockers.ShouldContain(AgentLaunchReadinessBlocker.MissingCostControlPosture);
+    }
+
+    [Fact]
+    public async Task MissingCostPostureIsStructurallyRefusedWithoutChangingPersistedState()
+    {
+        (await ProjectAsync(Created())).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        string previous = JsonSerializer.Serialize(Persisted());
+        int previousBatches = _store.BatchCount;
+        ProjectionEventDto malformed = Event(nameof(AgentLaunchReadinessRecorded), 2,
+            new AgentLaunchReadinessRecorded(AgentId, new AgentLaunchReadiness([], [], CostControlPosture.Unknown, null, "context"), 7, 12))
+            with
+            {
+                Payload = Encoding.UTF8.GetBytes("{\"agentId\":\"hexa\",\"readiness\":{\"metrics\":[],\"latencyTargets\":[]," +
+                    "\"costPostureNote\":null,\"contextPolicyReference\":\"context\"},\"launchReadinessVersion\":7,\"configurationVersion\":12}"),
+            };
+
+        (await ProjectAsync(malformed)).Status.ShouldBe(ProjectionDispatchStatus.Retryable);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(previous);
+        _store.BatchCount.ShouldBe(previousBatches);
+        var rejection = await Should.ThrowAsync<InvalidOperationException>(() => Handler().PrepareRebuildAsync(
+            Request(Created(), malformed), "rebuild-missing-cost", CancellationToken.None));
+        rejection.Message.ShouldBe(AgentSetupProjectionFold.UnresolvedEventReason);
+        JsonSerializer.Serialize(Persisted()).ShouldBe(previous);
+        _store.BatchCount.ShouldBe(previousBatches);
+    }
+
 }

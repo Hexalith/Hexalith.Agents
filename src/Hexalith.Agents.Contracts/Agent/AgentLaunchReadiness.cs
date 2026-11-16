@@ -18,14 +18,14 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <para>
 /// <see cref="ContextPolicyReference"/> confirms the in-force Conversation Context Policy (V1 default
 /// <c>full-conversation-v1</c> per AD-4/AD-11); it does not re-implement context bounding (already done in Story
-/// 2.3). The launch-readiness gate is a pure state check over these recorded values — an empty/invalid readiness is
-/// rejected at recording time, so a recorded readiness is exactly a valid one.
+/// 2.3). The launch-readiness gate checks current policy over these recorded values. Historical prohibited cost
+/// postures remain replayable but cannot authorize new readiness recording or production-like enablement.
 /// </para>
 /// </remarks>
 /// <param name="Metrics">The launch metric definitions (numerator/denominator/target/window/cohort + classification; AC2).</param>
 /// <param name="LatencyTargets">The explicit per-mode latency targets (Automatic + Confirmation; AC3).</param>
 /// <param name="CostPosture">The recorded cost-control posture (AC3).</param>
-/// <param name="CostPostureNote">An optional safe governance note about the cost posture (e.g. why a launch risk was accepted).</param>
+/// <param name="CostPostureNote">An optional safe governance note about the cost posture; it grants no policy exception.</param>
 /// <param name="ContextPolicyReference">The reference confirming the in-force Conversation Context Policy (V1 default <c>full-conversation-v1</c>).</param>
 public record AgentLaunchReadiness(
     IReadOnlyList<LaunchMetricDefinition> Metrics,

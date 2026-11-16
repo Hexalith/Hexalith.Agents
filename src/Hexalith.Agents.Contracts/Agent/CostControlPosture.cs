@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 using Hexalith.Agents.Contracts.Serialization;
@@ -5,35 +6,33 @@ using Hexalith.Agents.Contracts.Serialization;
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
-/// The recorded cost-control posture required before production-like generation is enabled (Story 4.4 AC3; FR-28;
-/// PRD §7 "Cost Control"). Cost controls are recorded as quotas, budgets, Provider/model limits, reporting-only
-/// monitoring, or an explicitly accepted launch risk — never left implicit.
+/// The recorded cost-control posture checked before production-like generation is enabled. Only quotas, budgets,
+/// and Provider/model limits are accepted for new readiness decisions. Historical prohibited values remain readable.
 /// </summary>
 /// <remarks>
-/// Serialized by name so an absent value never deserializes to a concrete posture. <see cref="Unknown"/>
-/// (ordinal 0) is the not-yet-decided sentinel — a recorded readiness must carry a concrete posture, so
-/// <see cref="Unknown"/> is rejected at recording time and can never satisfy the readiness gate. The concrete
-/// cost-control choice is itself an accepted downstream governance blocker (OQ-6); this enum records which posture
-/// kind was chosen, not the provider-specific numbers.
+/// Names and ordinals are stable for historical replay. Unknown and undefined values fail closed. A recorded
+/// posture describes a governance decision; it does not supply proof of live enforcement or Provider exclusion.
 /// </remarks>
 [JsonConverter(typeof(UnknownFallbackEnumConverter<CostControlPosture>))]
 public enum CostControlPosture
 {
-    /// <summary>Absent/unrecognized posture sentinel — fails readiness recording.</summary>
+    /// <summary>Absent/unrecognized posture sentinel — fails readiness recording and enablement.</summary>
     Unknown = 0,
 
     /// <summary>Cost is controlled by usage quotas.</summary>
-    Quotas,
+    Quotas = 1,
 
     /// <summary>Cost is controlled by spending budgets.</summary>
-    Budgets,
+    Budgets = 2,
 
     /// <summary>Cost is controlled by Provider/model limits.</summary>
-    ProviderModelLimits,
+    ProviderModelLimits = 3,
 
-    /// <summary>Cost is observed by reporting-only monitoring (no hard enforcement).</summary>
-    ReportingOnlyMonitoring,
+    /// <summary>Historical reporting-only monitoring without hard enforcement; prohibited for readiness.</summary>
+    [Obsolete("Reporting-only monitoring is prohibited. Record quotas, budgets, or Provider/model limits instead.")]
+    ReportingOnlyMonitoring = 4,
 
-    /// <summary>Uncontrolled cost is an explicitly accepted launch risk.</summary>
-    AcceptedLaunchRisk,
+    /// <summary>Historical acceptance of uncontrolled cost as a launch risk; prohibited for readiness.</summary>
+    [Obsolete("Accepted launch risk is prohibited. Record quotas, budgets, or Provider/model limits instead.")]
+    AcceptedLaunchRisk = 5,
 }

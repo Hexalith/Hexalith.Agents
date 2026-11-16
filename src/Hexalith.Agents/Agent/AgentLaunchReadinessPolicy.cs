@@ -14,9 +14,9 @@ namespace Hexalith.Agents.Agent;
 /// These are <em>pure state checks</em> over internal Agent state — no trusted verdict and no dependency read. The
 /// only externally-resolved input is <c>auditGovernanceResolved</c>, which the Server read/orchestration layer
 /// resolves from the <c>IAgentAuditGovernanceReadinessProvider</c> port and passes in as a bool (never read from the
-/// pure aggregate/policy; AD-3). Because an empty/invalid readiness is rejected at recording time, a recorded
-/// readiness is exactly a valid one, so a present-and-recorded readiness clears the readiness-derived blockers and a
-/// missing readiness fails them all (fail-closed; AD-12). Mirrors <see cref="AgentConfigurationPolicy.ComputeActivationBlockers"/>.
+/// pure aggregate/policy; AD-3). Historical recorded readiness is retained without granting current authority:
+/// prohibited and unrecognized cost postures are blocked on every evaluation. Missing readiness fails its required
+/// gates (fail-closed; AD-12). Mirrors <see cref="AgentConfigurationPolicy.ComputeActivationBlockers"/>.
 /// </remarks>
 internal static class AgentLaunchReadinessPolicy
 {
@@ -70,9 +70,9 @@ internal static class AgentLaunchReadinessPolicy
             blockers.Add(AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget);
         }
 
-        if ((readiness?.CostPosture ?? CostControlPosture.Unknown) == CostControlPosture.Unknown)
+        if (GetCostPostureBlocker(readiness?.CostPosture ?? CostControlPosture.Unknown) is { } costBlocker)
         {
-            blockers.Add(AgentLaunchReadinessBlocker.MissingCostControlPosture);
+            blockers.Add(costBlocker);
         }
 
         if (!auditGovernanceResolved)
@@ -82,6 +82,20 @@ internal static class AgentLaunchReadinessPolicy
 
         return blockers;
     }
+
+    /// <summary>Classifies the cost posture for both recording and readiness evaluation, failing closed for undefined values.</summary>
+    /// <param name="posture">The submitted or historically recorded posture.</param>
+    /// <returns>No blocker for an accepted hard control; otherwise the specific cost-posture blocker.</returns>
+    internal static AgentLaunchReadinessBlocker? GetCostPostureBlocker(CostControlPosture posture)
+        => posture switch
+        {
+            CostControlPosture.Quotas or CostControlPosture.Budgets or CostControlPosture.ProviderModelLimits => null,
+#pragma warning disable CS0618 // Historical identities must be classified without granting current authority.
+            CostControlPosture.ReportingOnlyMonitoring or CostControlPosture.AcceptedLaunchRisk
+                => AgentLaunchReadinessBlocker.ProhibitedCostControlPosture,
+#pragma warning restore CS0618
+            _ => AgentLaunchReadinessBlocker.MissingCostControlPosture,
+        };
 
     /// <summary>
     /// Whether a launch metric definition is complete: a concrete classification and all five governance descriptors

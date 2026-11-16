@@ -1127,4 +1127,27 @@ public sealed class AgentsOperationEndpointsTests
         using StreamReader reader = new(body);
         return await reader.ReadToEndAsync().ConfigureAwait(true);
     }
+
+    [Theory]
+    [InlineData(4, "ReportingOnlyMonitoring")]
+    [InlineData(5, "AcceptedLaunchRisk")]
+    public async Task SubstitutedReadinessTransportPreservesHistoricalPostureAndProhibitedBlocker(int ordinal, string name)
+    {
+        // Transport compatibility only: a substitute does not establish live authoritative readiness.
+        var view = new AgentLaunchReadinessView([], [], (CostControlPosture)ordinal, 7, true, true, true,
+            [AgentLaunchReadinessBlocker.ProhibitedCostControlPosture]);
+        IAgentsClient client = Substitute.For<IAgentsClient>();
+        IAgentStatusOperations status = Substitute.For<IAgentStatusOperations>();
+        status.GetAgentLaunchReadinessAsync("agent-1", Arg.Any<AgentOperationOptions?>(), Arg.Any<CancellationToken>())
+            .Returns(new ValueTask<AgentOperationResult<AgentLaunchReadinessView>>(
+                AgentOperationResult<AgentLaunchReadinessView>.Succeeded(view)));
+        client.Status.Returns(status);
+        await using WebApplication app = BuildApp(client);
+        string json = await InvokeEndpointAsync(app,
+            "/api/agents/operations/status/agents/{agentId}/launch-readiness", ("agentId", "agent-1")).ConfigureAwait(true);
+        json.ShouldContain(name);
+        json.ShouldContain("ProhibitedCostControlPosture");
+        json.ShouldContain("\"productionLikeGenerationEnabled\":true");
+    }
+
 }

@@ -23,6 +23,7 @@ public sealed class LaunchReadinessPresentationTests
     [InlineData(AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget, RecoveryActionGroup.FixPolicy)]
     [InlineData(AgentLaunchReadinessBlocker.MissingCostControlPosture, RecoveryActionGroup.FixPolicy)]
     [InlineData(AgentLaunchReadinessBlocker.UnresolvedAuditGovernance, RecoveryActionGroup.InspectAudit)]
+    [InlineData(AgentLaunchReadinessBlocker.ProhibitedCostControlPosture, RecoveryActionGroup.FixPolicy)]
     public void Every_blocker_maps_to_its_recovery_action_group(AgentLaunchReadinessBlocker blocker, RecoveryActionGroup expected)
         => LaunchReadinessPresentation.GroupForBlocker(blocker).ShouldBe(expected);
 
@@ -50,8 +51,10 @@ public sealed class LaunchReadinessPresentationTests
     [InlineData(CostControlPosture.Quotas, "Agents.LaunchReadiness.CostPosture.Quotas")]
     [InlineData(CostControlPosture.Budgets, "Agents.LaunchReadiness.CostPosture.Budgets")]
     [InlineData(CostControlPosture.ProviderModelLimits, "Agents.LaunchReadiness.CostPosture.ProviderModelLimits")]
+#pragma warning disable CS0618 // Historical postures retain visible labels.
     [InlineData(CostControlPosture.ReportingOnlyMonitoring, "Agents.LaunchReadiness.CostPosture.ReportingOnlyMonitoring")]
     [InlineData(CostControlPosture.AcceptedLaunchRisk, "Agents.LaunchReadiness.CostPosture.AcceptedLaunchRisk")]
+#pragma warning restore CS0618
     public void Cost_posture_key_is_a_single_whole_string_per_posture(CostControlPosture posture, string expected)
         => LaunchReadinessPresentation.CostPostureKeyFor(posture).ShouldBe(expected);
 

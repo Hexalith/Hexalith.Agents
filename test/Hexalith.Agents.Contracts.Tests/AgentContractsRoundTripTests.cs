@@ -350,6 +350,7 @@ public sealed class AgentContractsRoundTripTests
         ((int)AgentLaunchReadinessBlocker.MissingConfirmationLatencyTarget).ShouldBe(6);
         ((int)AgentLaunchReadinessBlocker.MissingCostControlPosture).ShouldBe(7);
         ((int)AgentLaunchReadinessBlocker.UnresolvedAuditGovernance).ShouldBe(8);
+        ((int)AgentLaunchReadinessBlocker.ProhibitedCostControlPosture).ShouldBe(9);
     }
 
     [Fact]
@@ -372,8 +373,10 @@ public sealed class AgentContractsRoundTripTests
         ((int)CostControlPosture.Quotas).ShouldBe(1);
         ((int)CostControlPosture.Budgets).ShouldBe(2);
         ((int)CostControlPosture.ProviderModelLimits).ShouldBe(3);
+#pragma warning disable CS0618 // Verify immutable historical identities.
         ((int)CostControlPosture.ReportingOnlyMonitoring).ShouldBe(4);
         ((int)CostControlPosture.AcceptedLaunchRisk).ShouldBe(5);
+#pragma warning restore CS0618
     }
 
     [Fact]
@@ -397,7 +400,9 @@ public sealed class AgentContractsRoundTripTests
         JsonSerializer.Deserialize<LaunchMetricClassification>("\"Primary\"").ShouldBe(LaunchMetricClassification.Primary);
         JsonSerializer.Deserialize<CostControlPosture>("\"Budgets\"").ShouldBe(CostControlPosture.Budgets);
         // Serialized by name (not ordinal).
+#pragma warning disable CS0618 // Historical values must still serialize by their original names.
         JsonSerializer.Serialize(CostControlPosture.AcceptedLaunchRisk).ShouldBe("\"AcceptedLaunchRisk\"");
+#pragma warning restore CS0618
     }
 
     // ===== Enum fail-safe defaults =====
@@ -416,4 +421,30 @@ public sealed class AgentContractsRoundTripTests
         default(AgentActivationBlocker).ShouldBe(AgentActivationBlocker.Unknown);
         JsonSerializer.Deserialize<AgentActivationBlocker>("\"Unknown\"").ShouldBe(AgentActivationBlocker.Unknown);
     }
+
+    [Theory]
+    [InlineData("ReportingOnlyMonitoring", 4)]
+    [InlineData("AcceptedLaunchRisk", 5)]
+    public void ProhibitedHistoricalPosturesRetainNamesOrdinalsAndObsoleteMetadata(string name, int ordinal)
+    {
+        var value = (CostControlPosture)ordinal;
+        Enum.GetName(value).ShouldBe(name);
+        JsonSerializer.Serialize(value).ShouldBe($"\"{name}\"");
+        JsonSerializer.Deserialize<CostControlPosture>($"\"{name}\"").ShouldBe(value);
+        JsonSerializer.Deserialize<CostControlPosture>(ordinal.ToString(System.Globalization.CultureInfo.InvariantCulture)).ShouldBe(value);
+        JsonSerializer.Deserialize<CostControlPosture>($"\"{ordinal}\"").ShouldBe(value);
+        object[] attributes = typeof(CostControlPosture).GetField(name)!.GetCustomAttributes(typeof(ObsoleteAttribute), false);
+        var obsolete = attributes.ShouldHaveSingleItem().ShouldBeOfType<ObsoleteAttribute>();
+        obsolete.IsError.ShouldBeFalse();
+        obsolete.Message.ShouldNotBeNull().ShouldContain("prohibited");
+    }
+
+    [Theory]
+    [InlineData("999")]
+    [InlineData("-1")]
+    [InlineData("\"FuturePosture\"")]
+    [InlineData("null")]
+    public void UnknownCostPosturesRetainFallbackCompatibility(string json)
+        => JsonSerializer.Deserialize<CostControlPosture>(json).ShouldBe(CostControlPosture.Unknown);
+
 }

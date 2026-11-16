@@ -4,7 +4,7 @@
 
 @* launch-readiness-panel (Story 4.4 AC4): a Fluent status region that surfaces the production-like-enablement state and
    the launch-readiness blockers grouped BY RecoveryActionGroup (fix policy, inspect audit) — never by the raw subsystem
-   (UX-DR9). The enablement badge uses status-success ONLY when production-like generation is enabled (all gates pass);
+   (UX-DR9). The enablement badge uses status-success ONLY when production-like generation is enabled and no current blocker remains;
    blocked readiness is status-severe (color + icon + visible text; UX-DR12). The container announces politely
    (UX-DR36); the page's AgentSurfaceState owns the assertive error/permission states. No secret/payload/content appears
    in any string, aria-label, or data-testid (AD-14). *@
@@ -67,17 +67,22 @@
     // Rendered in the canonical recovery order (RecoveryActionGroup declaration order).
     private static readonly RecoveryActionGroup[] _groupOrder = Enum.GetValues<RecoveryActionGroup>();
 
-    // status-success ONLY when production-like generation is enabled (all gates pass); blocked/not-enabled is severe.
-    private BadgeColor EnablementColor
-        => Readiness.ProductionLikeGenerationEnabled ? BadgeColor.Success : BadgeColor.Severe;
+    private bool IsCurrentlyEnabled => Readiness.ProductionLikeGenerationEnabled && Readiness.Blockers.Count == 0;
+
+    private BadgeColor EnablementColor => IsCurrentlyEnabled ? BadgeColor.Success : BadgeColor.Severe;
 
     private Icon EnablementIcon
-        => Readiness.ProductionLikeGenerationEnabled ? FcFluentIcons.Checkmark16() : FcFluentIcons.SubtractCircle16();
+        => Readiness.Blockers.Count > 0 ? FcFluentIcons.Warning16()
+            : IsCurrentlyEnabled ? FcFluentIcons.Checkmark16() : FcFluentIcons.SubtractCircle16();
 
     private string EnablementLabel
-        => Readiness.ProductionLikeGenerationEnabled
-            ? Localizer["Agents.LaunchReadiness.ProductionLike.Enabled"]
-            : Localizer["Agents.LaunchReadiness.ProductionLike.Disabled"];
+        => Readiness.Blockers.Count > 0
+            ? Localizer[Readiness.ProductionLikeGenerationEnabled
+                ? "Agents.LaunchReadiness.ProductionLike.HistoricallyEnabledBlocked"
+                : "Agents.LaunchReadiness.ProductionLike.Blocked"]
+            : Localizer[IsCurrentlyEnabled
+                ? "Agents.LaunchReadiness.ProductionLike.Enabled"
+                : "Agents.LaunchReadiness.ProductionLike.Disabled"];
 
     private IReadOnlyList<AgentLaunchReadinessBlocker> BlockersFor(RecoveryActionGroup group)
         => Readiness.Blockers
