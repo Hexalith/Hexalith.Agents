@@ -1,0 +1,15 @@
+{
+  ".": "dd94e17591ab265a8226d4fff9b2b1ec3363b552",
+  "references/Hexalith.AI.Tools": "17a37d83db193f0b7494c1b931fd1e82a67c1424",
+  "references/Hexalith.Commons": "ab5e92faa3bab1fa43b8ecadd423432dfe652bb2",
+  "references/Hexalith.PolymorphicSerializations": "476cfccac3c5ba694a8e0ef11b1157728b9ec093",
+  "references/Hexalith.Conversations": "ed6eedc146b493bfbf7250af7356fd3b20d8333f",
+  "references/Hexalith.EventStore": "2dcf708cbab0d4ad0cf72f947d0b0a1444e251a1",
+  "references/Hexalith.Memories": "003e3d8677292739bb7978efea95415210c78719",
+  "references/Hexalith.Tenants": "d73267fdbe84d09ccddf0a6492390e32d8938405",
+  "references/Hexalith.Parties": "5dacf507003d861e6ed935a4298cafb34b5f6e9a",
+  "references/Hexalith.Builds": "264e17d3185c87b72b0757dd66a13040793756bb",
+  "references/Hexalith.FrontComposer": "923988d855cd6131b4287e3da763f12baf60ab22",
+  "references/Hexalith.McpCli": "eaecf888a0bace9981ae78a81fd6aa7486927d22",
+  "references/Hexalith.Platform": "17b1f688b332020fafbe1da07a5c04a41886c7bd"
+}

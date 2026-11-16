@@ -1,0 +1,226 @@
+{
+  "date": "2026-11-16",
+  "story": "5.4",
+  "status": "in-progress",
+  "storyComplete": false,
+  "implementationSourceChanged": false,
+  "testsOrVerifierChanged": false,
+  "dependencyContractsAndStatusesChanged": false,
+  "frozenIntentAndAcceptanceChanged": false,
+  "primaryCommands": [
+    {
+      "mode": "Local",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Local",
+        "-ArtifactsPath",
+        "/tmp/hexalith-job.RkarM1qx/artifacts/local"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 105.02
+    },
+    {
+      "mode": "Live",
+      "command": [
+        "pwsh",
+        "-NoProfile",
+        "-File",
+        "./eng/verify-story-5.4.ps1",
+        "-Mode",
+        "Live",
+        "-ArtifactsPath",
+        "/tmp/hexalith-job.RkarM1qx/artifacts/live"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.73
+    }
+  ],
+  "toolingCommand": {
+    "command": [
+      "run-with-temp",
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/tooling",
+      "-p",
+      "story_54_verifier_test.py",
+      "-v"
+    ],
+    "exitCode": 0,
+    "testMethods": 6,
+    "log": "tooling-tests.log"
+  },
+  "revisions": {
+    ".": "dd94e17591ab265a8226d4fff9b2b1ec3363b552",
+    "references/Hexalith.AI.Tools": "17a37d83db193f0b7494c1b931fd1e82a67c1424",
+    "references/Hexalith.Commons": "ab5e92faa3bab1fa43b8ecadd423432dfe652bb2",
+    "references/Hexalith.PolymorphicSerializations": "476cfccac3c5ba694a8e0ef11b1157728b9ec093",
+    "references/Hexalith.Conversations": "ed6eedc146b493bfbf7250af7356fd3b20d8333f",
+    "references/Hexalith.EventStore": "2dcf708cbab0d4ad0cf72f947d0b0a1444e251a1",
+    "references/Hexalith.Memories": "003e3d8677292739bb7978efea95415210c78719",
+    "references/Hexalith.Tenants": "d73267fdbe84d09ccddf0a6492390e32d8938405",
+    "references/Hexalith.Parties": "5dacf507003d861e6ed935a4298cafb34b5f6e9a",
+    "references/Hexalith.Builds": "264e17d3185c87b72b0757dd66a13040793756bb",
+    "references/Hexalith.FrontComposer": "923988d855cd6131b4287e3da763f12baf60ab22",
+    "references/Hexalith.McpCli": "eaecf888a0bace9981ae78a81fd6aa7486927d22",
+    "references/Hexalith.Platform": "17b1f688b332020fafbe1da07a5c04a41886c7bd"
+  },
+  "localGate": {
+    "status": "passed",
+    "framework": "net11.0",
+    "sdk": "11.0.100",
+    "configuration": "Debug",
+    "dependencyMode": "canonical Builds producer source mapping",
+    "warningFreeBuilds": 5,
+    "projects": {
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 1997,
+        "passed": 1997,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 1980,
+        "passed": 1980,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1253,
+        "passed": 1253,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1017,
+        "passed": 1017,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "totalPassed": 6254,
+    "evidence": "Existing local boundary implementation only; no production or state-store persistence qualification."
+  },
+  "liveGate": {
+    "StoryComplete": false,
+    "ExternalCalls": 0,
+    "Blockers": [
+      {
+        "RecordId": "EXT-PARTIES-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-CONV-AI-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-SECRETS-1",
+        "Code": "DependencyNotAvailable"
+      },
+      {
+        "RecordId": "EXT-HOST-1",
+        "Code": "DependencyNotAvailable"
+      }
+    ],
+    "Mode": "Live"
+  },
+  "acceptedVersusInstalled": {
+    "EXT-PARTIES-1": {
+      "accepted": "56cb4401c4179d431385ad3d931fefa402e4fc5a",
+      "installed": "5dacf507003d861e6ed935a4298cafb34b5f6e9a",
+      "status": "Committed"
+    },
+    "EXT-CONV-AI-1": {
+      "accepted": "87e8b4a6ec3224b20a560b0e83de857805925572",
+      "installed": "ed6eedc146b493bfbf7250af7356fd3b20d8333f",
+      "status": "Committed"
+    },
+    "EXT-SECRETS-1": {
+      "accepted": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installed": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+      "status": "Committed"
+    },
+    "EXT-HOST-1": {
+      "accepted": "abbec4093715c1db854433119b32d4e16df20d08",
+      "installed": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+      "status": "Committed"
+    }
+  },
+  "preservation": {
+    "selectedRootInputs": 1085,
+    "sourceDrift": [],
+    "rootAndReferenceRevisionsUnchanged": true,
+    "scope": "Tracked root src/test/tests-tooling/eng/module and selected configuration/register inputs hashed before and after; no complete transitive/generated compiler-input attestation."
+  },
+  "remainingAcceptance": [
+    "Installed production current Tenants/Parties/Conversations authority and immutable provisioning bindings",
+    "Genuine AD-30 signature/principal/operation/scope verification and private issuer/nonce replay registration before target-command construction",
+    "Replicated durable denial spool and restricted recovery worker",
+    "Persisted private ACL, restart/restore/lost-ack/recovery and cross-tenant isolation matrix",
+    "Accepted exact-target Available owner deliveries and complete live acceptance"
+  ],
+  "actionsNotPerformed": [
+    "Owner compatibility commands",
+    "Remote Git operations",
+    "Deployment or maintenance",
+    "Dependency status changes",
+    "Production source edits",
+    "Full-story review"
+  ],
+  "disposableWorkspaces": "The run-with-temp local clone/build job and tooling job finished; scratch was removed. Only useful logs, XML, hashes and receipts remain.",
+  "evidenceArchive": {
+    "path": "evidence.tar.gz",
+    "sha256": "4a8a873e2fb28aed28ae6f4ec86daa695d9f1781c7a5e8549f93d7f084704d0d"
+  },
+  "artifactSha256": {
+    "clone.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "inputs-after.json": "37f32b65dbae9bcb9b4c4e8707af0918967abcd6198d1eed8999425c04508344",
+    "revisions-after.json": "76e580e290e13e4362d65089d6568408a8fc67c7bedb97eec165400b9a36aab9",
+    "assembly-hashes.json": "e11e449603c69c3fb004cd7d58c827b209d6c75f4a008bdc730be8892486ab65",
+    "run.json": "16440499dbd0ecd0be2693fabfd80ee579dd38a2dccd4574c1ec15d92c826fc7",
+    "revisions.json": "76e580e290e13e4362d65089d6568408a8fc67c7bedb97eec165400b9a36aab9",
+    "live.log": "81e45229e9b12abd486758354a600dcfe89e088fc76ccd70f6dcc080a3c5399e",
+    "tooling-tests.log": "65f34a2c979207b3d9cb23411d5902248dd93e790d41b4d1e3222224f26678ba",
+    "source-drift.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "inputs-before.json": "37f32b65dbae9bcb9b4c4e8707af0918967abcd6198d1eed8999425c04508344",
+    "local.log": "6b1c7035630edfa500b03c8fcf9d4a9d73b99405b17fd4dd23fe69b820cf4d24",
+    "evidence.tar.gz": "4a8a873e2fb28aed28ae6f4ec86daa695d9f1781c7a5e8549f93d7f084704d0d"
+  },
+  "independentVerification": {
+    "archiveXmlAndStrictCountsChecked": true,
+    "fiveWarningFreeBuildLogsChecked": true,
+    "liveZeroCallsAndFourBlockersChecked": true,
+    "selectedRootHashesAndCanonicalRevisionsStable": true,
+    "scratchRemoved": true
+  },
+  "specPreservation": {
+    "frontmatter": true,
+    "frozenIntent": true,
+    "tasksAndAcceptance": true,
+    "originalBaselineCommit": "4e79df1f8b4e91c8f7ec73f935ed9212950b596b",
+    "frozenIntentSha256": "a20faa6ebe5cdc5b92024d0e5bbb3644dd65e53964d2e5f8cdce4c153c1e3668"
+  }
+}

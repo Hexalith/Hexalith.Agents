@@ -1,0 +1,32 @@
+[
+  {
+    "mode": "Local",
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "./eng/verify-story-5.4.ps1",
+      "-Mode",
+      "Local",
+      "-ArtifactsPath",
+      "/tmp/hexalith-job.RkarM1qx/artifacts/local"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 105.02
+  },
+  {
+    "mode": "Live",
+    "command": [
+      "pwsh",
+      "-NoProfile",
+      "-File",
+      "./eng/verify-story-5.4.ps1",
+      "-Mode",
+      "Live",
+      "-ArtifactsPath",
+      "/tmp/hexalith-job.RkarM1qx/artifacts/live"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 0.73
+  }
+]
