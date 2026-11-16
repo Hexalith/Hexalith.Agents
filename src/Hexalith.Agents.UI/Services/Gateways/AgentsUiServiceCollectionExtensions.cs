@@ -52,6 +52,8 @@ public static class AgentsUiServiceCollectionExtensions
     /// Registers the live Agent setup gateway over the public Agents client (Story 5.2), and otherwise leaves the
     /// deferred placeholder in place. Registration is skipped when no Agent target is configured, so a host that
     /// has not named its Agent keeps the fail-closed surface instead of issuing unaddressed reads and writes.
+    /// Known deferred implementation types are replaced even when explicitly registered; other host bindings
+    /// are preserved in either registration order.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="configuration">The host configuration.</param>
@@ -66,13 +68,33 @@ public static class AgentsUiServiceCollectionExtensions
 
         if (!string.IsNullOrWhiteSpace(section["AgentId"]))
         {
-            services.TryAddScoped<IAgentSetupGateway, AgentsClientSetupGateway>();
+            AddLiveGateway<IAgentSetupGateway, DeferredAgentSetupGateway, AgentsClientSetupGateway>(services);
         }
 
         // Catalog administration is tenant-scoped, not Agent-scoped: a host that opts into the live setup
         // composition also binds the live catalog gateway. Plain AddAgentsUi keeps the deferred placeholder.
-        services.TryAddScoped<IProviderCatalogGateway, AgentsClientProviderCatalogGateway>();
+        AddLiveGateway<IProviderCatalogGateway, DeferredProviderCatalogGateway, AgentsClientProviderCatalogGateway>(services);
 
         return services.AddAgentsUi();
+    }
+
+    private static void AddLiveGateway<TGateway, TDeferred, TLive>(IServiceCollection services)
+        where TGateway : class
+        where TDeferred : class, TGateway
+        where TLive : class, TGateway
+    {
+        // Only our known placeholders are replaceable. Host factories, instances and custom types retain
+        // their lifetime and precedence regardless of which UI registration method ran first.
+        for (int index = services.Count - 1; index >= 0; index--)
+        {
+            ServiceDescriptor descriptor = services[index];
+            if (!descriptor.IsKeyedService && descriptor.ServiceType == typeof(TGateway)
+                && descriptor.ImplementationType == typeof(TDeferred))
+            {
+                services.RemoveAt(index);
+            }
+        }
+
+        services.TryAddScoped<TGateway, TLive>();
     }
 }

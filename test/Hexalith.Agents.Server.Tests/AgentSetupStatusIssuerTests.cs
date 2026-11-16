@@ -40,7 +40,19 @@ public sealed class AgentSetupStatusIssuerTests
     public Task ReservedSystemStatusScopeStaysUnavailableWithTheRealIssuer(bool credentials)
         => AssertComposedReaderAsync("system", "provider-catalog", credentials, expectedRead: false);
 
-    private static async Task AssertComposedReaderAsync(string tenant, string domain, bool credentials, bool expectedRead)
+    /// <summary>Completion and pending observations retain their exact lifecycle through the real issuer.</summary>
+    [Theory]
+    [InlineData("agent", CommandStatus.Completed)]
+    [InlineData("provider-catalog", CommandStatus.Completed)]
+    [InlineData("tenant-provider-enablement", CommandStatus.Completed)]
+    [InlineData("agent", CommandStatus.Received)]
+    [InlineData("provider-catalog", CommandStatus.Processing)]
+    [InlineData("tenant-provider-enablement", CommandStatus.EventsStored)]
+    public Task ComposedReaderPreservesCompletionAndPendingStatus(string domain, CommandStatus kind)
+        => AssertComposedReaderAsync("tenant-a", domain, credentials: true, expectedRead: true, kind);
+
+    private static async Task AssertComposedReaderAsync(string tenant, string domain, bool credentials, bool expectedRead,
+        CommandStatus kind = CommandStatus.Rejected)
     {
         IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -61,8 +73,9 @@ public sealed class AgentSetupStatusIssuerTests
         services.AddSingleton(environment);
         var handler = new CommandStatusResponseHandler
         {
-            Status = new CommandStatusQueryResponse("correlation", nameof(CommandStatus.Rejected),
-                (int)CommandStatus.Rejected, "InvalidSetupRejection", "message") { TenantId = tenant, Domain = domain },
+            Status = new CommandStatusQueryResponse("correlation", kind.ToString(),
+                (int)kind, kind == CommandStatus.Rejected ? "InvalidSetupRejection" : null, "message")
+                { TenantId = tenant, Domain = domain, AggregateId = "agent-a", EventCount = 1, CommittedEventSequence = 8 },
         };
         services.AddEventStoreGatewayClient(options => options.BaseAddress = new Uri("https://gateway.example/"))
             .AddEventStoreGatewayMultiDomainWorkloadTransport(["agent", "provider-catalog", "tenant-provider-enablement"])
@@ -77,7 +90,8 @@ public sealed class AgentSetupStatusIssuerTests
 
         if (expectedRead)
         {
-            status.ShouldNotBeNull().IsRejected.ShouldBeTrue();
+            status.ShouldNotBeNull().ShouldBe(handler.Status);
+            status.IsRejected.ShouldBe(kind == CommandStatus.Rejected);
             handler.Path.ShouldBe($"/api/v1/commands/status/workload/{tenant}/message");
             handler.DaprAppId.ShouldBe("eventstore-runtime");
             var token = new JsonWebToken(handler.Assertion.ShouldNotBeNull());

@@ -7,6 +7,9 @@ location: Platform/FrontComposer host composition
 source_spec: `_bmad-output/implementation-artifacts/spec-5-2-enforce-complete-launch-readiness-before-callability.md`
 reason: Story 5.2 ships AddAgentsUiSetup and composition tests, but no in-repo host invokes it; platform-owned hosting is Story 5.6 / EXT-HOST-1.
 status: open
+local_prerequisites: 2026-11-16 — `AddAgentsUiSetup` now replaces only known deferred setup/catalog registrations after plain UI registration, preserves host bindings and scoped lifetimes, and is idempotent. Both orders, missing target and custom descriptors have executable controls.
+remaining_inputs: Exact accepted Platform/FrontComposer host, real Agents client and configured Agent target; owner execution must prove the rendered live composition. No host or dependency acceptance is supplied locally.
+evidence_record: [Host/setup prerequisites](tests/host-setup-prerequisites-2026-11-16/README.md)
 
 ### DW-2: Align setup-query authorization with live tenant-access evidence instead of the deferred ITenantAccessReader alongside HTTP Agents.Administrator role checks.
 
@@ -149,6 +152,9 @@ evidence_record: [Setup UX and review reconciliation](deferred-setup-ux-review-2
   summary: Prove exact setup result payload replay and projection through the production-like EventStore topology.
   evidence: Unit and component evidence covers the platform contract, but the Story 5.6 production-like host fixture is required to establish whether the payload survives the real EventStore completion, idempotency replay, and persisted projection path end to end.
   status: open
+  local_prerequisites: 2026-11-16 — A real gateway HTTP submission runs the production setup aggregate, replays the original receipt/effect/version for equivalent intent, rejects changed intent without another event, and feeds the accepted event into AgentSetupProjectionHandler. Persisted FakeReadModelStore state catches up from lag once; duplicate delivery changes no batch or stored state.
+  remaining_inputs: Exact accepted production-like host and durable EventStore completion/idempotency/projection stores, with owner-run receipt and persisted end-state evidence. Callback history and the local read-model double are not durable topology qualification.
+  evidence_record: [Host/setup prerequisites](tests/host-setup-prerequisites-2026-11-16/README.md)
 
 ### DW-6: Eventful result payload forwarding depends on advisory command status reaching Completed.
 
@@ -275,6 +281,9 @@ source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-thro
 severity: medium
 reason: Deterministic rejection may throw before returning an accepted payload-less receipt, while advisory status lag produces the same shape for success. Story 5.6's production-like topology must settle reachability before the live reader is bound.
 status: open
+local_prerequisites: 2026-11-16 — Real SDK workload transport preserves all canonical lifecycle states and exact scope; the composed exact-domain issuer covers Completed, rejection and pending observations. Existing identity/credential refusals and custom-reader preservation remain exercised; reserved system status remains unavailable and Completed payload gating is unchanged.
+remaining_inputs: Accepted gateway status capability, exact tenant/domain grants and independently provisioned credentials, plus owner-run completion/rejection/lag observations. Platform system commands require an explicitly capable host override; SDK refusal is retained.
+evidence_record: [Host/setup prerequisites](tests/host-setup-prerequisites-2026-11-16/README.md)
 
 ### DW-20: Publish and consume the EventStore release that forwards no-op result payloads.
 
@@ -291,6 +300,9 @@ source_spec: `_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-thro
 severity: blocker
 reason: This repository publishes `Hexalith.Agents.EventStore` and proves its explicit registration in an isolated gateway provider, but it does not own the deployed Platform gateway host. Promotion requires that host to consume the package and call `AddAgentsEventStore` with the exact allow-listed Agents Dapr app id; without that call, reserved metadata and keyed setup commands fail closed before domain execution.
 status: open
+local_prerequisites: 2026-11-16 — Actual HTTP gateway admission requires registration plus an exact locally admitted proof; missing integration/proof, changed proof intent and foreign workload leave domain history untouched. The positive fixture uses the real registration and admission coordinator.
+remaining_inputs: Exact accepted gateway package/host, Agents Dapr identity, independent proof provenance/admission provider and owner-run no-effect refusal plus admitted success evidence. The synthetic local proof supplies no installed-host authority.
+evidence_record: [Host/setup prerequisites](tests/host-setup-prerequisites-2026-11-16/README.md)
 
 ### DW-22: Verify that packed dependency asset-exclusion metadata prevents transitive build or analyzer leakage.
 
@@ -1007,3 +1019,7 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `spec-five-deferred-ingress-and-consumer-items.md`
   summary: Qualify the actual provider /query endpoint with an owner-bound IDomainServiceAdministratorVerifier before claiming a working Platform query composition.
   evidence: Independent review B1 traced SDK ExecuteWithAdministratorVerificationAsync: the endpoint clears IsGlobalAdmin when no verifier is registered, and current Agents composition registers none. Direct dispatcher regressions establish local originating-caller binding and current human authority only; an exact authenticated HTTP positive control with the accepted owner verifier is needed. This pre-existing composition gap remains under DW-21; no host credential or verifier is invented by this batch.
+  status: open
+  local_prerequisites: 2026-11-16 — Real UseEventStoreDomainService HTTP /query now has list/detail positive controls with a synthetic current verifier, SDK workload/channel authentication, exact catalog generation, bound human and production handlers. Missing/false verifier, wrong caller, expired/revoked authority and unavailable verifier disclose no protected model; verifier exceptions return 503 before authority/model reads.
+  remaining_inputs: Accepted owner verifier, real current Parties/Tenants evidence and bound originating human credentials in the exact enrolled host; execute its authenticated HTTP positive and refusal controls. Test-only verifier/catalog/current-authority fixtures do not change dependency availability or production composition.
+  evidence_record: [Host/setup prerequisites](tests/host-setup-prerequisites-2026-11-16/README.md)

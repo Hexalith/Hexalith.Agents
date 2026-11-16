@@ -41,6 +41,32 @@ public sealed class EventStoreAgentCommandStatusReaderTests
     }
 
     [Theory]
+    [InlineData(CommandStatus.Received)]
+    [InlineData(CommandStatus.Processing)]
+    [InlineData(CommandStatus.EventsStored)]
+    [InlineData(CommandStatus.EventsPublished)]
+    [InlineData(CommandStatus.Completed)]
+    [InlineData(CommandStatus.Rejected)]
+    [InlineData(CommandStatus.PublishFailed)]
+    [InlineData(CommandStatus.TimedOut)]
+    public async Task ExactScopedTransportPreservesEveryCanonicalStatusAndItsEvidence(CommandStatus kind)
+    {
+        _handler.Status = Rejected() with
+        {
+            Status = kind.ToString(), StatusCode = (int)kind,
+            RejectionEventType = kind == CommandStatus.Rejected ? "InvalidAgentConfigurationRejection" : null,
+            AggregateId = "agent-a", CommittedEventSequence = 8, EventCount = 1,
+        };
+
+        CommandStatusQueryResponse status = (await Reader().ReadAsync(Tenant, Domain, Message, Correlation,
+            TestContext.Current.CancellationToken)).ShouldNotBeNull();
+
+        status.ShouldBe(_handler.Status);
+        status.IsRejected.ShouldBe(kind == CommandStatus.Rejected);
+        _handler.Path.ShouldBe($"/api/v1/commands/status/workload/{Tenant}/{Message}");
+    }
+
+    [Theory]
     [InlineData("tenant")]
     [InlineData("domain")]
     [InlineData("message")]

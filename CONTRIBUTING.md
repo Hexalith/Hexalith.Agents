@@ -263,10 +263,14 @@ or live runtime qualification.
 
 Ingress gateway callback fixtures apply/replay aggregate events in memory. They do
 not qualify durable-store transactions or a production proof/admission provider.
-Provider caller tests invoke the SDK dispatcher directly and bypass the `/query`
-endpoint's administrator verifier. A working platform-query endpoint still needs
-an owner-bound `IDomainServiceAdministratorVerifier` and authenticated HTTP positive
-control; that pre-existing composition qualification remains open under DW-21.
+`ProviderQueryEndpointPrerequisiteTests` additionally exercise actual HTTP `/query`
+through `UseEventStoreDomainService`, the real SDK workload/channel policy and
+catalog receiver guard, bound originating callers, and production provider query
+handlers. Their verifier, current-authority sources and immutable catalog are
+synthetic local fixtures. A working installed platform-query composition still
+needs an owner-bound `IDomainServiceAdministratorVerifier`, accepted current-authority
+sources and an authenticated positive control against the exact accepted host.
+That qualification remains open under DW-21.
 
 `eng/consumer-executable-assets.json` is the reviewed executable asset
 policy. CI refuses additions, removals, version changes, hash changes and changed
@@ -296,6 +300,24 @@ tests and errors. The gateway suite includes equivalent-intent replay and change
 payload conflict; the owner admission actor regressions additionally check that
 the first stored intent is retained. These are local regressions and do not
 establish production Dapr persistence or dependency acceptance.
+
+The [2026-11-16 host/setup prerequisite report](_bmad-output/implementation-artifacts/tests/host-setup-prerequisites-2026-11-16/README.md)
+records the UI registration-order fix and local gateway, status, receipt/projection
+and actual `/query` controls. `AddAgentsUiSetup` can follow plain `AddAgentsUi`:
+it replaces known deferred setup/catalog implementation types, including explicit
+registrations of those placeholders, and preserves other host bindings. Live
+gateways remain scoped. A missing Agent target leaves setup
+unavailable while catalog opt-in remains tenant-scoped. The installed Platform or
+FrontComposer host must still invoke the live registration with its real client
+and target; no host is introduced here.
+
+Installed gateway owners must call `AddAgentsEventStore` with the exact Agents
+Dapr app id and an independently admitted `IAgentsTrustedCommandProofReader`.
+Registration alone grants no reserved metadata authority. Qualify missing proof,
+foreign workload and changed intent as no-effect refusals against the accepted
+gateway. Local command history and `FakeReadModelStore` prove receipt replay,
+projection lag/catch-up and duplicate suppression only within their fixture;
+owners still need durable EventStore completion, replay and projection evidence.
 
 ## Terminal setup command status
 

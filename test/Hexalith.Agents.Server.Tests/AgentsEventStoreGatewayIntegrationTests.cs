@@ -10,8 +10,10 @@ using Dapr.Actors;
 using Dapr.Actors.Client;
 
 using Hexalith.Agents.Client;
+using Hexalith.Agents.Agent;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
+using Hexalith.Agents.Contracts.Agent.Events;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
@@ -25,12 +27,15 @@ using Hexalith.Agents.Contracts.ProviderCatalog.Events;
 using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 using Hexalith.Agents.Server.Composition;
 using Hexalith.Agents.Server.Ports;
+using Hexalith.Agents.Server.Projections;
 
 using Hexalith.EventStore.Authentication;
 using Hexalith.EventStore.Authorization;
 using Hexalith.EventStore.Configuration;
 using Hexalith.EventStore.Controllers;
 using Hexalith.EventStore.Contracts.Commands;
+using Hexalith.EventStore.Contracts.Projections;
+using Hexalith.EventStore.Contracts.Results;
 #if HEXALITH_EVENTSTORE_SOURCE
 using Hexalith.EventStore.Contracts.Routing;
 #endif
@@ -694,6 +699,120 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Fact]
+    public async Task SetupReceiptReplayFeedsTheProductionProjectionOnceAfterLagAndConflict()
+    {
+        const string StoreName = "statestore";
+        var created = new AgentCreated("agent-a", "tenant-a", "Hexa", null, "private instructions long enough", 1, 1);
+        var state = new AgentState();
+        state.Apply(created);
+        var history = new List<ProjectionEventDto>
+        {
+            new(nameof(AgentCreated), JsonSerializer.SerializeToUtf8Bytes(created), "json", 1, DateTimeOffset.UtcNow, "create-correlation", "create-message"),
+        };
+        var store = new FakeReadModelStore();
+        var projection = new AgentSetupProjectionHandler(store, store,
+            Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName }));
+        (await projection.ProjectAsync(new("tenant-a", "agent", "agent-a", [history[0]]), "seed",
+            TestContext.Current.CancellationToken)).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        string? resultPayload = null;
+        await using WebApplication domain = BuildDomainApp(command =>
+        {
+            var payload = JsonSerializer.Deserialize<ConfigureAgentResponseMode>(command.Payload,
+                new JsonSerializerOptions(JsonSerializerDefaults.Web)).ShouldNotBeNull();
+            DomainResult result = AgentAggregate.Handle(payload, state, command.ToCommandEnvelope());
+            var applied = result.Events.Single().ShouldBeOfType<AgentResponseModeConfigured>();
+            state.Apply(applied);
+            history.Add(new(nameof(AgentResponseModeConfigured), JsonSerializer.SerializeToUtf8Bytes(applied), "json",
+                history.Count + 1, DateTimeOffset.UtcNow, command.CorrelationId, command.MessageId));
+            resultPayload = result.ResultPayload.ShouldNotBeNull();
+        }, _ => resultPayload);
+        await domain.StartAsync(TestContext.Current.CancellationToken);
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        await using WebApplication gateway = BuildGatewayApp(Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId), ledger, true);
+        await gateway.StartAsync(TestContext.Current.CancellationToken);
+        using HttpClient client = GatewayClient(gateway);
+        using HttpResponseMessage original = await client.PostAsJsonAsync("/api/v1/commands",
+            ResponseModeRequest("{\"Mode\":\"Automatic\"}"), TestContext.Current.CancellationToken);
+        original.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse receipt = (await original.Content.ReadFromJsonAsync<SubmitCommandResponse>(TestContext.Current.CancellationToken)).ShouldNotBeNull();
+        JsonElement effect = receipt.ResultPayload.ShouldNotBeNull();
+        effect.GetProperty("effect").GetString().ShouldBe(nameof(AgentSetupWriteEffect.Applied));
+        int version = effect.GetProperty("configurationVersion").GetInt32();
+        version.ShouldBe(2);
+        string key = AgentSetupReadModelAddresses.Detail("tenant-a", "agent-a");
+        AgentSetupReadModel lagged = store.Snapshot<AgentSetupReadModel>(StoreName, key).ShouldNotBeNull();
+        lagged.ConfigurationVersion.ShouldBe(1);
+        AgentSetupViewFactory.Create(lagged, "tenant-a", "agent-a", version, true).Setup.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.AuthoritativePending);
+
+        using HttpResponseMessage retry = await client.PostAsJsonAsync("/api/v1/commands",
+            ResponseModeRequest("{\"mode\":1}"), TestContext.Current.CancellationToken);
+        retry.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+        SubmitCommandResponse replay = (await retry.Content.ReadFromJsonAsync<SubmitCommandResponse>(TestContext.Current.CancellationToken)).ShouldNotBeNull();
+        replay.MessageId.ShouldBe(receipt.MessageId);
+        replay.CorrelationId.ShouldBe(receipt.CorrelationId);
+        replay.ResultPayload.ShouldNotBeNull().GetRawText().ShouldBe(effect.GetRawText());
+        using HttpResponseMessage conflict = await client.PostAsJsonAsync("/api/v1/commands",
+            ResponseModeRequest("{\"mode\":\"Confirmation\"}"), TestContext.Current.CancellationToken);
+        conflict.StatusCode.ShouldBe(System.Net.HttpStatusCode.Conflict);
+        ledger.ExecutionCount.ShouldBe(1);
+        history.Count.ShouldBe(2);
+
+        var delivery = new ProjectionRequest("tenant-a", "agent", "agent-a", [history[1]]);
+        (await projection.ProjectAsync(delivery, "accepted-command", TestContext.Current.CancellationToken))
+            .Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        AgentSetupReadModel persisted = store.Snapshot<AgentSetupReadModel>(StoreName, key).ShouldNotBeNull();
+        persisted.ConfigurationVersion.ShouldBe(version);
+        persisted.LastSequenceNumber.ShouldBe(2);
+        persisted.ResponseMode.ShouldBe(AgentResponseMode.Automatic);
+        history[1].MessageId.ShouldBe(receipt.MessageId);
+        history[1].CorrelationId.ShouldBe(receipt.CorrelationId);
+        AgentSetupViewFactory.Create(persisted, "tenant-a", "agent-a", version, true).Setup.ShouldNotBeNull().TruthState.ShouldBe(AgentSetupTruthState.ProjectionConfirmed);
+        int writes = store.BatchCount;
+        (await projection.ProjectAsync(delivery, "duplicate-command", TestContext.Current.CancellationToken))
+            .Status.ShouldBe(ProjectionDispatchStatus.AlreadyCompleted);
+        store.BatchCount.ShouldBe(writes);
+        store.Snapshot<AgentSetupReadModel>(StoreName, key).ShouldBeEquivalentTo(persisted);
+        JsonSerializer.Serialize(persisted).ShouldNotContain("private instructions");
+    }
+
+    [Theory]
+    [InlineData("exact")]
+    [InlineData("missing-registration")]
+    [InlineData("missing-proof")]
+    [InlineData("wrong-intent")]
+    [InlineData("wrong-workload")]
+    public async Task HttpEnrollmentRequiresTheRegisteredExactProofBeforeAnyDomainEffects(string scenario)
+    {
+        SubmitCommandRequest admitted = ResponseModeRequest("{\"mode\":\"Automatic\"}");
+        // The SDK removes all extension metadata from the proof reader's command and passes each exact key/value separately.
+        string intent = JsonSerializer.Serialize(admitted with { Extensions = null });
+        var proof = Substitute.For<IAgentsTrustedCommandProofReader>();
+        proof.HasAdmittedProof(Arg.Any<ClaimsPrincipal>(), Arg.Any<SubmitCommandRequest>(), Arg.Any<string>(), Arg.Any<string>())
+            .Returns(call => JsonSerializer.Serialize(call.Arg<SubmitCommandRequest>()) == intent
+                && call.ArgAt<string>(2) == AgentSetupTrustedExtensions.AgentAdministrator && call.ArgAt<string>(3) == "true");
+        var history = new List<SubmitCommand>();
+        await using WebApplication domain = BuildDomainApp(history.Add);
+        await domain.StartAsync(TestContext.Current.CancellationToken);
+        using HttpClient domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient);
+        await using WebApplication gateway = BuildGatewayApp(
+            Principal(DaprInternalAuthenticationOptions.SchemeName, scenario == "wrong-workload" ? "foreign-agents" : AgentsAppId),
+            ledger, scenario != "missing-registration", proofReader: proof, proofAvailable: scenario != "missing-proof");
+        await gateway.StartAsync(TestContext.Current.CancellationToken);
+        using HttpClient client = GatewayClient(gateway);
+        SubmitCommandRequest submitted = scenario == "wrong-intent"
+            ? admitted with { Payload = JsonPayload("{\"mode\":\"Confirmation\"}") } : admitted;
+
+        using HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/commands", submitted,
+            TestContext.Current.CancellationToken);
+
+        response.StatusCode.ShouldBe(scenario == "exact" ? System.Net.HttpStatusCode.Accepted : System.Net.HttpStatusCode.BadRequest);
+        history.Count.ShouldBe(scenario == "exact" ? 1 : 0);
+        ledger.ExecutionCount.ShouldBe(scenario == "exact" ? 1 : 0);
+    }
+
+    [Fact]
     public async Task An_in_flight_key_from_the_previous_encoder_conflicts_without_a_second_execution()
     {
         const string RawPayload = "{\"Mode\":\"Automatic\"}";
@@ -1285,7 +1404,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         return identities.Active.IntentDigest;
     }
 
-    private static WebApplication BuildDomainApp(Action<SubmitCommand> onExecute)
+    private static WebApplication BuildDomainApp(Action<SubmitCommand> onExecute, Func<SubmitCommand, string?>? resultPayload = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
@@ -1303,7 +1422,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             onExecute(command);
             return Results.Ok(new SubmitCommandResult(
                 command.CorrelationId,
-                "{\"effect\":\"Applied\",\"configurationVersion\":8}",
+                resultPayload is null ? "{\"effect\":\"Applied\",\"configurationVersion\":8}" : resultPayload(command),
                 command.MessageId));
         });
         return app;
@@ -1525,7 +1644,8 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         bool registerAgentsIntegration,
         ProductionAdmissionState? admissionState = null,
         IAgentsTrustedCommandProofReader? proofReader = null,
-        string allowedDomains = "agent,other-domain")
+        string allowedDomains = "agent,other-domain",
+        bool proofAvailable = true)
     {
         ProductionAdmissionState state = admissionState ?? new ProductionAdmissionState();
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
@@ -1561,7 +1681,8 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         builder.Services.AddSingleton<ExtensionMetadataSanitizer>();
         if (registerAgentsIntegration)
         {
-            _ = builder.Services.AddAgentsEventStore(AgentsAppId, proofReader ?? new FixtureTrustedCommandProofReader());
+            _ = builder.Services.AddAgentsEventStore(AgentsAppId,
+                proofAvailable ? proofReader ?? new FixtureTrustedCommandProofReader() : null);
         }
 
         builder.Services.AddSingleton<IIdempotencyDigestKeyProvider>(_ => CreateDigestKeyProvider());

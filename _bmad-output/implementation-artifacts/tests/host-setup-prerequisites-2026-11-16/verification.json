@@ -1,0 +1,451 @@
+{
+  "date": "2026-11-16",
+  "scope": "Local prerequisites only; all five installed-host qualifications remain open",
+  "baselineCommit": "528c9375ecc1f528bc1ef0fac171f4dd853c23d2",
+  "dependencyRevisions": {
+    "Hexalith.Builds": "fdda17c0a4538b0f7c99f813c20ca24b49006530",
+    "Hexalith.EventStore": "f85419d501f279e9a813435aa73538185ad26ada",
+    "Hexalith.Platform": "fecdcbc309e19c95808673ff7c5549d993b19b76"
+  },
+  "sdkVersion": "11.0.100",
+  "externalOwnerCalls": 0,
+  "liveQualificationEstablished": false,
+  "preReviewEvidence": {
+    "scope": "Historical complete gate and focused evidence before review fixes; hashes are not current-source qualification",
+    "sourceSha256": {
+      "src/Hexalith.Agents.UI/Services/Gateways/AgentsUiServiceCollectionExtensions.cs": "efdbe7e221e9f8da178a3d9270aae689d53d74caf97e19b0589ab5fb0a619df0",
+      "test/Hexalith.Agents.Server.Tests/AgentSetupStatusIssuerTests.cs": "262f2e098e163adb185057571968ceac49a9a9e4f987a7c49756d0de3897157a",
+      "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "86fd0f5115be2b7b506cad98e0826cf1baa63104ddb04b320fc524b8687abd70",
+      "test/Hexalith.Agents.Server.Tests/EventStoreAgentCommandStatusReaderTests.cs": "918435d4024839a08fd92b81b902133e0f44a6fe64c64c4c97f82658027f6783",
+      "test/Hexalith.Agents.Server.Tests/FixtureProviderQueryRouteCatalog.cs": "4c913662aec44dfece0b7433051414eb1fbb83b6a685c2355fb40df5248d831d",
+      "test/Hexalith.Agents.Server.Tests/ProviderQueryEndpointPrerequisiteTests.cs": "5af8230cd2b2fdc41a200ee19baa66742f0bff918aff65cf65994e4da45d9902",
+      "test/Hexalith.Agents.UI.Tests/AgentsUiCompositionTests.cs": "7463e9242f9d0f5abbace74bf9998e2485f99f265f2a94401e193fb69e0dfe3e"
+    },
+    "fullPackageGate": {
+      "status": "passed",
+      "command": "pwsh -NoLogo -NoProfile -File eng/verify-story-6.1.ps1 -DependencyMode Package -ArtifactsPath <durable-evidence>/package",
+      "total": 6420,
+      "allBuildsZeroWarnings": true,
+      "runs": {
+        "Hexalith.Agents.Contracts.Tests": {
+          "total": 2005,
+          "passed": 2005,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "not-run": 0
+        },
+        "Hexalith.Agents.Client.Tests": {
+          "total": 7,
+          "passed": 7,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "not-run": 0
+        },
+        "Hexalith.Agents.Server.Tests": {
+          "total": 2005,
+          "passed": 2005,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "not-run": 0
+        },
+        "Hexalith.Agents.UI.Tests": {
+          "total": 1361,
+          "passed": 1361,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "not-run": 0
+        },
+        "Hexalith.Agents.Tests": {
+          "total": 1042,
+          "passed": 1042,
+          "failed": 0,
+          "errors": 0,
+          "skipped": 0,
+          "not-run": 0
+        }
+      }
+    },
+    "focusedNativeRuns": {
+      "ui-composition": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "query": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "host-boundaries": {
+        "total": 265,
+        "passed": 265,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "addedCaseAudit": {
+      "status": "passed",
+      "total": 55,
+      "methodCaseCounts": {
+        "LiveSetupReplacesOnlyKnownPlaceholdersInEitherOrder": 4,
+        "LiveSetupPreservesCustomFactoriesAndInstancesInEitherOrder": 4,
+        "LiveSetupPreservesExplicitImplementationTypesAndTheirHostSelectedLifetimes": 1,
+        "ExactScopedTransportPreservesEveryCanonicalStatusAndItsEvidence": 8,
+        "ComposedReaderPreservesCompletionAndPendingStatus": 6,
+        "SetupReceiptReplayFeedsTheProductionProjectionOnceAfterLagAndConflict": 1,
+        "HttpEnrollmentRequiresTheRegisteredExactProofBeforeAnyDomainEffects": 5,
+        "HttpQueryRequiresBoundCallerVerifierAndCurrentAuthority": 26
+      }
+    },
+    "packageFloor": {
+      "status": "passed",
+      "selectedRows": 13,
+      "selectedVersion": "5.1.1",
+      "minimumVersion": "3.128.3"
+    },
+    "sourceValidation": {
+      "status": "blocked",
+      "bareServer": "Conversations requires Platform tool-selected source mapping before Agents compilation",
+      "focusedUi": "Unsuppressed EventStore.Contracts CA1822 in ProductionProfileValidationResult.Authorization (15) and Qualification (18)"
+    },
+    "correctedAttempts": {
+      "focusedQuery": {
+        "failed": 26,
+        "reason": "Synthetic route ids rejected by catalog name grammar"
+      },
+      "focusedBoundaries": {
+        "total": 265,
+        "passed": 263,
+        "failed": 2,
+        "reason": "Proof fixture omitted SDK extension stripping and expected the wrong foreign-workload HTTP code"
+      },
+      "firstPackageGate": {
+        "serverTotal": 2005,
+        "serverPassed": 2004,
+        "serverFailed": 1,
+        "reason": "Incomplete copied tracked archive inventory; corrected using complete local Git clones"
+      }
+    },
+    "optionalTooling": {
+      "status": "interrupted-partial",
+      "exitCode": 130,
+      "finalTotalsAvailable": false,
+      "earlierErrorMarkers": 2,
+      "currentTest": "parties_identity_verification_test.PartiesIdentityVerificationTests.test_each_added_owner_selection_requires_complete_named_results",
+      "cleanup": {
+        "status": "interrupted-partial",
+        "reason": "Parent requested stopping optional tooling discovery after all required gates passed.",
+        "rootPid": 2680737,
+        "ownedPids": [
+          2680737,
+          2955124,
+          2956773
+        ],
+        "signals": [
+          {
+            "pid": 2680737,
+            "signal": "SIGINT"
+          }
+        ],
+        "remainingLiveOwnedPids": []
+      }
+    },
+    "artifactSha256": {
+      "focused-source-ui-build.log": "c45d56a5c2be0cf8e165ebd71798c664cc495dc68e8af14dc7c6c5aa31afcdd7",
+      "host-boundaries-attempt-1.log": "4a24499626178f0647061ec9719283f2f3c8327c9ca2e404b257a17979aba1f1",
+      "host-boundaries-attempt-1.xml": "bdf9b75001738a218716a976d31d1ea69871b02e7310b890b24cb25460504c0e",
+      "host-boundaries.log": "96126ce98cc8ed10c3ed173c879edee57bce477331af3d3720429b17c1f161ba",
+      "host-boundaries.xml": "24eaf4f06aa827d5512625240c601a96db569c808f5f6486ee5189365ab1d3bc",
+      "optional-tooling-interruption.json": "ce8ea661a7ba8cc40f2ad18734a3263f440a2e6525d5adfee38dc0498358d7de",
+      "package/package/Hexalith.Agents.Client.Tests.build.log": "ebcb13ef86ed410e96457a862f2d5950ccfec50cb02099feef7a47e8d9825ba0",
+      "package/package/Hexalith.Agents.Client.Tests.log": "e452053095af3dd64c3f006410ad33d210689847b7c38c2886f72380440d6951",
+      "package/package/Hexalith.Agents.Client.Tests.xml": "bb697a4fb2b24c233d6bf108c53358b9a1d775077c28695228ae9014444f6b12",
+      "package/package/Hexalith.Agents.Contracts.Tests.build.log": "5a24eafa1d84b8a3901fe7934e12e9e81b1ccb971813d1d41e4f500aee5643fa",
+      "package/package/Hexalith.Agents.Contracts.Tests.log": "f968ce1f8bb5062f4f9490a114b9fae75b81fdbc8cbd2cc2e9bba00f02aba265",
+      "package/package/Hexalith.Agents.Contracts.Tests.xml": "8016dda5f2af66d4292c1010eae571c183183f34923e4b1d2bbbf748175c327c",
+      "package/package/Hexalith.Agents.Server.Tests.build.log": "b14f59f5cfccffb1e6d622ba43b0465c2a82e2aba18479dd820be12236b5fa5e",
+      "package/package/Hexalith.Agents.Server.Tests.log": "c49f9043facb3b81a088e55953c6854a407f2857bac5fae4296b446bcf51d524",
+      "package/package/Hexalith.Agents.Server.Tests.xml": "a72f6a14dde086bcee8abaebec2fadbf66d7666b2d913f903279041e644418c9",
+      "package/package/Hexalith.Agents.Tests.build.log": "f3fd3d85dcb884f69d0e82e06b00f2f93ebd8dbcb4b04f2d5423c12e47459235",
+      "package/package/Hexalith.Agents.Tests.log": "6543ed3310f0ac60b7c05267d8291b30be8b4e76ba609898fb72b8db8fbab49a",
+      "package/package/Hexalith.Agents.Tests.xml": "4103a27ee0199580ba0b688c046eaf46bb3fc56a996c4c4f67f5792ffa9bf4d4",
+      "package/package/Hexalith.Agents.UI.Tests.build.log": "65421bdbead4607a62a57575d56ec10e9e78d36cce134367d671bbbe6696d93a",
+      "package/package/Hexalith.Agents.UI.Tests.log": "b8e5a2b6e239b58b1e8c858b2dbcb8c74555a3620ff786ddedaf073cb2b688d4",
+      "package/package/Hexalith.Agents.UI.Tests.xml": "0ecb8aaada8929e5093e0e80fd6141d15de33fefa219b6d011b0f10118ecfb43",
+      "package/result.json": "bbc05e5264816631220fd80c37d87ddf956e986cffa26d36cdfef005b1bea441",
+      "package-attempt-1/package/Hexalith.Agents.Client.Tests.build.log": "f2c8d23a4c8870398e7e09a4e8c7e948655ccb3252730796188a9ca34bcf11b2",
+      "package-attempt-1/package/Hexalith.Agents.Client.Tests.log": "23747bb4a4b8fe04024ae3e3b34ece583e0cba13b927bd3c9f4cea1c5356804d",
+      "package-attempt-1/package/Hexalith.Agents.Client.Tests.xml": "56134ba7b730eaa14d6bddb599ad1fdc87ece97e3ec20445eda2c37cd23564b1",
+      "package-attempt-1/package/Hexalith.Agents.Contracts.Tests.build.log": "520da3a1725130f25c6a8cbe00a3d5c40da1547065269cb134c5083b8e92ef85",
+      "package-attempt-1/package/Hexalith.Agents.Contracts.Tests.log": "6413707a5ebdada1ee2bd910cacaee095352353374107a46ae0122cc1d1ba32d",
+      "package-attempt-1/package/Hexalith.Agents.Contracts.Tests.xml": "63bbc6092571445523950ff65fb834e727cb89ee54b9699acd7ffe5d1d3363f4",
+      "package-attempt-1/package/Hexalith.Agents.Server.Tests.build.log": "a84fd11ad544702e09a680334b1c037a2b371a5d95b196e0af6818f7b117ffab",
+      "package-attempt-1/package/Hexalith.Agents.Server.Tests.log": "94038766fa18b99d4878c782ad2d0ce6311433a0afacc33b0fa0aaa7c99e7d00",
+      "package-attempt-1/package/Hexalith.Agents.Server.Tests.xml": "8f9b2ecc9d8c037976cd7b0dac2a3c37415d8e0584f4a8b6e7fd18e5ae5c8c44",
+      "package-attempt-1/package/Hexalith.Agents.Tests.build.log": "23fe5b7ec241f819b9cc0fba397931d9fbd279f40f726ab2f63a5e831c408112",
+      "package-attempt-1/package/Hexalith.Agents.Tests.log": "7121ff71e0859a00bbecf5bc3be9d0ebc34efc2726858df75df1da42c01d13c3",
+      "package-attempt-1/package/Hexalith.Agents.Tests.xml": "8b6fdd06cb5e39d96cfb236f6f153111c2c73dec0d766d2c8dd11552fa986bfa",
+      "package-floor.log": "3ea925dd675ceeef6041ecf268b2ac1c92f03e49b52b0f29b16d096ce7648b92",
+      "package-gate-attempt-1.log": "66748c2bc66b69b4589cfb53f8fce560770272d41ed6779ab746be78055a74a6",
+      "package-gate.log": "c3985d34e87c00c71f673ebcebb04c57844150e31b45de05ef6e81f0232c1e45",
+      "package-server-build.log": "dbf14ed1d172734aa9dc63d7a88118f5f331d4e4c3b6fc25ea1a6b19ed070ca6",
+      "package-ui-build.log": "6d44be913162bd33c0c9fe6f44ba5efa51a4e59c869f6d1e117ecd98c66cbcc3",
+      "query-attempt-2.xml": "bf6b6c9938fbe5cb124995965ee13d802ad1d9225c9f64cf5b52a1691040896a",
+      "query.log": "abd5666ccbb0c66beb11938c41b8d326a712bd0f3ee60adb3a7aca232160cbec",
+      "query.xml": "bf6b6c9938fbe5cb124995965ee13d802ad1d9225c9f64cf5b52a1691040896a",
+      "source-server-build.log": "942afdf748f11bfdaa8d993de7014e7bb6d13fc8b4c7dceaef33e538fd541122",
+      "tooling.log": "93a883ebbcdbab6d7db672e6df3ee1e473df626119229fb11103e41dd4cb2acb",
+      "ui-composition.log": "318bc03cd16c59377601059fb1f9561d22fc6b5ddf4d8d7b654684e0f7bdf334",
+      "ui-composition.xml": "caf4c2284b40cd7fc405586751c0b877b8ec3bd19d212390b112113d30807c51"
+    },
+    "reproducerSha256": "79663e1e2500f0fdbb4a8cf010a1254450c65f64fcc21a4ef10b1b4bf3f1b028",
+    "disposableJob": {
+      "workspaceRemoved": true,
+      "wrapperExitCode": 130,
+      "exitReason": "Interrupted optional tooling discovery; required native/package/floor gates already passed"
+    }
+  },
+  "requiredMethodCaseCounts": {
+    "Hexalith.Agents.UI.Tests.AgentsUiCompositionTests.LiveSetupReplacesOnlyKnownPlaceholdersInEitherOrder": 4,
+    "Hexalith.Agents.UI.Tests.AgentsUiCompositionTests.LiveSetupPreservesCustomFactoriesAndInstancesInEitherOrder": 4,
+    "Hexalith.Agents.UI.Tests.AgentsUiCompositionTests.LiveSetupPreservesExplicitImplementationTypesAndTheirHostSelectedLifetimes": 1,
+    "Hexalith.Agents.Server.Tests.EventStoreAgentCommandStatusReaderTests.ExactScopedTransportPreservesEveryCanonicalStatusAndItsEvidence": 8,
+    "Hexalith.Agents.Server.Tests.AgentSetupStatusIssuerTests.ComposedReaderPreservesCompletionAndPendingStatus": 6,
+    "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.SetupReceiptReplayFeedsTheProductionProjectionOnceAfterLagAndConflict": 1,
+    "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.HttpEnrollmentRequiresTheRegisteredExactProofBeforeAnyDomainEffects": 5,
+    "Hexalith.Agents.Server.Tests.ProviderQueryEndpointPrerequisiteTests.HttpQueryRequiresBoundCallerVerifierAndCurrentAuthority": 26,
+    "Hexalith.Agents.UI.Tests.AgentsUiCompositionTests.LiveSetupReplacesExplicitBuiltInDeferredImplementationTypes": 1
+  },
+  "expectedFocusedTotals": {
+    "query": 26,
+    "host-boundaries": 265,
+    "ui-composition": 17
+  },
+  "postReviewValidation": {
+    "status": "focused-passed",
+    "fullGateStatus": "Passed final parent end-to-end verification: 6421/6421; five warning-free builds. Pre-review results remain distinct.",
+    "sourceSha256": {
+      "src/Hexalith.Agents.UI/Services/Gateways/AgentsUiServiceCollectionExtensions.cs": "aec9a710d063d3ba85f933ab69f45c2d51c1a7044b6b3a58d71f4dbc2791650c",
+      "test/Hexalith.Agents.Server.Tests/AgentSetupStatusIssuerTests.cs": "262f2e098e163adb185057571968ceac49a9a9e4f987a7c49756d0de3897157a",
+      "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "86fd0f5115be2b7b506cad98e0826cf1baa63104ddb04b320fc524b8687abd70",
+      "test/Hexalith.Agents.Server.Tests/EventStoreAgentCommandStatusReaderTests.cs": "918435d4024839a08fd92b81b902133e0f44a6fe64c64c4c97f82658027f6783",
+      "test/Hexalith.Agents.Server.Tests/FixtureProviderQueryRouteCatalog.cs": "4c913662aec44dfece0b7433051414eb1fbb83b6a685c2355fb40df5248d831d",
+      "test/Hexalith.Agents.Server.Tests/ProviderQueryEndpointPrerequisiteTests.cs": "0f691e66fcddbf9550450ff16b5839efe6ada7bf6ca8ccd55c868de8bfcf76bb",
+      "test/Hexalith.Agents.UI.Tests/AgentsUiCompositionTests.cs": "734e6752556bb458802d290798ace00b099e9e6e350368e0d10937d08ca9f460"
+    },
+    "reproducerSha256": "fed1d76eb06747fb4a9347f8e6758ce433b6ca991c526a86474aaa343a47aa11",
+    "reviewControlsSha256": "6502aa730789fc654895caa313f72df012f8ff7d25ede5e3122dd08ef3baada1",
+    "documentationSha256": {
+      "CONTRIBUTING.md": "fba893c9ebc46904d34a917ff8ee6763dcfce3677d710d40f2b6370d9959ca0e",
+      "README.md": "0cbdb2fd2a33dcc2563c83dbbefd206973ea9a271a0c77d5a5bff94d89b7033e"
+    },
+    "focusedNativeRuns": {
+      "ui-composition": {
+        "total": 17,
+        "passed": 17,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "query": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "owningBuildsZeroWarnings": true,
+    "optimizedXmlAndDeletionControls": {
+      "passed": 9,
+      "optimization": "PYTHONOPTIMIZE=1 and python -O",
+      "cases": [
+        "overlay-deletion-and-preservation",
+        "optimized-xml-valid",
+        "optimized-xml-missing-xml",
+        "optimized-xml-malformed-xml",
+        "optimized-xml-failed-summary",
+        "optimized-xml-failed-row-with-forged-summary",
+        "optimized-xml-malformed-summary",
+        "optimized-xml-missing-method",
+        "optimized-xml-wrong-method-owner"
+      ]
+    },
+    "decodedPayloadControls": {
+      "passed": 7,
+      "scope": "Denied-payload recursive guard, including unknown fields/arrays/escaped strings and property names; authorized safe reference asserted by positive endpoint cases",
+      "scratchConsoleWarning": "CS7022: test-project generated xUnit entry point ignored in favor of probe global code; no owning-project warnings"
+    },
+    "failedReviewAttempt": {
+      "queryTotal": 26,
+      "passed": 24,
+      "failed": 2,
+      "reason": "Success cfg-ref absence instruction refuted by documented authorized safe-reference contract; preserved as review/query-attempt-1.log and .xml"
+    },
+    "artifactSha256": {
+      "implementation.diff": "753db0f3c1fbaa9bda560514ab4d8a94b784b8354aade792d2d641e3568d578f",
+      "payload-guard-build.log": "876ec17a508bb3086f066dda15615cc4732a98df46a5deff6e727f1f4b2f20f9",
+      "payload-guard.log": "bf5e45ced988539aa16775cbc0354ddbd12d90af1a2dc36bc7487e5e7ad6e782",
+      "query-attempt-1.log": "c40027cce33fea5ed3b313426a04e319afe01ebf73e9400ff38ab42f90f83489",
+      "query-attempt-1.xml": "3f6fff94eb41b97caeed3eb14ca83395039db8d2b1d23518dabf519b9145894d",
+      "query.log": "8159163b71302f1e41d6a7f8fc180438d61b952a297e211b4e9b1c1c729e0572",
+      "query.xml": "21aaea8ba446d2c6e422f0f0c6cd04dd816681e605de6087bf3a1bb40b84b052",
+      "review-controls.json": "9f3d5744e54260e4a4d1f6724a98f531a4e64eb61cd98aec73cfdcca31c99abc",
+      "review-controls.log": "6eac314ea3334b90ba125c91d645e1008ff5be0735826eba79f604f66b390d4f",
+      "run-focused.sh": "f7b8527a6e31001e533f05d150279f2ab1efbb1a6ba2d536c64bc575208466bb",
+      "run-query-final.sh": "4711db33d2f23b5e42259fc7f995494b1edf5bf0dcc26903ccb0c2b8b42df67f",
+      "server-build.log": "de01125409aa4f46cfab08c4a3276bf5488665ce7b0ddbe6fd9ddc487d2f1cdd",
+      "ui-build.log": "105fbafa65c0ec63fdf4ff13cbbc1052995ee5f0a2d6889ce241ddd9d16c6101",
+      "ui-composition.log": "e83d4df8f236fae13b1b55e379ddb07d7ac9149d85ac684303c93784d035ebe9",
+      "ui-composition.xml": "0af5e18570221eed268f54c7dc463b46077627492b606e9e297d52c5b141655c"
+    },
+    "disposableJobsCompleted": true
+  },
+  "finalParentValidation": {
+    "status": "passed",
+    "exitCode": 0,
+    "total": 6421,
+    "runs": {
+      "Hexalith.Agents.Client.Tests": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Contracts.Tests": {
+        "total": 2005,
+        "passed": 2005,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "total": 2005,
+        "passed": 2005,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.Tests": {
+        "total": 1042,
+        "passed": 1042,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "Hexalith.Agents.UI.Tests": {
+        "total": 1362,
+        "passed": 1362,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "command": "_bmad-output/implementation-artifacts/tests/host-setup-prerequisites-2026-11-16/verify-local.sh artifacts/host-setup-prerequisites-2026-11-16/final",
+    "focusedTotal": 308,
+    "focusedRuns": {
+      "query": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "host-boundaries": {
+        "total": 265,
+        "passed": 265,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "ui-composition": {
+        "total": 17,
+        "passed": 17,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "requiredAddedCases": 56,
+    "independentOptimizedXmlAndOverlayControls": 9,
+    "allBuildsZeroWarnings": true,
+    "sourceSha256": {
+      "src/Hexalith.Agents.UI/Services/Gateways/AgentsUiServiceCollectionExtensions.cs": "aec9a710d063d3ba85f933ab69f45c2d51c1a7044b6b3a58d71f4dbc2791650c",
+      "test/Hexalith.Agents.Server.Tests/AgentSetupStatusIssuerTests.cs": "262f2e098e163adb185057571968ceac49a9a9e4f987a7c49756d0de3897157a",
+      "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "86fd0f5115be2b7b506cad98e0826cf1baa63104ddb04b320fc524b8687abd70",
+      "test/Hexalith.Agents.Server.Tests/EventStoreAgentCommandStatusReaderTests.cs": "918435d4024839a08fd92b81b902133e0f44a6fe64c64c4c97f82658027f6783",
+      "test/Hexalith.Agents.Server.Tests/FixtureProviderQueryRouteCatalog.cs": "4c913662aec44dfece0b7433051414eb1fbb83b6a685c2355fb40df5248d831d",
+      "test/Hexalith.Agents.Server.Tests/ProviderQueryEndpointPrerequisiteTests.cs": "0f691e66fcddbf9550450ff16b5839efe6ada7bf6ca8ccd55c868de8bfcf76bb",
+      "test/Hexalith.Agents.UI.Tests/AgentsUiCompositionTests.cs": "734e6752556bb458802d290798ace00b099e9e6e350368e0d10937d08ca9f460"
+    },
+    "sourceStableDuringVerification": true,
+    "workspaceRemoved": true,
+    "ciPreflight": {
+      "workflow": ".github/workflows/ci.yml",
+      "workflowBuildsPin": "264e17d3185c87b72b0757dd66a13040793756bb",
+      "recordedBuildsGitlink": "fdda17c0a4538b0f7c99f813c20ca24b49006530",
+      "pinsMatch": false,
+      "missingReferencedFiles": [
+        "package.json",
+        "eng/verify-story.ps1",
+        "eng/verify-story-5.2.ps1"
+      ],
+      "ciExecuted": false,
+      "workflowChanged": false
+    },
+    "artifactSha256": {
+      "final-review-controls.log": "6eac314ea3334b90ba125c91d645e1008ff5be0735826eba79f604f66b390d4f",
+      "ci-preflight.json": "852bc4967c4b20d0b78b2e2c7dae4a26d79c12e2c0f430c0011de1a00d26f764",
+      "final-reproduction.log": "f1287a694328645313f25c92b32cb7cfbfa82a3bb8d1605bbf57cd3d8d29d5c2",
+      "final/package-gate.log": "ea7d15ff9e4ad788884106f8cac8a5a87d7132c7d8e95e56b2308a35a07e7369",
+      "final/ui-composition.log": "06fcfd9053847b910c3c094339537086416e687f9e1420f0b7b668c3136cb44f",
+      "final/query.xml": "ea415c9a00703588661056201d6b5383ddcc9d85858a0e72cbf5d112dea34244",
+      "final/host-boundaries.log": "3e769f219f13b02549e9c4a76ffaa0185fc0b662f38eb9ae8df5aa23273812cd",
+      "final/query.log": "9a47ce65f49c336d4520ddd60bd253870b9e6432fbf32e3b3a443fa579ca3083",
+      "final/focused-source-ui-build.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "final/ui-composition.xml": "19b1a0583e84de0381c1315f6949d98e0dc4b62972edaad2e17d244f9df69d00",
+      "final/host-boundaries.xml": "823eee5c49250c773afe084e750fd7d53dd54ef30fdcc1e78b52af088c599b20",
+      "final/focused-source-ui-build.log": "aecf64b174a07537b72a34775c7313817b839f0426a8c18b62a39774d47887c1",
+      "final-independent-controls/review-controls.json": "c47658d7be6210caa7d5f7fe526d7ff0b3077aa9f6d9e7da5a999d3ab76bb0ca",
+      "final/package/result.json": "609be6de1eec87e6004e36367334754ad86e61bcd53fac0728dbf9c69c62692f",
+      "final/package/package/Hexalith.Agents.Tests.log": "9b52dd41c91612ce474b645001c2b3089661f1a121642c1a7b06aadc666c2d8c",
+      "final/package/package/Hexalith.Agents.Tests.build.log": "6de6affb86ce88cd8b27b38efe4b4afe18181629fd4f22ce2d93bf38d83c96da",
+      "final/package/package/Hexalith.Agents.Contracts.Tests.xml": "726e9b9a431044317cd3992e4c4ee97373c283595003fbbffc33c9cd77d77b73",
+      "final/package/package/Hexalith.Agents.Client.Tests.xml": "45b53e467b5ef942d5be171a71db98db14dec79cc6a8d93424942bd67ce407b7",
+      "final/package/package/Hexalith.Agents.UI.Tests.build.log": "b12d8976576d68095d4567626751d7312e34ae7b3ed0bf06ba7a8bd23549a8c8",
+      "final/package/package/Hexalith.Agents.Contracts.Tests.log": "99653014e50aceaf77cc10749cd1af45472971dcdb9c643f026201d448bd14d0",
+      "final/package/package/Hexalith.Agents.Server.Tests.xml": "d8dc7358c3b9767fa9cd0839dc9d44a884f383727537f26d716f37f3b2bbb733",
+      "final/package/package/Hexalith.Agents.Contracts.Tests.build.log": "18b0e98953a70b67f877ac5ee40789e495b3394f6bff029c6425d21fc9d20adc",
+      "final/package/package/Hexalith.Agents.Client.Tests.build.log": "7b8c08d4e62a3dc4629aad841a3ef51ccfdbb1650df02c52cc8d19dc1337ff62",
+      "final/package/package/Hexalith.Agents.Server.Tests.log": "6cdda698678958466aefbbaffed709d3701020ace3ca25ecf5fdd70c31fa07b8",
+      "final/package/package/Hexalith.Agents.UI.Tests.xml": "4e887a4ce022851a2b1d7b8f99d55a8b98d6f687b1e66055b2544e08626c260e",
+      "final/package/package/Hexalith.Agents.Client.Tests.log": "09bc57c24a2cda3dfdc1ce039adf894a86b9ff7e9eb9e1311bf1535b2b671646",
+      "final/package/package/Hexalith.Agents.Server.Tests.build.log": "2e82d65fd013d010b4a8cde4991fa2828cce7e1b71efbc97b0ac020b2cc4ada6",
+      "final/package/package/Hexalith.Agents.UI.Tests.log": "2cb25c210954c995800144a435958dc3021ee2c45057a8ab6bb41cc77dc96899",
+      "final/package/package/Hexalith.Agents.Tests.xml": "c4200174ec7bd93a3f41b0c368e3764509945ced77512fc116b81db8dec0ed4b"
+    }
+  }
+}

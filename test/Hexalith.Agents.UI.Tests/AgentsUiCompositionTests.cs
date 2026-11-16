@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
+using NSubstitute;
+
 using Shouldly;
 
 namespace Hexalith.Agents.UI.Tests;
@@ -140,6 +142,107 @@ public sealed class AgentsUiCompositionTests
         using ServiceProvider provider = services.BuildServiceProvider();
         using IServiceScope scope = provider.CreateScope();
 
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<AgentsClientProviderCatalogGateway>();
+    }
+
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public void LiveSetupReplacesOnlyKnownPlaceholdersInEitherOrder(bool plainFirst, bool configured)
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+        IConfiguration configuration = configured ? Configuration(("Agents:Ui:AgentId", "hexa")) : Configuration();
+        if (plainFirst) { services.AddAgentsUi(); }
+        services.AddAgentsUiSetup(configuration);
+        services.AddAgentsUi();
+        services.AddAgentsUiSetup(configuration);
+
+        services.Count(d => d.ServiceType == typeof(IAgentSetupGateway)).ShouldBe(1);
+        services.Count(d => d.ServiceType == typeof(IProviderCatalogGateway)).ShouldBe(1);
+        services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        using ServiceProvider provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        using IServiceScope first = provider.CreateScope();
+        using IServiceScope second = provider.CreateScope();
+        IAgentSetupGateway setup = first.ServiceProvider.GetRequiredService<IAgentSetupGateway>();
+        setup.GetType().ShouldBe(configured ? typeof(AgentsClientSetupGateway) : typeof(DeferredAgentSetupGateway));
+        setup.ShouldBeSameAs(first.ServiceProvider.GetRequiredService<IAgentSetupGateway>());
+        setup.ShouldNotBeSameAs(second.ServiceProvider.GetRequiredService<IAgentSetupGateway>());
+        IProviderCatalogGateway catalog = first.ServiceProvider.GetRequiredService<IProviderCatalogGateway>();
+        catalog.ShouldBeOfType<AgentsClientProviderCatalogGateway>();
+        catalog.ShouldNotBeSameAs(second.ServiceProvider.GetRequiredService<IProviderCatalogGateway>());
+    }
+
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public void LiveSetupPreservesCustomFactoriesAndInstancesInEitherOrder(bool plainFirst, bool factory)
+    {
+        ServiceCollection services = new();
+        if (plainFirst) { services.AddAgentsUi(); }
+        IAgentSetupGateway setup = Substitute.For<IAgentSetupGateway>();
+        IProviderCatalogGateway catalog = Substitute.For<IProviderCatalogGateway>();
+        if (factory)
+        {
+            services.AddScoped(_ => setup);
+            services.AddScoped(_ => catalog);
+        }
+        else
+        {
+            services.AddSingleton(setup);
+            services.AddSingleton(catalog);
+        }
+        ServiceDescriptor[] custom = services.Where(d => d.ServiceType == typeof(IAgentSetupGateway) && d.ImplementationType != typeof(DeferredAgentSetupGateway)
+            || d.ServiceType == typeof(IProviderCatalogGateway) && d.ImplementationType != typeof(DeferredProviderCatalogGateway)).ToArray();
+        services.AddAgentsUiSetup(Configuration(("Agents:Ui:AgentId", "hexa")));
+        services.AddAgentsUi();
+        services.AddAgentsUiSetup(Configuration(("Agents:Ui:AgentId", "hexa")));
+
+        services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).ShouldBeSameAs(custom[0]);
+        services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).ShouldBeSameAs(custom[1]);
+        using ServiceProvider provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        using IServiceScope scope = provider.CreateScope();
+        scope.ServiceProvider.GetRequiredService<IAgentSetupGateway>().ShouldBeSameAs(setup);
+        scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeSameAs(catalog);
+    }
+
+    [Fact]
+    public void LiveSetupPreservesExplicitImplementationTypesAndTheirHostSelectedLifetimes()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+        services.AddSingleton<IAgentSetupGateway, AgentsClientSetupGateway>();
+        services.AddSingleton<IProviderCatalogGateway, AgentsClientProviderCatalogGateway>();
+        ServiceDescriptor setup = services.Single(d => d.ServiceType == typeof(IAgentSetupGateway));
+        ServiceDescriptor catalog = services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway));
+
+        services.AddAgentsUi();
+        services.AddAgentsUiSetup(Configuration(("Agents:Ui:AgentId", "hexa")));
+
+        services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).ShouldBeSameAs(setup);
+        services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).ShouldBeSameAs(catalog);
+    }
+
+    [Fact]
+    public void LiveSetupReplacesExplicitBuiltInDeferredImplementationTypes()
+    {
+        ServiceCollection services = new();
+        services.AddSingleton(AgentsClient.Unavailable());
+        services.AddSingleton<IAgentSetupGateway, DeferredAgentSetupGateway>();
+        services.AddSingleton<IProviderCatalogGateway, DeferredProviderCatalogGateway>();
+
+        services.AddAgentsUiSetup(Configuration(("Agents:Ui:AgentId", "hexa")));
+
+        services.Single(d => d.ServiceType == typeof(IAgentSetupGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        services.Single(d => d.ServiceType == typeof(IProviderCatalogGateway)).Lifetime.ShouldBe(ServiceLifetime.Scoped);
+        using ServiceProvider provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        using IServiceScope scope = provider.CreateScope();
+        scope.ServiceProvider.GetRequiredService<IAgentSetupGateway>().ShouldBeOfType<AgentsClientSetupGateway>();
         scope.ServiceProvider.GetRequiredService<IProviderCatalogGateway>().ShouldBeOfType<AgentsClientProviderCatalogGateway>();
     }
 
