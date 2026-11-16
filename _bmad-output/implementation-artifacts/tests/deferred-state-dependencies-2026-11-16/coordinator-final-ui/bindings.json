@@ -1,0 +1,27 @@
+{
+  "exitCode": 0,
+  "stateSuites": "UI",
+  "spoolFilters": "",
+  "sources": {
+    "src/Hexalith.Agents.UI/State/BrowserSessionPendingProviderCommandStore.cs": "248799dbf2b60e610be7ad320471a97b87cfca6b8eaea42289559e68bb358f2d",
+    "src/Hexalith.Agents.UI/wwwroot/pendingProviderCommands.js": "be95eec8488ef88b8bcf63e269ff51c72d550389bac42aa9d92f023a3ca4fb7e",
+    "test/Hexalith.Agents.UI.Tests/PendingProviderCommandStoreTests.cs": "00f7e12df33fbe0f8e6564b5f220fdcef2e520662e059b4ec469d13742ee8bd5",
+    "test/Hexalith.Agents.UI.Tests/InMemorySessionStorageJsRuntime.cs": "41cd8fc33e6ca7d5c044e11d15da24c40aaee1e70c507c645921661e563deee0",
+    "tests/tooling/pending_provider_storage_test.mjs": "a77b8d26f954f74559fd584aaecd00b85341d78fd99d60368d1e14f74f04af8f",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs": "0baabaf6485a7ff3f604d0c1c82668bfe914852d3df673848303eaca7bd60fb6",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshotJsonConverter.cs": "96dd46d5f93631ceab3d3b276dadb4ddcbf9ff64d29affbbd0ac9b29cada96b5",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs": "80d77ee6527ed97834cf4f5240925869d1e983a1d3fa0eb5f25e5a28ec4c559d",
+    "references/Hexalith.Platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs": "df0d041f43783afc61397f4856cbdac6ee35ce33524b3e0411053fd7b66f47a3",
+    "_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/verify-state.sh": "7999c16a6257675405f46eaa5ade2987173e3168a77aeff3136be366b0bae9f1"
+  },
+  "outputs": {
+    "ui-all-build.log.gz": "a0b64992b11953607153b74b5c3acc8c5dbabfbf6582a45adf9f8d9bac07a621",
+    "ui-all.log.gz": "96bd76c145640be7220b2d4c64552e7911e22334735b32a396e65fede10ade78",
+    "ui-all.log": "2a2eb9e74fc0de56200e1d179092d25cdc96c312c5ebae37f9f14016862dcf4d",
+    "native-results.json": "98f09f0ca809b701a649dda5ccf9e161a6a20c3c325cce805929cdcd6f2ac8c6",
+    "ui-all.xml": "63bbee57fd517e753d7a724db46366481eb999daa7bf474d0d2ee13d4ed007d5",
+    "browser-module.log": "207c23f3b50f5c467173816002e6f7c95ca743093cb2d7be23ebdb87656db70d",
+    "ui-all-build.log": "30e2ea2d481b66c3979eae334c84ab8967da8e038fca24384e0a39e0990c4111",
+    "browser-module.log.gz": "38a0db14ec7ef45757a3b152ba138341ca76e9ad2bafb67768707d61c4419589"
+  }
+}

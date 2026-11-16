@@ -557,10 +557,16 @@ Group D1 (`test/Hexalith.Agents.Server.Tests/**`) review. These items are carrie
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Reconcile the `references/Hexalith.EventStore` gitlink with the released package version the floor gate requires.
   evidence: `git describe --tags` on the gitlink returns a revision twenty commits past the `v3.106.0` tag, so Debug source mode compiles unreleased EventStore code while Release consumes the published package and a green source-mode lane does not prove the package-mode lane. Deferred because moving the gitlink changes the File List and invalidates the chunk evidence already recorded for this story, so it needs its own run.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-state-and-dependency-items.md` — The exact current gitlink eecc0e4da70a0d64aaeff4fb75cdc06f94eb7563 and released 5.1.1 commit f792bba6c0564d3c36dda6ad1c2fc55b0b0a6331 have compatible consumed ten-project inputs. The complete raw inventories differ only in one exact reviewed EventStore .editorconfig revision: non-C# LF save rules change, while C# rules and all other captured compiler/product/import/package inputs match. Debug/source and Release/package integration builds and the maintained floor pass; native gateway suites pass 142 cases in each mode. The default Server source-mapping refusal is retained separately from successful producer-mapped source execution. Pins and Builds version authority are unchanged.
+  evidence_record: [State/dependency verification](tests/deferred-state-dependencies-2026-11-16/README.md)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-2.md`
   summary: Show that the Builds, Commons, Conversations, FrontComposer, and PolymorphicSerializations gitlinks are required by the Agents EventStore integration.
   evidence: The EventStore integration diff moves those five pins with the EventStore pin. Nothing in that diff shows the new adapters need them. Unverified medium: an unnecessary pin can pull unrelated submodule behavior into this story. Settle by rebuilding `Hexalith.Agents.EventStore` against the previous five pins.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-state-and-dependency-items.md` — Both exact historical SDK 10.0.401 integrations build and pass the same 42 gateway cases with EventStore fixed at 4bc61d9a60fae13a65f23963c1cb731065222f2a and only the five selected pins varied. The previous five pins are sufficient for this integration, so the reviewed changes were not necessary for that selected graph. This counterfactual does not justify rolling back current unrelated changes.
+  evidence_record: [State/dependency verification](tests/deferred-state-dependencies-2026-11-16/README.md)
 
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-2-configure-hexa-through-live-eventstore-operations-3.md`
   summary: Make CI and release evidence honest for Story 5.2 floors, pins, skips, package layout, Dependabot, and unpublished dispatches.
@@ -812,6 +818,9 @@ Aggregate and contracts chunk review. One new item; the rest are carried onto ex
 - source_spec: `/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/spec-5-4-owner-prerequisites.md`
   summary: Rehashing a revision-10 spool head or archive page may fail its stored digest after the reservation fields were added.
   evidence: `ReservedArchiveDigest` and `ArchiveReservationCount` serialize under default options, so a snapshot written before those fields would get a new `StateDigest` and could fail anchor or archive-link checks. No retained pre-change head or page was shown, and divergent digests already fail closed. An actual retained revision-10 head or archive page would settle whether this is a medium compatibility break.
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-state-and-dependency-items.md` — Platform now retains historical/current serialized layout identity through deserialization, record copies and generic pending-transition recovery. Fixtures compiled from exact pre-reservation source 8a56bd57837784806aae989159fbcbc71fbd41d4 preserve original digests; restart/drain, mixed archive chains, interrupted reservation promotion, current defaults and malformed/tampered refusal pass. Compact legacy reservation also preserves the unchanged 32 MiB limit at the boundary. The final full local Custody suite passes 806 cases; no retained production inventory or live qualification is claimed.
+  evidence_record: [State/dependency verification](tests/deferred-state-dependencies-2026-11-16/README.md)
 
 - source_spec: none
   summary: Story 6.1 goal B — legacy InteractionDirectoryMigration Workflow (EventStore migration-epoch write fence, directory-repair fence, old-epoch bridge, two-scan DirectoryReady, legacy-plaintext negative fixture).
@@ -929,7 +938,10 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-complete-conversations-internal-catalog.md`
   summary: The current default Platform source regression graph cannot restore its Tenants dependencies under the selected central package versions.
   evidence: At Platform c869f1c7, the parent eight-case related selection has three NU1109 restore failures before reader compilation: Tenants requires EventStore 4.0.0/McpCli 2.0.0 while the generated reader pins 3.133.0/1.1.0. All 38 explicitly mapped Conversations catalogue cases pass. Exact XML and restore logs are retained in Conversations docs/implementation/ext-conv-ai-1-internal-catalog-2026-11-02/parent-final-20261102T195034Z-c2fdcdb8c402476d82c8402242adaf8f. Reconcile the published/default source tuple and qualify the resulting SDK cohort; do not suppress downgrades or substitute a different owner selection.
-  status: open
+  status: done 2026-11-16
+  initial_verification_update: 2026-11-16 — The exact Platform 17b1f688b332020fafbe1da07a5c04a41886c7bd default source owners build cleanly and pass all eight original related cases, including the three previously failing cases. Full producer-mapped Conversations catalog verification remains blocked: exact declared Works object b2985d22b3bfbc6d86bcde28a5da722ae7f930c3 is absent from local repositories. No root was dropped or substituted, and no full tuple closure is claimed.
+  evidence_record: [State/dependency verification](tests/deferred-state-dependencies-2026-11-16/README.md)
+  resolution: `spec-five-deferred-state-and-dependency-items.md` — The exact Platform owner tuple now passes default and producer-mapped source builds, all eight original related cases in both contexts, all 38 catalog cases, and 29 source-propagation controls. The coordinator supplied the exact Works object. Explicit local corrections preserve plain-source Tooling catalog neutrality while respecting mapped authority, and compare complete adapter route-ID inventories before binding. All 18 producer-selected roots and exact dependency revisions remain intact; baseline HXW006 and intermediate native refusals are retained separately. This closes local source-tuple regression qualification only, not live owner or installed runtime acceptance.
 
 - source_spec: `spec-sync-update-and-release-2026-11-15.md`
   summary: Provide an approved provider-catalog platform command-status reader or gate writes until terminal status can be observed.
@@ -963,3 +975,7 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `spec-five-deferred-provider-recovery-and-context-items.md`
   summary: Coordinate browser pending-command read/modify/write atomically across overlapping store instances or circuits sharing one session-storage scope.
   evidence: Independent review BH-7: both baseline and current stores use an instance-local semaphore around separate getItem/setItem calls. Two instances can read the same list and overwrite distinct pending additions. This predates the selected authentication-await correction; a browser-atomic transaction or shared cross-instance coordination and deterministic interleaving regression are required before claiming this concurrency property.
+
+  status: done 2026-11-16
+  resolution: `spec-five-deferred-state-and-dependency-items.md` — A non-waiting browser Web Lock encloses an exact-byte conditional storage mutation, preventing delayed queued writes after cancellation. Stale comparisons retry only after fresh C# validation and authentication checks; eight unsuccessful attempts refuse. Distinct-runtime additions, acknowledgement, removal, conflict, cancellation, authentication change-back and corruption controls preserve persisted locks. The final actual JavaScript module passes five cases, the earlier focused store suite passes 60, and all 1,352 UI tests pass.
+  evidence_record: [State/dependency verification](tests/deferred-state-dependencies-2026-11-16/README.md)

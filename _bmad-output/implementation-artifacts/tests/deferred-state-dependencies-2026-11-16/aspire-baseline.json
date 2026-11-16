@@ -1,0 +1,37 @@
+{
+  "appHostPath": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/apphost.cs",
+  "commands": [
+    [
+      "aspire",
+      "start",
+      "--non-interactive",
+      "--apphost",
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/apphost.cs"
+    ],
+    [
+      "aspire",
+      "describe",
+      "--apphost",
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/apphost.cs"
+    ],
+    [
+      "aspire",
+      "stop",
+      "--non-interactive",
+      "--apphost",
+      "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/apphost.cs"
+    ]
+  ],
+  "start": "success",
+  "stop": "success",
+  "observed": {
+    "infrastructure": "healthy",
+    "eventstore": "unhealthy",
+    "memories": "unhealthy",
+    "memories-domain-service": "unhealthy",
+    "tenants": "unhealthy",
+    "tenants-api": "unhealthy",
+    "memories-access-telemetry": "waiting"
+  },
+  "runtimeQualification": false
+}

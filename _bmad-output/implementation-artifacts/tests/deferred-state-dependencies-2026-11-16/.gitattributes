@@ -1,0 +1,4 @@
+* -text -diff
+*.md diff
+*.sh diff
+*.py diff

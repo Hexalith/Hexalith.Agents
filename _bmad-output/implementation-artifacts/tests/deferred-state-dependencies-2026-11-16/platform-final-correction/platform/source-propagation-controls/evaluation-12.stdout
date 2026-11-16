@@ -1,0 +1,54 @@
+{
+  "Properties": {
+    "HexalithEventStoreVersion": "4.0.4",
+    "RestoreUseStaticGraphEvaluation": "true",
+    "BuildsToolingAssemblyPath": ""
+  },
+  "Items": {
+    "ProjectReference": [
+      {
+        "Identity": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/Hexalith.EventStore.DomainService.csproj",
+        "ReferenceSourceTarget": "ProjectReference",
+        "AdditionalProperties": ";HexalithEventStoreVersion=4.0.4;UseHexalithProjectReferences=true",
+        "OutputItemType": "",
+        "Targets": "",
+        "FullPath": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/Hexalith.EventStore.DomainService.csproj",
+        "RootDir": "/",
+        "Filename": "Hexalith.EventStore.DomainService",
+        "Extension": ".csproj",
+        "RelativeDir": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/",
+        "Directory": "tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.DomainService/",
+        "RecursiveDir": "",
+        "ModifiedTime": "2026-11-15 09:31:38.0000000",
+        "CreatedTime": "2026-11-15 09:31:38.0000000",
+        "AccessedTime": "2026-11-16 13:41:57.3629044",
+        "DefiningProjectFullPath": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/Hexalith.Platform.Composition.csproj",
+        "DefiningProjectDirectory": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/",
+        "DefiningProjectName": "Hexalith.Platform.Composition",
+        "DefiningProjectExtension": ".csproj"
+      },
+      {
+        "Identity": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj",
+        "ReferenceSourceTarget": "ProjectReference",
+        "AdditionalProperties": "ControlContext=keep;hexalithEventStoreVersion=4.1.0;UseHexalithProjectReferences=true",
+        "OutputItemType": "",
+        "Targets": "",
+        "FullPath": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/Hexalith.EventStore.Contracts.csproj",
+        "RootDir": "/",
+        "Filename": "Hexalith.EventStore.Contracts",
+        "Extension": ".csproj",
+        "RelativeDir": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/",
+        "Directory": "tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore/src/Hexalith.EventStore.Contracts/",
+        "RecursiveDir": "",
+        "ModifiedTime": "2026-11-15 09:31:38.0000000",
+        "CreatedTime": "2026-11-15 09:31:38.0000000",
+        "AccessedTime": "2026-11-16 13:41:57.3629044",
+        "DefiningProjectFullPath": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/Hexalith.Platform.Composition.csproj",
+        "DefiningProjectDirectory": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/",
+        "DefiningProjectName": "Hexalith.Platform.Composition",
+        "DefiningProjectExtension": ".csproj"
+      }
+    ],
+    "Reference": []
+  }
+}

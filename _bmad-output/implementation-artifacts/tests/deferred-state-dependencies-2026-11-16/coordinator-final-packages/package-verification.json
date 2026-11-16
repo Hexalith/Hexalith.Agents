@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "published": false,
+  "moduleSha256": "be95eec8488ef88b8bcf63e269ff51c72d550389bac42aa9d92f023a3ca4fb7e",
+  "packages": {
+    "Hexalith.Agents.Testing.1.0.0.nupkg": "86d7f91f1619ff05a6e5163d706c413ffccf9b30f65085c223cb0890f53bd59e",
+    "Hexalith.Agents.EventStore.1.0.0.nupkg": "9386156d6aa9d3faff3485f59d9cc6f33f4e053c6e3f4c88317e345f6b81e15b",
+    "Hexalith.Agents.Contracts.1.0.0.nupkg": "860c7d3c9627be699c655a71e36b82a55ce43b887f7f3cbe6ea29c4decb3a4f4",
+    "Hexalith.Agents.1.0.0.nupkg": "0df4d041913e45c5c837b81ef18ffda49c92cee854312f8bba72d39ea3909d97",
+    "Hexalith.Agents.UI.1.0.0.nupkg": "ee2e414377540eef4b18a4860610f498839432bdb2cdd51048a4ce54c0225df1",
+    "Hexalith.Agents.Client.1.0.0.nupkg": "02bf4a690137f26738c6ef1dde61aa3b20e23edcc9de206e720051ac49833e12"
+  },
+  "evidenceSha256": {
+    "Hexalith.Agents.Contracts.log": "5ac6fb0f11df7fd2a65826a720617e45aedd50f89c77be315ed6e71e7e935cbe",
+    "Hexalith.Agents.log": "acb3359f282099031e204f807bfcd45b682dd9404e194fec3ca245bc49643827",
+    "consumer-validation.log": "5ae14722f55194d08a1dd4875dfec784caf705a31095f7e29fae02744f34e59f",
+    "package-validation.log": "01077bb87bce64fb52b505723cb8d42362a717e74373643d5043183e3e4555c3",
+    "Hexalith.Agents.UI.log": "5e009bbff8c6b744c1a299e5b57354fc5b091e2eecd7a034c7a7779c6c359f11",
+    "Hexalith.Agents.EventStore.log": "55318dfffaf2804a52f1aea1abd1d7aadf1d7a25929aee0dc1f41fdd5fb549c8",
+    "consumer-receipt.json": "ef54a2170a12a259aaee08e6ca7600c532379b07ac2e5aa7cf7544719e8d1711",
+    "Hexalith.Agents.Testing.log": "db2ec47e2d16e6a91678506df60f19d8dedc7155241b0176787bad5bdbff1b3f",
+    "Hexalith.Agents.Client.log": "e5f5339a402ed8ca5474dfad1551d99ba26ec097dbb4fe950023ec011b687e92"
+  }
+}

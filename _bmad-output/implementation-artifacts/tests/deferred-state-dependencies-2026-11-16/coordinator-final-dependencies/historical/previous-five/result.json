@@ -1,0 +1,199 @@
+{
+  "name": "previous-five",
+  "status": "passed",
+  "commands": [
+    {
+      "label": "integration-build",
+      "argv": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "cwd": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents",
+      "environment": {},
+      "exitCode": 0,
+      "elapsedSeconds": 16.975,
+      "logSha256": "57b646ae01c2bbc46fdc2c66299e3948380510075085a91aa3999cc480418727"
+    },
+    {
+      "label": "gateway",
+      "argv": [
+        "dotnet",
+        "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+        "-failSkips",
+        "-class",
+        "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests",
+        "-result-xml",
+        "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/coordinator-final-dependencies/historical/previous-five/gateway.xml"
+      ],
+      "cwd": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents",
+      "environment": {},
+      "exitCode": 0,
+      "elapsedSeconds": 0.866,
+      "logSha256": "1e22e6299c0306a842c500a37ffa1ccc17ace044f2e8da989da928ff0d9e5419"
+    }
+  ],
+  "exports": [
+    {
+      "owner": "Hexalith.Agents",
+      "revision": "13857fd86e9fda7e2ba0f4017aadb042750e4284",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents",
+      "archiveSha256": "b76469d9fd32bb19b326aebf594d457bffc26320e3d6734be0e3cbb9c3195229"
+    },
+    {
+      "owner": "Hexalith.AI.Tools",
+      "revision": "5f93d2ec8239494852c97032c819cb1689939e36",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.AI.Tools",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.AI.Tools",
+      "archiveSha256": "38c1dfbc17c7f9d4bd3429ed44dab926b29a05d779198288e186103892d10c7b"
+    },
+    {
+      "owner": "Hexalith.Builds",
+      "revision": "aee01323579adeda952bf41b2f3e0e61785075c6",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.Builds",
+      "archiveSha256": "9032d1e39cb4cdb7c615191a7546710cc4735b0b8310f45cbf719c289dcbc335"
+    },
+    {
+      "owner": "Hexalith.Commons",
+      "revision": "19d7d4d6b21160557b7449f55a0ad0f55e6d7dc6",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.Commons",
+      "archiveSha256": "548792b903eae21ade6ec2528d0edc9d36c0c9661005e25a3bab6e4e168a45fa"
+    },
+    {
+      "owner": "Hexalith.Conversations",
+      "revision": "589cdd711871d5a632b97df0b04375d1cf6e0864",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.Conversations",
+      "archiveSha256": "12e2a575174358765a141db9805c98dd1eecfac3ce25988d519784397729bda5"
+    },
+    {
+      "owner": "Hexalith.EventStore",
+      "revision": "4bc61d9a60fae13a65f23963c1cb731065222f2a",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.EventStore",
+      "archiveSha256": "8b606cb85e3333ff9c4ed32da61dad2412ddebe09beb6b00a59d8ecfd68789ca"
+    },
+    {
+      "owner": "Hexalith.FrontComposer",
+      "revision": "6e064785e765102fa1a90039f06e10e0b252fdec",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.FrontComposer",
+      "archiveSha256": "8e941709ca681dc76d736217c0571367e70efdf99499306fc6b83a26a31c12b0"
+    },
+    {
+      "owner": "Hexalith.Memories",
+      "revision": "5829db422522b79c0d164df85adde53a996ba114",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Memories",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.Memories",
+      "archiveSha256": "9ff52a08fe4c82e7cda6d77f48b7437641cd95b58b73ca6713c1f1a3adfd501c"
+    },
+    {
+      "owner": "Hexalith.Parties",
+      "revision": "14d249fde316b0002aec84351d7a7cdf953d1d30",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.Parties",
+      "archiveSha256": "7def91007693c54386d70e53525d1e241a66fa75daf782a2bd62f41beaef8aa8"
+    },
+    {
+      "owner": "Hexalith.PolymorphicSerializations",
+      "revision": "8aeed1d27c9a050bc4bec6d89051aa00de306a69",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.PolymorphicSerializations",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.PolymorphicSerializations",
+      "archiveSha256": "d44a02b0f55b18a21917bb88ac18e16510e3d8eed371c652034c18bce99c5037"
+    },
+    {
+      "owner": "Hexalith.Tenants",
+      "revision": "c150d5b1af4f911ff3b2a7ab7901d94838be09d7",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants",
+      "destination": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/references/Hexalith.Tenants",
+      "archiveSha256": "26cd0762475163d52d26b8bc4fe76f39ff274fa2dbedf30e203491ff06143d6e"
+    }
+  ],
+  "runnerSha256": "6f6b9b60238be34b461e7012fb0885d34dee2e5c03baf02145fc0f0dbbbf4c03",
+  "caseInventoriesSha256": "5633fd81f6d43ecd349b8597338cd48cc5fb8ba38a40d5db292cb3c2061f11df",
+  "evidenceSha256": {
+    "gateway.xml": "bb7b948bc154ea6d79111fb44135f39258d0b4186361426252fa6c7ffba53353",
+    "integration-build.log": "57b646ae01c2bbc46fdc2c66299e3948380510075085a91aa3999cc480418727",
+    "gateway.log": "1e22e6299c0306a842c500a37ffa1ccc17ace044f2e8da989da928ff0d9e5419",
+    "deferred-dependency-case-inventories.json": "5633fd81f6d43ecd349b8597338cd48cc5fb8ba38a40d5db292cb3c2061f11df",
+    "runner.py": "6f6b9b60238be34b461e7012fb0885d34dee2e5c03baf02145fc0f0dbbbf4c03"
+  },
+  "selectedPins": {
+    "Hexalith.AI.Tools": "5f93d2ec8239494852c97032c819cb1689939e36",
+    "Hexalith.Builds": "aee01323579adeda952bf41b2f3e0e61785075c6",
+    "Hexalith.Commons": "19d7d4d6b21160557b7449f55a0ad0f55e6d7dc6",
+    "Hexalith.Conversations": "589cdd711871d5a632b97df0b04375d1cf6e0864",
+    "Hexalith.EventStore": "4bc61d9a60fae13a65f23963c1cb731065222f2a",
+    "Hexalith.FrontComposer": "6e064785e765102fa1a90039f06e10e0b252fdec",
+    "Hexalith.Memories": "5829db422522b79c0d164df85adde53a996ba114",
+    "Hexalith.Parties": "14d249fde316b0002aec84351d7a7cdf953d1d30",
+    "Hexalith.PolymorphicSerializations": "8aeed1d27c9a050bc4bec6d89051aa00de306a69",
+    "Hexalith.Tenants": "c150d5b1af4f911ff3b2a7ab7901d94838be09d7"
+  },
+  "onlyVariedOwners": [
+    "Hexalith.Builds",
+    "Hexalith.Commons",
+    "Hexalith.Conversations",
+    "Hexalith.FrontComposer",
+    "Hexalith.PolymorphicSerializations"
+  ],
+  "gateway": {
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0,
+    "assemblyPath": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/historical/previous-five/Hexalith.Agents/test/Hexalith.Agents.Server.Tests/bin/Debug/net10.0/Hexalith.Agents.Server.Tests.dll",
+    "assemblySha256": "5a1f2ffbe0bd76b102dd259dee4e28782c4504f4e059577395ade9cae980bc8b",
+    "originalCaseInventory": "historical-gateway",
+    "testNames": [
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_rejects_missing_duplicate_or_foreign_identity_claims",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Every_setup_adapter_publishes_its_stable_descriptor_contract(commandType: \\\"ActivateAgent\\\", expectedAdapterId: \\\"Hexalith.Agents.EventStore.ActivateAgent.v1\\\", expectedOperationId: \\\"agents.setup.activate\\\", expectedDescriptorVersion: 1)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Every_setup_adapter_publishes_its_stable_descriptor_contract(commandType: \\\"ConfigureAgentResponseMode\\\", expectedAdapterId: \\\"Hexalith.Agents.EventStore.ConfigureAgentResponseM\\\"\u00b7\u00b7\u00b7, expectedOperationId: \\\"agents.setup.response-mode\\\", expectedDescriptorVersion: 1)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Every_setup_adapter_publishes_its_stable_descriptor_contract(commandType: \\\"CreateAgent\\\", expectedAdapterId: \\\"Hexalith.Agents.EventStore.CreateAgent.v1\\\", expectedOperationId: \\\"agents.setup.create\\\", expectedDescriptorVersion: 1)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Every_setup_adapter_publishes_its_stable_descriptor_contract(commandType: \\\"DisableAgent\\\", expectedAdapterId: \\\"Hexalith.Agents.EventStore.DisableAgent.v1\\\", expectedOperationId: \\\"agents.setup.disable\\\", expectedDescriptorVersion: 1)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Every_setup_adapter_publishes_its_stable_descriptor_contract(commandType: \\\"UpdateAgentConfiguration\\\", expectedAdapterId: \\\"Hexalith.Agents.EventStore.UpdateAgentConfiguratio\\\"\u00b7\u00b7\u00b7, expectedOperationId: \\\"agents.setup.update\\\", expectedDescriptorVersion: 1)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"UpdateAgentConfiguration\\\", key: \\\"actor:agentsAdmin\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"provider:selectionValidation\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"approver:policyValidation\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"agent:activationExpectedConfigurationVersion\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"UpdateAgentConfiguration\\\", key: \\\"provider:selectionValidation\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"other-domain\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"OtherCommand\\\", key: \\\"actor:agentsAdmin\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_claims_only_its_exact_keys(domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"agent:unknown\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Activation_intent_excludes_dependency_evidence_but_keeps_payload_authorization_and_version",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Missing_gateway_registration_or_non_Dapr_caller_rejects_reserved_extensions_before_execution(registerAgentsIntegration: False, authenticationType: \\\"DaprInternal\\\")",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Missing_gateway_registration_or_non_Dapr_caller_rejects_reserved_extensions_before_execution(registerAgentsIntegration: True, authenticationType: \\\"Bearer\\\")",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Gateway_registration_is_explicit_idempotent_and_owns_all_five_setup_adapters",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"provider:selectionValidation\\\", value: \\\"valid\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"agent:activationExpectedConfigurationVersion\\\", value: \\\"7\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"approver:policyValidation\\\", value: \\\"Valid\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"provider:selectionValidation\\\", value: \\\"Valid\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"UpdateAgentConfiguration\\\", key: \\\"provider:selectionValidation\\\", value: \\\"Valid\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"True\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"agent:activationExpectedConfigurationVersion\\\", value: \\\"07\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"OtherCommand\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"other-app\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"Bearer\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"UpdateAgentConfiguration\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"DisableAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"CreateAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ConfigureAgentResponseMode\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: True)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"other-domain\\\", commandType: \\\"ActivateAgent\\\", key: \\\"actor:agentsAdmin\\\", value: \\\"true\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Reserved_extension_policy_accepts_only_the_exact_Dapr_identity_command_key_and_value(authenticationType: \\\"DaprInternal\\\", appId: \\\"agents\\\", domain: \\\"agent\\\", commandType: \\\"ActivateAgent\\\", key: \\\"agent:unknown\\\", value: \\\"true\\\", expected: False)",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Standard_setup_intent_keeps_administrator_authorization(commandType: \\\"ConfigureAgentResponseMode\\\")",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Standard_setup_intent_keeps_administrator_authorization(commandType: \\\"CreateAgent\\\")",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Standard_setup_intent_keeps_administrator_authorization(commandType: \\\"DisableAgent\\\")",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Standard_setup_intent_keeps_administrator_authorization(commandType: \\\"UpdateAgentConfiguration\\\")",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Real_gateway_HTTP_path_replays_the_same_intent_and_conflicts_changed_semantics_without_a_second_execution",
+      "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.Setup_intent_scopes_the_canonical_target_by_tenant_and_agent"
+    ]
+  }
+}

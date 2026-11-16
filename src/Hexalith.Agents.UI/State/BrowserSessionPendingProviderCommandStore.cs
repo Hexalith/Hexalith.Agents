@@ -15,6 +15,7 @@ namespace Hexalith.Agents.UI.State;
 /// <summary>Stores only safe pending command identities in browser session storage.</summary>
 public sealed class BrowserSessionPendingProviderCommandStore : IPendingProviderCommandStore, IDisposable
 {
+    private const int MutationAttempts = 8;
     private const string StorageKeyPrefix = "hexalith.agents.provider-governance.pending.v1.";
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly IJSRuntime _javascript;
@@ -39,7 +40,7 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
         try
         {
             await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
-            List<PendingProviderCommand> pending = await ReadAsync(key, generation, cancellationToken).ConfigureAwait(false);
+            var (_, pending) = await ReadAsync(key, generation, cancellationToken).ConfigureAwait(false);
             await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
             foreach (PendingProviderCommand command in pending)
             {
@@ -63,18 +64,25 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
         {
             await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
             GuardCommandScope(command.Acceptance.MessageId, key, generation);
-            List<PendingProviderCommand> pending = await ReadAsync(key, generation, cancellationToken).ConfigureAwait(false);
-            PendingProviderCommand? existing = pending.SingleOrDefault(item => item.Family == command.Family && item.ResourceKey == command.ResourceKey);
-            if (existing is not null && (existing.TenantId != command.TenantId
-                || existing.Acceptance.MessageId != command.Acceptance.MessageId
-                || existing.Acceptance.CorrelationId != command.Acceptance.CorrelationId))
+            for (int attempt = 0; attempt < MutationAttempts; attempt++)
             {
-                throw new InvalidOperationException("An unresolved governance command already locks this resource.");
+                var (expected, pending) = await ReadAsync(key, generation, cancellationToken).ConfigureAwait(false);
+                PendingProviderCommand? existing = pending.SingleOrDefault(item => item.Family == command.Family && item.ResourceKey == command.ResourceKey);
+                if (existing is not null && (existing.TenantId != command.TenantId
+                    || existing.Acceptance.MessageId != command.Acceptance.MessageId
+                    || existing.Acceptance.CorrelationId != command.Acceptance.CorrelationId))
+                {
+                    throw new InvalidOperationException("An unresolved governance command already locks this resource.");
+                }
+                pending.RemoveAll(item => item.Family == command.Family && item.ResourceKey == command.ResourceKey);
+                pending.Add(command);
+                if (await WriteAsync(key, generation, expected, pending, cancellationToken).ConfigureAwait(false))
+                {
+                    _commandScopes.TryAdd(command.Acceptance.MessageId, (key, generation));
+                    return;
+                }
             }
-            pending.RemoveAll(item => item.Family == command.Family && item.ResourceKey == command.ResourceKey);
-            pending.Add(command);
-            await WriteAsync(key, generation, pending, cancellationToken).ConfigureAwait(false);
-            _commandScopes.TryAdd(command.Acceptance.MessageId, (key, generation));
+            throw new InvalidOperationException("Pending governance commands changed too often to save safely.");
         }
         finally
         {
@@ -91,10 +99,17 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
         {
             await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
             GuardCommandScope(messageId, key, generation);
-            List<PendingProviderCommand> pending = await ReadAsync(key, generation, cancellationToken).ConfigureAwait(false);
-            pending.RemoveAll(item => item.Family == family && item.ResourceKey == resourceKey
-                && item.Acceptance.MessageId == messageId);
-            await WriteAsync(key, generation, pending, cancellationToken).ConfigureAwait(false);
+            for (int attempt = 0; attempt < MutationAttempts; attempt++)
+            {
+                var (expected, pending) = await ReadAsync(key, generation, cancellationToken).ConfigureAwait(false);
+                pending.RemoveAll(item => item.Family == family && item.ResourceKey == resourceKey
+                    && item.Acceptance.MessageId == messageId);
+                if (await WriteAsync(key, generation, expected, pending, cancellationToken).ConfigureAwait(false))
+                {
+                    return;
+                }
+            }
+            throw new InvalidOperationException("Pending governance commands changed too often to remove safely.");
         }
         finally
         {
@@ -175,7 +190,7 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
         return StorageKeyPrefix + Convert.ToHexString(hash);
     }
 
-    private async Task<List<PendingProviderCommand>> ReadAsync(string key, long generation, CancellationToken cancellationToken)
+    private async Task<(string? Json, List<PendingProviderCommand> Commands)> ReadAsync(string key, long generation, CancellationToken cancellationToken)
     {
         try
         {
@@ -184,7 +199,7 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
             await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
             if (json is null)
             {
-                return [];
+                return (null, []);
             }
             using JsonDocument document = JsonDocument.Parse(json);
             if (document.RootElement.ValueKind != JsonValueKind.Array)
@@ -215,7 +230,7 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
                 }
                 unique[resource] = command;
             }
-            return [.. unique.Values];
+            return (json, [.. unique.Values]);
         }
         catch (JSException exception)
         {
@@ -227,14 +242,21 @@ public sealed class BrowserSessionPendingProviderCommandStore : IPendingProvider
         }
     }
 
-    private async Task WriteAsync(string key, long generation, List<PendingProviderCommand> pending, CancellationToken cancellationToken)
+    private async Task<bool> WriteAsync(string key, long generation, string? expected, List<PendingProviderCommand> pending, CancellationToken cancellationToken)
     {
         try
         {
             await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
-            await _javascript.InvokeVoidAsync("sessionStorage.setItem", cancellationToken,
-                key, JsonSerializer.Serialize(pending)).ConfigureAwait(false);
-            await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
+            IJSObjectReference module = await _javascript.InvokeAsync<IJSObjectReference>("import", cancellationToken,
+                "./_content/Hexalith.Agents.UI/pendingProviderCommands.js").ConfigureAwait(false);
+            await using (module.ConfigureAwait(false))
+            {
+                await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
+                bool saved = await module.InvokeAsync<bool>("compareAndSet", cancellationToken,
+                    key, expected, JsonSerializer.Serialize(pending)).ConfigureAwait(false);
+                await GuardScopeAsync(key, generation, cancellationToken).ConfigureAwait(false);
+                return saved;
+            }
         }
         catch (JSException exception)
         {

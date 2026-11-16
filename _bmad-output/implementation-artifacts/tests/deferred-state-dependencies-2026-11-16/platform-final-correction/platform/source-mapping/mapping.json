@@ -1,0 +1,118 @@
+{
+  "Mode": "source",
+  "Root": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform",
+  "ActiveModule": "Hexalith.Platform",
+  "Entries": [
+    {
+      "Identity": "Hexalith.AI.Tools",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.AI.Tools"
+    },
+    {
+      "Identity": "Hexalith.Agents",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Agents"
+    },
+    {
+      "Identity": "Hexalith.Builds",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Builds"
+    },
+    {
+      "Identity": "Hexalith.ChatBot",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.ChatBot"
+    },
+    {
+      "Identity": "Hexalith.Commons",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Commons"
+    },
+    {
+      "Identity": "Hexalith.Conversations",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Conversations"
+    },
+    {
+      "Identity": "Hexalith.EventStore",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore"
+    },
+    {
+      "Identity": "Hexalith.Folders",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Folders"
+    },
+    {
+      "Identity": "Hexalith.FrontComposer",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.FrontComposer"
+    },
+    {
+      "Identity": "Hexalith.McpCli",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.McpCli"
+    },
+    {
+      "Identity": "Hexalith.Memories",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Memories"
+    },
+    {
+      "Identity": "Hexalith.Parties",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Parties"
+    },
+    {
+      "Identity": "Hexalith.Platform",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform"
+    },
+    {
+      "Identity": "Hexalith.PolymorphicSerializations",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.PolymorphicSerializations"
+    },
+    {
+      "Identity": "Hexalith.Projects",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Projects"
+    },
+    {
+      "Identity": "Hexalith.Tenants",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants"
+    },
+    {
+      "Identity": "Hexalith.Timesheets",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Timesheets"
+    },
+    {
+      "Identity": "Hexalith.Works",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Works"
+    }
+  ],
+  "HasGit": true,
+  "PlatformIdentity": {
+    "Commit": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "CompositionCommit": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "CheckoutCommit": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "PlatformPath": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform",
+    "ReleaseTag": null,
+    "CatalogCommit": "e2bbbd0893f586e4d447ef8358ff747ea3d34435",
+    "ToolVersionRange": "[6.0.5, 7.0.0-0)",
+    "RecordPath": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/hexalith-platform.json",
+    "IsPlatformRepository": true
+  },
+  "IdentityFindings": [
+    {
+      "RuleId": "HXW010",
+      "Message": "Tool version 1.0.0-20261116124416 is outside Platform range [6.0.5, 7.0.0-0) at \u0027/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/hexalith-platform.json\u0027.",
+      "Path": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/hexalith-platform.json",
+      "Hint": null
+    }
+  ],
+  "ContentHash": "ff49ae94d236df850177de73a8305f035556e25035741cd4b021b22ee9273909"
+}

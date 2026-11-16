@@ -224,6 +224,34 @@
       },
       {
         "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "build/Hexalith.Agents.UI.targets",
+        "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssets.targets",
+        "sha256": "69bfb2ca06e77059de236370ced3f2060b10338a65ad337b7c41015b25993b48"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "buildMultiTargeting/Hexalith.Agents.UI.targets",
+        "sha256": "34a8cfad17ed34af3bbc0fe5414a9f74c14141f195f0b78172c15ee66c5d3493"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "buildTransitive/Hexalith.Agents.UI.targets",
+        "sha256": "8da1d8e205b9a88bd984fc27385950a2a9ab11544b9d8734f73f4bb6ec14702d"
+      },
+      {
+        "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
         "version": "5.1.1",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
@@ -384,6 +412,34 @@
         "version": "7.0.0",
         "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
         "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "build/Hexalith.Agents.UI.targets",
+        "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "build/Microsoft.AspNetCore.StaticWebAssets.targets",
+        "sha256": "69bfb2ca06e77059de236370ced3f2060b10338a65ad337b7c41015b25993b48"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "buildMultiTargeting/Hexalith.Agents.UI.targets",
+        "sha256": "34a8cfad17ed34af3bbc0fe5414a9f74c14141f195f0b78172c15ee66c5d3493"
+      },
+      {
+        "kind": "import",
+        "package": "Hexalith.Agents.UI",
+        "version": "$produced",
+        "path": "buildTransitive/Hexalith.Agents.UI.targets",
+        "sha256": "8da1d8e205b9a88bd984fc27385950a2a9ab11544b9d8734f73f4bb6ec14702d"
       },
       {
         "kind": "import",
@@ -625,6 +681,34 @@
       "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
       "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad",
       "version": "7.0.0"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.Agents.UI",
+      "version": "$produced",
+      "path": "build/Hexalith.Agents.UI.targets",
+      "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.Agents.UI",
+      "version": "$produced",
+      "path": "build/Microsoft.AspNetCore.StaticWebAssets.targets",
+      "sha256": "69bfb2ca06e77059de236370ced3f2060b10338a65ad337b7c41015b25993b48"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.Agents.UI",
+      "version": "$produced",
+      "path": "buildMultiTargeting/Hexalith.Agents.UI.targets",
+      "sha256": "34a8cfad17ed34af3bbc0fe5414a9f74c14141f195f0b78172c15ee66c5d3493"
+    },
+    {
+      "kind": "import",
+      "package": "Hexalith.Agents.UI",
+      "version": "$produced",
+      "path": "buildTransitive/Hexalith.Agents.UI.targets",
+      "sha256": "8da1d8e205b9a88bd984fc27385950a2a9ab11544b9d8734f73f4bb6ec14702d"
     },
     {
       "kind": "import",

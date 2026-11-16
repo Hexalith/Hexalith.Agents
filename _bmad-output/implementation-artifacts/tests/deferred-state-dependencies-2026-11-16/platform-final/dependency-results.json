@@ -1,0 +1,188 @@
+{
+  "platform": {
+    "name": "platform",
+    "status": "blocked",
+    "commands": [
+      {
+        "label": "default-source-build",
+        "argv": [
+          "dotnet",
+          "build",
+          "tests/Hexalith.Platform.Composition.Tests/Hexalith.Platform.Composition.Tests.csproj",
+          "-c",
+          "Debug",
+          "-m:1",
+          "-p:MinVerVersionOverride=1.0.0",
+          "-p:HexalithAgentsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Agents",
+          "-p:HexalithBuildsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Builds",
+          "-p:HexalithChatBotRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.ChatBot",
+          "-p:HexalithCommonsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Commons",
+          "-p:HexalithConversationsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Conversations",
+          "-p:HexalithEventStoreRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore",
+          "-p:HexalithFoldersRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Folders",
+          "-p:HexalithFrontComposerRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.FrontComposer",
+          "-p:HexalithMcpCliRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.McpCli",
+          "-p:HexalithMemoriesRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Memories",
+          "-p:HexalithPartiesRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Parties",
+          "-p:HexalithPolymorphicSerializationsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.PolymorphicSerializations",
+          "-p:HexalithProjectsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Projects",
+          "-p:HexalithTenantsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants",
+          "-p:HexalithTimesheetsRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Timesheets",
+          "-p:HexalithWorksRoot=/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Works"
+        ],
+        "cwd": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform",
+        "environment": {},
+        "exitCode": 0,
+        "elapsedSeconds": 30.115,
+        "logSha256": "0c9a7aab94c5d955b437cdec63c72f66334a0ac52f0e6e72ff48db78e045f0a2"
+      },
+      {
+        "label": "default-related",
+        "argv": [
+          "dotnet",
+          "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/tests/Hexalith.Platform.Composition.Tests/bin/Debug/net11.0/Hexalith.Platform.Composition.Tests.dll",
+          "-failSkips",
+          "-class",
+          "Hexalith.Platform.Composition.Tests.DomainEnrollmentBindingTests",
+          "-class",
+          "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests",
+          "-result-xml",
+          "/home/administrator/projects/hexalith/agents/_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/platform-final/platform/default-related.xml"
+        ],
+        "cwd": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform",
+        "environment": {},
+        "exitCode": 0,
+        "elapsedSeconds": 84.362,
+        "logSha256": "2c6bdbbca1f36d19e0ff851e0fc0b3ac707ce8f92ca09b2d2e31a5678983ba3a"
+      }
+    ],
+    "exports": [
+      {
+        "owner": "Hexalith.Platform",
+        "revision": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform",
+        "archiveSha256": "6c6cb63ba4a8011d876aef16c8ab8330a93d593a07155f2affcac21ebe2253b9"
+      },
+      {
+        "owner": "Hexalith.AI.Tools",
+        "revision": "17a37d83db193f0b7494c1b931fd1e82a67c1424",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.AI.Tools",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.AI.Tools",
+        "archiveSha256": "7cb30d646c3b9e026c016b8d17e2eb64445ceb8e05e6347d815249d315e4ec0f"
+      },
+      {
+        "owner": "Hexalith.Builds",
+        "revision": "e2bbbd0893f586e4d447ef8358ff747ea3d34435",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Builds",
+        "archiveSha256": "be733a9a1d9a7bfc4e76a2c5be839f5e66014a8d2a9b0c92ab85965a498d7d7d"
+      },
+      {
+        "owner": "Hexalith.Commons",
+        "revision": "fbf4e94233821f6ca336af91a06feaaeb7a16855",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Commons",
+        "archiveSha256": "8a10bc269aa2a6396bfa9d786980f521b66e3ec6e3deaf4afcebd8def7051dc3"
+      },
+      {
+        "owner": "Hexalith.Conversations",
+        "revision": "c34dc3c1e0469765c75ea608f2960381f649579c",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Conversations",
+        "archiveSha256": "73926533a963e8dfa019805cc2b35380fa8f89d2fcdeaaed033525b463068a7c"
+      },
+      {
+        "owner": "Hexalith.EventStore",
+        "revision": "df976e0051b9e2eaa9d3592b3054a0317d83d0cb",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.EventStore",
+        "archiveSha256": "18f20dcd8cfbc5a5380175c46410d5436199cba1ccf55dd65091d0c5b961f4ec"
+      },
+      {
+        "owner": "Hexalith.FrontComposer",
+        "revision": "7063810a3eb940a8d803fcb977bde5a0a8a2ab59",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.FrontComposer",
+        "archiveSha256": "33401cc80f4bb4fb82821c041d204ca88afc3a2e15526bca04ef6707e7761ada"
+      },
+      {
+        "owner": "Hexalith.McpCli",
+        "revision": "23072f04f423eea3f30456fe5af13d2d382624fe",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.McpCli",
+        "archiveSha256": "a804401054060687235328cd2a4e1fd3c1222741b09027c4682a31be149f2e7b"
+      },
+      {
+        "owner": "Hexalith.Memories",
+        "revision": "f20e8b8145a6c00310a2aed3d0c8758844b65fdc",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Memories",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Memories",
+        "archiveSha256": "10f0c7905c9b83b35d6cb472c4817ec41ff82fd3bdfe46e964ae49490e9fd5b2"
+      },
+      {
+        "owner": "Hexalith.Parties",
+        "revision": "a494093da3e2656c49e539392284cd1b10f799b3",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Parties",
+        "archiveSha256": "d1faed807cf2e3b00c77c7ab7b4ae8ec2d7605205c6d0530845c6793c90b5cea"
+      },
+      {
+        "owner": "Hexalith.PolymorphicSerializations",
+        "revision": "e97b56930e213f674b64c157551f499b0473ec43",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.PolymorphicSerializations",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.PolymorphicSerializations",
+        "archiveSha256": "67589c508e2410b9961fe83c4de607ba8275ee23b605b718d556a8ddc7dc8833"
+      },
+      {
+        "owner": "Hexalith.Tenants",
+        "revision": "2ec938397c5b330cf1e694e8cc442cb4ad022f2b",
+        "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants",
+        "destination": "/tmp/hexalith-job.0UhegyUh/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants",
+        "archiveSha256": "78015ab964bfafa101cfe150a0c997f3573663c3e29b0b78adf3d558efe4136e"
+      }
+    ],
+    "runnerSha256": "ec297a3986a2c6aa204c5a7b6f29cf01cc792ce863a843984b168d04b41a769e",
+    "evidenceSha256": {
+      "default-source-build.log": "0c9a7aab94c5d955b437cdec63c72f66334a0ac52f0e6e72ff48db78e045f0a2",
+      "default-related.log": "2c6bdbbca1f36d19e0ff851e0fc0b3ac707ce8f92ca09b2d2e31a5678983ba3a",
+      "runner.py": "ec297a3986a2c6aa204c5a7b6f29cf01cc792ce863a843984b168d04b41a769e",
+      "default-related.xml": "960eb97a0075db05e3622c8d724184c349d3da87da81076c4f9fc79995eb62c1"
+    },
+    "selectedPins": {
+      "Hexalith.AI.Tools": "17a37d83db193f0b7494c1b931fd1e82a67c1424",
+      "Hexalith.Agents": "4a65f67d040bec4d646a830ed72b65c0e8951048",
+      "Hexalith.Builds": "e2bbbd0893f586e4d447ef8358ff747ea3d34435",
+      "Hexalith.ChatBot": "6a4ca07b18e9b58500dc79dfede1f308da36c828",
+      "Hexalith.Commons": "fbf4e94233821f6ca336af91a06feaaeb7a16855",
+      "Hexalith.Conversations": "c34dc3c1e0469765c75ea608f2960381f649579c",
+      "Hexalith.EventStore": "df976e0051b9e2eaa9d3592b3054a0317d83d0cb",
+      "Hexalith.Folders": "89e2fbb6bd965eae2008db4501e7b79cc6e1c8e1",
+      "Hexalith.FrontComposer": "7063810a3eb940a8d803fcb977bde5a0a8a2ab59",
+      "Hexalith.McpCli": "23072f04f423eea3f30456fe5af13d2d382624fe",
+      "Hexalith.Memories": "f20e8b8145a6c00310a2aed3d0c8758844b65fdc",
+      "Hexalith.Parties": "a494093da3e2656c49e539392284cd1b10f799b3",
+      "Hexalith.PolymorphicSerializations": "e97b56930e213f674b64c157551f499b0473ec43",
+      "Hexalith.Projects": "fc58cefde69d72d7d3daa574b5022f73f830a85e",
+      "Hexalith.Tenants": "2ec938397c5b330cf1e694e8cc442cb4ad022f2b",
+      "Hexalith.Timesheets": "aafdae771e81f152671d18c506a0470ce0deee7f",
+      "Hexalith.Works": "b2985d22b3bfbc6d86bcde28a5da722ae7f930c3"
+    },
+    "default-related": {
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "testNames": [
+        "Hexalith.Platform.Composition.Tests.DomainEnrollmentBindingTests.StaticValidityRequiresExplicitProjectAndScopedConfigurationBeforeComposition",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.ActualPartiesDeclarationValidatesAndSelectsEightMappedServers",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.ResolvedStandaloneRootsBindTheirActualPartiesProjectAsync(name: \\\"Hexalith.Parties\\\")",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.ResolvedStandaloneRootsBindTheirActualPartiesProjectAsync(name: \\\"renamed-parties-checkout\\\")",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.NativeSourceSuiteRequiresTheExactMappedRunnerSeed",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.CompositionWiresSingularPartyGatewayAndDeclarativeTenantSubscription",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.MissingOrOverriddenPartiesSourceRefusesBeforeComposition",
+        "Hexalith.Platform.Composition.Tests.PartiesAdoptionTests.SignedPartiesRunUsesTheRunnerJwtSettingsAsync"
+      ]
+    },
+    "blocker": "Exact local object unavailable: Hexalith.Works@b2985d22b3bfbc6d86bcde28a5da722ae7f930c3"
+  }
+}

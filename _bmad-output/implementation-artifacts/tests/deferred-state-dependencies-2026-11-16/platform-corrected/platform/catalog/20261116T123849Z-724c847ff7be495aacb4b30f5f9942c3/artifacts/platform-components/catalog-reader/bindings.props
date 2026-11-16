@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemGroup>
+    <ProjectReference Include="/tmp/hexalith-job.tqdZzxLU/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj" />
+    <ProjectReference Include="/tmp/hexalith-job.tqdZzxLU/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Server/Hexalith.Tenants.Server.csproj" />
+    <ProjectReference Include="/tmp/hexalith-job.tqdZzxLU/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Memories/src/Hexalith.Memories.EventStore/Hexalith.Memories.EventStore.csproj" />
+    <ProjectReference Include="/tmp/hexalith-job.tqdZzxLU/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Memories/src/Hexalith.Memories.EventStoreExtensions/Hexalith.Memories.EventStoreExtensions.csproj" />
+    <ProjectReference Include="/tmp/hexalith-job.tqdZzxLU/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Conversations/src/Hexalith.Conversations.Contracts/Hexalith.Conversations.Contracts.csproj" />
+    <ProjectReference Include="/tmp/hexalith-job.tqdZzxLU/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Conversations/src/Hexalith.Conversations.EventStoreExtensions/Hexalith.Conversations.EventStoreExtensions.csproj" />
+  </ItemGroup>
+</Project>

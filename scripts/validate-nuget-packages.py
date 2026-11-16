@@ -4,6 +4,10 @@
 from __future__ import annotations
 
 import argparse
+import base64
+from datetime import datetime, timezone
+from email.utils import format_datetime
+import hashlib
 import json
 import posixpath
 import stat
@@ -396,6 +400,7 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
             f"missing={sorted(expected_dlls - actual_dlls)}; unexpected={sorted(actual_dlls - expected_dlls)}"
         )
 
+    enrolled_assets = validate_ui_static_assets(path, normalized_names, metadata.archive_names) if metadata.package_id == "Hexalith.Agents.UI" else set()
     forbidden_asset_segments = {"analyzers", "build", "buildtransitive", "content", "contentfiles", "source", "src", "tools"}
     forbidden_asset_fragments = (
         ".server",
@@ -409,12 +414,110 @@ def validate_package(metadata: PackageMetadata, path: Path, produced_version: st
     leaked_assets = sorted(
         name
         for name in normalized_names
-        if name.casefold().endswith((".cs", ".csproj", ".sln", ".slnx", ".props", ".targets", ".pfx", ".snk"))
-        or bool(forbidden_asset_segments & {segment.casefold() for segment in name.split("/")})
-        or any(fragment in name.casefold() for fragment in forbidden_asset_fragments)
+        if name not in enrolled_assets and (
+            name.casefold().endswith((".cs", ".csproj", ".sln", ".slnx", ".props", ".targets", ".pfx", ".snk"))
+            or bool(forbidden_asset_segments & {segment.casefold() for segment in name.split("/")})
+            or any(fragment in name.casefold() for fragment in forbidden_asset_fragments))
     )
     if leaked_assets:
         raise ValueError(f"{path.name}: repository source, secret, or host asset leak: {leaked_assets}")
+
+
+def static_asset_fingerprint(module: bytes) -> str:
+    """Match the pinned Razor SDK FileHasher: absolute signed little-endian nine-byte hash prefix, ten least-significant base36 digits."""
+    value = abs(int.from_bytes(hashlib.sha256(module).digest()[:9], "little", signed=True))
+    digits = []
+    for _ in range(10):
+        value, remainder = divmod(value, 36)
+        digits.append("0123456789abcdefghijklmnopqrstuvwxyz"[remainder])
+    return "".join(digits)
+
+
+def validate_ui_static_assets(path: Path, names: list[str], raw_names: tuple[str, ...]) -> set[str]:
+    """Enroll one module and the exact reviewed Razor SDK registration, without admitting arbitrary build code."""
+    package_id = "Hexalith.Agents.UI"
+    asset_name = "staticwebassets/pendingProviderCommands.js"
+    manifest_name = f"build/{package_id}.PackageAssets.json"
+    targets = (f"build/{package_id}.targets", "build/Microsoft.AspNetCore.StaticWebAssets.targets",
+               f"buildMultiTargeting/{package_id}.targets", f"buildTransitive/{package_id}.targets")
+    enrolled = {asset_name, manifest_name, *targets}
+    actual = {name for name in names if name.split("/", 1)[0].casefold() in
+              {"build", "buildmultitargeting", "buildtransitive", "staticwebassets"} or name.casefold().endswith(".js")}
+    if actual != enrolled:
+        raise ValueError(f"{path.name}: UI static asset inventory differs: missing={sorted(enrolled - actual)}; unexpected={sorted(actual - enrolled)}")
+    mapped = dict(zip(names, raw_names, strict=True))
+    with zipfile.ZipFile(path) as archive:
+        def member(name: str, maximum: int = 65536) -> bytes:
+            if archive.getinfo(mapped[name]).file_size > maximum:
+                raise ValueError(f"{path.name}: oversized UI static metadata: {name}")
+            return archive.read(mapped[name])
+        for name in targets:
+            expected = (ROOT / "eng/ui-static-assets" / name).read_text(encoding="utf-8-sig")
+            actual_text = member(name).decode("utf-8-sig").replace("\r\n", "\n")
+            if actual_text != expected.replace("\r\n", "\n"):
+                raise ValueError(f"{path.name}: unreviewed UI static registration: {name}")
+        module = member(asset_name, 1024 * 1024)
+        if not module:
+            raise ValueError(f"{path.name}: empty UI browser module")
+        integrity = base64.b64encode(hashlib.sha256(module).digest()).decode("ascii")
+        def unique(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError(f"{path.name}: duplicate UI static metadata: {key}")
+                result[key] = value
+            return result
+        manifest = json.loads(member(manifest_name), object_pairs_hook=unique)
+    if not isinstance(manifest, dict) or set(manifest) != {"Version", "ManifestType", "Assets", "Endpoints"} \
+            or type(manifest["Version"]) is not int or manifest["Version"] != 1 or manifest["ManifestType"] != "Package" \
+            or not isinstance(manifest["Assets"], dict) or set(manifest["Assets"]) != {asset_name}:
+        raise ValueError(f"{path.name}: invalid UI static manifest identity")
+    asset = manifest["Assets"][asset_name]
+    if not isinstance(asset, dict):
+        raise ValueError(f"{path.name}: invalid UI static asset")
+    fingerprint = asset.get("Fingerprint")
+    content_root = asset.get("ContentRoot")
+    timestamp = asset.get("LastWriteTime")
+    if fingerprint != static_asset_fingerprint(module) \
+            or not isinstance(content_root, str) or len(content_root) > 4096 \
+            or not (content_root.startswith("/") or re.match(r"^[A-Za-z]:[/\\]", content_root)) \
+            or any(value in content_root for value in ("\0", "$(", "@(")) or not isinstance(timestamp, str):
+        raise ValueError(f"{path.name}: invalid UI static asset metadata")
+    try:
+        modified = datetime.fromisoformat(timestamp)
+        if modified.tzinfo is None:
+            raise ValueError("An offset is required")
+        last_modified = format_datetime(modified.astimezone(timezone.utc).replace(microsecond=0), usegmt=True)
+    except ValueError as error:
+        raise ValueError(f"{path.name}: invalid UI static modification time") from error
+    base_path = f"_content/{package_id}"
+    expected_asset = {"Identity": asset_name, "SourceId": package_id, "SourceType": "Package", "ContentRoot": content_root,
+        "BasePath": base_path, "RelativePath": "pendingProviderCommands#[.{fingerprint}]?.js", "AssetKind": "All",
+        "AssetMode": "All", "AssetRole": "Primary", "AssetMergeBehavior": "", "AssetMergeSource": "", "RelatedAsset": "",
+        "AssetTraitName": "", "AssetTraitValue": "", "AssetGroups": "", "Fingerprint": fingerprint, "Integrity": integrity,
+        "CopyToOutputDirectory": "Never", "CopyToPublishDirectory": "PreserveNewest", "OriginalItemSpec": "wwwroot/pendingProviderCommands.js",
+        "FileLength": len(module), "LastWriteTime": timestamp}
+    if asset != expected_asset or type(asset.get("FileLength")) is not int:
+        raise ValueError(f"{path.name}: UI static asset does not bind the packaged module")
+    endpoints = manifest["Endpoints"]
+    if not isinstance(endpoints, list) or len(endpoints) != 2 or any(not isinstance(item, dict) for item in endpoints):
+        raise ValueError(f"{path.name}: invalid UI static endpoints")
+    expected_endpoints = []
+    for fingerprinted in (True, False):
+        route = f"{base_path}/pendingProviderCommands" + (f".{fingerprint}" if fingerprinted else "") + ".js"
+        headers = [{"Name": "Cache-Control", "Value": "max-age=31536000, immutable" if fingerprinted else "no-cache"},
+            {"Name": "Content-Length", "Value": str(len(module))}, {"Name": "Content-Type", "Value": "text/javascript"},
+            {"Name": "ETag", "Value": '"' + integrity + '"'}, {"Name": "Last-Modified", "Value": last_modified},
+            {"Name": "Vary", "Value": "Accept-Encoding"}]
+        properties = [{"Name": "integrity", "Value": "sha256-" + integrity}]
+        if fingerprinted:
+            properties.insert(0, {"Name": "fingerprint", "Value": fingerprint})
+            properties.append({"Name": "label", "Value": f"{base_path}/pendingProviderCommands.js"})
+        expected_endpoints.append({"Route": route, "AssetFile": asset_name, "Selectors": [], "ResponseHeaders": headers,
+                                   "EndpointProperties": properties})
+    if endpoints != expected_endpoints:
+        raise ValueError(f"{path.name}: UI static endpoints do not bind the packaged module")
+    return enrolled
 
 
 def validate_directory(package_directory: Path) -> tuple[list[PackageMetadata], str]:

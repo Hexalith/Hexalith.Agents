@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "scope": "Final strict guard accepts unchanged genuine SDK static registration bytes retained from the earlier candidate package. This sample predates the final JS; the six-package/seven-consumer replay and exact current-module SDK fingerprint vector are recorded separately.",
+  "validatorSha256": "7cbf976468730f1f48bf0e597ac20f8a73ce14e624318fd400e8b76c3348fa31",
+  "sampleFiles": {
+    "build/Hexalith.Agents.UI.PackageAssets.json": {
+      "sha256": "6a24c4c14f04064bde8deb573eced059c6d84415d4964c152784953267b31100",
+      "size": 2185
+    },
+    "build/Hexalith.Agents.UI.targets": {
+      "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc",
+      "size": 91
+    },
+    "build/Microsoft.AspNetCore.StaticWebAssets.targets": {
+      "sha256": "69bfb2ca06e77059de236370ced3f2060b10338a65ad337b7c41015b25993b48",
+      "size": 461
+    },
+    "buildMultiTargeting/Hexalith.Agents.UI.targets": {
+      "sha256": "34a8cfad17ed34af3bbc0fe5414a9f74c14141f195f0b78172c15ee66c5d3493",
+      "size": 82
+    },
+    "buildTransitive/Hexalith.Agents.UI.targets": {
+      "sha256": "8da1d8e205b9a88bd984fc27385950a2a9ab11544b9d8734f73f4bb6ec14702d",
+      "size": 96
+    },
+    "staticwebassets/pendingProviderCommands.js": {
+      "sha256": "17efd7037f6e5bfc377cd12bcfcfb7a1641f7b39ff863d58571619b8aac96cf9",
+      "size": 675
+    }
+  },
+  "enrolledAssets": [
+    "build/Hexalith.Agents.UI.PackageAssets.json",
+    "build/Hexalith.Agents.UI.targets",
+    "build/Microsoft.AspNetCore.StaticWebAssets.targets",
+    "buildMultiTargeting/Hexalith.Agents.UI.targets",
+    "buildTransitive/Hexalith.Agents.UI.targets",
+    "staticwebassets/pendingProviderCommands.js"
+  ]
+}

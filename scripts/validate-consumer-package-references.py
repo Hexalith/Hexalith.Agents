@@ -122,11 +122,23 @@ def executable_asset_receipt(assets: dict, packages: Path, analyzers: list[str],
             "generatedImports": sorted(generated, key=key)}
 
 
-def enforce_asset_policy(receipts: list[dict], policy: dict) -> None:
+def policy_selection(selected: list[dict], produced_version: str | None = None) -> list[dict]:
+    """Bind UI imports to the validated release version while keeping every path and byte fingerprint exact."""
+    result = []
+    for entry in selected:
+        value = dict(entry)
+        if produced_version is not None and value.get("package") == "Hexalith.Agents.UI" and value.get("version") == produced_version:
+            value["version"] = "$produced"
+        result.append(value)
+    return result
+
+
+def enforce_asset_policy(receipts: list[dict], policy: dict, produced_version: str | None = None) -> None:
     """Fail closed on unreviewed selected package code, regardless of nuspec exclusion metadata."""
-    actual = sorted({json.dumps(entry, sort_keys=True) for receipt in receipts for entry in receipt["selected"]})
+    actual = sorted({json.dumps(entry, sort_keys=True) for receipt in receipts
+                     for entry in policy_selection(receipt["selected"], produced_version)})
     expected = sorted(json.dumps(entry, sort_keys=True) for entry in policy.get("selected", []))
-    per_consumer = {receipt["consumer"]: receipt["selected"] for receipt in receipts}
+    per_consumer = {receipt["consumer"]: policy_selection(receipt["selected"], produced_version) for receipt in receipts}
     if policy.get("schemaVersion") != 1 or actual != expected or per_consumer != policy.get("consumers"):
         raise ValueError("consumer executable asset baseline changed; review package/version/path/SHA-256 "
             f"before updating eng/consumer-executable-assets.json; added={sorted(set(actual)-set(expected))}; "
@@ -305,13 +317,15 @@ def main() -> int:
             for package_id, version in identities], "consumers": receipts}
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
     args.receipt.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
-    policy = {"schemaVersion": 1, "consumers": {result["consumer"]: result["selected"] for result in receipts}, "selected": [json.loads(entry) for entry in sorted({
-        json.dumps(entry, sort_keys=True) for result in receipts for entry in result["selected"]})]}
+    produced_version = next(iter(versions))
+    policy = {"schemaVersion": 1, "consumers": {result["consumer"]: policy_selection(result["selected"], produced_version)
+              for result in receipts}, "selected": [json.loads(entry) for entry in sorted({
+        json.dumps(entry, sort_keys=True) for result in receipts for entry in policy_selection(result["selected"], produced_version)})]}
     if args.write_baseline:
         args.write_baseline.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
         print(f"Wrote candidate executable asset baseline for explicit review: {args.write_baseline}")
     else:
-        enforce_asset_policy(receipts, json.loads(args.policy.read_text()))
+        enforce_asset_policy(receipts, json.loads(args.policy.read_text()), produced_version)
     print(f"Validated {len(receipts)} isolated consumers at {next(iter(versions))}.")
     return 0
 

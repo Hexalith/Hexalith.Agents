@@ -1,0 +1,18 @@
+[
+  {
+    "module": "Agents",
+    "revision": "f90e43f2e048f3b9ef77e7445eaa51544b76536d",
+    "buildsRevision": "801f268cd1b37ecae41d4fb20d115c055b4c5793",
+    "command": "python3 references/Hexalith.Builds/check.py",
+    "exitCode": 1,
+    "output": "/tmp/hexalith-job.aogE7hMy/Agents/.github/hexalith-ci.json: [Errno 2] No such file or directory: '/tmp/hexalith-job.aogE7hMy/Agents/.github/hexalith-ci.json'\n"
+  },
+  {
+    "module": "Platform",
+    "revision": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "buildsRevision": "e2bbbd0893f586e4d447ef8358ff747ea3d34435",
+    "command": "python3 references/Hexalith.Builds/check.py",
+    "exitCode": 1,
+    "output": "/tmp/hexalith-job.aogE7hMy/Platform/.github/hexalith-ci.json: [Errno 2] No such file or directory: '/tmp/hexalith-job.aogE7hMy/Platform/.github/hexalith-ci.json'\n"
+  }
+]

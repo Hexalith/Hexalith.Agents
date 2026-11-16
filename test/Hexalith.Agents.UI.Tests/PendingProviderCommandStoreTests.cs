@@ -359,6 +359,117 @@ public sealed class PendingProviderCommandStoreTests
         await AssertCorruptionAsync(json);
     }
 
+    [Theory]
+    [InlineData("add")]
+    [InlineData("acknowledge")]
+    [InlineData("remove")]
+    [InlineData("conflict")]
+    public async Task DistinctRuntimesRetryValidatedStateWithoutLosingIndependentLocks(string mutation)
+    {
+        var shared = new Dictionary<string, string>(StringComparer.Ordinal);
+        var firstRuntime = new InMemorySessionStorageJsRuntime(shared);
+        var secondRuntime = new InMemorySessionStorageJsRuntime(shared);
+        var authentication = new ControlledSetupAuthenticationStateProvider();
+        using var first = new BrowserSessionPendingProviderCommandStore(firstRuntime, authentication);
+        using var second = new BrowserSessionPendingProviderCommandStore(secondRuntime, authentication);
+        PendingProviderCommand original = PreparedCommand("ProviderCatalogMutation");
+        PendingProviderCommand other = original with
+        {
+            ResourceKey = ProviderCatalogIdentity.EntryId("openai", "other"),
+            Acceptance = original.Acceptance with { ModelId = "other", MessageId = "01ARZ3NDEKTSV4RRFFQ69G5FAX" },
+        };
+        if (mutation is "acknowledge" or "remove")
+        {
+            await first.SaveAsync(original);
+        }
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        firstRuntime.Comparing = () => { entered.TrySetResult(); return release.Task; };
+        PendingProviderCommand candidate = mutation == "acknowledge" ? original with
+        {
+            IsPrepared = false,
+            Acceptance = original.Acceptance with { TruthState = AgentSetupTruthState.Submitted },
+        } : original;
+        Task pending = mutation == "remove"
+            ? first.RemoveAsync(original.Family, original.ResourceKey, original.Acceptance.MessageId)
+            : first.SaveAsync(candidate);
+        await entered.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await second.SaveAsync(mutation == "conflict" ? original with
+        {
+            Acceptance = original.Acceptance with { MessageId = other.Acceptance.MessageId },
+        } : other);
+        release.SetResult();
+        if (mutation == "conflict")
+        {
+            await Should.ThrowAsync<InvalidOperationException>(() => pending);
+            (await second.LoadAsync()).ShouldHaveSingleItem().Acceptance.MessageId.ShouldBe(other.Acceptance.MessageId);
+        }
+        else
+        {
+            await pending;
+            IReadOnlyList<PendingProviderCommand> persisted = await second.LoadAsync();
+            persisted.ShouldContain(other);
+            persisted.Count.ShouldBe(mutation == "remove" ? 1 : 2);
+            if (mutation != "remove") { persisted.ShouldContain(candidate); }
+        }
+        firstRuntime.Conflicts.ShouldBe(1);
+    }
+
+    [Theory]
+    [InlineData("cancel")]
+    [InlineData("account")]
+    [InlineData("corrupt")]
+    [InlineData("contention")]
+    public async Task ConflictedMutationRevalidatesCancellationAuthenticationAndCorruption(string interruption)
+    {
+        var shared = new Dictionary<string, string>(StringComparer.Ordinal);
+        var firstRuntime = new InMemorySessionStorageJsRuntime(shared);
+        var secondRuntime = new InMemorySessionStorageJsRuntime(shared);
+        var authentication = new ControlledSetupAuthenticationStateProvider();
+        using var first = new BrowserSessionPendingProviderCommandStore(firstRuntime, authentication);
+        using var second = new BrowserSessionPendingProviderCommandStore(secondRuntime, authentication);
+        PendingProviderCommand command = ValidCommand();
+        using var cancellation = new CancellationTokenSource();
+        int calls = 0;
+        firstRuntime.Comparing = async () =>
+        {
+            calls++;
+            if (interruption == "contention")
+            {
+                // Valid, distinct bytes force a fresh read until the bounded retry refusal.
+                shared[shared.Keys.SingleOrDefault() ?? "unused"] = "[]";
+                if (calls > 1) { shared[shared.Keys.Single()] = new string(' ', calls) + "[]"; }
+            }
+            else
+            {
+                await second.SaveAsync(command);
+                if (interruption == "cancel") { cancellation.Cancel(); }
+                if (interruption == "account")
+                {
+                    authentication.Publish(Task.FromResult(ControlledSetupAuthenticationStateProvider.State("bob")));
+                    authentication.Publish(Task.FromResult(ControlledSetupAuthenticationStateProvider.State()));
+                }
+                if (interruption == "corrupt") { shared[shared.Keys.Single()] = "null"; }
+            }
+        };
+        if (interruption == "contention") { await second.SaveAsync(command); }
+        if (interruption == "cancel")
+        {
+            await Should.ThrowAsync<OperationCanceledException>(() => first.SaveAsync(command, cancellation.Token));
+        }
+        else
+        {
+            await Should.ThrowAsync<InvalidOperationException>(() => first.SaveAsync(command, cancellation.Token));
+        }
+        if (interruption == "contention") { calls.ShouldBe(8); }
+        if (interruption == "corrupt") { shared.Values.ShouldHaveSingleItem().ShouldBe("null"); }
+        if (interruption is "cancel" or "account")
+        {
+            using var refreshed = new BrowserSessionPendingProviderCommandStore(secondRuntime, new ControlledSetupAuthenticationStateProvider());
+            (await refreshed.LoadAsync()).ShouldHaveSingleItem().ShouldBe(command);
+        }
+    }
+
     private static PendingProviderCommand PreparedCommand(string family)
     {
         string entry = ProviderCatalogIdentity.EntryId("openai", "gpt-x");

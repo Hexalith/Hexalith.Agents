@@ -1,0 +1,24 @@
+{
+  "exitCode": 1,
+  "stateSuites": "all",
+  "spoolFilters": "",
+  "sources": {
+    "src/Hexalith.Agents.UI/State/BrowserSessionPendingProviderCommandStore.cs": "248799dbf2b60e610be7ad320471a97b87cfca6b8eaea42289559e68bb358f2d",
+    "src/Hexalith.Agents.UI/wwwroot/pendingProviderCommands.js": "be95eec8488ef88b8bcf63e269ff51c72d550389bac42aa9d92f023a3ca4fb7e",
+    "test/Hexalith.Agents.UI.Tests/PendingProviderCommandStoreTests.cs": "00f7e12df33fbe0f8e6564b5f220fdcef2e520662e059b4ec469d13742ee8bd5",
+    "test/Hexalith.Agents.UI.Tests/InMemorySessionStorageJsRuntime.cs": "41cd8fc33e6ca7d5c044e11d15da24c40aaee1e70c507c645921661e563deee0",
+    "tests/tooling/pending_provider_storage_test.mjs": "a77b8d26f954f74559fd584aaecd00b85341d78fd99d60368d1e14f74f04af8f",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs": "0baabaf6485a7ff3f604d0c1c82668bfe914852d3df673848303eaca7bd60fb6",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/SecuritySpoolSnapshotJsonConverter.cs": "96dd46d5f93631ceab3d3b276dadb4ddcbf9ff64d29affbbd0ac9b29cada96b5",
+    "references/Hexalith.Platform/src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs": "80d77ee6527ed97834cf4f5240925869d1e983a1d3fa0eb5f25e5a28ec4c559d",
+    "references/Hexalith.Platform/tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs": "df0d041f43783afc61397f4856cbdac6ee35ce33524b3e0411053fd7b66f47a3",
+    "_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/verify-state.sh": "7999c16a6257675405f46eaa5ade2987173e3168a77aeff3136be366b0bae9f1"
+  },
+  "outputs": {
+    "spool-all.xml": "92b8d3c2a74f0bac51338eb75f2db6b4429cd5911a3ca3a2a8c356fc43e416c6",
+    "spool-all.log": "d0cc4abf790df98b115c904917c751aa670fd08e046d47aff9c6b2a3a72f3340",
+    "spool-isolated-build.log.gz": "7c8f0e6f1253f22d225c79cdf51af2f44c619dfaf518967a6a0385a2cd0b59f6",
+    "spool-all.log.gz": "be0b058326c2b930be1e8082d8a738ca30768c6c182f7d356c8197540202c8bf",
+    "spool-isolated-build.log": "07e2c2846ef333f63d75958b26973b7e65a4c8ccfe89b17d41e0b98947e7bd38"
+  }
+}

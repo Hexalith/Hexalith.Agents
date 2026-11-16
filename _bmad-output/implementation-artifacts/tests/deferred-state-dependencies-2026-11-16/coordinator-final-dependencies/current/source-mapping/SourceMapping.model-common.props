@@ -1,0 +1,18 @@
+<Project><PropertyGroup><UseHexalithProjectReferences>true</UseHexalithProjectReferences>
+<UseNuGetDeps>false</UseNuGetDeps>
+<HexalithAIToolsFromSource>true</HexalithAIToolsFromSource>
+<HexalithAgentsFromSource>true</HexalithAgentsFromSource>
+<HexalithBuildsFromSource>true</HexalithBuildsFromSource>
+<HexalithCommonsFromSource>true</HexalithCommonsFromSource>
+<HexalithCommonsHttpFromSource>true</HexalithCommonsHttpFromSource>
+<HexalithCommonsServiceDefaultsFromSource>true</HexalithCommonsServiceDefaultsFromSource>
+<HexalithConversationsFromSource>true</HexalithConversationsFromSource>
+<HexalithEventStoreFromSource>true</HexalithEventStoreFromSource>
+<HexalithFrontComposerFromSource>true</HexalithFrontComposerFromSource>
+<HexalithMcpCliFromSource>true</HexalithMcpCliFromSource>
+<HexalithMemoriesFromSource>true</HexalithMemoriesFromSource>
+<HexalithPartiesFromSource>true</HexalithPartiesFromSource>
+<HexalithPlatformFromSource>true</HexalithPlatformFromSource>
+<HexalithPolymorphicSerializationsFromSource>true</HexalithPolymorphicSerializationsFromSource>
+<HexalithTenantsFromSource>true</HexalithTenantsFromSource>
+</PropertyGroup><Import Project="/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/prepared/source-mapping/pinned-tree/Props/Directory.Packages.props" /><Import Project="$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props" /></Project>

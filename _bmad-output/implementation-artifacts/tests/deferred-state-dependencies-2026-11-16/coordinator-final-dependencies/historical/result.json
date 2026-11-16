@@ -1,0 +1,27 @@
+{
+  "name": "historical",
+  "status": "passed",
+  "commands": [],
+  "exports": [],
+  "runnerSha256": "6f6b9b60238be34b461e7012fb0885d34dee2e5c03baf02145fc0f0dbbbf4c03",
+  "caseInventoriesSha256": "5633fd81f6d43ecd349b8597338cd48cc5fb8ba38a40d5db292cb3c2061f11df",
+  "outcomes": {
+    "reviewed": "passed",
+    "previous-five": "passed"
+  },
+  "conclusion": "Both exact historical integrations execute; the five reviewed pin changes were not necessary for this selected integration. No current rollback is implied.",
+  "evidenceSha256": {
+    "deferred-dependency-case-inventories.json": "5633fd81f6d43ecd349b8597338cd48cc5fb8ba38a40d5db292cb3c2061f11df",
+    "runner.py": "6f6b9b60238be34b461e7012fb0885d34dee2e5c03baf02145fc0f0dbbbf4c03",
+    "reviewed/gateway.xml": "747e56347091d12f35d746fbd91a03886e16d41b3d10e4adcddfa1209c305bb9",
+    "reviewed/integration-build.log": "1fd92762f8d8136cd87eb6ddf008c45d9ebfad17dcfb5bdfb676a66b2cbbd5ef",
+    "reviewed/gateway.log": "9dcd4c507622f3d15bb5c86d959dd3091b547dffc003a00de974b631c40b9a00",
+    "reviewed/deferred-dependency-case-inventories.json": "5633fd81f6d43ecd349b8597338cd48cc5fb8ba38a40d5db292cb3c2061f11df",
+    "reviewed/runner.py": "6f6b9b60238be34b461e7012fb0885d34dee2e5c03baf02145fc0f0dbbbf4c03",
+    "previous-five/gateway.xml": "bb7b948bc154ea6d79111fb44135f39258d0b4186361426252fa6c7ffba53353",
+    "previous-five/integration-build.log": "57b646ae01c2bbc46fdc2c66299e3948380510075085a91aa3999cc480418727",
+    "previous-five/gateway.log": "1e22e6299c0306a842c500a37ffa1ccc17ace044f2e8da989da928ff0d9e5419",
+    "previous-five/deferred-dependency-case-inventories.json": "5633fd81f6d43ecd349b8597338cd48cc5fb8ba38a40d5db292cb3c2061f11df",
+    "previous-five/runner.py": "6f6b9b60238be34b461e7012fb0885d34dee2e5c03baf02145fc0f0dbbbf4c03"
+  }
+}

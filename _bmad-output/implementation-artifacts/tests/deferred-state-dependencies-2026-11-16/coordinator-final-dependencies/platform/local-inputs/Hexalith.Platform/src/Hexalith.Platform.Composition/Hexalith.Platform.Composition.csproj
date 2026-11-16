@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <StartupObject>Hexalith.Platform.Composition.PlatformSourceStateWorker</StartupObject>
+    <!-- Builds loads this model from its private output directory; native preparation also uses its runtime dependencies. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(UseHexalithProjectReferences)' == 'true'">
+    <!-- The source-selected SDK carries the extension API; exact public support is gated below. -->
+    <DefineConstants>$(DefineConstants);HEXALITH_PLATFORM_SOURCE_CATALOG;HEXALITH_PLATFORM_EXTENSION_SDK</DefineConstants>
+    <HexalithTenantPreparationRoot Condition="'$(HexalithTenantsRoot)' != ''">$(HexalithTenantsRoot)</HexalithTenantPreparationRoot>
+    <HexalithTenantPreparationRoot Condition="'$(HexalithTenantPreparationRoot)' == ''">$(MSBuildThisFileDirectory)../../references/Hexalith.Tenants</HexalithTenantPreparationRoot>
+    <HexalithMemoriesPreparationRoot Condition="'$(HexalithMemoriesRoot)' != ''">$(HexalithMemoriesRoot)</HexalithMemoriesPreparationRoot>
+    <HexalithMemoriesPreparationRoot Condition="'$(HexalithMemoriesPreparationRoot)' == ''">$(MSBuildThisFileDirectory)../../references/Hexalith.Memories</HexalithMemoriesPreparationRoot>
+  </PropertyGroup>
+  <!-- The exact public 4.2.0 SDK carries the reviewed extension API. -->
+  <PropertyGroup Condition="'$(HexalithEventStoreVersion)' == '4.2.0'"><DefineConstants>$(DefineConstants);HEXALITH_PLATFORM_EXTENSION_SDK</DefineConstants></PropertyGroup>
+  <!-- Qualify exact SDK cohorts; future packages remain unqualified. -->
+  <!-- Canonical public tenants, platform human admission and explicit status scopes ship in these exact SDKs. -->
+  <PropertyGroup Condition="'$(UseHexalithProjectReferences)' == 'true' or '$(HexalithEventStoreVersion)' == '4.0.0' or '$(HexalithEventStoreVersion)' == '4.0.2' or '$(HexalithEventStoreVersion)' == '4.0.3' or '$(HexalithEventStoreVersion)' == '4.0.4' or '$(HexalithEventStoreVersion)' == '4.1.0' or '$(HexalithEventStoreVersion)' == '4.2.0'"><DefineConstants>$(DefineConstants);HEXALITH_PLATFORM_CANONICAL_SCOPES</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="'$(UseHexalithProjectReferences)' == 'true' or '$(HexalithEventStoreVersion)' == '3.129.0' or '$(HexalithEventStoreVersion)' == '3.130.0' or '$(HexalithEventStoreVersion)' == '3.130.1' or '$(HexalithEventStoreVersion)' == '3.130.2' or '$(HexalithEventStoreVersion)' == '3.132.1' or '$(HexalithEventStoreVersion)' == '3.132.2' or '$(HexalithEventStoreVersion)' == '3.133.0' or '$(HexalithEventStoreVersion)' == '4.0.0' or '$(HexalithEventStoreVersion)' == '4.0.2' or '$(HexalithEventStoreVersion)' == '4.0.3' or '$(HexalithEventStoreVersion)' == '4.0.4' or '$(HexalithEventStoreVersion)' == '4.1.0' or '$(HexalithEventStoreVersion)' == '4.2.0'"><DefineConstants>$(DefineConstants);HEXALITH_PLATFORM_CATALOG_SDK</DefineConstants></PropertyGroup>
+  <PropertyGroup Condition="'$(UseHexalithProjectReferences)' == 'true' or '$(HexalithEventStoreVersion)' == '3.130.0' or '$(HexalithEventStoreVersion)' == '3.130.1' or '$(HexalithEventStoreVersion)' == '3.130.2' or '$(HexalithEventStoreVersion)' == '3.132.1' or '$(HexalithEventStoreVersion)' == '3.132.2' or '$(HexalithEventStoreVersion)' == '3.133.0' or '$(HexalithEventStoreVersion)' == '4.0.0' or '$(HexalithEventStoreVersion)' == '4.0.2' or '$(HexalithEventStoreVersion)' == '4.0.3' or '$(HexalithEventStoreVersion)' == '4.0.4' or '$(HexalithEventStoreVersion)' == '4.1.0' or '$(HexalithEventStoreVersion)' == '4.2.0'"><DefineConstants>$(DefineConstants);HEXALITH_PLATFORM_V2_CATALOG</DefineConstants></PropertyGroup>
+  <ItemGroup Condition="'$(UseHexalithProjectReferences)' == 'true'">
+    <ProjectReference Include="$(HexalithTenantPreparationRoot)/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj" />
+    <ProjectReference Include="$(HexalithMemoriesPreparationRoot)/src/Hexalith.Memories.Contracts/Hexalith.Memories.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting" />
+    <PackageReference Include="Aspire.Hosting.Kubernetes" />
+    <PackageReference Include="YamlDotNet" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" />
+    <PackageReference Include="Aspire.Hosting.Redis" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseHexalithProjectReferences)' == 'true'">
+    <ProjectReference Include="$(HexalithEventStoreRoot)/src/Hexalith.EventStore.Aspire/Hexalith.EventStore.Aspire.csproj" />
+    <ProjectReference Include="$(HexalithEventStoreRoot)/src/Hexalith.EventStore.ServiceDefaults/Hexalith.EventStore.ServiceDefaults.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseHexalithProjectReferences)' != 'true'">
+    <PackageReference Include="Hexalith.EventStore.Aspire" />
+    <PackageReference Include="Hexalith.EventStore.DomainService" />
+    <PackageReference Include="Hexalith.EventStore.ServiceDefaults" />
+    <PackageReference Include="Hexalith.Tenants.Contracts" />
+    <PackageReference Include="Hexalith.Tenants.Server" Condition="('$(HexalithEventStoreVersion)' == '4.1.0' or '$(HexalithEventStoreVersion)' == '4.2.0') and ('$(HexalithTenantsVersion)' == '7.0.5' or ('$(HexalithEventStoreVersion)' == '4.2.0' and '$(HexalithTenantsVersion)' == '7.0.7'))" />
+    <PackageReference Include="Hexalith.Memories.Contracts" />
+    <PackageReference Include="Hexalith.Parties.Contracts" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(BuildsToolingAssemblyPath)' == ''">
+    <!-- Plain builds keep Tooling's neutral catalog; authenticated mappings own every retained edge. -->
+    <ProjectReference Include="$(HexalithBuildsResolvedRoot)/src/libraries/Hexalith.Builds.Tooling/Hexalith.Builds.Tooling.csproj">
+      <GlobalPropertiesToRemove Condition="'$(HexalithSourceMappingMode)' != 'source' and '$(HexalithSourceMappingHash)' == '' and '$(HEXALITH_SOURCE_MAPPING_HASH)' == '' and '$(HEXALITH_SOURCE_MAPPING_PATH)' == ''">HexalithEventStoreVersion</GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(BuildsToolingAssemblyPath)' != ''">
+    <Reference Include="Hexalith.Builds.Tooling" HintPath="$(BuildsToolingAssemblyPath)" />
+    <PackageReference Include="JsonSchema.Net" />
+    <PackageReference Include="NuGet.Versioning" />
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
+  <ItemGroup><None Update="Declarations/*.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DaprSelfHostedMtls.cs" Link="DaprSelfHostedMtls.cs" /><Compile Include="../../DaprSelfHostedMtlsSubscriber.cs" Link="DaprSelfHostedMtlsSubscriber.cs" /></ItemGroup>
+  <ItemGroup><InternalsVisibleTo Include="Hexalith.Platform.Composition.Tests" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../Hexalith.Platform.Works.Runtime/Hexalith.Platform.Works.Runtime.csproj" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../Hexalith.Platform.Custody/Hexalith.Platform.Custody.csproj" /><ProjectReference Include="../Hexalith.Platform.Secrets.Runtime/Hexalith.Platform.Secrets.Runtime.csproj" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../eng/ext-secrets-1/public-joint-plan.json" LogicalName="ExtSecretsFullJointPlan" /></ItemGroup>
+  <ItemGroup><Compile Include="../Hexalith.Platform.CatalogBuilder/PublishedCatalogArtifactCohort.cs" Link="PublishedCatalogArtifactCohort.cs" /></ItemGroup>
+  <!-- Measured signed EventStore 4.2.0 carries the extension API; unknown SDKs remain unqualified. -->
+  <PropertyGroup Condition="'$(UseHexalithProjectReferences)' != 'true' and '$(HexalithEventStoreVersion)' == '4.2.0'">
+    <DefineConstants>$(DefineConstants);HEXALITH_PLATFORM_EXTENSION_SDK;HEXALITH_PLATFORM_CANONICAL_SCOPES;HEXALITH_PLATFORM_CATALOG_SDK;HEXALITH_PLATFORM_V2_CATALOG</DefineConstants>
+  </PropertyGroup>
+</Project>

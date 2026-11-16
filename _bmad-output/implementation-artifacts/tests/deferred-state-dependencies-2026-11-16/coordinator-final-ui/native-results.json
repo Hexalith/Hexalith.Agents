@@ -1,0 +1,9 @@
+{
+  "Hexalith.Agents.UI.Tests": {
+    "assemblyPath": "/tmp/hexalith-job.x8J6X5SW/ui-repo/test/Hexalith.Agents.UI.Tests/bin/Debug/net11.0/Hexalith.Agents.UI.Tests.dll",
+    "assemblySha256": "00abe7af07a3404ece658bf2ff29ea7159a720000499ab770232ba6193323093",
+    "xml": "ui-all.xml",
+    "xmlSha256": "63bbee57fd517e753d7a724db46366481eb999daa7bf474d0d2ee13d4ed007d5",
+    "passed": 1352
+  }
+}

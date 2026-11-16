@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "run-with-temp",
+    "python3",
+    "scripts/verify-deferred-dependency-cohort.py",
+    "--lane",
+    "platform",
+    "--owner-root",
+    "Hexalith.Works=/home/administrator/projects/hexalith/works",
+    "--platform-overlay",
+    "src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj=/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj",
+    "--platform-overlay",
+    "eng/test_source_sdk_propagation.py=/home/administrator/projects/hexalith/agents/references/Hexalith.Platform/eng/test_source_sdk_propagation.py",
+    "--evidence",
+    "_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/platform-corrected"
+  ]
+}

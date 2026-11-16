@@ -1,0 +1,67 @@
+{
+  "Properties": {
+    "HexalithEventStoreVersion": "5.1.0",
+    "RestoreUseStaticGraphEvaluation": "true",
+    "BuildsToolingAssemblyPath": ""
+  },
+  "Items": {
+    "ProjectReference": [
+      {
+        "Identity": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj",
+        "ReferenceSourceTarget": "ProjectReference",
+        "AdditionalProperties": "ControlContext=keep;useHEXALITHProjectReferences=false;hexalithEventStoreVersion=4.1.0",
+        "OutputItemType": "",
+        "Targets": "",
+        "FullPath": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj",
+        "RootDir": "/",
+        "Filename": "Hexalith.Tenants.Contracts",
+        "Extension": ".csproj",
+        "RelativeDir": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/",
+        "Directory": "tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/",
+        "RecursiveDir": "",
+        "ModifiedTime": "2026-11-15 09:25:53.0000000",
+        "CreatedTime": "2026-11-15 09:25:53.0000000",
+        "AccessedTime": "2026-11-16 13:41:57.4149061",
+        "DefiningProjectFullPath": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/child-selection-3/Hexalith.Platform.Composition.csproj",
+        "DefiningProjectDirectory": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/child-selection-3/",
+        "DefiningProjectName": "Hexalith.Platform.Composition",
+        "DefiningProjectExtension": ".csproj"
+      }
+    ],
+    "Reference": []
+  },
+  "TargetResults": {
+    "ObserveChildSourceMode": {
+      "Result": "Success",
+      "Items": [
+        {
+          "Identity": "Hexalith.Tenants.Contracts",
+          "Mode": "false",
+          "ReferenceSourceTarget": "ProjectReference",
+          "MSBuildSourceProjectFile": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj",
+          "Sdk": "4.1.0",
+          "AdditionalProperties": "ControlContext=keep;useHEXALITHProjectReferences=false;hexalithEventStoreVersion=4.1.0",
+          "OutputItemType": "",
+          "EventStoreFromSource": "",
+          "MSBuildSourceTargetName": "ObserveSourceModeLeaf",
+          "Targets": "",
+          "OriginalItemSpec": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/references/Hexalith.Tenants/src/Hexalith.Tenants.Contracts/Hexalith.Tenants.Contracts.csproj",
+          "FullPath": "/tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/Hexalith.Tenants.Contracts",
+          "RootDir": "/",
+          "Filename": "Hexalith.Tenants",
+          "Extension": ".Contracts",
+          "RelativeDir": "",
+          "Directory": "tmp/hexalith-job.KJ4ond4y/deferred-dependencies/platform/Hexalith.Platform/",
+          "RecursiveDir": "",
+          "ModifiedTime": "",
+          "CreatedTime": "",
+          "AccessedTime": "",
+          "DefiningProjectFullPath": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/child-selection-3/Hexalith.Platform.Composition.csproj",
+          "DefiningProjectDirectory": "/tmp/hexalith-job.KJ4ond4y/platform-source-sdk-metadata-o8amr0_e/child-selection-3/",
+          "DefiningProjectName": "Hexalith.Platform.Composition",
+          "DefiningProjectExtension": ".csproj"
+        }
+      ]
+    }
+  }
+}

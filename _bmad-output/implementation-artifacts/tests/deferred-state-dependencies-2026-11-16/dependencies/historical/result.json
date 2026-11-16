@@ -1,0 +1,19 @@
+{
+  "name": "historical",
+  "status": "passed",
+  "commands": [],
+  "exports": [],
+  "outcomes": {
+    "reviewed": "passed",
+    "previous-five": "passed"
+  },
+  "conclusion": "Both exact historical integrations execute; the five reviewed pin changes were not necessary for this selected integration. No current rollback is implied.",
+  "evidenceSha256": {
+    "reviewed/gateway.xml": "30309190ba2b6a800e36db74cfd19978332b3dd7a5960a74c0764b345f8da9e5",
+    "reviewed/integration-build.log": "7b6b5a63dd9272ba378bb91e91a9783dd219f8ae437e9576f7217b1377f5aaa0",
+    "reviewed/gateway.log": "95d0a4c6b7f6af9f4c80fbb7a104d083ea09b1a9f947edd786a4432a6f7a507d",
+    "previous-five/gateway.xml": "a7b62980e70736340770e1051343772c6c34448d76ede2a0f648b6bc97acab6a",
+    "previous-five/integration-build.log": "f4670ff5d3ce67568b3011d4d004db8416341d4fd87948d5d692e1fa56a44149",
+    "previous-five/gateway.log": "9453d37b682dd4a15c49ad7df03547feffa3670617075a6d502e7b8c07d8f17a"
+  }
+}

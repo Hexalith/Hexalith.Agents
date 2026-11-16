@@ -1,0 +1,23 @@
+<Project><PropertyGroup><UseHexalithProjectReferences>true</UseHexalithProjectReferences>
+<UseNuGetDeps>false</UseNuGetDeps>
+<HexalithAIToolsFromSource>true</HexalithAIToolsFromSource>
+<HexalithAgentsFromSource>true</HexalithAgentsFromSource>
+<HexalithBuildsFromSource>true</HexalithBuildsFromSource>
+<HexalithChatBotFromSource>true</HexalithChatBotFromSource>
+<HexalithCommonsFromSource>true</HexalithCommonsFromSource>
+<HexalithCommonsHttpFromSource>true</HexalithCommonsHttpFromSource>
+<HexalithCommonsServiceDefaultsFromSource>true</HexalithCommonsServiceDefaultsFromSource>
+<HexalithConversationsFromSource>true</HexalithConversationsFromSource>
+<HexalithEventStoreFromSource>true</HexalithEventStoreFromSource>
+<HexalithFoldersFromSource>true</HexalithFoldersFromSource>
+<HexalithFrontComposerFromSource>true</HexalithFrontComposerFromSource>
+<HexalithMcpCliFromSource>true</HexalithMcpCliFromSource>
+<HexalithMemoriesFromSource>true</HexalithMemoriesFromSource>
+<HexalithPartiesFromSource>true</HexalithPartiesFromSource>
+<HexalithPlatformFromSource>true</HexalithPlatformFromSource>
+<HexalithPolymorphicSerializationsFromSource>true</HexalithPolymorphicSerializationsFromSource>
+<HexalithProjectsFromSource>true</HexalithProjectsFromSource>
+<HexalithTenantsFromSource>true</HexalithTenantsFromSource>
+<HexalithTimesheetsFromSource>true</HexalithTimesheetsFromSource>
+<HexalithWorksFromSource>true</HexalithWorksFromSource>
+</PropertyGroup><Import Project="/tmp/hexalith-job.KJ4ond4y/conversations-source-catalog-bec981cff2c844f088c594d6dcef5f1f/source-mapping/pinned-tree/Props/Directory.Packages.props" /><Import Project="$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props" /></Project>

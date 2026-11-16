@@ -1,0 +1,102 @@
+{
+  "final-dependencies/current/released-graph-Hexalith.EventStore.Contracts-expanded.xml": {
+    "originalSha256": "8fbc0478f25a5e7d6dbf8227bdcc739ea5d33eb0e46f14621010c974fb285060",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.Contracts-expanded.xml.gz",
+    "gzipSha256": "e9d6ed9a91f04bb7d13cb959efa7b350c4f637d11c4d5631dedc43d853773e26"
+  },
+  "final-dependencies/current/released-graph-Hexalith.Agents.Contracts-expanded.xml": {
+    "originalSha256": "847003fcb80db817635772bd8da30dd7aa11f454fd465c685ff08858f9f8be34",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.Agents.Contracts-expanded.xml.gz",
+    "gzipSha256": "988703f319033cd401f8feb1c4d822324bebc87fd4c241285fb67bf9fb52fd03"
+  },
+  "final-dependencies/current/released-graph-Hexalith.Agents.EventStore-expanded.xml": {
+    "originalSha256": "2d4ca5ff21485c7a88bbc151d293a6e5a3e6292305af016a478a385bed709eb3",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.Agents.EventStore-expanded.xml.gz",
+    "gzipSha256": "d5d3836ff3193d271c7039520b2bf6e327464473fa3b5549d7c034d3baea7823"
+  },
+  "final-dependencies/current/released-graph-Hexalith.EventStore.Server-expanded.xml": {
+    "originalSha256": "36101abe7f04ac958e14203cbdaa8fd4a5f001e29c977063a5fbf9e354a1efb6",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.Server-expanded.xml.gz",
+    "gzipSha256": "9c167d8163a65cfc7b84893d9f5c77d8fe5fb9d0708a6b1930f46073196960a8"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.Contracts-expanded.xml": {
+    "originalSha256": "8fbc0478f25a5e7d6dbf8227bdcc739ea5d33eb0e46f14621010c974fb285060",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.Contracts-expanded.xml.gz",
+    "gzipSha256": "e9d6ed9a91f04bb7d13cb959efa7b350c4f637d11c4d5631dedc43d853773e26"
+  },
+  "final-dependencies/current/released-graph-Hexalith.EventStore.Gateway-expanded.xml": {
+    "originalSha256": "6b9d53ba920ab2e12bcac8c4d28e7063601b1b3342e73f201a606c04119f395b",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.Gateway-expanded.xml.gz",
+    "gzipSha256": "ffa955d91e58420e772839f48cbd7b6ad552eecef935390aab0ac86422953e50"
+  },
+  "final-dependencies/current/released-graph-Hexalith.EventStore.DomainService-expanded.xml": {
+    "originalSha256": "59aad10c944f7080765603fee3a7685b833e740373446ce295d64f6daad7925e",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.DomainService-expanded.xml.gz",
+    "gzipSha256": "862943d58e2827650d11f5a620278fa5268872a50b9e0294a1af38b9ae94d576"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.Client-expanded.xml": {
+    "originalSha256": "ea24981901f352feb00ff8280802556c6c96380690c18292523cb84e16e6333a",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.Client-expanded.xml.gz",
+    "gzipSha256": "ba02037bd2a2a3253255e66f92980a3502382ae2b85f8eb59778d4130286af36"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.Gateway-expanded.xml": {
+    "originalSha256": "6ff0173f12d64ca7a008e8a77871f8825cfb01d58295ca8204bca0da9522458f",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.Gateway-expanded.xml.gz",
+    "gzipSha256": "6fac300cbcdc129bedd6a7192841f00be4095fe33f09852dd4c9f8b6b3907f42"
+  },
+  "final-dependencies/current/released-graph-Hexalith.EventStore.Admin.Abstractions-expanded.xml": {
+    "originalSha256": "e9c23b10e618013c5cfdda49086bde0f041303de80b99053df403758e12af00a",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.Admin.Abstractions-expanded.xml.gz",
+    "gzipSha256": "319fb7cb32d3bb63caa0d2fe933afa043048cd4b526100e47cb6fabb73e67f69"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.Agents.Contracts-expanded.xml": {
+    "originalSha256": "847003fcb80db817635772bd8da30dd7aa11f454fd465c685ff08858f9f8be34",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.Agents.Contracts-expanded.xml.gz",
+    "gzipSha256": "988703f319033cd401f8feb1c4d822324bebc87fd4c241285fb67bf9fb52fd03"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.Admin.Abstractions-expanded.xml": {
+    "originalSha256": "e9c23b10e618013c5cfdda49086bde0f041303de80b99053df403758e12af00a",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.Admin.Abstractions-expanded.xml.gz",
+    "gzipSha256": "319fb7cb32d3bb63caa0d2fe933afa043048cd4b526100e47cb6fabb73e67f69"
+  },
+  "final-dependencies/current/released-graph-Hexalith.Commons.UniqueIds-expanded.xml": {
+    "originalSha256": "9e3e4932a80ed202b2a81730eeecfc58e1468737ed724683f1f820b6055865aa",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.Commons.UniqueIds-expanded.xml.gz",
+    "gzipSha256": "59f8ca8b13641e4ea94dc351a39682b83b46d7b790bb5f4bf216e6450fbeb834"
+  },
+  "final-dependencies/current/released-graph-Hexalith.EventStore.Client-expanded.xml": {
+    "originalSha256": "ea24981901f352feb00ff8280802556c6c96380690c18292523cb84e16e6333a",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.Client-expanded.xml.gz",
+    "gzipSha256": "ba02037bd2a2a3253255e66f92980a3502382ae2b85f8eb59778d4130286af36"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.ServiceDefaults-expanded.xml": {
+    "originalSha256": "f3c1254c227507dc8eab83cd9652821acd51d8442cccf54fcb5f907e66af88e6",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.ServiceDefaults-expanded.xml.gz",
+    "gzipSha256": "d404104ee600c203bbb4e2dd7ffd49ef7feaf14bff496757f65e1257b2df2336"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.Agents.EventStore-expanded.xml": {
+    "originalSha256": "fe10f72fc92046421e3556a5e15292bc6568f086111e139c8667dce393ab1f44",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.Agents.EventStore-expanded.xml.gz",
+    "gzipSha256": "4c93a6c9b3456a7c32f91f7db24b6adb79ce4fe6800f106b75b1fe31abaae3b2"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.Server-expanded.xml": {
+    "originalSha256": "36101abe7f04ac958e14203cbdaa8fd4a5f001e29c977063a5fbf9e354a1efb6",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.Server-expanded.xml.gz",
+    "gzipSha256": "9c167d8163a65cfc7b84893d9f5c77d8fe5fb9d0708a6b1930f46073196960a8"
+  },
+  "final-dependencies/current/released-graph-Hexalith.EventStore.ServiceDefaults-expanded.xml": {
+    "originalSha256": "1dbc6e75629849553cb084b3e7b70054efa325393c950c09c3250ae52a14f219",
+    "gzipPath": "final-dependencies/current/released-graph-Hexalith.EventStore.ServiceDefaults-expanded.xml.gz",
+    "gzipSha256": "a5c67e025dd1fa69784b518ff1bf0606bf612e57e52d056c0e1e29a219ddb4cb"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.EventStore.DomainService-expanded.xml": {
+    "originalSha256": "59aad10c944f7080765603fee3a7685b833e740373446ce295d64f6daad7925e",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.EventStore.DomainService-expanded.xml.gz",
+    "gzipSha256": "862943d58e2827650d11f5a620278fa5268872a50b9e0294a1af38b9ae94d576"
+  },
+  "final-dependencies/current/selected-graph-Hexalith.Commons.UniqueIds-expanded.xml": {
+    "originalSha256": "9e3e4932a80ed202b2a81730eeecfc58e1468737ed724683f1f820b6055865aa",
+    "gzipPath": "final-dependencies/current/selected-graph-Hexalith.Commons.UniqueIds-expanded.xml.gz",
+    "gzipSha256": "59f8ca8b13641e4ea94dc351a39682b83b46d7b790bb5f4bf216e6450fbeb834"
+  }
+}

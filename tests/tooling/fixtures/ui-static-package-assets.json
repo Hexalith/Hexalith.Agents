@@ -1,0 +1,114 @@
+{
+  "Version": 1,
+  "ManifestType": "Package",
+  "Assets": {
+    "staticwebassets/pendingProviderCommands.js": {
+      "Identity": "staticwebassets/pendingProviderCommands.js",
+      "SourceId": "Hexalith.Agents.UI",
+      "SourceType": "Package",
+      "ContentRoot": "/synthetic/sdk-ui/wwwroot/",
+      "BasePath": "_content/Hexalith.Agents.UI",
+      "RelativePath": "pendingProviderCommands#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "AssetGroups": "",
+      "Fingerprint": "bjmcys22z0",
+      "Integrity": "F+/XA39uW/w3fNErz8+3oWQfezn/hj1YVxYZuKrJbPk=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/pendingProviderCommands.js",
+      "FileLength": 675,
+      "LastWriteTime": "2026-11-16T13:18:19+00:00"
+    }
+  },
+  "Endpoints": [
+    {
+      "Route": "_content/Hexalith.Agents.UI/pendingProviderCommands.bjmcys22z0.js",
+      "AssetFile": "staticwebassets/pendingProviderCommands.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "675"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"F+/XA39uW/w3fNErz8+3oWQfezn/hj1YVxYZuKrJbPk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 16 Nov 2026 13:18:19 GMT"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Accept-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bjmcys22z0"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-F+/XA39uW/w3fNErz8+3oWQfezn/hj1YVxYZuKrJbPk="
+        },
+        {
+          "Name": "label",
+          "Value": "_content/Hexalith.Agents.UI/pendingProviderCommands.js"
+        }
+      ]
+    },
+    {
+      "Route": "_content/Hexalith.Agents.UI/pendingProviderCommands.js",
+      "AssetFile": "staticwebassets/pendingProviderCommands.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "675"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"F+/XA39uW/w3fNErz8+3oWQfezn/hj1YVxYZuKrJbPk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 16 Nov 2026 13:18:19 GMT"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Accept-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-F+/XA39uW/w3fNErz8+3oWQfezn/hj1YVxYZuKrJbPk="
+        }
+      ]
+    }
+  ]
+}

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+import base64
+import hashlib
 import json
 import struct
 import sys
@@ -23,6 +25,36 @@ VERSION = "1.2.3"
 PACKAGE_IDS = tuple(package["id"] for package in json.loads(
     (ROOT / "eng" / "release-packages.json").read_text(encoding="utf-8")
 )["packages"])
+
+
+def ui_static_assets() -> dict[str, bytes]:
+    """Bind synthetic module bytes through a manifest captured from the pinned Razor SDK."""
+    module = b"export function fixture() {}\n"
+    integrity = base64.b64encode(hashlib.sha256(module).digest()).decode("ascii")
+    manifest = json.loads((ROOT / "tests/tooling/fixtures/ui-static-package-assets.json").read_text())
+    asset = manifest["Assets"]["staticwebassets/pendingProviderCommands.js"]
+    asset["Integrity"] = integrity
+    asset["FileLength"] = len(module)
+    # Independently captured pinned-SDK fingerprint for the constant fixture module.
+    original_fingerprint = asset["Fingerprint"]
+    asset["Fingerprint"] = "ymbusap65w"
+    for endpoint in manifest["Endpoints"]:
+        endpoint["Route"] = endpoint["Route"].replace(original_fingerprint, asset["Fingerprint"])
+        for header in endpoint["ResponseHeaders"]:
+            if header["Name"] == "Content-Length":
+                header["Value"] = str(len(module))
+            if header["Name"] == "ETag":
+                header["Value"] = '"' + integrity + '"'
+        for value in endpoint["EndpointProperties"]:
+            if value["Name"] == "integrity":
+                value["Value"] = "sha256-" + integrity
+            if value["Name"] == "fingerprint":
+                value["Value"] = asset["Fingerprint"]
+    result = {str(path.relative_to(ROOT / "eng/ui-static-assets")): path.read_bytes()
+              for path in (ROOT / "eng/ui-static-assets").rglob("*.targets")}
+    result["staticwebassets/pendingProviderCommands.js"] = module
+    result["build/Hexalith.Agents.UI.PackageAssets.json"] = json.dumps(manifest).encode()
+    return result
 
 
 def write_package(
@@ -68,6 +100,9 @@ def write_package(
         archive.writestr(dll_path or f"lib/net11.0/{package_id}.dll", b"fixture assembly")
         if package_id == "Hexalith.Agents.UI":
             archive.writestr("lib/net11.0/fr/Hexalith.Agents.UI.resources.dll", b"fixture resources")
+            for name, contents in ui_static_assets().items():
+                if name not in (extra_assets or {}):
+                    archive.writestr(name, contents)
         if readme is not None:
             archive.writestr(policy["PackageReadmeFile"], readme)
         for name, content in (extra_assets or {}).items():

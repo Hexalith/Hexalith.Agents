@@ -1,0 +1,15 @@
+{
+  "assemblyPath": "/tmp/hexalith-job.ppOP68H4/state/references/Hexalith.Platform/tests/Hexalith.Platform.Custody.Tests/bin/Debug/net11.0/Hexalith.Platform.Custody.Tests.dll",
+  "assemblySha256": "171c1a0ac1634ef07e3f9bebc0d160a271d494ba6727b34860d0901b37f6ec11",
+  "parallel": "none",
+  "results": {
+    "signing-recheck": {
+      "passed": 7,
+      "xmlSha256": "0cd8162ecda3fffa98de467ddd46947a13b9782ac3a379ff81a824ff858dd37b"
+    },
+    "custody-all": {
+      "passed": 806,
+      "xmlSha256": "eb159c2dae8e078fa3dd9d1a6575581cf9dac94303951df74f37f2e7278b3667"
+    }
+  }
+}

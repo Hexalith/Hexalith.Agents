@@ -1,0 +1,98 @@
+[
+  {
+    "path": "references/Hexalith.AI.Tools",
+    "head": "7ef8166ef87e1365f86d1a1b3aaf0235545177d4",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t0"
+  },
+  {
+    "path": "references/Hexalith.Commons",
+    "head": "ab5e92faa3bab1fa43b8ecadd423432dfe652bb2",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t1"
+  },
+  {
+    "path": "references/Hexalith.PolymorphicSerializations",
+    "head": "476cfccac3c5ba694a8e0ef11b1157728b9ec093",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t1"
+  },
+  {
+    "path": "references/Hexalith.Conversations",
+    "head": "ad31afd60da0fcaa49cd62f732b1d884a73999a9",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t3"
+  },
+  {
+    "path": "references/Hexalith.EventStore",
+    "head": "eecc0e4da70a0d64aaeff4fb75cdc06f94eb7563",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t3"
+  },
+  {
+    "path": "references/Hexalith.Memories",
+    "head": "fad5ec5efb286a1b4589869a354895acd3aaf55c",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t3"
+  },
+  {
+    "path": "references/Hexalith.Tenants",
+    "head": "8aa6f169b3e27f0a831ad6425c4bc1278ca2c445",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t0"
+  },
+  {
+    "path": "references/Hexalith.Parties",
+    "head": "d4a71068bc1366ba67699aa9ec68cf24c0645c71",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t1"
+  },
+  {
+    "path": "references/Hexalith.Builds",
+    "head": "801f268cd1b37ecae41d4fb20d115c055b4c5793",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t3"
+  },
+  {
+    "path": "references/Hexalith.FrontComposer",
+    "head": "11c8377a858a756c4e4069bf08e62db1f58e1733",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t8"
+  },
+  {
+    "path": "references/Hexalith.McpCli",
+    "head": "ab92da41988c4d423c05ea3f5ab401ed0db1fc32",
+    "branch": "main",
+    "status": "",
+    "upstream": "origin/main",
+    "divergence": "0\t5"
+  },
+  {
+    "path": "references/Hexalith.Platform",
+    "head": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "branch": "main",
+    "status": "M  eng/test_source_sdk_propagation.py\nM  src/Hexalith.Platform.CatalogBuilder/Program.cs\nM  src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj\nM  src/Hexalith.Platform.Custody/ReplicatedSecurityObservationSpool.cs\nM  src/Hexalith.Platform.Custody/SecuritySpoolSnapshot.cs\nA  src/Hexalith.Platform.Custody/SecuritySpoolSnapshotJsonConverter.cs\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/.gitattributes\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/Program.cs.txt\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/SecurityEventRecordReceipt.cs.txt\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/SecurityObservationIntent.cs.txt\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/SecurityObservationRecord.cs.txt\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/SecuritySpoolArchivePage.cs.txt\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/SecuritySpoolSnapshot.cs.txt\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/acknowledged-head.json\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/archive-page.json\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/empty.json\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/generate.py\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/pending-head.json\nA  tests/Hexalith.Platform.Custody.Tests/Fixtures/pre-reservation/provenance.json\nM  tests/Hexalith.Platform.Custody.Tests/Hexalith.Platform.Custody.Tests.csproj\nM  tests/Hexalith.Platform.Custody.Tests/ReplicatedSecurityObservationSpoolTests.cs",
+    "upstream": "origin/main",
+    "divergence": "0\t12"
+  }
+]

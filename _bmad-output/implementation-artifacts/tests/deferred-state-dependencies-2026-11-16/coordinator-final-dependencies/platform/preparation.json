@@ -1,0 +1,14 @@
+{
+  "workspace": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/platform/prepared",
+  "mode": "source",
+  "mappingHash": "d4a0fd6c7d3177b939e9c1d544b2e003bf9f30c8b22eceffbfb3511e81816608",
+  "environment": {
+    "CustomBeforeDirectoryBuildProps": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/platform/prepared/source-mapping/SourceMapping.targets",
+    "CustomAfterMicrosoftCommonProps": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/platform/prepared/source-mapping/SourceMapping.props",
+    "CustomBeforeDirectoryBuildTargets": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/platform/prepared/source-mapping/SourceMapping.before-targets.props",
+    "CustomAfterDirectoryBuildTargets": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/platform/prepared/source-mapping/SourceMapping.late.props",
+    "AfterMicrosoftNETSdkTargets": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/platform/prepared/source-mapping/SourceMapping.final.targets",
+    "HEXALITH_SOURCE_MAPPING_HASH": "d4a0fd6c7d3177b939e9c1d544b2e003bf9f30c8b22eceffbfb3511e81816608",
+    "Configuration": "Debug"
+  }
+}

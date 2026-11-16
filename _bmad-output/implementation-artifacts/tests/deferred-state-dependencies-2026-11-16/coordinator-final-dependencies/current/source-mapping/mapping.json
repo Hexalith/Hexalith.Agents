@@ -1,0 +1,105 @@
+{
+  "Mode": "source",
+  "Root": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents",
+  "ActiveModule": "Hexalith.Agents",
+  "Entries": [
+    {
+      "Identity": "Hexalith.AI.Tools",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.AI.Tools"
+    },
+    {
+      "Identity": "Hexalith.Agents",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents"
+    },
+    {
+      "Identity": "Hexalith.Builds",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Builds"
+    },
+    {
+      "Identity": "Hexalith.Commons",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Commons"
+    },
+    {
+      "Identity": "Hexalith.Conversations",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Conversations"
+    },
+    {
+      "Identity": "Hexalith.EventStore",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.EventStore"
+    },
+    {
+      "Identity": "Hexalith.FrontComposer",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.FrontComposer"
+    },
+    {
+      "Identity": "Hexalith.McpCli",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.McpCli"
+    },
+    {
+      "Identity": "Hexalith.Memories",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Memories"
+    },
+    {
+      "Identity": "Hexalith.Parties",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Parties"
+    },
+    {
+      "Identity": "Hexalith.Platform",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Platform"
+    },
+    {
+      "Identity": "Hexalith.PolymorphicSerializations",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.PolymorphicSerializations"
+    },
+    {
+      "Identity": "Hexalith.Tenants",
+      "Origin": "source",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Tenants"
+    }
+  ],
+  "HasGit": true,
+  "PlatformIdentity": {
+    "Commit": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "CompositionCommit": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "CheckoutCommit": "17b1f688b332020fafbe1da07a5c04a41886c7bd",
+    "PlatformPath": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Platform",
+    "ReleaseTag": null,
+    "CatalogCommit": "e2bbbd0893f586e4d447ef8358ff747ea3d34435",
+    "ToolVersionRange": "[6.0.5, 7.0.0-0)",
+    "RecordPath": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Platform/hexalith-platform.json",
+    "IsPlatformRepository": false
+  },
+  "IdentityFindings": [
+    {
+      "RuleId": "HXW011",
+      "Message": "Platform identity 17b1f688b332020fafbe1da07a5c04a41886c7bd has no local v\u003CSemVer\u003E release tag.",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Platform",
+      "Hint": "Fetch Platform tags, then retry."
+    },
+    {
+      "RuleId": "HXW009",
+      "Message": "Builds catalog \u0027/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Builds\u0027 is staged 801f268cd1b37ecae41d4fb20d115c055b4c5793, checked out 801f268cd1b37ecae41d4fb20d115c055b4c5793; Platform 17b1f688b332020fafbe1da07a5c04a41886c7bd pins e2bbbd0893f586e4d447ef8358ff747ea3d34435.",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Builds",
+      "Hint": null
+    },
+    {
+      "RuleId": "HXW010",
+      "Message": "Tool version 1.0.0-20261116134200 is outside Platform range [6.0.5, 7.0.0-0) at \u0027/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Platform/hexalith-platform.json\u0027.",
+      "Path": "/tmp/hexalith-job.UKNcGRWA/deferred-dependencies/current/Hexalith.Agents/references/Hexalith.Platform/hexalith-platform.json",
+      "Hint": null
+    }
+  ],
+  "ContentHash": "5aad8f5faef708a194c590fa5dc564a9795561eb1afcb68b08e49b35bd5f7543"
+}

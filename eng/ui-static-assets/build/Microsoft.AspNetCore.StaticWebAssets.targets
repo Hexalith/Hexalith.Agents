@@ -1,0 +1,9 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetPackageManifest Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)Hexalith.Agents.UI.PackageAssets.json'))">
+      <SourceId>Hexalith.Agents.UI</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <PackageRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</PackageRoot>
+    </StaticWebAssetPackageManifest>
+  </ItemGroup>
+</Project>

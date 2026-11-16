@@ -1,0 +1,21 @@
+{
+  "sdkAssembly": "/home/administrator/.dotnet/sdk/11.0.100/Sdks/Microsoft.NET.Sdk.StaticWebAssets/tasks/net11.0/Microsoft.NET.Sdk.StaticWebAssets.Tasks.dll",
+  "sdkSha256": "56D08A4CD5E6CB15599ABD433EBC520B1672282A982592B640369CE579B26BC0",
+  "vectors": [
+    {
+      "name": "fixture",
+      "sha256": "6AAA30A709ADD4134874DCB9FF5DE4A418CE9915BB72447389DBAA7773927D1E",
+      "fingerprint": "ymbusap65w"
+    },
+    {
+      "name": "empty",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "fingerprint": "5ipweew5fc"
+    },
+    {
+      "name": "current-module",
+      "sha256": "BE95EEC8488EF88B8BCF63E269FF51C72D550389BAC42AA9D92F023A3CA4FB7E",
+      "fingerprint": "eprwitz8vy"
+    }
+  ]
+}
