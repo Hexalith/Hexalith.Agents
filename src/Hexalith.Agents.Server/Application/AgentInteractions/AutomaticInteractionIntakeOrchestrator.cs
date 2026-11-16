@@ -30,6 +30,8 @@ public sealed class AutomaticInteractionIntakeOrchestrator(
         var epoch = await readiness.ReadAsync(request.TenantId, ct).ConfigureAwait(false);
         if (epoch is null) { return new(AutomaticInteractionIntakeStatus.DirectoryNotReady); }
         var directory = await directoryReader.ReadAsync(request.TenantId, request.ConversationId, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
+        if (directory is not null && directory.Revision != 0 && (directory.TenantId != request.TenantId || directory.ConversationId != request.ConversationId)) { return new(AutomaticInteractionIntakeStatus.NotFound); }
         if (directory?.DeletionRequestId is not null) { return new(AutomaticInteractionIntakeStatus.ConversationClosing); }
         string id = ConversationAgentStateIdentity.Interaction(request.TenantId, request.AgentId, request.ConversationId, request.CallerPartyId, request.ClientIdempotencyKey);
         var permit = new InteractionPermit(request.TenantId, request.ConversationId, id, request.AgentId, request.CallerPartyId, request.ClientIdempotencyKey,

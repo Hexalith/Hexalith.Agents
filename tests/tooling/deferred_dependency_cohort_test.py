@@ -181,6 +181,47 @@ class CompilerAndAssetTests(FocusedFixture):
         self.assertIn(".editorconfig", files)
         self.assertEqual(1, len(COHORT.collect_graph_assets(self.root, inventory, "Debug")))
 
+    def test_graph_reads_structured_sdk_result_without_dropping_diagnostic_logs(self):
+        project = self.root / "src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj"
+        project.parent.mkdir(); project.write_text("<Project />")
+        experiment = type("GraphFixture", (), {})()
+        experiment.work = self.root / "work"; experiment.work.mkdir()
+        experiment.evidence = self.root / "evidence"; experiment.evidence.mkdir()
+        evaluated = {"Items": self.evaluated["Items"], "Properties": {"Configuration": "Debug",
+            "ProjectAssetsFile": str(self.root / "project.assets.json"), "TargetDir": str(self.root / "bin"),
+            "TargetPath": str(self.root / "bin/Owner.dll")}}
+        diagnostic = "MSBuild server unavailable: falling back to an in-process build.\n"
+        def run(label, args, cwd):
+            args = list(map(str, args))
+            (experiment.evidence / (label + ".log")).write_text(diagnostic + json.dumps(evaluated))
+            for argument in args:
+                if argument.startswith("-getResultOutputFile:"):
+                    Path(argument.split(":", 1)[1]).write_text(json.dumps(evaluated))
+                if argument.startswith("-preprocess:"):
+                    Path(argument.split(":", 1)[1]).write_text("<Project />")
+        experiment.run = run
+        inventory = COHORT.graph(experiment, self.root, "diagnostic")
+        self.assertIn("tools/bin/Guard.dll", inventory[str(project.relative_to(self.root))]["files"])
+        log = experiment.evidence / ("diagnostic-graph-" + project.stem + ".log")
+        self.assertTrue(log.read_text().startswith(diagnostic))
+        result = log.with_name(log.stem + "-evaluation.json")
+        self.assertEqual(evaluated, json.loads(result.read_text()))
+
+    def test_graph_refuses_missing_or_malformed_result_even_with_a_json_console_log(self):
+        experiment = type("GraphFixture", (), {})()
+        experiment.work = self.root / "work"; experiment.work.mkdir()
+        experiment.evidence = self.root / "evidence"; experiment.evidence.mkdir()
+        for result in (None, "{malformed"):
+            with self.subTest(result=result):
+                def run(label, args, cwd):
+                    (experiment.evidence / (label + ".log")).write_text('{"Properties":{},"Items":{}}')
+                    for argument in map(str, args):
+                        if argument.startswith("-getResultOutputFile:") and result is not None:
+                            Path(argument.split(":", 1)[1]).write_text(result)
+                experiment.run = run
+                with self.assertRaises(FileNotFoundError if result is None else json.JSONDecodeError):
+                    COHORT.graph(experiment, self.root, "missing" if result is None else "malformed")
+
 
 class DestinationAndProcessTests(FocusedFixture):
     def test_command_provenance_records_mapping_inputs_without_unrelated_credentials(self):

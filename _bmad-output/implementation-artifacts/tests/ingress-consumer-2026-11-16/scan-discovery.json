@@ -1,0 +1,237 @@
+{
+  "checker": "scan_discovery.Discovery.discover (actual CiCd coverage checker, pinned source)",
+  "controllerRevision": "2b2ca853816cb9570bf2392d05e9fc2016de32de",
+  "checkerSourceSha256": {
+    "tools/scan_discovery.py": "8a5e8cfeebd635d57f9bf84a3b029fa0dfed9021b8c47df68231fc3886f24ceb",
+    "tools/delivery_runtime.py": "dba53df3c84ee14f046cdf7b67ab8631b5e0b0b4d63510379764fe7c44b7dd65"
+  },
+  "moduleRevision": "c5c22620cafaa0af2625896cf41022e614e9b490",
+  "snapshot": "HEAD tree plus current tracked working-tree file bytes; no commit or owner policy mutation",
+  "selected": [
+    ".github/actions/after-unit-tests/action.yml",
+    "scripts/check-built-packages.py",
+    "scripts/consumer_package_validation.py",
+    "scripts/nuget_package_validation.py",
+    "scripts/release_package_integrity.py",
+    "scripts/release_package_inventory.py"
+  ],
+  "selectedSourceSha256": {
+    ".github/actions/after-unit-tests/action.yml": "be00b42b104d63bdef762edb6d59781568a3a0e8bc9adaa874028fc35ea6e3c4",
+    "scripts/check-built-packages.py": "bf64def0895a0b34b0b445a0195a1c806dcb90efe0323af59321dd31f99a6693",
+    "scripts/consumer_package_validation.py": "3e0016f9f33e50b67ab72d7a4a500de5f3617373fa8a0b65971f99a485bbc8c8",
+    "scripts/nuget_package_validation.py": "5072370944a6fd6d49c1cdd190563a6df5418051a1df1dbcb4737f5f1b80963f",
+    "scripts/release_package_integrity.py": "9317b8f31b5481b195aec3ee881e3030f2af10ac68ed9dac28eeb9d9974609a8",
+    "scripts/release_package_inventory.py": "0d66efae03b428de2b2088458b7f5914c055a2b1f3c2db53be498d86ae71b71c"
+  },
+  "literalHookCommands": [
+    {
+      "line": 32,
+      "argv": [
+        "dotnet",
+        "pack",
+        "src/Hexalith.Agents/Hexalith.Agents.csproj",
+        "--no-build",
+        "--no-restore",
+        "--configuration",
+        "Release",
+        "--output",
+        "artifacts/cicd-agents-package-check/packages",
+        "-p:Version=0.0.0-ci-check",
+        "-p:PackageVersion=0.0.0-ci-check",
+        "-p:UseHexalithProjectReferences=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 37,
+      "argv": [
+        "dotnet",
+        "pack",
+        "src/Hexalith.Agents.Client/Hexalith.Agents.Client.csproj",
+        "--no-build",
+        "--no-restore",
+        "--configuration",
+        "Release",
+        "--output",
+        "artifacts/cicd-agents-package-check/packages",
+        "-p:Version=0.0.0-ci-check",
+        "-p:PackageVersion=0.0.0-ci-check",
+        "-p:UseHexalithProjectReferences=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 42,
+      "argv": [
+        "dotnet",
+        "pack",
+        "src/Hexalith.Agents.Contracts/Hexalith.Agents.Contracts.csproj",
+        "--no-build",
+        "--no-restore",
+        "--configuration",
+        "Release",
+        "--output",
+        "artifacts/cicd-agents-package-check/packages",
+        "-p:Version=0.0.0-ci-check",
+        "-p:PackageVersion=0.0.0-ci-check",
+        "-p:UseHexalithProjectReferences=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 47,
+      "argv": [
+        "dotnet",
+        "pack",
+        "src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
+        "--no-build",
+        "--no-restore",
+        "--configuration",
+        "Release",
+        "--output",
+        "artifacts/cicd-agents-package-check/packages",
+        "-p:Version=0.0.0-ci-check",
+        "-p:PackageVersion=0.0.0-ci-check",
+        "-p:UseHexalithProjectReferences=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 52,
+      "argv": [
+        "dotnet",
+        "pack",
+        "src/Hexalith.Agents.Testing/Hexalith.Agents.Testing.csproj",
+        "--no-build",
+        "--no-restore",
+        "--configuration",
+        "Release",
+        "--output",
+        "artifacts/cicd-agents-package-check/packages",
+        "-p:Version=0.0.0-ci-check",
+        "-p:PackageVersion=0.0.0-ci-check",
+        "-p:UseHexalithProjectReferences=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 57,
+      "argv": [
+        "dotnet",
+        "pack",
+        "src/Hexalith.Agents.UI/Hexalith.Agents.UI.csproj",
+        "--no-build",
+        "--no-restore",
+        "--configuration",
+        "Release",
+        "--output",
+        "artifacts/cicd-agents-package-check/packages",
+        "-p:Version=0.0.0-ci-check",
+        "-p:PackageVersion=0.0.0-ci-check",
+        "-p:UseHexalithProjectReferences=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 68,
+      "argv": [
+        "strace",
+        "--kill-on-exit",
+        "-f",
+        "-q",
+        "-e",
+        "trace=process",
+        "-o",
+        "artifacts/cicd-agents-package-check/consumer/obj/ptrace-probe.log",
+        "/bin/true"
+      ]
+    },
+    {
+      "line": 71,
+      "argv": [
+        "dotnet",
+        "build",
+        "artifacts/cicd-agents-package-check/consumer/obj/load-observer/Observer.csproj",
+        "-c",
+        "Release",
+        "-p:UseSharedCompilation=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 75,
+      "argv": [
+        "dotnet",
+        "restore",
+        "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
+        "--configfile",
+        "artifacts/cicd-agents-package-check/consumer/NuGet.config",
+        "--packages",
+        "artifacts/cicd-agents-package-check/consumer/packages",
+        "--no-cache",
+        "--force-evaluate",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 82,
+      "argv": [
+        "strace",
+        "--kill-on-exit",
+        "-ff",
+        "-q",
+        "-e",
+        "trace=process",
+        "-o",
+        "artifacts/cicd-agents-package-check/consumer/obj/assembly-loads/process-preprocess",
+        "-E",
+        "LD_DEBUG=files",
+        "dotnet",
+        "msbuild",
+        "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
+        "-nologo",
+        "-preprocess:artifacts/cicd-agents-package-check/consumer/imports.xml",
+        "-p:Configuration=Release",
+        "-p:UseSharedCompilation=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    },
+    {
+      "line": 89,
+      "argv": [
+        "strace",
+        "--kill-on-exit",
+        "-ff",
+        "-q",
+        "-e",
+        "trace=process",
+        "-o",
+        "artifacts/cicd-agents-package-check/consumer/obj/assembly-loads/process-build",
+        "-E",
+        "LD_DEBUG=files",
+        "dotnet",
+        "msbuild",
+        "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
+        "-nologo",
+        "-target:Build",
+        "-verbosity:quiet",
+        "-getItem:Analyzer",
+        "-p:Configuration=Release",
+        "-p:UseSharedCompilation=false",
+        "/m:1",
+        "/nr:false"
+      ]
+    }
+  ],
+  "errors": [],
+  "notRun": "The full network cross-module duplicate detector is outside this focused source-discovery check."
+}

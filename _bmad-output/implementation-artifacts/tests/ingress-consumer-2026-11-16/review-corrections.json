@@ -1,0 +1,157 @@
+{
+  "scope": "Focused review corrections only. Full validation and exact seven-package policy requalification remain with the parent workflow.",
+  "sourceSha256": {
+    ".gitattributes": "85a554af96f1eb785ffe2534ebb89eefb4d0851c37d8f5d1c53c8156c169e283",
+    "CONTRIBUTING.md": "d24ae5b99725764c38bbb7fb0526a0492e7ab99c6118a8b9c555aec972edb83f",
+    "eng/consumer-executable-assets.json": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "scripts/StartupHook.cs": "964c8d882b4293389977b2a84f6e0435a8eb64e7a9f97ed6ee3fc0291b2ae463",
+    "scripts/consumer-process-observer.c": "c716b2cb44550925caf2b191db6ae5319477be9650d31cf7b9feb09ea2f6979a",
+    "scripts/validate-consumer-package-references.py": "aa305fddcbdb80d382da813eb53492d419319e692e810dbae44509d385aba1ce",
+    "src/Hexalith.Agents.EventStore/AgentsProviderCatalogCoordinationPolicy.cs": "88bdd6e3263ca0c31a313c3a837513a082528014670f8138b01f384ee7c40a5a",
+    "src/Hexalith.Agents.EventStore/ProviderGovernanceCommandIntent.cs": "2a4c382ede02d30a9fd255fa84a971be48ce0ba35baee68e0ed13e07be016025",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "be7ae1b5d9602a95797d71032a118be869a42bc0139332d47beba1230a220496",
+    "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "c4cfff8e37773b63b425cd732a712dc457db0f4fa2166f651871c05703ccc5df",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeRecoveryTests.cs": "f3956d87ed90bb0074fe564ec4c6bc8e95e9a6b72d28e24e03e40bbbeba2a1b9",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogCoordinationIntegrationTests.cs": "2e6254dd2ec31dd0c910290442e5c97c0377dad0deb8613da42cc38e5774e04f",
+    "test/Hexalith.Agents.Server.Tests/VerifiedProviderQueryCallerTests.cs": "84edd7236d3fdd46969fd9b30abb7d1b00c9aa6b068fc70a2fd3e3ddca7ee968",
+    "test/Hexalith.Agents.UI.Tests/ProviderCatalogGovernanceUiTests.cs": "e1d63d07237832ba13a220b0d809feb370f8b6137f1214e7d4476d9a0809fd56",
+    "tests/tooling/dependency_assets_restore_test.py": "016341244e675b4066b3ca0d08b29d8d461d5a22b39863d53263de0052112cf0",
+    "tests/tooling/ui_consumer_assets_test.py": "e8ee0d6e6febed20fec1063d1a6619f1f7dea454dddf28fb4af7e445e63c210b"
+  },
+  "native": {
+    "total": 213,
+    "passed": 213,
+    "failed": 0,
+    "skipped": 0,
+    "not-run": 0,
+    "errors": 0
+  },
+  "nativeClasses": [
+    "AutomaticInteractionIntakeRecoveryTests",
+    "ProviderCatalogCoordinationIntegrationTests",
+    "AgentsEventStoreGatewayIntegrationTests"
+  ],
+  "helperTests": {
+    "total": 4,
+    "passed": 4,
+    "skipped": 0
+  },
+  "observerUnits": {
+    "total": 8,
+    "passed": 8,
+    "skipped": 0
+  },
+  "exactMembershipFollowup": {
+    "total": 1,
+    "passed": 1,
+    "skipped": 0,
+    "purpose": "Independently refuses archive-present/library-absent as well as library-present/archive-absent."
+  },
+  "corrections": [
+    {
+      "finding": "Static and environment-cleared subprocesses evade cooperative traces",
+      "fix": "Kernel ptrace independently follows all threads and descendant process creation/exec; exact process/managed/native observation inventories must agree.",
+      "regression": "Both actual subprocess forms write their execution marker successfully, then qualification refuses."
+    },
+    {
+      "finding": "Native bytes can execute and restore reviewed bytes before hashing; inferred package ownership",
+      "fix": "Inotify watches directories and file inodes through preprocessing and Build; any mutation refuses, including atomic restoration. Package provenance requires exact membership in both library.files and the .nupkg.",
+      "regression": "Changed native helper writes original2, atomically restores original bytes and still refuses; archive/library omission controls refuse independently."
+    },
+    {
+      "finding": "Preprocessing uses different/unobserved inputs",
+      "fix": "Preprocessing and Build use the same complete property/environment inputs and the same process/managed/native observers; imports are collected there.",
+      "regression": "Full consumer fixture requires UseSharedCompilation=false for conditional.xml and proves one observed task execution."
+    },
+    {
+      "finding": "Omitted Enabled becomes false",
+      "fix": "Shared typed command parsing requires explicit case-insensitive boolean Enabled.",
+      "regression": "Missing/null controls refuse scope, validation, digest and registered adapter; all three casing forms of explicit false succeed."
+    },
+    {
+      "finding": "Cancellation during directory await can become NotFound",
+      "fix": "Check cancellation immediately after the await before foreign scope classification.",
+      "regression": "Actual cancellation during the foreign-directory read yields a canceled task/token and zero commands/model state/scheduling effects."
+    },
+    {
+      "finding": "Duplicate JSON surfaces as infrastructure failure",
+      "fix": "Malformed governance input throws the existing ArgumentException client-validation contract.",
+      "regression": "Raw HTTP duplicate/missing/null JSON returns nonretryable 400/correct_request with no admission record or aggregate/model callback."
+    },
+    {
+      "finding": "Unsupported platforms and prerequisite diagnostics are late/implicit",
+      "fix": "Complete consumer entry checks Linux/glibc/cc/inotify; compiles and probes permitted ptrace before any consumer restore or SDK build. Native fixture static-link prerequisites fail explicitly.",
+      "regression": "Unsupported consumer entry invokes no restore/build/child tools; missing compiler diagnostics tested; no qualification skips."
+    },
+    {
+      "finding": "Fileless refusal branches lack actual execution coverage",
+      "fix": "Executable task fixtures load a helper from bytes and emit/invoke a dynamic assembly.",
+      "regression": "Both successfully write execution markers before fileless provenance refuses."
+    },
+    {
+      "finding": "Model replay/dispatcher evidence overclaims durability or endpoint qualification",
+      "fix": "Contributor guide, dated report and selected ledger resolutions explicitly distinguish callback model replay from durable-store transactions and direct dispatcher tests from endpoint administrator verification.",
+      "followup": "The pre-existing endpoint/DW-21 owner-bound verifier qualification remains open and unchanged."
+    },
+    {
+      "finding": "Tracer must preserve SIGTRAP and retry EINTR",
+      "fix": "Deliver ordinary tracee SIGTRAP; suppress only ptrace event traps. Retry interrupted initial and descendant waits.",
+      "regression": "Native SIGTRAP termination status remains 133; a native preload shim injects EINTR into both wait sites and tracing completes successfully."
+    },
+    {
+      "finding": "Genuine SIGSTOP was swallowed with attachment stops",
+      "fix": "Pipe-held initial child attached with PTRACE_SEIZE/PTRACE_INTERRUPT; genuine group stops use PTRACE_LISTEN. Synthetic PTRACE_EVENT_STOP traps are distinguished from real signal delivery. No WCONTINUED events are requested.",
+      "regression": "A parent forks a child that raises SIGSTOP; parent waitpid(WUNTRACED) sees that stop and sends SIGCONT. Direct and traced executions both exit 0.",
+      "preserved": "Detached descendants are awaited; actual package atomic-restoration mutation still refuses."
+    }
+  ],
+  "whitespace": "git diff --check passed",
+  "fullValidationPendingParent": true,
+  "preStopCorrectionSourceSha256": {
+    ".gitattributes": "85a554af96f1eb785ffe2534ebb89eefb4d0851c37d8f5d1c53c8156c169e283",
+    "CONTRIBUTING.md": "10332a620d32db7aa91618587b4de59d09c180b7c2ef010b6976ae7b94451668",
+    "eng/consumer-executable-assets.json": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "scripts/StartupHook.cs": "964c8d882b4293389977b2a84f6e0435a8eb64e7a9f97ed6ee3fc0291b2ae463",
+    "scripts/consumer-process-observer.c": "ad10e95aa07753b24e7922f2b11395256ca94b63b7a1281e02f4561b0c5ca4a8",
+    "scripts/validate-consumer-package-references.py": "aa305fddcbdb80d382da813eb53492d419319e692e810dbae44509d385aba1ce",
+    "src/Hexalith.Agents.EventStore/AgentsProviderCatalogCoordinationPolicy.cs": "88bdd6e3263ca0c31a313c3a837513a082528014670f8138b01f384ee7c40a5a",
+    "src/Hexalith.Agents.EventStore/ProviderGovernanceCommandIntent.cs": "2a4c382ede02d30a9fd255fa84a971be48ce0ba35baee68e0ed13e07be016025",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "be7ae1b5d9602a95797d71032a118be869a42bc0139332d47beba1230a220496",
+    "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "c4cfff8e37773b63b425cd732a712dc457db0f4fa2166f651871c05703ccc5df",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeRecoveryTests.cs": "f3956d87ed90bb0074fe564ec4c6bc8e95e9a6b72d28e24e03e40bbbeba2a1b9",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogCoordinationIntegrationTests.cs": "2e6254dd2ec31dd0c910290442e5c97c0377dad0deb8613da42cc38e5774e04f",
+    "test/Hexalith.Agents.Server.Tests/VerifiedProviderQueryCallerTests.cs": "84edd7236d3fdd46969fd9b30abb7d1b00c9aa6b068fc70a2fd3e3ddca7ee968",
+    "test/Hexalith.Agents.UI.Tests/ProviderCatalogGovernanceUiTests.cs": "e1d63d07237832ba13a220b0d809feb370f8b6137f1214e7d4476d9a0809fd56",
+    "tests/tooling/dependency_assets_restore_test.py": "016341244e675b4066b3ca0d08b29d8d461d5a22b39863d53263de0052112cf0",
+    "tests/tooling/ui_consumer_assets_test.py": "e39155d863777a8bb71b4dd9e6dd0a01f17787f9f19770cfd84050c06372552d"
+  },
+  "stopCorrection": {
+    "mechanism": "Pipe-held initial child attached with PTRACE_SEIZE/PTRACE_INTERRUPT; genuine group stops use PTRACE_LISTEN. Synthetic PTRACE_EVENT_STOP traps are distinguished from real signal delivery. No WCONTINUED events are requested.",
+    "exactProbe": "A parent forks a child that raises SIGSTOP; parent waitpid(WUNTRACED) sees that stop and sends SIGCONT. Direct and traced executions both exit 0.",
+    "focusedKernelProbes": {
+      "total": 2,
+      "passed": 2,
+      "skipped": 0,
+      "alsoCovered": [
+        "Detached double-fork descendant completion before tracer return",
+        "Ordinary SIGTRAP exits 133",
+        "Injected EINTR at initial and main waits"
+      ]
+    },
+    "focusedAdversarialRegression": {
+      "total": 1,
+      "passed": 1,
+      "skipped": 0,
+      "subcases": [
+        "Static executable",
+        "Cleared child environment",
+        "Byte-loaded assembly",
+        "Dynamic assembly",
+        "Native changed-byte execution followed by atomic reviewed-byte restoration"
+      ]
+    },
+    "fullValidationPendingParent": true
+  },
+  "evidencePhase": "pre-integration",
+  "integrationEvidence": "integration.json"
+}

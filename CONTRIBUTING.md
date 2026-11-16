@@ -197,11 +197,78 @@ dependency build selection. Analyzer and `buildTransitive` selection have separa
 semantics. `scripts/validate-consumer-package-references.py <package-directory>`
 restores and builds each packed Agents package individually and all six together
 in isolated directories with a copy of the root `global.json`. Its normalized
-receipt records selected analyzers and active imports with package ownership,
-version, path and SHA-256, separately from available archive assets, generated
-NuGet imports and SDK assets. Any unowned executable import or analyzer fails.
+schema-2 receipt records selected analyzers, active imports, and assemblies and
+native libraries actually loaded by MSBuild, tasks and the fresh compiler. Each
+package input carries its owning package, exact version, path and SHA-256. Available
+archive assets, generated NuGet imports, the generated observation assembly, SDK
+assemblies/native libraries and OS native libraries have separate provenance.
 
-`eng/consumer-executable-assets.json` is the reviewed initial executable asset
+Executable qualification requires Linux/glibc and permitted kernel ptrace/inotify
+observation. The standalone CLI additionally requires a native `cc` compiler.
+The actual after-unit-tests product hook, `scripts/check-built-packages.py`, uses
+system `strace` with `--kill-on-exit`, `-ff`, `-e trace=process` and `-E` support
+so its compiler commands remain literal and discoverable by CiCd. It refuses a
+missing system tracer before packing and probes its tracing/capability support
+before observer compilation or consumer restore. No package installation is
+performed by the hook. Unsupported platforms and missing CLI prerequisites
+refuse at the complete consumer entry before restore or SDK builds. The native
+regression fixtures also require static libc development files (`cc -static`);
+missing prerequisites fail with explicit diagnostics and never skip qualification.
+The standalone verifier first compiles/probes `scripts/consumer-process-observer.c`, which
+independently follows process/thread creation and execution through kernel ptrace.
+Static executables and children clearing their environment cannot disappear from
+this process inventory; executions lacking managed/loader observations refuse.
+The tracer uses `PTRACE_SEIZE`/`PTRACE_LISTEN` to preserve genuine group stops
+and SIGCONT while distinguishing synthetic attachment events. It preserves ordinary
+SIGTRAP delivery, retries interrupted waits and awaits detached descendants; it
+does not consume WCONTINUED notifications intended for the child's real parent.
+The hook's system tracer independently follows the same process tree, waits for
+detached descendants and kills tracees if the tracer exits. Both backends require
+complete process observations for preprocessing and Build; either phase missing
+or truncated refuses qualification. Every referenced thread/descendant must have
+a terminal trace record. Loader output uses absolute paths so a
+compiler's working directory cannot drop its native observations.
+
+The verifier compiles `scripts/StartupHook.cs` beneath the consumer's excluded
+`obj` directory and installs its .NET assembly-load observer alongside
+`LD_DEBUG=files`. Shared compilation and persistent MSBuild nodes are disabled. Analyzer items come
+from that same observed Build. Import preprocessing runs under the same complete
+properties and environment (including `UseSharedCompilation=false`), with the same
+process, managed-load and native-load observation; it never runs a second Build.
+An inotify watch covers restored package directories and file inodes throughout
+both phases. Any write, replacement or membership mutation refuses, even when a
+helper executes changed bytes and atomically restores the reviewed file before
+exit. Package provenance requires exact membership in both the restored assets
+library file inventory and its `.nupkg` archive. Archive membership matches NuGet's
+normalization of redundant slashes only when the resulting member is unique;
+ambiguous normalized members and traversal components refuse. This handles the
+published MessagePackAnalyzer 3.1.12 CodeFixes member with its doubled archive
+slash without admitting generated or unlisted files.
+Both the MSBuild process and a fresh compiler must complete observation; missing
+managed/native traces, byte-only or dynamic assemblies without file provenance,
+unobserved executable subprocesses, changed observed bytes and unowned package
+helpers refuse. Unsupported platforms refuse before building. Native libraries
+under the resolved `/lib`, `/lib64` and `/usr/lib` roots are recorded as OS inputs;
+those under the installed dotnet host, SDK, packs or shared runtime are SDK inputs.
+These inputs do not silently become package-owned baseline entries.
+
+The isolated restore regression executes a real source generator and `UsingTask`
+assembly that load a separate managed helper and native helper. Changing either
+helper while preserving the entry assemblies/imports causes policy refusal;
+external helper symlinks and unlisted files beneath a package root fail ownership
+checks. Real static/sanitized-environment children, byte-loaded and emitted managed
+assemblies, and native atomic-restoration fixtures prove refusal after their helper
+code successfully executes. This is local consumer qualification, not installed-host
+or live runtime qualification.
+
+Ingress gateway callback fixtures apply/replay aggregate events in memory. They do
+not qualify durable-store transactions or a production proof/admission provider.
+Provider caller tests invoke the SDK dispatcher directly and bypass the `/query`
+endpoint's administrator verifier. A working platform-query endpoint still needs
+an owner-bound `IDomainServiceAdministratorVerifier` and authenticated HTTP positive
+control; that pre-existing composition qualification remains open under DW-21.
+
+`eng/consumer-executable-assets.json` is the reviewed executable asset
 policy. CI refuses additions, removals, version changes, hash changes and changed
 per-consumer selection. Retain `--receipt <path>` for dependency-change reviews.
 `--write-baseline <candidate-path>` only generates a candidate: inspect every

@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "argv": [
+        "dotnet",
+        "restore",
+        "/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
+        "-p:Configuration=Debug",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:ArtifactsPath=/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/work/graph-artifacts"
+      ],
+      "exitCode": 0,
+      "log": "final-command-1.log",
+      "sha256": "20c1263961737569785f46aff03faa1296e032bc247fb16bb36c74c7fca3c04a"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "msbuild",
+        "/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
+        "-nologo",
+        "-p:Configuration=Debug",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:ArtifactsPath=/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/work/graph-artifacts",
+        "-target:ResolveLockFileAnalyzers",
+        "-getResultOutputFile:/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/evidence/static-graph-Hexalith.Agents.EventStore-evaluation.json",
+        "-getProperty:ProjectAssetsFile,TargetDir,TargetPath,Configuration,DefineConstants,LangVersion,Nullable,AnalysisLevel,RunAnalyzersDuringBuild,EnableNETAnalyzers",
+        "-getItem:Compile,EmbeddedResource,Content,None,Analyzer,AdditionalFiles,EditorConfigFiles,GlobalAnalyzerConfigFiles,ProjectReference,PackageReference,PackageVersion"
+      ],
+      "exitCode": 0,
+      "log": "final-command-2.log",
+      "sha256": "d7583bee0ee828ca3f8cde2706bb62db25edcfa58258fadbb24241a756dc354e",
+      "sdkResultFile": "final-sdk-evaluation.json",
+      "sdkResultSha256": "0dc00315cf07f4f63539c07dbbe2874fc0b6660e48226ae969d217b63c212783"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "msbuild",
+        "/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
+        "-nologo",
+        "-p:Configuration=Debug",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:ArtifactsPath=/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/work/graph-artifacts",
+        "-preprocess:/tmp/hexalith-job.aZOnLunW/tmpmbjl4ocw/evidence/static-graph-Hexalith.Agents.EventStore-expanded.xml"
+      ],
+      "exitCode": 0,
+      "log": "final-command-3.log",
+      "sha256": "d7583bee0ee828ca3f8cde2706bb62db25edcfa58258fadbb24241a756dc354e"
+    }
+  ]
+}

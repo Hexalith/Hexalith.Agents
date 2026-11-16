@@ -316,18 +316,76 @@ public sealed class AutomaticInteractionIntakeRecoveryTests
         fixture.AcceptedCommandIds.Count.ShouldBe(accepted);
     }
 
+    /// <summary>Both directory entry points refuse established foreign scope before Closing or revision use.</summary>
     [Theory]
     [InlineData(1)]
+    [InlineData(17)]
     [InlineData(-1)]
     public async Task EstablishedForeignDirectoryScopeRemainsNotFoundWithoutEffects(long revision)
     {
-        var fixture = new AutomaticInteractionReplayFixture(); var foreign = new ConversationAgentStateState();
-        foreign.Apply(new ConversationDeletionClosingEntered("foreign-tenant", AutomaticInteractionReplayFixture.Conversation, new string('d', 64), [], revision));
+        foreach (bool intake in new[] { false, true })
+        foreach (bool foreignTenant in new[] { false, true })
+        foreach (bool closing in new[] { false, true })
+        {
+            var fixture = new AutomaticInteractionReplayFixture();
+            var foreign = JsonSerializer.Deserialize<ConversationAgentStateState>(JsonSerializer.Serialize(new
+            {
+                TenantId = foreignTenant ? "foreign-tenant" : AutomaticInteractionReplayFixture.Tenant,
+                ConversationId = foreignTenant ? AutomaticInteractionReplayFixture.Conversation : "foreign-conversation",
+                Revision = revision,
+                DeletionRequestId = closing ? "foreign-closing" : null,
+            })).ShouldNotBeNull();
+            string before = JsonSerializer.Serialize(foreign);
+            var reader = Substitute.For<IConversationAgentStateReader>();
+            reader.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(foreign);
+            var recovery = new InteractionOutboxRecoveryOrchestrator(reader, fixture, fixture, fixture);
+            var result = intake
+                ? await new AutomaticInteractionIntakeOrchestrator(fixture, Substitute.For<IAgentDependencyAvailability>(), fixture, reader, fixture, recovery)
+                    .ExecuteAsync(fixture.Request, CancellationToken.None)
+                : await recovery.RecoverAsync(AutomaticInteractionReplayFixture.Tenant, AutomaticInteractionReplayFixture.Conversation, fixture.InteractionId, CancellationToken.None);
+            result.Status.ShouldBe(AutomaticInteractionIntakeStatus.NotFound); result.AgentInteractionId.ShouldBeNull();
+            fixture.Dispatches.ShouldBeEmpty(); fixture.Scheduled.ShouldBeEmpty(); fixture.Directory.ShouldBeNull(); fixture.Interaction.ShouldBeNull();
+            JsonSerializer.Serialize(foreign).ShouldBe(before);
+        }
+    }
+
+    /// <summary>Cancellation during the owner read wins over foreign-scope classification without effects.</summary>
+    [Fact]
+    public async Task CancellationDuringForeignDirectoryReadRemainsCancellation()
+    {
+        var fixture = new AutomaticInteractionReplayFixture();
+        using var cancellation = new CancellationTokenSource();
+        var foreign = new ConversationAgentStateState();
+        foreign.Apply(new ConversationDeletionClosingEntered("foreign-tenant", AutomaticInteractionReplayFixture.Conversation, "closing", [], 1));
         var reader = Substitute.For<IConversationAgentStateReader>();
-        reader.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(foreign);
-        var result = await new InteractionOutboxRecoveryOrchestrator(reader, fixture, fixture, fixture)
-            .RecoverAsync(AutomaticInteractionReplayFixture.Tenant, AutomaticInteractionReplayFixture.Conversation, fixture.InteractionId, CancellationToken.None);
-        result.Status.ShouldBe(AutomaticInteractionIntakeStatus.NotFound); result.AgentInteractionId.ShouldBeNull();
-        fixture.Dispatches.ShouldBeEmpty(); fixture.Scheduled.ShouldBeEmpty();
+        reader.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            cancellation.Cancel(); return foreign;
+        });
+        var recovery = new InteractionOutboxRecoveryOrchestrator(reader, fixture, fixture, fixture);
+        var intake = new AutomaticInteractionIntakeOrchestrator(fixture, Substitute.For<IAgentDependencyAvailability>(), fixture, reader, fixture, recovery);
+        var operation = intake.ExecuteAsync(fixture.Request, cancellation.Token);
+        (await Should.ThrowAsync<OperationCanceledException>(() => operation)).CancellationToken.ShouldBe(cancellation.Token);
+        operation.IsCanceled.ShouldBeTrue(); fixture.Dispatches.ShouldBeEmpty(); fixture.Scheduled.ShouldBeEmpty();
+        fixture.Directory.ShouldBeNull(); fixture.Interaction.ShouldBeNull();
+    }
+
+    /// <summary>An unbound rejection-only directory is a valid initial observation, as is an absent owner.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task EmptyDirectoryObservationAllowsExactIntakeRecovery(bool rejectionOnly)
+    {
+        var fixture = new AutomaticInteractionReplayFixture();
+        var empty = rejectionOnly ? new ConversationAgentStateState() : null;
+        var reader = Substitute.For<IConversationAgentStateReader>();
+        reader.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(_ => fixture.Directory ?? empty);
+        var recovery = new InteractionOutboxRecoveryOrchestrator(reader, fixture, fixture, fixture);
+        var intake = new AutomaticInteractionIntakeOrchestrator(fixture, Substitute.For<IAgentDependencyAvailability>(), fixture, reader, fixture, recovery);
+        (await intake.ExecuteAsync(fixture.Request, CancellationToken.None)).Status.ShouldBe(AutomaticInteractionIntakeStatus.Scheduled);
+        fixture.Directory!.Permits.ShouldContainKey(fixture.InteractionId);
+        fixture.Interaction!.PermittedCreation!.Permit.AgentInteractionId.ShouldBe(fixture.InteractionId);
+        fixture.Scheduled.ShouldBe([fixture.InteractionId]);
+        string before = fixture.Snapshot(); fixture.Restart(); fixture.Snapshot().ShouldBe(before);
     }
 }

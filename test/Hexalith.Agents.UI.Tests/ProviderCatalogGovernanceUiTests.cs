@@ -517,7 +517,7 @@ public sealed class ProviderCatalogGovernanceUiTests : AgentsTestContext
         await pending.WaitAsync(TimeSpan.FromSeconds(2));
 
         cut.Find("[data-testid='agents-provider-catalog-enablement-tenant']").Change("tenant-b");
-        cut.Find("[data-testid='agents-provider-catalog-enablement-revision']").GetAttribute("value").ShouldBe("0");
+        cut.WaitForAssertion(() => cut.Find("[data-testid='agents-provider-catalog-enablement-revision']").GetAttribute("value").ShouldBe("0"));
         cut.Find("[data-testid='agents-provider-catalog-enablement-save']")
             .HasAttribute("disabled").ShouldBeFalse();
         await cut.Find("[data-testid='agents-provider-catalog-enablement-save']")

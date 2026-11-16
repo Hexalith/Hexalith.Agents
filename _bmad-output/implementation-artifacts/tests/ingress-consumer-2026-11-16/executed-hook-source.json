@@ -1,0 +1,13 @@
+{
+  "sourceSha256": {
+    "scripts/check-built-packages.py": "bf64def0895a0b34b0b445a0195a1c806dcb90efe0323af59321dd31f99a6693",
+    "scripts/consumer_package_validation.py": "3e0016f9f33e50b67ab72d7a4a500de5f3617373fa8a0b65971f99a485bbc8c8",
+    "scripts/StartupHook.cs": "964c8d882b4293389977b2a84f6e0435a8eb64e7a9f97ed6ee3fc0291b2ae463",
+    "scripts/consumer-process-observer.c": "c716b2cb44550925caf2b191db6ae5319477be9650d31cf7b9feb09ea2f6979a",
+    "scripts/validate-consumer-package-references.py": "b1f675375e1fb8ceec1801ccb6cbdfe782a8993bcadd8560710be6ac7701a671",
+    "eng/consumer-executable-assets.json": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "global.json": "5feaf50426a6c5554654e326bedd2f6c6273f13b948b1ec6e11e12cae68f9f05",
+    ".github/actions/after-unit-tests/action.yml": "be00b42b104d63bdef762edb6d59781568a3a0e8bc9adaa874028fc35ea6e3c4"
+  },
+  "matchesFinalWorkingTree": true
+}

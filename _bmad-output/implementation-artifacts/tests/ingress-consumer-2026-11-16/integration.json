@@ -1,0 +1,188 @@
+{
+  "date": "2026-11-16",
+  "evidencePhase": "post-integration focused qualification",
+  "baseline": "c5c22620cafaa0af2625896cf41022e614e9b490",
+  "previousBaseline": "805b35da01efe4d3ac5f1402e611950ac282d0a1",
+  "priorEvidence": "verification.json, review-corrections.json and the original report/logs are pre-integration; all original review rows and frozen intent preserved.",
+  "sourceSha256": {
+    ".gitattributes": "85a554af96f1eb785ffe2534ebb89eefb4d0851c37d8f5d1c53c8156c169e283",
+    ".github/actions/after-unit-tests/action.yml": "be00b42b104d63bdef762edb6d59781568a3a0e8bc9adaa874028fc35ea6e3c4",
+    "CONTRIBUTING.md": "cf1f3db106b72b93e65627b90f9bad99800fe7721bef39f562950f0f72431d79",
+    "_bmad-output/implementation-artifacts/deferred-work.md": "e927c6fc35cf657a2b9845c080b75d337af74db6787d991f100bffc0a9e4714f",
+    "_bmad-output/implementation-artifacts/spec-five-deferred-ingress-and-consumer-items.md": "a2f7bdc4a51134607b27c36ad017bff35c2435dbc2c8533d6eadb8cb4cbd3dce",
+    "eng/consumer-executable-assets.json": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "global.json": "5feaf50426a6c5554654e326bedd2f6c6273f13b948b1ec6e11e12cae68f9f05",
+    "scripts/StartupHook.cs": "964c8d882b4293389977b2a84f6e0435a8eb64e7a9f97ed6ee3fc0291b2ae463",
+    "scripts/check-built-packages.py": "bf64def0895a0b34b0b445a0195a1c806dcb90efe0323af59321dd31f99a6693",
+    "scripts/consumer-process-observer.c": "c716b2cb44550925caf2b191db6ae5319477be9650d31cf7b9feb09ea2f6979a",
+    "scripts/consumer_package_validation.py": "3e0016f9f33e50b67ab72d7a4a500de5f3617373fa8a0b65971f99a485bbc8c8",
+    "scripts/validate-consumer-package-references.py": "b1f675375e1fb8ceec1801ccb6cbdfe782a8993bcadd8560710be6ac7701a671",
+    "src/Hexalith.Agents.EventStore/AgentsProviderCatalogCoordinationPolicy.cs": "88bdd6e3263ca0c31a313c3a837513a082528014670f8138b01f384ee7c40a5a",
+    "src/Hexalith.Agents.EventStore/ProviderGovernanceCommandIntent.cs": "2a4c382ede02d30a9fd255fa84a971be48ce0ba35baee68e0ed13e07be016025",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "be7ae1b5d9602a95797d71032a118be869a42bc0139332d47beba1230a220496",
+    "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "c4cfff8e37773b63b425cd732a712dc457db0f4fa2166f651871c05703ccc5df",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeRecoveryTests.cs": "f3956d87ed90bb0074fe564ec4c6bc8e95e9a6b72d28e24e03e40bbbeba2a1b9",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogCoordinationIntegrationTests.cs": "2e6254dd2ec31dd0c910290442e5c97c0377dad0deb8613da42cc38e5774e04f",
+    "test/Hexalith.Agents.Server.Tests/VerifiedProviderQueryCallerTests.cs": "84edd7236d3fdd46969fd9b30abb7d1b00c9aa6b068fc70a2fd3e3ddca7ee968",
+    "test/Hexalith.Agents.UI.Tests/ProviderCatalogGovernanceUiTests.cs": "e1d63d07237832ba13a220b0d809feb370f8b6137f1214e7d4476d9a0809fd56",
+    "tests/tooling/built_package_hook_test.py": "72a9ab50f7f5a812a0137b8d2cfe45cc533c11f0e8b4c12da0eeb12dcf62a570",
+    "tests/tooling/dependency_assets_restore_test.py": "9f15b6d60acc3995a2dab32905058fca454f6117006799fbef11e481b8490700",
+    "tests/tooling/ui_consumer_assets_test.py": "9ae027e4e8c7c5ac35fd2fe248fe5406d649eb42b1436f0c111cec3156c95e51"
+  },
+  "executedHookSource": "executed-hook-source.json: final private actual-hook source bytes match final working tree.",
+  "finalResults": {
+    "hookUnits": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "log": "integration-hook-units.log.gz",
+      "includes": [
+        "Missing system tracer before pack/build/restore and scratch cleanup",
+        "Missing preprocess/Build traces",
+        "Missing thread file and truncated terminal thread record",
+        "Absolute trace paths and inherited environment restoration",
+        "Six fixed pack commands without module compilation/restore"
+      ]
+    },
+    "actualHookRegressions": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "log": "integration-actual-hook-regressions.log.gz",
+      "subcases": [
+        "Valid package task/native helper/conditional import qualifies through actual hook and common policy",
+        "Static child executes then refuses",
+        "Environment-cleared child executes then refuses",
+        "Byte-loaded managed helper executes then refuses",
+        "Emitted dynamic managed helper executes then refuses",
+        "Changed native bytes execute and atomically restore reviewed bytes, then mutation refuses",
+        "Detached child is awaited and killed when system tracer exits"
+      ]
+    },
+    "actualProductHook": {
+      "exitCode": 0,
+      "packages": 6,
+      "isolatedConsumers": 7,
+      "exactPerConsumerPolicy": "passed without a baseline change",
+      "scratchCleanup": "confirmed",
+      "log": "integration-current-hook.log.gz",
+      "producerPreparation": "Six unchanged library Release builds in a private copy; no native C# suites run",
+      "producerLog": "integration-built-inputs.log.gz"
+    },
+    "actualCiCdDiscovery": {
+      "errors": 0,
+      "selectedFiles": [
+        ".github/actions/after-unit-tests/action.yml",
+        "scripts/check-built-packages.py",
+        "scripts/consumer_package_validation.py",
+        "scripts/nuget_package_validation.py",
+        "scripts/release_package_integrity.py",
+        "scripts/release_package_inventory.py"
+      ],
+      "controllerRevision": "2b2ca853816cb9570bf2392d05e9fc2016de32de",
+      "evidence": "scan-discovery.json",
+      "checker": "Actual pinned Discovery.discover coverage checker; no owner code/policy modified"
+    },
+    "whitespace": "git diff --check HEAD passed",
+    "unmergedIndexEntries": 0
+  },
+  "earlierIntegrationResults": {
+    "uiConsumerUnits": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "log": "integration-ui-units.log.gz",
+      "scope": "Merged pure receipt, normalization, no-receipt/inventory and unchanged C tracer controls; ran before the hook-only trace-closure correction"
+    },
+    "dependencyHelpers": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "log": "integration-helper-restores.log.gz",
+      "scope": "Initial integration shared-helper/CLI checks, including actual MessagePack restore and unlisted-file refusal; before adding actual-hook methods"
+    },
+    "beforeThreadClosureHelpers": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "log": "integration-before-thread-closure-helpers.log.gz",
+      "scope": "Superseded helper/hook/cleanup controls before final parser thread closure"
+    },
+    "beforeThreadClosureProductHook": {
+      "exitCode": 0,
+      "packages": 6,
+      "consumers": 7,
+      "scratchCleanup": "confirmed",
+      "log": "integration-before-thread-closure-hook.log.gz",
+      "scope": "Successful actual hook with kill-on-exit before the final trace-closure correction"
+    },
+    "initialNativeTraceRefusal": {
+      "diagnostic": "native load observation is missing or contains an unobserved executable process",
+      "cause": "Relative LD_DEBUG_OUTPUT lost children after cwd change; fixed to inherited absolute output",
+      "scratchCleanup": "confirmed",
+      "rawLogPreserved": false
+    },
+    "discardedHarness": {
+      "exitCode": 127,
+      "reason": "Ad hoc Bash harness edited while executing; py: command not found. No successful product result inferred. Replaced with final stable fresh harness.",
+      "log": "integration-discarded-harness.log.gz"
+    },
+    "cleanedProducerReuseAttempt": {
+      "qualificationRun": false,
+      "reason": "Prior private producer completed and its run-with-temp directory was already removed; final run prepared fresh inputs.",
+      "log": "integration-cleaned-reuse-attempt.log.gz"
+    }
+  },
+  "policy": {
+    "schemaVersion": 2,
+    "unionEntries": 46,
+    "sha256": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "changedDuringIntegration": false
+  },
+  "retainedOriginalReviewRows": 11,
+  "stracePrerequisite": {
+    "bootstrap": "strace-bootstrap.json",
+    "globalInstall": false,
+    "requiredCapabilities": [
+      "--kill-on-exit",
+      "-ff",
+      "-e trace=process",
+      "-E"
+    ],
+    "timing": "Linux/glibc/inotify/tool-presence checks before packing; actual tracing/capability probe before observer build and consumer restore."
+  },
+  "notRerunByImplementation": [
+    "Broad native C# suites and maintained product gates after integration; parent owns combined validation",
+    "Full network cross-module duplicate detector; actual source-discovery checker only",
+    "Hosted CI, deployment, durable-store or endpoint administrator-verifier qualification"
+  ],
+  "knownLimitations": [
+    "Current upstream ci.yml still references npm ci with deleted root package metadata and removed verify-story.ps1/verify-story-5.2.ps1; corresponding old contributor setup/gate prose is stale. No owner CI changes or deleted tooling restoration.",
+    "Product hook requires supported Linux/glibc/ptrace/inotify and an available capable system strace; no unobserved fallback.",
+    "Pre-existing endpoint/DW-21 and durable-store proof boundaries remain open."
+  ],
+  "combinedValidationAndIndependentReviewPendingParent": true,
+  "artifactSha256": {
+    "executed-hook-source.json": "f97afa24c6dbbddf4eee54568c291da1e287518ecfb626770e3adeafcb1d0b72",
+    "integration-actual-hook-regressions.log.gz": "00e34ecdfedf058dbc4a85f95ac5f5e679baa1ed94e1522133a9c78d08daec77",
+    "integration-before-exitkill-helper.log.gz": "df9ee7857276d9d1ee88e46157b2c75a06fcd8707bfdaf1eeeae2a0ca72d64cb",
+    "integration-before-thread-closure-helpers.log.gz": "79a77a487aa912070c9b62732f4ab13719bd56555780eca8880dd0174c7b1456",
+    "integration-before-thread-closure-hook.log.gz": "c29e8b898959c211eb6c024fae31e3126f60ad6f26b26a67472fae82fa192e54",
+    "integration-built-inputs.log.gz": "533da0635ed3f9917ec3e739e623331e5dbf60e2468285c393996af9f94ad7ac",
+    "integration-cleaned-reuse-attempt.log.gz": "154a3af9f89378c2a1372a07dfb94bb8486b320b85a9104e208d54cde96bfb88",
+    "integration-current-hook.log.gz": "44608dd1ced19b74fae2c0ee4a052b89c22607b3e7c4e32d179d9990890f3eae",
+    "integration-discarded-harness.log.gz": "9dc3b2c322ec3df0ce8e04fd40a863b577da7acbda8ab6d25fa28f652f881a0d",
+    "integration-helper-restores.log.gz": "02782dbd233035a71e00d002aab0dcde0950657758da48a42baf65a255cff711",
+    "integration-hook-units.log.gz": "d909bad852550f7dd7a67baa73e29d8bd6dc5f7d6552a1010ad58df5468cd6bf",
+    "integration-ui-units.log.gz": "6cec21a495b68a234319cf02bd051f31029ae4f5ec5a57ccb48978db20dabf56",
+    "scan-discovery.json": "9da8e204729950eb5e0392565c8688aa2e3a46ac3e66e417cdf28610f30ef9b2",
+    "strace-bootstrap.json": "3d84d1bd8c2e9749abc8a3e0516793a2b83438c9efc6987388fd2e89967ed13c",
+    "verify-integrated-discovery.py": "ea10175db663d2f6257547ec53f88ed559849a55fee257b9eb205fc4251c2118",
+    "verify-integrated-product-hook.sh": "e3c201e7a62f7195b5cc3dd9387a1062aff61eb288c2a2c71c7236684b537eeb"
+  }
+}

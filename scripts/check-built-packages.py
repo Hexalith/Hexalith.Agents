@@ -9,7 +9,8 @@ import subprocess
 import sys
 
 from consumer_package_validation import (consumer_receipt, enforce_asset_policy, prepare_consumer,
-                                         validate_consumer_assets)
+    validate_consumer_assets, check_hook_prerequisites, prepare_hook_observer,
+    hook_observation_environment, immutable_package_inputs, hook_observation)
 from nuget_package_validation import validate_directory
 from release_package_integrity import expected_archives
 from release_package_inventory import load_packages
@@ -60,29 +61,39 @@ def pack_built_packages() -> None:
     ], cwd=".", check=True)
 
 
-def check_consumer() -> str:
-    """Compile only the scratch consumer; every executable and operand is literal."""
+def check_consumer() -> dict:
+    """Observe the scratch consumer with literal, scan-discoverable compiler/tool commands."""
+    consumer = SCRATCH / "consumer"
+    prepare_hook_observer(consumer)
+    subprocess.run([
+        "strace", "--kill-on-exit", "-f", "-q", "-e", "trace=process", "-o", "artifacts/cicd-agents-package-check/consumer/obj/ptrace-probe.log", "/bin/true",
+    ], cwd=".", check=True)
+    subprocess.run([
+        "dotnet", "build", "artifacts/cicd-agents-package-check/consumer/obj/load-observer/Observer.csproj",
+        "-c", "Release", "-p:UseSharedCompilation=false", "/m:1", "/nr:false",
+    ], cwd=".", check=True)
     subprocess.run([
         "dotnet", "restore", "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
         "--configfile", "artifacts/cicd-agents-package-check/consumer/NuGet.config",
         "--packages", "artifacts/cicd-agents-package-check/consumer/packages",
         "--no-cache", "--force-evaluate", "/m:1", "/nr:false",
     ], cwd=".", check=True)
-    subprocess.run([
-        "dotnet", "build", "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
-        "--no-restore", "-c", "Release", "/m:1", "/nr:false",
-    ], cwd=".", check=True)
-    evaluated = subprocess.run([
-        "dotnet", "msbuild", "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
-        "-nologo", "-target:Build", "-verbosity:quiet", "-getItem:Analyzer",
-        "-p:Configuration=Release", "/m:1", "/nr:false",
-    ], cwd=".", check=True, capture_output=True, text=True)
-    subprocess.run([
-        "dotnet", "msbuild", "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
-        "-nologo", "-preprocess:artifacts/cicd-agents-package-check/consumer/imports.xml",
-        "-p:Configuration=Release", "/m:1", "/nr:false",
-    ], cwd=".", check=True)
-    return evaluated.stdout
+    with hook_observation_environment(consumer), immutable_package_inputs(consumer / "packages"):
+        subprocess.run([
+            "strace", "--kill-on-exit", "-ff", "-q", "-e", "trace=process", "-o", "artifacts/cicd-agents-package-check/consumer/obj/assembly-loads/process-preprocess",
+            "-E", "LD_DEBUG=files",
+            "dotnet", "msbuild", "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
+            "-nologo", "-preprocess:artifacts/cicd-agents-package-check/consumer/imports.xml",
+            "-p:Configuration=Release", "-p:UseSharedCompilation=false", "/m:1", "/nr:false",
+        ], cwd=".", check=True)
+        evaluated = subprocess.run([
+            "strace", "--kill-on-exit", "-ff", "-q", "-e", "trace=process", "-o", "artifacts/cicd-agents-package-check/consumer/obj/assembly-loads/process-build",
+            "-E", "LD_DEBUG=files",
+            "dotnet", "msbuild", "artifacts/cicd-agents-package-check/consumer/PackageConsumer.csproj",
+            "-nologo", "-target:Build", "-verbosity:quiet", "-getItem:Analyzer",
+            "-p:Configuration=Release", "-p:UseSharedCompilation=false", "/m:1", "/nr:false",
+        ], cwd=".", check=True, capture_output=True, text=True)
+    return hook_observation(consumer, evaluated.stdout)
 
 
 def main() -> int:
@@ -99,6 +110,7 @@ def main() -> int:
         shutil.rmtree(SCRATCH)
     SCRATCH.mkdir(parents=True)
     try:
+        check_hook_prerequisites()
         pack_built_packages()
         feed = SCRATCH / "packages"
         metadata, version = validate_directory(feed)
@@ -113,9 +125,9 @@ def main() -> int:
             if consumer.exists():
                 shutil.rmtree(consumer)
             prepare_consumer(consumer, feed, selection, identities)
-            evaluation = check_consumer()
+            observation = check_consumer()
             validate_consumer_assets(consumer, feed, selection, identities)
-            receipts.append(consumer_receipt(consumer, label, evaluation))
+            receipts.append(consumer_receipt(consumer, label, observation))
         enforce_asset_policy(receipts, json.loads((ROOT / "eng/consumer-executable-assets.json").read_text()), version)
         print("Validated six built packages and seven isolated package consumers.")
         return 0

@@ -24,6 +24,7 @@ using Hexalith.EventStore.Server.Configuration;
 using Hexalith.EventStore.Server.Events;
 using Hexalith.EventStore.Server.Pipeline.Commands;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
@@ -315,6 +316,107 @@ public sealed class ProviderCatalogCoordinationIntegrationTests
             Projected("stale-toggle", 2, new ProviderModelLifecycleRevisionRejected(entryId, "provider", "model", 0, 1)),
             Projected("missing", 3, new ProviderModelEntryNotFoundRejection(entryId, "provider", "model")),
         ]).ShouldBeTrue();
+    }
+
+    /// <summary>All command families bind the same identity, enablement and digest regardless of single-key casing.</summary>
+    [Theory]
+    [InlineData(nameof(CreateProviderModelEntry))]
+    [InlineData(nameof(UpdateProviderModelEntry))]
+    [InlineData(nameof(EnableProviderModelEntry))]
+    [InlineData(nameof(DisableProviderModelEntry))]
+    [InlineData(nameof(SetTenantProviderModelEnablement))]
+    [InlineData(nameof(DecideProviderDataHandling))]
+    public void GovernanceJsonIsUnambiguousAcrossEveryPolicyEntryPoint(string commandType)
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, _now);
+        object payload = commandType switch
+        {
+            nameof(CreateProviderModelEntry) => new CreateProviderModelEntry("provider", "model", "Model", true, true, 1000, 500,
+                new(30000, 3), ProviderModelCapabilityFlags.Streaming, "cfg-ref", new("USD", 0.002m, 0.008m, 1), terms),
+            nameof(UpdateProviderModelEntry) => new UpdateProviderModelEntry("provider", "model", "Model", true, 1000, 500,
+                new(30000, 3), ProviderModelCapabilityFlags.Streaming, "cfg-ref", new("USD", 0.002m, 0.008m, 1), 1, terms),
+            nameof(EnableProviderModelEntry) => new EnableProviderModelEntry("provider", "model", 1),
+            nameof(DisableProviderModelEntry) => new DisableProviderModelEntry("provider", "model", 1),
+            nameof(SetTenantProviderModelEnablement) => new SetTenantProviderModelEnablement("tenant-a", "provider", "model", true, 1, terms),
+            _ => new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, _now),
+        };
+        bool platform = commandType is not (nameof(SetTenantProviderModelEnablement) or nameof(DecideProviderDataHandling));
+        var original = new CommandEnvelope("message", platform ? "system" : "tenant-a",
+            platform ? "provider-catalog" : "tenant-provider-enablement",
+            platform ? ProviderCatalogIdentity.EntryId("provider", "model") : "tenant-a", commandType,
+            JsonSerializer.SerializeToUtf8Bytes(payload, payload.GetType()), "correlation", null, "operator", null);
+        var services = new ServiceCollection();
+        services.AddAgentsEventStore("agents", new FixtureTrustedCommandProofReader());
+        using var provider = services.BuildServiceProvider();
+        var adapter = provider.GetServices<IIdempotencyIntentAdapter>().Single(item => item.CommandType == commandType);
+        IdempotencyIntentCommand Intent(CommandEnvelope command) => new(command.CommandType, command.TenantId, command.Domain,
+            command.AggregateId, command.Payload, command.Extensions);
+        byte[] semantic = adapter.CreateIntent(Intent(original)).SemanticPayload;
+        var scope = policy.GetScope(original); string digest = policy.GetCommandDigest(original);
+        ProjectionEventDto[] source = [Projected("created", 1, Created(terms))];
+        policy.Validate(original, source).ShouldBeTrue();
+        using var document = JsonDocument.Parse(original.Payload);
+        var properties = document.RootElement.EnumerateObject().ToArray();
+        foreach (bool reverse in new[] { false, true })
+        foreach (bool uppercase in new[] { false, true })
+        {
+            string json = "{" + string.Join(",", (reverse ? properties.Reverse() : properties)
+                .Select(p => JsonSerializer.Serialize(uppercase ? p.Name.ToUpperInvariant() : JsonNamingPolicy.CamelCase.ConvertName(p.Name)) + ":" + p.Value.GetRawText())) + "}";
+            var canonical = original with { Payload = System.Text.Encoding.UTF8.GetBytes(json) };
+            policy.GetScope(canonical).ShouldBe(scope); policy.GetCommandDigest(canonical).ShouldBe(digest);
+            policy.Validate(canonical, source).ShouldBeTrue();
+            adapter.CreateIntent(Intent(canonical)).SemanticPayload.ShouldBe(semantic);
+            foreach (string name in new[] { "ProviderId", "ModelId", "Enabled" }.Where(n => properties.Any(p => p.Name == n)))
+            foreach (bool equivalent in new[] { false, true })
+            foreach (bool sameCasing in new[] { false, true })
+            {
+                var property = properties.Single(p => p.Name == name);
+                string key = uppercase ? name.ToUpperInvariant() : JsonNamingPolicy.CamelCase.ConvertName(name);
+                string value = equivalent ? property.Value.GetRawText() : name == "Enabled" ? "false" : "\"other\"";
+                string duplicate = JsonSerializer.Serialize(sameCasing ? key : name) + ":" + value;
+                string ambiguous = reverse ? "{" + duplicate + "," + json[1..] : json[..^1] + "," + duplicate + "}";
+                var rejected = original with { Payload = System.Text.Encoding.UTF8.GetBytes(ambiguous) };
+                Should.Throw<ArgumentException>(() => policy.GetScope(rejected));
+                Should.Throw<ArgumentException>(() => policy.GetCommandDigest(rejected));
+                Should.Throw<ArgumentException>(() => policy.Validate(rejected, source));
+                Should.Throw<ArgumentException>(() => adapter.CreateIntent(Intent(rejected)));
+            }
+        }
+    }
+
+    /// <summary>Missing/null enablement cannot silently become a disable decision at any shared entry point.</summary>
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("null")]
+    [InlineData("false")]
+    public void TenantEnablementRequiresAnExplicitBoolean(string value)
+    {
+        var policy = new AgentsProviderCatalogCoordinationPolicy();
+        var services = new ServiceCollection(); services.AddAgentsEventStore("agents", new FixtureTrustedCommandProofReader());
+        using var provider = services.BuildServiceProvider();
+        var adapter = provider.GetServices<IIdempotencyIntentAdapter>().Single(item => item.CommandType == nameof(SetTenantProviderModelEnablement));
+        foreach (string key in new[] { "Enabled", "enabled", "ENABLED" })
+        {
+            string json = "{\"TenantId\":\"tenant-a\",\"ProviderId\":\"provider\",\"ModelId\":\"model\",\"ExpectedRevision\":0"
+                + (value == "missing" ? "" : "," + JsonSerializer.Serialize(key) + ":" + value) + "}";
+            var command = new CommandEnvelope("message", "tenant-a", "tenant-provider-enablement", "tenant-a", nameof(SetTenantProviderModelEnablement),
+                System.Text.Encoding.UTF8.GetBytes(json), "correlation", null, "operator", null);
+            IdempotencyIntentCommand intent = new(command.CommandType, command.TenantId, command.Domain, command.AggregateId, command.Payload, command.Extensions);
+            if (value == "false")
+            {
+                policy.GetScope(command).RequiresSourceValidation.ShouldBeFalse();
+                policy.Validate(command, []).ShouldBeTrue();
+                policy.GetCommandDigest(command).ShouldNotBeNullOrWhiteSpace(); adapter.CreateIntent(intent).ShouldNotBeNull();
+            }
+            else
+            {
+                Should.Throw<ArgumentException>(() => policy.GetScope(command));
+                Should.Throw<ArgumentException>(() => policy.Validate(command, []));
+                Should.Throw<ArgumentException>(() => policy.GetCommandDigest(command));
+                Should.Throw<ArgumentException>(() => adapter.CreateIntent(intent));
+            }
+        }
     }
 
     private static ProviderModelEntryCreated Created(ProviderDataHandlingRecord terms)

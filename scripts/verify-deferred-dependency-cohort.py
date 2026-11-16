@@ -376,11 +376,13 @@ def graph(experiment, repo, label, configuration="Debug", artifacts=None):
         if identity in inventory:
             continue
         tag = label + "-graph-" + project.stem
+        result = experiment.evidence / (tag + "-evaluation.json")
         experiment.run(tag, ["dotnet", "msbuild", project, "-nologo", *properties,
             "-target:ResolveLockFileAnalyzers",
+            "-getResultOutputFile:" + str(result),
             "-getProperty:ProjectAssetsFile,TargetDir,TargetPath,Configuration,DefineConstants,LangVersion,Nullable,AnalysisLevel,RunAnalyzersDuringBuild,EnableNETAnalyzers",
             "-getItem:Compile,EmbeddedResource,Content,None,Analyzer,AdditionalFiles,EditorConfigFiles,GlobalAnalyzerConfigFiles,ProjectReference,PackageReference,PackageVersion"], repo)
-        evaluated = json.loads((experiment.evidence / (tag + ".log")).read_text())
+        evaluated = json.loads(result.read_text())
         files = static_compiler_inputs(repo, project, evaluated)
         preprocessed = experiment.evidence / (tag + "-expanded.xml")
         experiment.run(tag + "-imports", ["dotnet", "msbuild", project, "-nologo", *properties,

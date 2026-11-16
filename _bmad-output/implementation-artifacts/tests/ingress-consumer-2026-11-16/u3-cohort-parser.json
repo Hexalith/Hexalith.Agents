@@ -1,0 +1,68 @@
+{
+  "triage": "U3",
+  "classification": "Pre-existing verifier parsing defect exposed during the required final merged tooling run.",
+  "originalBroadRun": {
+    "total": 324,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 1,
+    "failure": "CompilerAndAssetTests.test_actual_sdk_graph_includes_explicit_compiler_inputs_and_scoped_assets: JSONDecodeError reading the combined MSBuild log.",
+    "log": "artifacts/five-ingress-final-merged-tooling.log",
+    "sha256": "1a7dd93997fab7feb50a5f8c5d861775dce77bda9ef3ea57b938d9c53c7209ad"
+  },
+  "preExistingGraphFunctionSha256": {
+    "805b35da01efe4d3ac5f1402e611950ac282d0a1": "55bc2732f0e83bb2da9687092abfccf5268965c9bafa0efeb0d15025827a4e38",
+    "c5c22620cafaa0af2625896cf41022e614e9b490": "55bc2732f0e83bb2da9687092abfccf5268965c9bafa0efeb0d15025827a4e38"
+  },
+  "diagnosis": "dotnet msbuild returns exit 0 but prepends an MSBuild-server-unavailable/fallback diagnostic to the combined log before its JSON output. Parsing the log as JSON fails. Reproduced without inherited observation/server-control flags.",
+  "fix": "Use the SDK-supported -getResultOutputFile for graph property/item JSON and parse only that fresh structured file. Complete diagnostic logs, existing command exit checks, source-input hashing, graph scope and audit gates remain intact. No generic prefix stripping or MSBuild-server state changes.",
+  "sourceSha256": {
+    "scripts/verify-deferred-dependency-cohort.py": "1cdd53b1a0dbe4bf690dcc047b75d1537d18d94bde5a0276ce2ff14f7afbb7b8",
+    "tests/tooling/deferred_dependency_cohort_test.py": "23455112cbf3537b6984823997dc0de6b21b67e5648aa54760142b310359c8f2"
+  },
+  "focusedVerification": {
+    "class": "CompilerAndAssetTests",
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "log": "u3-focused-tests.log.gz",
+    "newRegressions": [
+      "Diagnostic-prefixed console output cannot contaminate the dedicated SDK result; complete diagnostic log is retained.",
+      "Missing or malformed SDK result refuses even when the console log contains valid JSON."
+    ],
+    "reproduceCommand": "run-with-temp python3 -B -m unittest discover -s tests/tooling -p deferred_dependency_cohort_test.py -k CompilerAndAssetTests -v"
+  },
+  "additionalActualSdkFixture": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "log": "u3-final-actual-graph.log.gz",
+    "realDiagnosticPreserved": "u3-final-command-2.log.gz",
+    "validStructuredResult": "u3-final-sdk-evaluation.json",
+    "commandMetadata": "u3-final-actual-graph.json"
+  },
+  "originalReproduction": {
+    "total": 1,
+    "errors": 1,
+    "log": "u3-reproduction.log.gz",
+    "commandMetadata": "u3-reproduction.json",
+    "contaminatedLog": "u3-command-2.log.gz"
+  },
+  "artifactSha256": {
+    "u3-command-1.log.gz": "dc595c6dfd8eea93daf27673ac6c5dd0a8e721d23416173586c6e943db924bfd",
+    "u3-command-2.log.gz": "f21409dd4f771b97f8abad930567011cd15b8a93a2899a1fe347267ea3066f39",
+    "u3-final-actual-graph.json": "b8549edc0e97b625445fe1c0392ce923014822e3e2e6d4a00df61f7e93bbdc3f",
+    "u3-final-actual-graph.log.gz": "6c91b32a4d13acc7f081d3c532ceb13910e4a70eece39ca03b0882e41e09c1ef",
+    "u3-final-command-1.log.gz": "d4c297bd09d7dba2d97d44eb6297d9f7bd970cd33b2663d66790dde55ced6bd5",
+    "u3-final-command-2.log.gz": "1f4b7ee359f8babe2b8edf33b9053b46cb81bdda366e6ce2322abf5f8e293c3f",
+    "u3-final-command-3.log.gz": "1f4b7ee359f8babe2b8edf33b9053b46cb81bdda366e6ce2322abf5f8e293c3f",
+    "u3-final-sdk-evaluation.json": "0dc00315cf07f4f63539c07dbbe2874fc0b6660e48226ae969d217b63c212783",
+    "u3-focused-tests.log.gz": "3abccf845a411c6f777fb43c40684a550e86c81b0c31e7696df106582ca19fdb",
+    "u3-reproduction.json": "133d2584500d626c68745c6638eac1b0db3f68f5ec25d78ab930d6790f27d282",
+    "u3-reproduction.log.gz": "317e7ac825dd0333d8ef00ce967558b877573dc2669129e206114223c8930940"
+  },
+  "whitespace": "git diff --check HEAD passed",
+  "scope": "Only the cohort verification runner, its CompilerAndAssetTests class and this U3 evidence changed. No consumer/product/C# runtime changes, owner CI changes, global server shutdown, parent snapshot/job changes, commits or pushes. No broader tests run; parent owns final synchronization and exact acceptance evidence."
+}

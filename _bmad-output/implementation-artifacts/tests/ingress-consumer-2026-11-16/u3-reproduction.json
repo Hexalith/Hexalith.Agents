@@ -1,0 +1,40 @@
+{
+  "passed": false,
+  "commands": [
+    {
+      "argv": [
+        "dotnet",
+        "restore",
+        "/tmp/hexalith-job.DLwEkDzs/tmptp2a8e_0/src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
+        "-p:Configuration=Debug",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:ArtifactsPath=/tmp/hexalith-job.DLwEkDzs/tmptp2a8e_0/work/graph-artifacts"
+      ],
+      "exitCode": 0,
+      "log": "command-1.log",
+      "sha256": "d500eab925686bef33cf3f4a5e5f6104177410486dc7803c580bcdfb6e806b90"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "msbuild",
+        "/tmp/hexalith-job.DLwEkDzs/tmptp2a8e_0/src/Hexalith.Agents.EventStore/Hexalith.Agents.EventStore.csproj",
+        "-nologo",
+        "-p:Configuration=Debug",
+        "-p:UseHexalithProjectReferences=true",
+        "-p:ArtifactsPath=/tmp/hexalith-job.DLwEkDzs/tmptp2a8e_0/work/graph-artifacts",
+        "-target:ResolveLockFileAnalyzers",
+        "-getProperty:ProjectAssetsFile,TargetDir,TargetPath,Configuration,DefineConstants,LangVersion,Nullable,AnalysisLevel,RunAnalyzersDuringBuild,EnableNETAnalyzers",
+        "-getItem:Compile,EmbeddedResource,Content,None,Analyzer,AdditionalFiles,EditorConfigFiles,GlobalAnalyzerConfigFiles,ProjectReference,PackageReference,PackageVersion"
+      ],
+      "exitCode": 0,
+      "log": "command-2.log",
+      "sha256": "7c319844d51b2d25a5c0e8475f3d09bac35439bc11a4938478a3c9cfdb222422"
+    }
+  ],
+  "ambientControlFlags": {
+    "DOTNET_CLI_USE_MSBUILD_SERVER": null,
+    "MSBUILDDISABLENODEREUSE": null
+  },
+  "ambientObserverPresent": false
+}

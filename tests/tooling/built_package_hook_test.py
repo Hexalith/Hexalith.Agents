@@ -47,10 +47,63 @@ class BuiltPackageHookTests(unittest.TestCase):
             with mock.patch.object(HOOK, "ROOT", root), mock.patch.object(HOOK, "SCRATCH", scratch), \
                     mock.patch.object(Path, "cwd", return_value=root), \
                     mock.patch.object(HOOK, "load_packages", return_value=packages), \
+                    mock.patch.object(HOOK, "check_hook_prerequisites"), \
                     mock.patch.object(HOOK, "pack_built_packages", side_effect=ValueError("product failure")):
                 with self.assertRaisesRegex(ValueError, "product failure"):
                     HOOK.main()
             self.assertFalse(scratch.exists())
+
+    def test_missing_system_tracer_refuses_before_product_commands_and_cleans_scratch(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); scratch = root / "artifacts/cicd-agents-package-check"
+            packages = [SimpleNamespace(package_id=name, project=root / path) for name, path in HOOK.EXPECTED_PROJECTS.items()]
+            with mock.patch.object(HOOK, "ROOT", root), mock.patch.object(HOOK, "SCRATCH", scratch), \
+                    mock.patch.object(Path, "cwd", return_value=root), mock.patch.object(HOOK, "load_packages", return_value=packages), \
+                    mock.patch.object(HOOK.shutil, "which", return_value=None), mock.patch.object(HOOK, "pack_built_packages") as pack, \
+                    mock.patch.object(HOOK.subprocess, "run") as command:
+                with self.assertRaisesRegex(ValueError, "requires system strace"):
+                    HOOK.main()
+                pack.assert_not_called(); command.assert_not_called(); self.assertFalse(scratch.exists())
+
+    def test_system_tracer_inventory_refuses_missing_and_truncated_output(self):
+        from consumer_package_validation import strace_process_inventory
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with self.assertRaisesRegex(ValueError, "strace process observation is missing"):
+                strace_process_inventory(root)
+            (root / "process-preprocess.2").write_text('execve("/dotnet", ["dotnet"], []) = 0\nexit_group(0) = ?\n+++ exited with 0 +++\n')
+            with self.assertRaisesRegex(ValueError, "strace process observation is missing"):
+                strace_process_inventory(root)
+            path = root / "process-build.1"
+            path.write_text('execve("/dotnet", ["dotnet"], []) = 0\n')
+            with self.assertRaisesRegex(ValueError, "incomplete"):
+                strace_process_inventory(root)
+            path.write_text('clone(child_stack=NULL, flags=SIGCHLD <unfinished ...>\n')
+            with self.assertRaisesRegex(ValueError, "incomplete"):
+                strace_process_inventory(root)
+            path.write_text('execve("/dotnet", ["dotnet"], []) = 0\nclone(child_stack=NULL, flags=CLONE_THREAD|CLONE_VM) = 3\nexit_group(0) = ?\n+++ exited with 0 +++\n')
+            with self.assertRaisesRegex(ValueError, "incomplete"):
+                strace_process_inventory(root)
+            thread = root / "process-build.3"; thread.write_text('exit(0) = ?\n')
+            with self.assertRaisesRegex(ValueError, "incomplete"):
+                strace_process_inventory(root)
+            thread.write_text('exit(0) = ?\n+++ exited with 0 +++\n')
+            strace_process_inventory(root)
+            self.assertTrue((root / "processes.log").read_text().endswith("complete\n"))
+
+    def test_observation_environment_uses_absolute_paths_and_restores_inherited_settings(self):
+        import os
+        from consumer_package_validation import hook_observation_environment
+        with tempfile.TemporaryDirectory() as temporary, mock.patch.dict(os.environ,
+                {"LD_DEBUG": "libs", "LD_DEBUG_OUTPUT": "prior-output", "DOTNET_STARTUP_HOOKS": "prior-hook"}):
+            root = Path(temporary); (root / "obj").mkdir()
+            before = dict(os.environ)
+            with hook_observation_environment(root):
+                self.assertNotIn("LD_DEBUG", os.environ)
+                self.assertEqual(str(root / "obj/assembly-loads/native"), os.environ["LD_DEBUG_OUTPUT"])
+                self.assertEqual(before["PATH"], os.environ["PATH"])
+                self.assertTrue(os.environ["DOTNET_STARTUP_HOOKS"].startswith("prior-hook" + os.pathsep))
+            self.assertEqual(before, dict(os.environ))
 
 
 if __name__ == "__main__":

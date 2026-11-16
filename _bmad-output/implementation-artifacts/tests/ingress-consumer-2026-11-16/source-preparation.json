@@ -1,0 +1,231 @@
+{
+  "status": "blocked",
+  "selectedPins": {
+    "Hexalith.AI.Tools": "736687b79c1e4fa8beabdab75c4675bb76c466b9",
+    "Hexalith.Builds": "fdda17c0a4538b0f7c99f813c20ca24b49006530",
+    "Hexalith.Commons": "49187d47da882d5470deac982bb383486c90202c",
+    "Hexalith.Conversations": "9e24c280efd5e9c13826eab9bc8b8b687a7bee09",
+    "Hexalith.EventStore": "f85419d501f279e9a813435aa73538185ad26ada",
+    "Hexalith.FrontComposer": "bc9dbedc6141b750ca92f01b40ac840dc2066704",
+    "Hexalith.McpCli": "e2e3db7ba2d45d61feacc39c41b3051310fbc57f",
+    "Hexalith.Memories": "898f451111740ccf489d56f7c20cd47edc2fcdf6",
+    "Hexalith.Parties": "a575021fc97a8eda664711089270b60f5e570ded",
+    "Hexalith.Platform": "fecdcbc309e19c95808673ff7c5549d993b19b76",
+    "Hexalith.PolymorphicSerializations": "2cbec6a66e2174adc7c5d431c1b1f0d28abd5647",
+    "Hexalith.Tenants": "292dbf164f26bcf376ef86d749b149b075f8b502",
+    "Hexalith.ChatBot": "6a4ca07b18e9b58500dc79dfede1f308da36c828",
+    "Hexalith.Folders": "89e2fbb6bd965eae2008db4501e7b79cc6e1c8e1",
+    "Hexalith.Projects": "fc58cefde69d72d7d3daa574b5022f73f830a85e",
+    "Hexalith.Timesheets": "aafdae771e81f152671d18c506a0470ce0deee7f",
+    "Hexalith.Works": "b2985d22b3bfbc6d86bcde28a5da722ae7f930c3"
+  },
+  "exports": [
+    {
+      "owner": "Hexalith.Agents",
+      "revision": "805b35da01efe4d3ac5f1402e611950ac282d0a1",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents",
+      "archiveSha256": "d00592c928a1e74c0bf41ea1b6c16b4cb071cb762bb314fb9f489d27945530d5"
+    },
+    {
+      "owner": "Hexalith.AI.Tools",
+      "revision": "736687b79c1e4fa8beabdab75c4675bb76c466b9",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.AI.Tools",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.AI.Tools",
+      "archiveSha256": "a2500f514e4fccd0284f2cb17026714cf3b150b7f9bd903bb072a9d807098a91"
+    },
+    {
+      "owner": "Hexalith.Builds",
+      "revision": "fdda17c0a4538b0f7c99f813c20ca24b49006530",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Builds",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Builds",
+      "archiveSha256": "371a7bda4c332c3d84638b8e71396efc9cc1173f7320b3c0b669eb5c1f02e2db"
+    },
+    {
+      "owner": "Hexalith.Commons",
+      "revision": "49187d47da882d5470deac982bb383486c90202c",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Commons",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Commons",
+      "archiveSha256": "43d89c83b476a9aa4b017474dd937bf122359c45c50333f756ccc8c8402f40f4"
+    },
+    {
+      "owner": "Hexalith.Conversations",
+      "revision": "9e24c280efd5e9c13826eab9bc8b8b687a7bee09",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Conversations",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Conversations",
+      "archiveSha256": "55e4d3e26dc4ff01dddff0e069c2bc0ebd4cd1f1154f9db93047dec74db1ced3"
+    },
+    {
+      "owner": "Hexalith.EventStore",
+      "revision": "f85419d501f279e9a813435aa73538185ad26ada",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.EventStore",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.EventStore",
+      "archiveSha256": "82a66e53c6d3c5c567e9f88829c60d223d5bf0be12fc80ef8a10fabcc2478722"
+    },
+    {
+      "owner": "Hexalith.FrontComposer",
+      "revision": "bc9dbedc6141b750ca92f01b40ac840dc2066704",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.FrontComposer",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.FrontComposer",
+      "archiveSha256": "9fa143aa2f6526b433c81a5f9d9821d02e6f47fa3bb432a6ee48c4cf38b0de06"
+    },
+    {
+      "owner": "Hexalith.McpCli",
+      "revision": "e2e3db7ba2d45d61feacc39c41b3051310fbc57f",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.McpCli",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.McpCli",
+      "archiveSha256": "252c77d6b791e9f28a490d000adcd311d1bd075e3137db7471de78ffe0552f47"
+    },
+    {
+      "owner": "Hexalith.Memories",
+      "revision": "898f451111740ccf489d56f7c20cd47edc2fcdf6",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Memories",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Memories",
+      "archiveSha256": "b4967cfb8c36e32e48d993886ed3ecd87cd4452533288c05d2e67de7127bcdf0"
+    },
+    {
+      "owner": "Hexalith.Parties",
+      "revision": "a575021fc97a8eda664711089270b60f5e570ded",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Parties",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Parties",
+      "archiveSha256": "953ce0a0cd96d48ab9a84ecf077ff059281b7b1f6f317e9a6c6305af1a01369f"
+    },
+    {
+      "owner": "Hexalith.Platform",
+      "revision": "fecdcbc309e19c95808673ff7c5549d993b19b76",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Platform",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Platform",
+      "archiveSha256": "9b0973e3b04266b46ec30177058d77973054146421c04bec7c6354b2569b8259"
+    },
+    {
+      "owner": "Hexalith.PolymorphicSerializations",
+      "revision": "2cbec6a66e2174adc7c5d431c1b1f0d28abd5647",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.PolymorphicSerializations",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.PolymorphicSerializations",
+      "archiveSha256": "5a925798f99c16dd628396016aed3168fee46849f40a1c1cbde52cf977757ea5"
+    },
+    {
+      "owner": "Hexalith.Tenants",
+      "revision": "292dbf164f26bcf376ef86d749b149b075f8b502",
+      "sourceRepository": "/home/administrator/projects/hexalith/agents/references/Hexalith.Tenants",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Tenants",
+      "archiveSha256": "95890888f01c15bc6a41f31a7a766cd7fd61473df6eb0fccb5f099571b08444c"
+    },
+    {
+      "owner": "Hexalith.ChatBot",
+      "revision": "6a4ca07b18e9b58500dc79dfede1f308da36c828",
+      "sourceRepository": "/home/administrator/projects/hexalith/chatbot",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.ChatBot",
+      "archiveSha256": "14b38c9d2656995448ba3f0dee1ab797d97907087a4a873e177f401144ba0e68"
+    },
+    {
+      "owner": "Hexalith.Folders",
+      "revision": "89e2fbb6bd965eae2008db4501e7b79cc6e1c8e1",
+      "sourceRepository": "/home/administrator/projects/hexalith/folders",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Folders",
+      "archiveSha256": "684d95cca3a53805c84f87753ca307776ae491b473e7f7d75b3ab92848fceb66"
+    },
+    {
+      "owner": "Hexalith.Projects",
+      "revision": "fc58cefde69d72d7d3daa574b5022f73f830a85e",
+      "sourceRepository": "/home/administrator/projects/hexalith/projects",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Projects",
+      "archiveSha256": "5b010732725a49c08c4d768b9377ef4f0c4ff194661a64b9ae433664f3de8739"
+    },
+    {
+      "owner": "Hexalith.Timesheets",
+      "revision": "aafdae771e81f152671d18c506a0470ce0deee7f",
+      "sourceRepository": "/home/administrator/projects/hexalith/timesheets",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Timesheets",
+      "archiveSha256": "2e0a99997b928fc9d36df18769423b8747160c64dd287934ea33d5a03f0cdaab"
+    },
+    {
+      "owner": "Hexalith.Works",
+      "revision": "b2985d22b3bfbc6d86bcde28a5da722ae7f930c3",
+      "sourceRepository": "/home/administrator/projects/hexalith/works",
+      "destination": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Works",
+      "archiveSha256": "a8fb5201033fc04e0d25d2cf808c2e745f36fad2253f49c5004fee18ccc4f5d0"
+    }
+  ],
+  "commands": [
+    {
+      "label": "producer-build",
+      "argv": [
+        "dotnet",
+        "build",
+        "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "cwd": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Builds",
+      "environment": {},
+      "exitCode": 0,
+      "elapsedSeconds": 9.985,
+      "logSha256": "81bc3a570bee3a835e240c0c138f44c4982b986c292090afec9096757ab4f40d"
+    },
+    {
+      "label": "prepare-build",
+      "argv": [
+        "dotnet",
+        "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/bin/Debug/net11.0/Hexalith.Builds.Module.Cli.dll",
+        "prepare-build",
+        "--manifest",
+        "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents/verification.module-manifest.v2.json",
+        "--mode",
+        "source",
+        "--output",
+        "json",
+        "--workspace",
+        "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared"
+      ],
+      "cwd": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents",
+      "environment": {},
+      "exitCode": 0,
+      "elapsedSeconds": 66.902,
+      "logSha256": "08b5a681d206f60a98d5c33e1bd0b94ab24590c0e89bff214ed69ab7e7e86f8d"
+    },
+    {
+      "label": "server-source-build",
+      "argv": [
+        "dotnet",
+        "build",
+        "test/Hexalith.Agents.Server.Tests/Hexalith.Agents.Server.Tests.csproj",
+        "-c",
+        "Debug",
+        "-m:1",
+        "-p:MinVerVersionOverride=1.0.0"
+      ],
+      "cwd": "/tmp/hexalith-job.RsQ5jbVu/mapped/Hexalith.Agents",
+      "environment": {
+        "CustomBeforeDirectoryBuildProps": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.targets",
+        "CustomAfterMicrosoftCommonProps": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.props",
+        "CustomBeforeDirectoryBuildTargets": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.before-targets.props",
+        "CustomAfterDirectoryBuildTargets": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.late.props",
+        "AfterMicrosoftNETSdkTargets": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.final.targets",
+        "HEXALITH_SOURCE_MAPPING_HASH": "05f1d4f68111ed76144b093c3ccbce9c9c1377b05b83c1c856260988c0101801",
+        "Configuration": "Debug"
+      },
+      "exitCode": 1,
+      "elapsedSeconds": 5.189,
+      "logSha256": "537e18b9661901d284c58af8325f5415b4735f943e86508e6c14ca8dbfc6c5a5"
+    }
+  ],
+  "blocker": "server-source-build exited 1; see server-source-build.log",
+  "producerMappingSha256": "a392f40023ded6e0907644ca4d226bc9cd34fd749f50c6a79d1eaa4edfac0985",
+  "preparation": {
+    "workspace": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared",
+    "mode": "source",
+    "mappingHash": "05f1d4f68111ed76144b093c3ccbce9c9c1377b05b83c1c856260988c0101801",
+    "environment": {
+      "CustomBeforeDirectoryBuildProps": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.targets",
+      "CustomAfterMicrosoftCommonProps": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.props",
+      "CustomBeforeDirectoryBuildTargets": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.before-targets.props",
+      "CustomAfterDirectoryBuildTargets": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.late.props",
+      "AfterMicrosoftNETSdkTargets": "/tmp/hexalith-job.RsQ5jbVu/mapped/prepared/source-mapping/SourceMapping.final.targets",
+      "HEXALITH_SOURCE_MAPPING_HASH": "05f1d4f68111ed76144b093c3ccbce9c9c1377b05b83c1c856260988c0101801",
+      "Configuration": "Debug"
+    }
+  }
+}

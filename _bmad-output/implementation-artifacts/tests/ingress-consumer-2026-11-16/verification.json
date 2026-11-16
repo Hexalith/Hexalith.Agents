@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-16",
+  "baseline": "805b35da01efe4d3ac5f1402e611950ac282d0a1",
+  "scope": "Local source/package qualification only; installed gateway/domain-host qualification remains open under DW-21.",
+  "directDependencyRevisions": {
+    "references/Hexalith.AI.Tools": "736687b79c1e4fa8beabdab75c4675bb76c466b9",
+    "references/Hexalith.Builds": "fdda17c0a4538b0f7c99f813c20ca24b49006530",
+    "references/Hexalith.Commons": "49187d47da882d5470deac982bb383486c90202c",
+    "references/Hexalith.Conversations": "9e24c280efd5e9c13826eab9bc8b8b687a7bee09",
+    "references/Hexalith.EventStore": "f85419d501f279e9a813435aa73538185ad26ada",
+    "references/Hexalith.FrontComposer": "bc9dbedc6141b750ca92f01b40ac840dc2066704",
+    "references/Hexalith.McpCli": "e2e3db7ba2d45d61feacc39c41b3051310fbc57f",
+    "references/Hexalith.Memories": "898f451111740ccf489d56f7c20cd47edc2fcdf6",
+    "references/Hexalith.Parties": "a575021fc97a8eda664711089270b60f5e570ded",
+    "references/Hexalith.Platform": "fecdcbc309e19c95808673ff7c5549d993b19b76",
+    "references/Hexalith.PolymorphicSerializations": "2cbec6a66e2174adc7c5d431c1b1f0d28abd5647",
+    "references/Hexalith.Tenants": "292dbf164f26bcf376ef86d749b149b075f8b502"
+  },
+  "sourceSha256": {
+    ".gitattributes": "85a554af96f1eb785ffe2534ebb89eefb4d0851c37d8f5d1c53c8156c169e283",
+    "CONTRIBUTING.md": "d24ae5b99725764c38bbb7fb0526a0492e7ab99c6118a8b9c555aec972edb83f",
+    "eng/consumer-executable-assets.json": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "scripts/StartupHook.cs": "964c8d882b4293389977b2a84f6e0435a8eb64e7a9f97ed6ee3fc0291b2ae463",
+    "scripts/consumer-process-observer.c": "c716b2cb44550925caf2b191db6ae5319477be9650d31cf7b9feb09ea2f6979a",
+    "scripts/validate-consumer-package-references.py": "aa305fddcbdb80d382da813eb53492d419319e692e810dbae44509d385aba1ce",
+    "src/Hexalith.Agents.EventStore/AgentsProviderCatalogCoordinationPolicy.cs": "88bdd6e3263ca0c31a313c3a837513a082528014670f8138b01f384ee7c40a5a",
+    "src/Hexalith.Agents.EventStore/ProviderGovernanceCommandIntent.cs": "2a4c382ede02d30a9fd255fa84a971be48ce0ba35baee68e0ed13e07be016025",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "be7ae1b5d9602a95797d71032a118be869a42bc0139332d47beba1230a220496",
+    "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "c4cfff8e37773b63b425cd732a712dc457db0f4fa2166f651871c05703ccc5df",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeRecoveryTests.cs": "f3956d87ed90bb0074fe564ec4c6bc8e95e9a6b72d28e24e03e40bbbeba2a1b9",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogCoordinationIntegrationTests.cs": "2e6254dd2ec31dd0c910290442e5c97c0377dad0deb8613da42cc38e5774e04f",
+    "test/Hexalith.Agents.Server.Tests/VerifiedProviderQueryCallerTests.cs": "84edd7236d3fdd46969fd9b30abb7d1b00c9aa6b068fc70a2fd3e3ddca7ee968",
+    "test/Hexalith.Agents.UI.Tests/ProviderCatalogGovernanceUiTests.cs": "e1d63d07237832ba13a220b0d809feb370f8b6137f1214e7d4476d9a0809fd56",
+    "tests/tooling/dependency_assets_restore_test.py": "016341244e675b4066b3ca0d08b29d8d461d5a22b39863d53263de0052112cf0",
+    "tests/tooling/ui_consumer_assets_test.py": "e8ee0d6e6febed20fec1063d1a6619f1f7dea454dddf28fb4af7e445e63c210b"
+  },
+  "native": {
+    "matrix": {
+      "total": 219,
+      "passed": 219,
+      "failed": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "errors": 0
+    },
+    "server": {
+      "total": 1957,
+      "passed": 1957,
+      "failed": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "errors": 0
+    },
+    "ui": {
+      "total": 1352,
+      "passed": 1352,
+      "failed": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "errors": 0
+    },
+    "uiFocused": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "errors": 0
+    }
+  },
+  "maintainedGates": {
+    "story52Release": {
+      "exit": 0,
+      "owningPassed": {
+        "Contracts": 2005,
+        "Client": 7,
+        "Domain": 1042,
+        "Server": 1955,
+        "UI": 1352
+      }
+    },
+    "story61Package": {
+      "exit": 0,
+      "finalOwningRuns": {
+        "Hexalith.Agents.Contracts.Tests": {
+          "total": 2005,
+          "passed": 2005,
+          "failed": 0,
+          "skipped": 0,
+          "not-run": 0,
+          "errors": 0
+        },
+        "Hexalith.Agents.Client.Tests": {
+          "total": 7,
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "not-run": 0,
+          "errors": 0
+        },
+        "Hexalith.Agents.Server.Tests": {
+          "total": 1957,
+          "passed": 1957,
+          "failed": 0,
+          "skipped": 0,
+          "not-run": 0,
+          "errors": 0
+        },
+        "Hexalith.Agents.UI.Tests": {
+          "total": 1352,
+          "passed": 1352,
+          "failed": 0,
+          "skipped": 0,
+          "not-run": 0,
+          "errors": 0
+        },
+        "Hexalith.Agents.Tests": {
+          "total": 1042,
+          "passed": 1042,
+          "failed": 0,
+          "skipped": 0,
+          "not-run": 0,
+          "errors": 0
+        }
+      },
+      "priorFailure": "Existing UI immediate render assertion retained in story-6.1.log.gz; same expectation now awaited. Final end-to-end rerun passed after the correction."
+    }
+  },
+  "source": {
+    "bareDebug": "Blocked by required Conversations producer mapping.",
+    "mappedDebug": "Preparation succeeded; build blocked by existing EventStore ProductionProfileValidationResult CA1822 at lines 15 and 18.",
+    "auditsOrAnalyzersSuppressed": false
+  },
+  "tooling": {
+    "discovery": {
+      "total": 339,
+      "passed": 337,
+      "failed": 0,
+      "skipped": 2
+    },
+    "discoverySkips": [
+      "Story52RealRunnerCompatibilityTests.test_native_selectors_and_real_summary_format",
+      "Story53RealRunnerCompatibilityTests.test_native_selectors_and_real_summary_format"
+    ],
+    "explicitReleaseRunnerFallback": {
+      "total": 2,
+      "passed": 2,
+      "skipped": 0,
+      "qualification": "Actual package-built Domain assembly; path alias solely for the unchanged compatibility harness, not a Debug/source build."
+    },
+    "finalHelperFixtures": {
+      "total": 2,
+      "passed": 2,
+      "skipped": 0
+    },
+    "finalObserverUnits": {
+      "total": 6,
+      "passed": 6,
+      "skipped": 0
+    }
+  },
+  "consumer": {
+    "schemaVersion": 2,
+    "sdkVersion": "11.0.100",
+    "packages": [
+      {
+        "id": "Hexalith.Agents",
+        "version": "1.0.0",
+        "sha256": "14bc78f07a7babb9d3e24187c1faa8d80b27f8b024b9534adc00862934d980e2"
+      },
+      {
+        "id": "Hexalith.Agents.Client",
+        "version": "1.0.0",
+        "sha256": "089ed4a52f07ff17a6da65295d333505e5ad67be30a4a09bac9ded8375cf56e6"
+      },
+      {
+        "id": "Hexalith.Agents.Contracts",
+        "version": "1.0.0",
+        "sha256": "d4c5cb985545eb035923256ce45e201636d57c4bc05a18f18327fe10353f4119"
+      },
+      {
+        "id": "Hexalith.Agents.EventStore",
+        "version": "1.0.0",
+        "sha256": "72bcf077091b5ccd6892d56b5e3d7ca1747d811f5b1eca2a9130ac92273b0774"
+      },
+      {
+        "id": "Hexalith.Agents.Testing",
+        "version": "1.0.0",
+        "sha256": "a2f606a8b3576e96a3634e513cc7efe002246a0a41d083538d7b928591cbb9b1"
+      },
+      {
+        "id": "Hexalith.Agents.UI",
+        "version": "1.0.0",
+        "sha256": "9d89b86465d6ff5aa696bb7599580d25e260c2ba2a5de93f6d017ea62c5cdbba"
+      }
+    ],
+    "count": 7,
+    "policyUnionCount": 46,
+    "previousUnionCount": 38,
+    "unchangedExistingEntries": 38,
+    "addedObservedAssemblies": 8,
+    "perConsumer": {
+      "Hexalith.Agents": {
+        "selected": 5,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 7,
+        "systemNativeLibraries": 15
+      },
+      "Hexalith.Agents.Client": {
+        "selected": 1,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 7,
+        "systemNativeLibraries": 15
+      },
+      "Hexalith.Agents.Contracts": {
+        "selected": 1,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 7,
+        "systemNativeLibraries": 15
+      },
+      "Hexalith.Agents.EventStore": {
+        "selected": 27,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 8,
+        "systemNativeLibraries": 15
+      },
+      "Hexalith.Agents.Testing": {
+        "selected": 1,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 7,
+        "systemNativeLibraries": 15
+      },
+      "Hexalith.Agents.UI": {
+        "selected": 21,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 7,
+        "systemNativeLibraries": 15
+      },
+      "combined": {
+        "selected": 46,
+        "processes": [
+          "csc.dll",
+          "dotnet.dll"
+        ],
+        "sdkNativeLibraries": 8,
+        "systemNativeLibraries": 15
+      }
+    }
+  },
+  "whitespace": "git diff --check passed; exact authored CRLF C# paths have whitespace=cr-at-eol attributes.",
+  "delivery": "Independent review, Conventional Commit validation, submodule reachability and commit/push are retained by the parent workflow.",
+  "preReviewSourceSha256": {
+    ".gitattributes": "85a554af96f1eb785ffe2534ebb89eefb4d0851c37d8f5d1c53c8156c169e283",
+    "CONTRIBUTING.md": "2dbac3a17e242be42b79b2bffccd20728e48b71bf03d65c522e3e171db26b40f",
+    "eng/consumer-executable-assets.json": "f2daad00f42f22baaf34ede4377a1a79d9a8c5affcb5a4ff006e4cb0c6e8dd90",
+    "scripts/StartupHook.cs": "964c8d882b4293389977b2a84f6e0435a8eb64e7a9f97ed6ee3fc0291b2ae463",
+    "scripts/validate-consumer-package-references.py": "dc6d8aa84e39d223d2bed3a35d50d817497f46e1456e0f0fe968e73a1b3bb82f",
+    "src/Hexalith.Agents.EventStore/AgentsProviderCatalogCoordinationPolicy.cs": "88bdd6e3263ca0c31a313c3a837513a082528014670f8138b01f384ee7c40a5a",
+    "src/Hexalith.Agents.EventStore/ProviderGovernanceCommandIntent.cs": "b5c69854bc3a0d60f499206168ba4c41f56a3390a249b8572516acf6e93e143c",
+    "src/Hexalith.Agents.Server/Application/AgentInteractions/AutomaticInteractionIntakeOrchestrator.cs": "c14c1761b58e7cc861d0640c6d904c502ee4d40979552dd25320840ff75cc867",
+    "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "6601893633258717a6c56703f4374d391b7cb3c58ce049d3f5252a4dbbfdb925",
+    "test/Hexalith.Agents.Server.Tests/AutomaticInteractionIntakeRecoveryTests.cs": "0f76e3b1644bd8a33a7acbae25890eb682feb958055c6bb6498bc3fd41e57ba1",
+    "test/Hexalith.Agents.Server.Tests/ProviderCatalogCoordinationIntegrationTests.cs": "836f028a6b9f3fca8de92974799e0a2a2c605f9569f681d106bd419c3f5f9907",
+    "test/Hexalith.Agents.Server.Tests/VerifiedProviderQueryCallerTests.cs": "84edd7236d3fdd46969fd9b30abb7d1b00c9aa6b068fc70a2fd3e3ddca7ee968",
+    "test/Hexalith.Agents.UI.Tests/ProviderCatalogGovernanceUiTests.cs": "e1d63d07237832ba13a220b0d809feb370f8b6137f1214e7d4476d9a0809fd56",
+    "tests/tooling/dependency_assets_restore_test.py": "5275f10b267e13c6ec7ab9b90d0d498c42fd5e0ee9439b63ae1edbd93f9e84fb",
+    "tests/tooling/ui_consumer_assets_test.py": "177127d473c6e0df969829251845b2ab068c3d0d1ef094a39142f8a4fe7a1a4c"
+  },
+  "reviewCorrections": {
+    "evidence": "review-corrections.json",
+    "native": {
+      "total": 213,
+      "passed": 213,
+      "failed": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "errors": 0
+    },
+    "helperTests": 4,
+    "observerUnits": 8,
+    "membershipFollowup": 1,
+    "fullValidationPendingParent": true,
+    "stopCorrection": {
+      "mechanism": "Pipe-held initial child attached with PTRACE_SEIZE/PTRACE_INTERRUPT; genuine group stops use PTRACE_LISTEN. Synthetic PTRACE_EVENT_STOP traps are distinguished from real signal delivery. No WCONTINUED events are requested.",
+      "exactProbe": "A parent forks a child that raises SIGSTOP; parent waitpid(WUNTRACED) sees that stop and sends SIGCONT. Direct and traced executions both exit 0.",
+      "focusedKernelProbes": {
+        "total": 2,
+        "passed": 2,
+        "skipped": 0,
+        "alsoCovered": [
+          "Detached double-fork descendant completion before tracer return",
+          "Ordinary SIGTRAP exits 133",
+          "Injected EINTR at initial and main waits"
+        ]
+      },
+      "focusedAdversarialRegression": {
+        "total": 1,
+        "passed": 1,
+        "skipped": 0,
+        "subcases": [
+          "Static executable",
+          "Cleared child environment",
+          "Byte-loaded assembly",
+          "Dynamic assembly",
+          "Native changed-byte execution followed by atomic reviewed-byte restoration"
+        ]
+      },
+      "fullValidationPendingParent": true
+    }
+  },
+  "retainedFullVerificationScope": "The retained full suite/gate/consumer results predate review corrections; current source hashes and focused correction results are recorded separately. Parent performs subsequent complete validation.",
+  "evidencePhase": "pre-integration",
+  "integrationEvidence": "integration.json"
+}

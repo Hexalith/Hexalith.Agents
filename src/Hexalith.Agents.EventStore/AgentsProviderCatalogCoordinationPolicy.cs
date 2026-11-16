@@ -86,14 +86,14 @@ public sealed class AgentsProviderCatalogCoordinationPolicy : ICoordinatedComman
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(sourceEvents);
+        (string providerId, string modelId, bool enablementEnabled) = ReadIdentity(command);
         if (string.Equals(command.Domain, ProviderCatalogIdentity.Domain, StringComparison.Ordinal)
             || command.CommandType == nameof(SetTenantProviderModelEnablement)
-                && Deserialize<SetTenantProviderModelEnablement>(command.Payload).Enabled is false)
+                && !enablementEnabled)
         {
             return true;
         }
 
-        (string providerId, string modelId, _) = ReadIdentity(command);
         string expectedEntryId = ProviderCatalogIdentity.EntryId(providerId, modelId);
         bool exists = false;
         bool enabled = false;
@@ -170,8 +170,8 @@ public sealed class AgentsProviderCatalogCoordinationPolicy : ICoordinatedComman
         }
 
         var confirmed = command.CommandType == nameof(DecideProviderDataHandling)
-            ? Deserialize<DecideProviderDataHandling>(command.Payload).ConfirmedTerms
-            : Deserialize<SetTenantProviderModelEnablement>(command.Payload).CurrentTerms;
+            ? ProviderGovernanceCommandIntent.Read<DecideProviderDataHandling>(command.Payload).ConfirmedTerms
+            : ProviderGovernanceCommandIntent.Read<SetTenantProviderModelEnablement>(command.Payload).CurrentTerms;
         return confirmed is not null
             && confirmed.DataHandlingVersion == currentTerms.DataHandlingVersion
             && SameRenderedTermsSnapshot(confirmed, currentTerms);
@@ -197,32 +197,30 @@ public sealed class AgentsProviderCatalogCoordinationPolicy : ICoordinatedComman
 
     private static (string ProviderId, string ModelId, bool EnablementEnabled) ReadIdentity(CommandEnvelope command)
     {
-        try
+        (string providerId, string modelId, bool enabled) = command.CommandType switch
         {
-            using JsonDocument document = JsonDocument.Parse(command.Payload);
-            JsonElement root = document.RootElement;
-            string providerId = ReadString(root, "ProviderId");
-            string modelId = ReadString(root, "ModelId");
-            bool enabled = command.CommandType == nameof(SetTenantProviderModelEnablement)
-                && ReadProperty(root, "Enabled").GetBoolean();
-            return (providerId, modelId, enabled);
-        }
-        catch (Exception exception) when (exception is JsonException or InvalidOperationException or KeyNotFoundException)
+            nameof(CreateProviderModelEntry) => Identity(ProviderGovernanceCommandIntent.Read<CreateProviderModelEntry>(command.Payload)),
+            nameof(UpdateProviderModelEntry) => Identity(ProviderGovernanceCommandIntent.Read<UpdateProviderModelEntry>(command.Payload)),
+            nameof(EnableProviderModelEntry) => Identity(ProviderGovernanceCommandIntent.Read<EnableProviderModelEntry>(command.Payload)),
+            nameof(DisableProviderModelEntry) => Identity(ProviderGovernanceCommandIntent.Read<DisableProviderModelEntry>(command.Payload)),
+            nameof(SetTenantProviderModelEnablement) => Identity(ProviderGovernanceCommandIntent.Read<SetTenantProviderModelEnablement>(command.Payload)),
+            nameof(DecideProviderDataHandling) => Identity(ProviderGovernanceCommandIntent.Read<DecideProviderDataHandling>(command.Payload)),
+            _ => throw new InvalidOperationException("The governance command is unsupported."),
+        };
+        if (string.IsNullOrWhiteSpace(providerId) || string.IsNullOrWhiteSpace(modelId))
         {
-            throw new InvalidOperationException("The coordinated command payload is invalid.", exception);
+            throw new InvalidOperationException("The coordinated command identity is missing.");
         }
+
+        return (providerId, modelId, enabled);
     }
 
-    private static string ReadString(JsonElement root, string name)
-    {
-        string? value = ReadProperty(root, name).GetString();
-        return !string.IsNullOrWhiteSpace(value)
-            ? value : throw new InvalidOperationException("The coordinated command identity is missing.");
-    }
-
-    private static JsonElement ReadProperty(JsonElement root, string name)
-        => root.TryGetProperty(name, out JsonElement value) || root.TryGetProperty(JsonNamingPolicy.CamelCase.ConvertName(name), out value)
-            ? value : throw new KeyNotFoundException();
+    private static (string, string, bool) Identity(CreateProviderModelEntry command) => (command.ProviderId, command.ModelId, command.Enabled);
+    private static (string, string, bool) Identity(UpdateProviderModelEntry command) => (command.ProviderId, command.ModelId, false);
+    private static (string, string, bool) Identity(EnableProviderModelEntry command) => (command.ProviderId, command.ModelId, true);
+    private static (string, string, bool) Identity(DisableProviderModelEntry command) => (command.ProviderId, command.ModelId, false);
+    private static (string, string, bool) Identity(SetTenantProviderModelEnablement command) => (command.ProviderId, command.ModelId, command.Enabled);
+    private static (string, string, bool) Identity(DecideProviderDataHandling command) => (command.ProviderId, command.ModelId, false);
 
     private static T Deserialize<T>(byte[] payload)
         => JsonSerializer.Deserialize<T>(payload, _json)

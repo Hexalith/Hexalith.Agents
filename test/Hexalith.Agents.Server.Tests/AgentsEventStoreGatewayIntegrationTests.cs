@@ -20,6 +20,9 @@ using System.Text.Json.Nodes;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.ProviderCatalog.Commands;
 using Hexalith.Agents.EventStore;
+using Hexalith.Agents.TenantProviderEnablement;
+using Hexalith.Agents.Contracts.ProviderCatalog.Events;
+using Hexalith.Agents.Contracts.ProviderCatalog.Events.Rejections;
 using Hexalith.Agents.Server.Composition;
 using Hexalith.Agents.Server.Ports;
 
@@ -1337,11 +1340,192 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 #endif
 
+    /// <summary>The public SDK gateway never treats the historical provider storage partition as a public tenant.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RawPlatformGovernanceTimestampsCannotBypassTheStorageScopeBoundary(bool update)
+    {
+        foreach (int offsetDays in new[] { -365, 365 })
+        foreach (bool flags in new[] { false, true })
+        {
+            DateTimeOffset serverTime = DateTimeOffset.UtcNow;
+            var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, serverTime.AddDays(offsetDays));
+            object payload = update
+                ? new UpdateProviderModelEntry("provider", "model", "Model", true, 1000, 500, new(30000, 3),
+                    ProviderModelCapabilityFlags.Streaming, "cfg-ref", new("USD", 0.002m, 0.008m, 1), 1, terms)
+                : new CreateProviderModelEntry("provider", "model", "Model", true, true, 1000, 500, new(30000, 3),
+                    ProviderModelCapabilityFlags.Streaming, "cfg-ref", new("USD", 0.002m, 0.008m, 1), terms);
+            var request = Request("provider-catalog", update ? nameof(UpdateProviderModelEntry) : nameof(CreateProviderModelEntry)) with
+            {
+                Tenant = ProviderCatalogIdentity.PlatformTenantId,
+                AggregateId = ProviderCatalogIdentity.EntryId("provider", "model"),
+                Payload = JsonSerializer.SerializeToElement(payload, payload.GetType()),
+                Extensions = flags ? new Dictionary<string, string> { ["actor:agentsProviderAdmin"] = "true" } : null,
+            };
+            var persisted = new List<SubmitCommand>();
+            await using WebApplication domain = BuildDomainApp(persisted.Add);
+            await domain.StartAsync(); using var domainClient = domain.GetTestClient();
+            var ledger = new InMemoryAdmissionLedger(domainClient);
+            var proof = Substitute.For<IAgentsTrustedCommandProofReader>();
+            await using WebApplication gateway = BuildGatewayApp(Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId), ledger,
+                true, proofReader: proof, allowedDomains: "provider-catalog");
+            await gateway.StartAsync(); using var client = GatewayClient(gateway);
+
+            using var response = await client.PostAsJsonAsync("/api/v1/commands", request);
+
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Forbidden);
+            persisted.ShouldBeEmpty(); ledger.ExecutionCount.ShouldBe(0); proof.ReceivedCalls().ShouldBeEmpty();
+        }
+    }
+
+    /// <summary>Malformed governance JSON is a nonretryable client rejection before admission or model replay.</summary>
+    [Theory]
+    [InlineData("duplicate")]
+    [InlineData("missing-enabled")]
+    [InlineData("null-enabled")]
+    public async Task AmbiguousGovernanceJsonReturnsClientValidationBeforeAdmission(string scenario)
+    {
+        string json = scenario == "duplicate"
+            ? "{\"ProviderId\":\"provider\",\"providerId\":\"other\",\"ModelId\":\"model\"}"
+            : "{\"TenantId\":\"tenant-a\",\"ProviderId\":\"provider\",\"ModelId\":\"model\""
+                + (scenario == "null-enabled" ? ",\"Enabled\":null}" : "}");
+        var request = Request("tenant-provider-enablement", scenario == "duplicate" ? nameof(DecideProviderDataHandling) : nameof(SetTenantProviderModelEnablement)) with
+        {
+            AggregateId = "tenant-a", Payload = JsonPayload(json), Extensions = null,
+        };
+        ClaimsPrincipal principal = Principal("Bearer", AgentsAppId);
+        ((ClaimsIdentity)principal.Identity!).AddClaim(new Claim("eventstore:tenant", "tenant-a"));
+        var modelCommands = new List<SubmitCommand>();
+        await using WebApplication domain = BuildDomainApp(modelCommands.Add);
+        await domain.StartAsync(); using var domainClient = domain.GetTestClient();
+        var ledger = new InMemoryAdmissionLedger(domainClient); var admission = new ProductionAdmissionState();
+        await using WebApplication gateway = BuildGatewayApp(principal, ledger, true, admission);
+        await gateway.StartAsync(); using var client = gateway.GetTestClient();
+
+        using var response = await client.PostAsJsonAsync("/api/v1/commands", request);
+
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+        body.GetProperty("retryable").GetBoolean().ShouldBeFalse();
+        body.GetProperty("clientAction").GetString().ShouldBe("correct_request");
+        admission.ObservedIntentDigest.ShouldBeNull(); admission.ObservedRetentionTier.ShouldBeNull();
+        ledger.ExecutionCount.ShouldBe(0); modelCommands.ShouldBeEmpty();
+    }
+
+    /// <summary>Raw governance clocks confer no authority through real gateway reserved-extension admission.</summary>
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("forged")]
+    [InlineData("wrong-app")]
+    [InlineData("false-flag")]
+    [InlineData("wrong-key")]
+    [InlineData("proof-time")]
+    [InlineData("proof-payload")]
+    [InlineData("proof-subject")]
+    [InlineData("valid")]
+    public async Task RawGovernanceTimestampRequiresExactPriorAuthorityAdmission(string mutation)
+    {
+        foreach (int offsetDays in new[] { -365, 365 })
+        {
+            DateTimeOffset serverTime = DateTimeOffset.UtcNow;
+            var terms = new ProviderDataHandlingRecord(30, false, ["EU"], "terms-v1", 1, serverTime);
+            var admittedPayload = new DecideProviderDataHandling("provider", "model", 1, true, "approved", 1, terms, serverTime);
+            var request = Request("tenant-provider-enablement", nameof(DecideProviderDataHandling)) with
+            {
+                AggregateId = "tenant-a",
+                Payload = JsonSerializer.SerializeToElement(admittedPayload),
+                Extensions = new Dictionary<string, string> { [TenantProviderEnablementAggregate.TenantAdministratorExtensionKey] = "true" },
+            };
+            string admittedRequest = JsonSerializer.Serialize(request with { Extensions = null });
+            var proof = Substitute.For<IAgentsTrustedCommandProofReader>();
+            proof.HasAdmittedProof(Arg.Any<ClaimsPrincipal>(), Arg.Any<SubmitCommandRequest>(), Arg.Any<string>(), Arg.Any<string>())
+                .Returns(call => mutation != "forged"
+                    && call.ArgAt<ClaimsPrincipal>(0).FindFirst("sub")?.Value == "system:agents"
+                    && JsonSerializer.Serialize(call.ArgAt<SubmitCommandRequest>(1)) == admittedRequest
+                    && call.ArgAt<string>(2) == TenantProviderEnablementAggregate.TenantAdministratorExtensionKey
+                    && call.ArgAt<string>(3) == "true");
+            if (mutation != "valid")
+            {
+                request = request with { Payload = JsonSerializer.SerializeToElement(admittedPayload with
+                {
+                    DecidedAt = serverTime.AddDays(offsetDays),
+                    ConfirmedTerms = mutation == "proof-time" ? terms : terms with { EffectiveAt = serverTime.AddDays(offsetDays) },
+                }) };
+                if (mutation == "missing") { request = request with { Extensions = null }; }
+                if (mutation == "false-flag") { request = request with { Extensions = new Dictionary<string, string> { [TenantProviderEnablementAggregate.TenantAdministratorExtensionKey] = "false" } }; }
+                if (mutation == "wrong-key") { request = request with { Extensions = new Dictionary<string, string> { [TenantProviderEnablementAggregate.PlatformOperatorExtensionKey] = "true" } }; }
+            }
+            // Wrong-app and wrong-subject controls have an exact prior request admission, but the wrong authenticated transport.
+            if (mutation is "wrong-app" or "proof-subject") { admittedRequest = JsonSerializer.Serialize(request with { Extensions = null }); }
+            ClaimsPrincipal principal = Principal(DaprInternalAuthenticationOptions.SchemeName, mutation == "wrong-app" ? "foreign-app" : AgentsAppId);
+            if (mutation == "proof-subject")
+            {
+                var identity = (ClaimsIdentity)principal.Identity!;
+                identity.RemoveClaim(identity.FindFirst("sub")!); identity.AddClaim(new Claim("sub", "other-subject"));
+            }
+            var enabled = new TenantProviderModelEnablementSet("tenant-a", "provider", "model", true, 1, "operator", null);
+            var state = new TenantProviderEnablementState(); state.Apply(enabled);
+            var persisted = new List<Hexalith.EventStore.Contracts.Events.IEventPayload> { enabled };
+            await using WebApplication domain = BuildDomainApp(command =>
+            {
+                var payload = JsonSerializer.Deserialize<DecideProviderDataHandling>(command.Payload).ShouldNotBeNull();
+                var result = TenantProviderEnablementAggregate.Handle(payload, state, command.ToCommandEnvelope());
+                foreach (var item in result.Events)
+                {
+                    persisted.Add(item);
+                    if (item is ProviderDataHandlingDecided accepted) { state.Apply(accepted); }
+                    else { state.Apply(item.ShouldBeOfType<TenantProviderGovernanceRejected>()); }
+                }
+            });
+            await domain.StartAsync();
+            using var domainClient = domain.GetTestClient(); var ledger = new InMemoryAdmissionLedger(domainClient);
+            await using WebApplication gateway = BuildGatewayApp(principal, ledger, true, proofReader: proof,
+                allowedDomains: "tenant-provider-enablement");
+            await gateway.StartAsync(); using var client = GatewayClient(gateway);
+
+            using var response = await client.PostAsJsonAsync("/api/v1/commands", request);
+
+            var replay = new TenantProviderEnablementState();
+            foreach (var item in persisted)
+            {
+                if (item is TenantProviderModelEnablementSet seed) { replay.Apply(seed); }
+                else if (item is ProviderDataHandlingDecided accepted) { replay.Apply(accepted); }
+                else { replay.Apply(item.ShouldBeOfType<TenantProviderGovernanceRejected>()); }
+            }
+            JsonSerializer.Serialize(replay).ShouldBe(JsonSerializer.Serialize(state));
+            if (mutation == "valid")
+            {
+                response.StatusCode.ShouldBe(System.Net.HttpStatusCode.Accepted);
+                replay.Revision.ShouldBe(2);
+                replay.Entries.Single().Value.LastDecision!.DecidedAt.ShouldBe(serverTime);
+                persisted.OfType<ProviderDataHandlingDecided>().ShouldHaveSingleItem().ConfirmedTerms.EffectiveAt.ShouldBe(serverTime);
+                ledger.ExecutionCount.ShouldBe(1);
+            }
+            else
+            {
+                replay.Revision.ShouldBe(1); replay.Entries.Single().Value.LastDecision.ShouldBeNull();
+                persisted.OfType<ProviderDataHandlingDecided>().ShouldBeEmpty();
+                if (mutation == "missing")
+                {
+                    persisted.OfType<TenantProviderGovernanceRejected>().ShouldHaveSingleItem().Reason.ShouldBe("NotAuthorized");
+                }
+                else
+                {
+                    response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+                    ledger.ExecutionCount.ShouldBe(0); persisted.Count.ShouldBe(1);
+                }
+            }
+        }
+    }
+
     private static WebApplication BuildGatewayApp(
         ClaimsPrincipal principal,
         InMemoryAdmissionLedger ledger,
         bool registerAgentsIntegration,
-        ProductionAdmissionState? admissionState = null)
+        ProductionAdmissionState? admissionState = null,
+        IAgentsTrustedCommandProofReader? proofReader = null,
+        string allowedDomains = "agent,other-domain")
     {
         ProductionAdmissionState state = admissionState ?? new ProductionAdmissionState();
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
@@ -1365,7 +1549,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
             EventStoreHttpHostSecurityExtensions.CreateHumanPolicy()));
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Authentication:BoundCommand:AllowedDomains:agents"] = "agent,other-domain",
+            ["Authentication:BoundCommand:AllowedDomains:agents"] = allowedDomains,
             ["Authentication:BoundStreamRead:PublicKeys:agents"] = FixtureBoundAgentCommandHandler.PublicKey,
         });
 #else
@@ -1377,7 +1561,7 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         builder.Services.AddSingleton<ExtensionMetadataSanitizer>();
         if (registerAgentsIntegration)
         {
-            _ = builder.Services.AddAgentsEventStore(AgentsAppId, new FixtureTrustedCommandProofReader());
+            _ = builder.Services.AddAgentsEventStore(AgentsAppId, proofReader ?? new FixtureTrustedCommandProofReader());
         }
 
         builder.Services.AddSingleton<IIdempotencyDigestKeyProvider>(_ => CreateDigestKeyProvider());

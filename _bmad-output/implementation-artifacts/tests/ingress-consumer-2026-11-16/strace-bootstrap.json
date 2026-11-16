@@ -1,0 +1,9 @@
+{
+  "binary": "/tmp/hexalith-job.1ffd20TS/strace-root/usr/bin/strace",
+  "binDirectory": "/tmp/hexalith-job.1ffd20TS/strace-root/usr/bin",
+  "version": "strace -- version 6.19",
+  "deb": "strace_6.19+ds-0ubuntu5_amd64.deb",
+  "debSha256": "aa530bb652e46beaf92d5c916403182a5ac6b2ba79a94f18e5b9da45d1799ee5",
+  "binarySha256": "f47342683309e807bca57d6d89b82f94a9b39aa614e9c28c2b67cefbc35eee58",
+  "globalInstall": false
+}
