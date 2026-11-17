@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Hexalith.Agents.Contracts.Security;
 using Hexalith.EventStore.Contracts.Commands;
+using Hexalith.EventStore.Contracts.Serialization;
 using Hexalith.EventStore.DomainService;
 
 namespace Hexalith.Agents.EventStore;
@@ -25,7 +26,7 @@ internal sealed class AutomaticInteractionIdempotencyIntentAdapter<TCommand> : I
     {
         ArgumentNullException.ThrowIfNull(command);
         if (command.Domain != _domain || command.CommandType != CommandType) { throw new ArgumentException("CommandIntentMismatch", nameof(command)); }
-        TCommand declared = JsonSerializer.Deserialize<TCommand>(command.Payload) ?? throw new ArgumentException("InvalidCommandPayload", nameof(command));
+        TCommand declared = JsonSerializer.Deserialize<TCommand>(command.Payload, EventStorePayloadSerialization.Options) ?? throw new ArgumentException("InvalidCommandPayload", nameof(command));
         JsonObject normalized = JsonSerializer.SerializeToNode(declared)!.AsObject();
         normalized.Remove("ExpectedRevision");
         if (normalized["Fact"] is JsonObject fact) { fact.Remove("Revision"); }

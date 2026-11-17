@@ -1151,20 +1151,8 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     [Fact]
     public async Task RegisteredAutomaticAdaptersIgnoreRevisionRestampsAndRetainBusinessProtectedAndAuthorityIntent()
     {
-        var fixture = new AutomaticInteractionReplayFixture(); await fixture.StartAsync();
-        var p = fixture.Directory!.Permits[fixture.InteractionId].Permit;
-        var lease = fixture.Directory.Leases.Values.Single();
-        var fact = new AutomaticInteractionFact(AutomaticInteractionStep.ProviderInvocationAuthorized, new string('b', 64), AutomaticInteractionOutcome.Authorized, 11,
-            lease.LeaseId, lease.CommitRevision, OutputAuthority: new(1, new string('c', 64), AgentInteractionStatus.GenerationFailed, "reason", "metric", "disposition", 1, new string('d', 64)));
-        object[] commands =
-        [
-            new RegisterInteractionPermit(p, 10), new AcknowledgeInteractionCreation(p.AgentInteractionId, p.PermitId, p.CreationOutboxId, 1, 10),
-            new AcquireConversationEffectLease(lease, 10), new CommitConversationEffect(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, 10),
-            new SettleConversationEffectLease(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, lease.CommitRevision, 11, 10),
-            new CancelConversationEffectLease(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, 10),
-            new EnterConversationDeletionClosing(p.TenantId, p.ConversationId, new string('e', 64), 10),
-            new CreatePermittedAgentInteraction(p, 1, 0), new RecordAutomaticInteractionStep(p.TenantId, p.AgentInteractionId, fact, 10),
-        ];
+        object[] commands = await AutomaticCommandsAsync();
+        var p = ((RegisterInteractionPermit)commands[0]).Permit;
         var registry = Registry();
         foreach (object command in commands)
         {
@@ -1200,6 +1188,114 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
     }
 
     [Theory]
+    [InlineData("PascalCase")]
+    [InlineData("camelCase")]
+    [InlineData("mixedCase")]
+    public async Task RegisteredAutomaticAdaptersBindEveryDeclaredCasingAndPreserveOpaqueProtectedValues(string casing)
+    {
+        var registry = Registry();
+        foreach (object command in await AutomaticCommandsAsync())
+        {
+            var payload = JsonSerializer.SerializeToNode(command, command.GetType())!.AsObject();
+            var submission = AutomaticSubmission(command, payload);
+            byte[] original = registry.Resolve(submission).CanonicalIntent;
+            var alternate = SpellDeclaredMembers(payload, casing);
+            byte[] canonical = registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(alternate) }).CanonicalIntent;
+            canonical.ShouldBe(original, command.GetType().Name + "/" + casing);
+            using var normalized = JsonDocument.Parse(canonical);
+            normalized.RootElement.TryGetProperty("ExpectedRevision", out _).ShouldBeFalse();
+            var changed = payload.DeepClone().AsObject();
+            if (changed["Permit"] is JsonObject permit) { permit["RequestDigest"] = new string('f', 64); }
+            else if (changed["Lease"] is JsonObject lease) { lease["OperationIdentity"] = new string('f', 64); }
+            else if (changed["Fact"] is JsonObject fact) { fact["OperationId"] = new string('f', 64); }
+            else if (changed.ContainsKey("DeletionRequestId")) { changed["DeletionRequestId"] = new string('f', 64); }
+            else { changed["AgentInteractionId"] = "changed-business-id"; }
+            registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(SpellDeclaredMembers(changed, casing)) }).CanonicalIntent.ShouldNotBe(original);
+            foreach (string protectedMember in new[] { "Permit", "Fact" })
+            {
+                string contentMember = protectedMember == "Permit" ? "Request" : "Output";
+                if (payload[protectedMember]?[contentMember] is not JsonObject content) { continue; }
+                var canonicalContent = normalized.RootElement.GetProperty(protectedMember).GetProperty(contentMember);
+                canonicalContent.GetProperty("Value").GetRawText().ShouldBe(content["Value"]!.ToJsonString(new JsonSerializerOptions { WriteIndented = false }));
+                var opaqueChange = payload.DeepClone().AsObject();
+                opaqueChange[protectedMember]![contentMember]!["Value"]!["FixtureSealed"] = "changed-ciphertext";
+                registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(SpellDeclaredMembers(opaqueChange, casing)) }).CanonicalIntent.ShouldNotBe(original);
+            }
+            var invalid = payload.DeepClone().AsObject(); invalid["ExpectedRevision"] = new JsonObject { ["Invalid"] = 1 };
+            foreach (byte[] malformed in new[] { "{"u8.ToArray(), "[]"u8.ToArray(), "null"u8.ToArray(), JsonSerializer.SerializeToUtf8Bytes(SpellDeclaredMembers(invalid, casing)) })
+            {
+                Should.Throw<Exception>(() => registry.Resolve(submission with { Payload = malformed }));
+            }
+        }
+    }
+
+    [Theory]
+    [InlineData("PascalCase")]
+    [InlineData("camelCase")]
+    [InlineData("mixedCase")]
+    public async Task RegisteredAutomaticAdaptersRetainEachBusinessRevisionUnderEveryWireSpelling(string casing)
+    {
+        object[] commands = await AutomaticCommandsAsync();
+        var registry = Registry();
+        (string CommandType, string? Parent, string Member)[] revisions =
+        [
+            (nameof(AcquireConversationEffectLease), "Lease", "CommitRevision"),
+            (nameof(AcquireConversationEffectLease), "Lease", "ResultRevision"),
+            (nameof(SettleConversationEffectLease), null, "CommitRevision"),
+            (nameof(SettleConversationEffectLease), null, "ResultRevision"),
+            (nameof(CreatePermittedAgentInteraction), null, "PermitRevision"),
+            (nameof(AcknowledgeInteractionCreation), null, "InteractionCreationRevision"),
+            (nameof(RecordAutomaticInteractionStep), "Fact", "LeaseCommitRevision"),
+        ];
+        foreach (var revision in revisions)
+        {
+            object command = commands.Single(c => c.GetType().Name == revision.CommandType);
+            var payload = JsonSerializer.SerializeToNode(command, command.GetType())!.AsObject();
+            var submission = AutomaticSubmission(command, SpellDeclaredMembers(payload, casing));
+            byte[] original = registry.Resolve(submission).CanonicalIntent;
+            var changed = payload.DeepClone().AsObject();
+            JsonObject owner = revision.Parent is null ? changed : changed[revision.Parent]!.AsObject();
+            owner[revision.Member] = owner[revision.Member]!.GetValue<long>() + 1;
+            registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(SpellDeclaredMembers(changed, casing)) }).CanonicalIntent.ShouldNotBe(original, revision.CommandType + "/" + revision.Member);
+            var restamped = payload.DeepClone().AsObject(); restamped["ExpectedRevision"] = 999;
+            registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(SpellDeclaredMembers(restamped, casing)) }).CanonicalIntent.ShouldBe(original);
+            if (payload["Fact"] is JsonObject)
+            {
+                restamped = payload.DeepClone().AsObject(); restamped["Fact"]!["Revision"] = 1000;
+                registry.Resolve(submission with { Payload = JsonSerializer.SerializeToUtf8Bytes(SpellDeclaredMembers(restamped, casing)) }).CanonicalIntent.ShouldBe(original);
+            }
+        }
+    }
+
+    private static JsonObject SpellDeclaredMembers(JsonObject payload, string casing)
+    {
+        var spelled = new JsonObject();
+        foreach (var member in payload)
+        {
+            string key = casing switch
+            {
+                "camelCase" => char.ToLowerInvariant(member.Key[0]) + member.Key[1..],
+                "mixedCase" => string.Concat(member.Key.Select((c, i) => i % 2 == 0 ? char.ToLowerInvariant(c) : char.ToUpperInvariant(c))),
+                _ => member.Key,
+            };
+            // ProtectedContent.Value is opaque JSON; only declared contract members are respelled.
+            spelled[key] = member.Key != "Value" && member.Value is JsonObject child ? SpellDeclaredMembers(child, casing) : member.Value?.DeepClone();
+        }
+        return spelled;
+    }
+
+    private static SubmitCommand AutomaticSubmission(object command, JsonObject payload)
+    {
+        var fixture = new AutomaticInteractionReplayFixture();
+        var p = fixture.Request;
+        string domain = command is CreatePermittedAgentInteraction or RecordAutomaticInteractionStep ? "agent-interaction" : ConversationAgentStateIdentity.Domain;
+        string authority = command is EnterConversationDeletionClosing ? ConversationAgentStateIdentity.DeletionAuthority : ConversationAgentStateIdentity.WorkflowAuthority;
+        return new SubmitCommand("message", p.TenantId, domain,
+            domain == "agent-interaction" ? fixture.InteractionId : ConversationAgentStateIdentity.Directory(p.TenantId, p.ConversationId), command.GetType().Name,
+            JsonSerializer.SerializeToUtf8Bytes(payload), "correlation", "workflow", new() { [authority] = "true" });
+    }
+
+    [Theory]
     [InlineData("conversation-agent-state", nameof(RegisterInteractionPermit), ConversationAgentStateIdentity.WorkflowAuthority)]
     [InlineData("conversation-agent-state", nameof(AcknowledgeInteractionCreation), ConversationAgentStateIdentity.WorkflowAuthority)]
     [InlineData("conversation-agent-state", nameof(AcquireConversationEffectLease), ConversationAgentStateIdentity.WorkflowAuthority)]
@@ -1229,6 +1325,86 @@ public sealed class AgentsEventStoreGatewayIntegrationTests
         policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, ["other-domain", commandType, key]).ShouldBe(false);
         policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, [domain, commandType, key.ToUpperInvariant()]).ShouldBe(false);
         policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!.Invoke(policy, [domain, "OtherCommand", key]).ShouldBe(false);
+    }
+
+    [Theory]
+    [InlineData("conversation-agent-state", nameof(RegisterInteractionPermit))]
+    [InlineData("conversation-agent-state", nameof(AcknowledgeInteractionCreation))]
+    [InlineData("conversation-agent-state", nameof(AcquireConversationEffectLease))]
+    [InlineData("conversation-agent-state", nameof(CommitConversationEffect))]
+    [InlineData("conversation-agent-state", nameof(SettleConversationEffectLease))]
+    [InlineData("conversation-agent-state", nameof(CancelConversationEffectLease))]
+    [InlineData("conversation-agent-state", nameof(EnterConversationDeletionClosing))]
+    [InlineData("agent-interaction", nameof(CreatePermittedAgentInteraction))]
+    [InlineData("agent-interaction", nameof(RecordAutomaticInteractionStep))]
+    public void AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(string domain, string commandType)
+    {
+        const string key = "trust:deliveryNonce";
+        const string nonce = "delivery-nonce";
+        var proof = Substitute.For<IAgentsTrustedCommandProofReader>();
+        var services = new ServiceCollection(); services.AddAgentsEventStore(AgentsAppId, proof);
+        using var provider = services.BuildServiceProvider(); var policy = provider.GetRequiredService<ITrustedCommandExtensionPolicy>();
+        var principal = Principal(DaprInternalAuthenticationOptions.SchemeName, AgentsAppId);
+        var request = Request(domain, commandType);
+        var claims = policy.GetType().GetMethod("Claims", BindingFlags.Instance | BindingFlags.Public)!;
+        claims.Invoke(policy, [domain, commandType, key]).ShouldBe(true);
+        claims.Invoke(policy, ["other-domain", commandType, key]).ShouldBe(false);
+        claims.Invoke(policy, [domain, "OtherCommand", key]).ShouldBe(false);
+        claims.Invoke(policy, [domain, commandType, "TRUST:deliveryNonce"]).ShouldBe(false);
+        claims.Invoke(policy, [domain, commandType, "trust:"]).ShouldBe(false);
+        policy.Accepts(principal, request, key, nonce).ShouldBeFalse();
+        void Admit(ClaimsPrincipal actor, SubmitCommandRequest submission, string extensionKey, string value)
+            => proof.HasAdmittedProof(Arg.Is<ClaimsPrincipal>(p => ReferenceEquals(p, actor)), Arg.Is<SubmitCommandRequest>(r => ReferenceEquals(r, submission)), extensionKey, value).Returns(true);
+        Admit(principal, request, key, nonce);
+        policy.Accepts(principal, request, key, nonce).ShouldBeTrue();
+        // The proof binds all four exact inputs; a changed admitted delivery is not reusable.
+        policy.Accepts(principal, request with { AggregateId = "another-owner" }, key, nonce).ShouldBeFalse();
+        policy.Accepts(principal, request with { Payload = "{}"u8.ToArray() }, key, nonce).ShouldBeFalse();
+        policy.Accepts(principal, request, key, "another-nonce").ShouldBeFalse();
+        policy.Accepts(principal, request, "trust:DeliveryNonce", nonce).ShouldBeFalse();
+        foreach (string value in new[] { "", " ", "\t\r\n" })
+        {
+            Admit(principal, request, key, value);
+            policy.Accepts(principal, request, key, value).ShouldBeFalse();
+        }
+        foreach (string invalidKey in new[] { "TRUST:deliveryNonce", "trust:" })
+        {
+            Admit(principal, request, invalidKey, nonce);
+            policy.Accepts(principal, request, invalidKey, nonce).ShouldBeFalse();
+        }
+        foreach (var wrongRoute in new[] { request with { Domain = "other-domain" }, request with { CommandType = "OtherCommand" } })
+        {
+            Admit(principal, wrongRoute, key, nonce);
+            policy.Accepts(principal, wrongRoute, key, nonce).ShouldBeFalse();
+        }
+        foreach (var caller in new[]
+        {
+            Principal("Bearer", AgentsAppId), Principal(DaprInternalAuthenticationOptions.SchemeName, "other-app"),
+            Principal(null!, AgentsAppId), new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", "system:agents")], DaprInternalAuthenticationOptions.SchemeName)),
+        })
+        {
+            Admit(caller, request, key, nonce);
+            policy.Accepts(caller, request, key, nonce).ShouldBeFalse();
+        }
+        policy.Accepts(principal, request, key, nonce).ShouldBeTrue();
+    }
+
+    private static async Task<object[]> AutomaticCommandsAsync()
+    {
+        var fixture = new AutomaticInteractionReplayFixture(); await fixture.StartAsync();
+        var p = fixture.Directory!.Permits[fixture.InteractionId].Permit;
+        var lease = fixture.Directory.Leases.Values.Single();
+        var fact = new AutomaticInteractionFact(AutomaticInteractionStep.ProviderInvocationAuthorized, new string('b', 64), AutomaticInteractionOutcome.Authorized, 11,
+            lease.LeaseId, lease.CommitRevision, OutputAuthority: new(1, new string('c', 64), AgentInteractionStatus.GenerationFailed, "reason", "metric", "disposition", 1, new string('d', 64)), Output: p.Request);
+        return
+        [
+            new RegisterInteractionPermit(p, 10), new AcknowledgeInteractionCreation(p.AgentInteractionId, p.PermitId, p.CreationOutboxId, 1, 10),
+            new AcquireConversationEffectLease(lease, 10), new CommitConversationEffect(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, 10),
+            new SettleConversationEffectLease(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, lease.CommitRevision, 11, 10),
+            new CancelConversationEffectLease(lease.LeaseId, p.AgentInteractionId, p.AgentInteractionId, 10),
+            new EnterConversationDeletionClosing(p.TenantId, p.ConversationId, new string('e', 64), 10),
+            new CreatePermittedAgentInteraction(p, 1, 0), new RecordAutomaticInteractionStep(p.TenantId, p.AgentInteractionId, fact, 10),
+        ];
     }
 
     private static IdempotencyIntentAdapterRegistry Registry(string tenantId = "tenant-a")
