@@ -1,0 +1,577 @@
+{
+  "date": "2026-11-17",
+  "approvedBaseline": "492a0217dfa08f1dc57b5d24840a257c1bd30861",
+  "evidenceLevel": 2,
+  "initialVerification": {
+    "date": "2026-11-17",
+    "approvedBaseline": "492a0217dfa08f1dc57b5d24840a257c1bd30861",
+    "evidenceLevel": 2,
+    "codeSha256": {
+      "src/Hexalith.Agents.EventStore/AutomaticInteractionIdempotencyIntentAdapter.cs": "6a672df4ba8c125479bd947a06bbcf4d6d851325c61c439e1c3dbe6e4f5f82e2",
+      "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "7f71cfc1789eacd698fc89e65f80fd37916c92f962d87bf4df15361d4e6e3d27",
+      "test/Hexalith.Agents.Tests/ConversationDirectoryTestData.cs": "52caa8ee8b143f99e1a2658ebd9175fe376dc4d95943b07bb83ba3b3073dc9ef",
+      "test/Hexalith.Agents.Tests/InteractionCommandAuthorityTests.cs": "e3a66d9f07ff38d6a7810fd0d8f53ce42d780f61e4c47cb2b3dbeef75ba58073",
+      "test/Hexalith.Agents.Tests/AutomaticInteractionPhaseGuardTests.cs": "a49f2d31f8256e919c03b8c59293898305361cc2ba97edd32cf46517f99cdf78"
+    },
+    "consumedRevisions": {
+      ".": "fcb51cad0178b1cf60b8d8be8410cd1f938116ac",
+      "references/Hexalith.AI.Tools": "cfd1ebea92587cdea41b9aa2cff47358bf2f32f6",
+      "references/Hexalith.Commons": "49187d47da882d5470deac982bb383486c90202c",
+      "references/Hexalith.PolymorphicSerializations": "2cbec6a66e2174adc7c5d431c1b1f0d28abd5647",
+      "references/Hexalith.Conversations": "4ab8f9060d9d16302c1132734f0b234b4489b8a5",
+      "references/Hexalith.EventStore": "3b2350e7c1fff640131f8101596c78a59e31a03f",
+      "references/Hexalith.Memories": "68a78d475c7ae8b77193e308dfb8c8f5e4cc0826",
+      "references/Hexalith.Tenants": "ac7b6ba9edd88c197701fa1d1503cf2743ee022a",
+      "references/Hexalith.Parties": "d0a01fbadc5c6d9df56a39e6b1e4e831df9bdfd1",
+      "references/Hexalith.Builds": "717e5ab29569fc57b0f43415f1aee2fc93441859",
+      "references/Hexalith.FrontComposer": "66250f89230e1b261b51ce873c83d96176a9d325",
+      "references/Hexalith.McpCli": "c9ffbd5c9f6bc100ecbf6ac13acf4fbe50a498a9",
+      "references/Hexalith.Platform": "8ccb479e391564ce982309f106504cf8329c0a43"
+    },
+    "sourceStability": {
+      "checkedCodeAndBuildInputs": 1061,
+      "changedDuringVerification": []
+    },
+    "runs": {
+      "sourceDomainFocused": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/domain-source-focused.xml",
+        "sha256": "851aa6406f4c32976a6b44fce9870f53d18b9a4f1af313a78d85bf99ac5c7086",
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "sourceDomainFull": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/domain-source-full.xml",
+        "sha256": "31739afaf2cacc359a4e6761eecd6e8b506293feace6ab29ceb0a160d0b1eb8d",
+        "total": 1075,
+        "passed": 1075,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageDomainFocused": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/domain-focused.xml",
+        "sha256": "cad0f85abb01a06889d11df5e816f8ceaa3340ba0f5af8f039aa2a183c7db7f4",
+        "total": 28,
+        "passed": 28,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageServerFocused": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/server-focused.xml",
+        "sha256": "99009b8d1156ff22fa8aa5ba775dd653b7206e2c17e29a5cce24c30e96d3e7af",
+        "total": 25,
+        "passed": 25,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "baselineReaderCasing": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/baseline-casing.xml",
+        "sha256": "21fc597a4fa86f91d3382f8a1ef60661126a818884c017919e096fc8b26defe9",
+        "total": 3,
+        "passed": 1,
+        "failed": 2,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageContracts": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/package/package/Hexalith.Agents.Contracts.Tests.xml",
+        "sha256": "e11188a70c187b12902dbc67127799cc9ca69c177b6dd9fc6f030b45e269ca2a",
+        "total": 2005,
+        "passed": 2005,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageClient": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/package/package/Hexalith.Agents.Client.Tests.xml",
+        "sha256": "facccd9a54ab80089bfa9282be4828cbf61435d6095b4807c8a7424f6755a963",
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageDomain": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/package/package/Hexalith.Agents.Tests.xml",
+        "sha256": "d8cbee3ea0845af8cd10090cd19e1359c969301651d9fd458db958cf3652e6b6",
+        "total": 1075,
+        "passed": 1075,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageServer": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/implementation-02/package/package/Hexalith.Agents.Server.Tests.xml",
+        "sha256": "44ae3578650b48f1afca34bf7180ef31ee2155715307efa816c04d9b19a01e54",
+        "total": 2059,
+        "passed": 2058,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "packageUiContinuation": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/ui-continuation-03/ui-full.xml",
+        "sha256": "cb25ecbf9e1fc47a7baa0d91dd39b55ebff9ab58752dc5f46963421a89e631b6",
+        "total": 1362,
+        "passed": 1362,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "cleanBaselineAudit": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/baseline-audit-04/audit.xml",
+        "sha256": "f7b42bfafafb6710c18d3ee207b97c2f3e53d74372e4a5913ef3f7cb4f2f4935",
+        "total": 1,
+        "passed": 0,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "focusedNativeCases": [
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"RegisterInteractionPermit\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"AcknowledgeInteractionCreation\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"AcquireConversationEffectLease\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"CommitConversationEffect\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"SettleConversationEffectLease\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"CancelConversationEffectLease\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"EnterConversationDeletionClosing\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"CreatePermittedAgentInteraction\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.InteractionCommandAuthorityTests.CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects(commandType: \\\"RecordAutomaticInteractionStep\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"expected-revision\\\", reason: StaleRevision)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-digest\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-alias\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-interaction\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-tenant\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-missing\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"authority-misplaced\\\", reason: InvalidAuthority)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"authority-status\\\", reason: InvalidAuthority)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-key-version\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"authority-digest\\\", reason: InvalidAuthority)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"authority-missing\\\", reason: InvalidAuthority)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"lease-foreign\\\", reason: LeaseCommitRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"lease-missing\\\", reason: LeaseCommitRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"lease-negative\\\", reason: LeaseCommitRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"lease-zero\\\", reason: LeaseCommitRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"ordering\\\", reason: InvalidPhase)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"fact-revision\\\", reason: StaleRevision)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"authority-revision\\\", reason: InvalidAuthority)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Tests.AutomaticInteractionPhaseGuardTests.InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(invalid: \\\"output-misplaced\\\", reason: ProtectedContentRequired)",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersRetainEachBusinessRevisionUnderEveryWireSpelling(casing: \\\"PascalCase\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersRetainEachBusinessRevisionUnderEveryWireSpelling(casing: \\\"camelCase\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersRetainEachBusinessRevisionUnderEveryWireSpelling(casing: \\\"mixedCase\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersIgnoreRevisionRestampsAndRetainBusinessProtectedAndAuthorityIntent",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"RegisterInteractionPermit\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"AcknowledgeInteractionCreation\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"AcquireConversationEffectLease\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"CommitConversationEffect\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"SettleConversationEffectLease\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"CancelConversationEffectLease\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"conversation-agent-state\\\", commandType: \\\"EnterConversationDeletionClosing\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"agent-interaction\\\", commandType: \\\"CreatePermittedAgentInteraction\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload(domain: \\\"agent-interaction\\\", commandType: \\\"RecordAutomaticInteractionStep\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersBindEveryDeclaredCasingAndPreserveOpaqueProtectedValues(casing: \\\"PascalCase\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersBindEveryDeclaredCasingAndPreserveOpaqueProtectedValues(casing: \\\"camelCase\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.RegisteredAutomaticAdaptersBindEveryDeclaredCasingAndPreserveOpaqueProtectedValues(casing: \\\"mixedCase\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"RegisterInteractionPermit\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"AcknowledgeInteractionCreation\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"AcquireConversationEffectLease\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"CommitConversationEffect\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"SettleConversationEffectLease\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"CancelConversationEffectLease\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"conversation-agent-state\\\", commandType: \\\"EnterConversationDeletionClosing\\\", key: \\\"actor:conversationDeletionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"agent-interaction\\\", commandType: \\\"CreatePermittedAgentInteraction\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      },
+      {
+        "name": "Hexalith.Agents.Server.Tests.AgentsEventStoreGatewayIntegrationTests.AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue(domain: \\\"agent-interaction\\\", commandType: \\\"RecordAutomaticInteractionStep\\\", key: \\\"actor:interactionWorkflow\\\")",
+        "result": "Pass"
+      }
+    ],
+    "packageGate": {
+      "command": "pwsh -NoLogo -NoProfile -File eng/verify-story-6.1.ps1 -Mode Local -DependencyMode Package -ArtifactsPath /home/administrator/verification/agents-command-admission-20261117/implementation-02/package",
+      "exit": 1,
+      "failure": "BuildContractConformanceTests.OrdinaryReleaseShouldRejectAllAuditFindings",
+      "reason": "Consumed Builds Props/Directory.Packages.props exempts NU1901 and NU1902; reproduced unchanged on clean approved baseline.",
+      "ui": "Executed independently after verifier stopped at Server; same code/build inputs verified."
+    },
+    "sourceServerBlocker": "Conversations requires the Platform tool-selected source mapping; validation does not resolve dependency mappings.",
+    "reproductionScripts": [
+      "/home/administrator/verification/agents-command-admission-20261117/implementation-02/run.sh",
+      "/home/administrator/verification/agents-command-admission-20261117/ui-continuation-03/run.sh",
+      "/home/administrator/verification/agents-command-admission-20261117/baseline-audit-04/run.sh"
+    ],
+    "independentReviewAndDelivery": "Coordinator-owned; not performed in implementation handoff."
+  },
+  "reviewCorrections": {
+    "focusedRuns": {
+      "domain": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/review-fixes-05/domain.xml",
+        "sha256": "f5e28383263dc4d439963920398e983d6f1285c4461055a6a28bd871d1b71cc5",
+        "total": 37,
+        "passed": 37,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      },
+      "server": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/review-fixes-06/server.xml",
+        "sha256": "ff52d0474b3ba9bb9d04474efcf69787ace527b7b2e874b85dc8c9e2101d0cdf",
+        "total": 11,
+        "passed": 11,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0
+      }
+    },
+    "triage": "Nine patch findings fixed; one unverified historical descriptor qualification deferred; edge-case and verification-gap reviews returned no findings."
+  },
+  "finalVerification": {
+    "codeSha256": {
+      "src/Hexalith.Agents.EventStore/AutomaticInteractionIdempotencyIntentAdapter.cs": "6a672df4ba8c125479bd947a06bbcf4d6d851325c61c439e1c3dbe6e4f5f82e2",
+      "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "32ecb8b44fd8cf6042ae5388e1721f6136c4f5400b1849603f16200001e6e8c2",
+      "test/Hexalith.Agents.Tests/AutomaticInteractionPhaseGuardTests.cs": "3cc4fae96174fae780df056f64552c8b04ad7b1ff79124c8e5c7250c4296b38e",
+      "test/Hexalith.Agents.Tests/ConversationDirectoryTestData.cs": "52caa8ee8b143f99e1a2658ebd9175fe376dc4d95943b07bb83ba3b3073dc9ef",
+      "test/Hexalith.Agents.Tests/InteractionCommandAuthorityTests.cs": "dbf5d38646b7e406919b6beb1643fe04bc9ede94c2f0f6706acda949e34312bf"
+    },
+    "runs": {
+      "Hexalith.Agents.Tests": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/final-owning-suites/Hexalith.Agents.Tests.xml",
+        "sha256": "49eea49193cdd3acc44a82fddbeee618d1c4145e7263415ab75302d98ccb80d6",
+        "total": 1084,
+        "passed": 1084,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "failures": [],
+        "nativeExit": 0
+      },
+      "Hexalith.Agents.Server.Tests": {
+        "results": "/home/administrator/verification/agents-command-admission-20261117/final-owning-suites/Hexalith.Agents.Server.Tests.xml",
+        "sha256": "122ff3cfbedc52376ca4c9977b395bdc148b5125b1767e2f4d4eca7903b6c03b",
+        "total": 2063,
+        "passed": 2062,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 0,
+        "not-run": 0,
+        "failures": [
+          "Hexalith.Agents.Server.Tests.BuildContractConformanceTests.OrdinaryReleaseShouldRejectAllAuditFindings"
+        ],
+        "nativeExit": 1
+      }
+    },
+    "requiredPassingMethods": {
+      "RegisteredAutomaticAdaptersIgnoreRevisionRestampsAndRetainBusinessProtectedAndAuthorityIntent": 1,
+      "RegisteredAutomaticAdaptersBindEveryDeclaredCasingAndPreserveOpaqueProtectedValues": 3,
+      "RegisteredAutomaticAdaptersRetainEachBusinessRevisionUnderEveryWireSpelling": 3,
+      "RegisteredAutomaticAdaptersAgreeWithSdkOnQuotedBusinessAndTransportRevisions": 3,
+      "RegisteredAutomaticAdaptersExcludeAdmittedDeliveryNoncesButRetainActorAuthority": 1,
+      "AutomaticDeliveryMetadataRequiresGovernedRouteExactProofAndAuthenticatedAgentsWorkload": 9,
+      "AutomaticAuthorityRequiresExactAdmittedPrincipalCommandKeyAndValue": 9,
+      "CorrectAuthorityAcceptsWhileMissingAndOtherActorKeysRejectWithoutBusinessEffects": 9,
+      "InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange": 28
+    },
+    "requiredPassingCases": 66,
+    "changedDuringVerification": [],
+    "combinedPackageSuites": {
+      "total": 6521,
+      "passed": 6520,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0,
+      "not-run": 0,
+      "unchangedSuites": [
+        "Contracts: 2005/2005",
+        "Client: 7/7",
+        "UI: 1362/1362"
+      ]
+    }
+  },
+  "coordinatorChecks": {
+    "buildAndPackageAuthority": {
+      "root": "fcb51cad0178b1cf60b8d8be8410cd1f938116ac",
+      "builds": "717e5ab29569fc57b0f43415f1aee2fc93441859",
+      "codeSha256": {
+        "src/Hexalith.Agents.EventStore/AutomaticInteractionIdempotencyIntentAdapter.cs": "6a672df4ba8c125479bd947a06bbcf4d6d851325c61c439e1c3dbe6e4f5f82e2",
+        "test/Hexalith.Agents.Server.Tests/AgentsEventStoreGatewayIntegrationTests.cs": "7f71cfc1789eacd698fc89e65f80fd37916c92f962d87bf4df15361d4e6e3d27",
+        "test/Hexalith.Agents.Tests/ConversationDirectoryTestData.cs": "52caa8ee8b143f99e1a2658ebd9175fe376dc4d95943b07bb83ba3b3073dc9ef",
+        "test/Hexalith.Agents.Tests/InteractionCommandAuthorityTests.cs": "e3a66d9f07ff38d6a7810fd0d8f53ce42d780f61e4c47cb2b3dbeef75ba58073",
+        "test/Hexalith.Agents.Tests/AutomaticInteractionPhaseGuardTests.cs": "a49f2d31f8256e919c03b8c59293898305361cc2ba97edd32cf46517f99cdf78"
+      },
+      "exits": {
+        "solution-build": 0,
+        "existing-ci-pin": 1,
+        "package-authority": 0
+      }
+    },
+    "commitlint": {
+      "exit": 0,
+      "messageFile": "/home/administrator/verification/agents-command-admission-20261117/coordinator-checks/commit-message.txt"
+    },
+    "rootSubmodules": {
+      "references/Hexalith.AI.Tools": {
+        "head": "cfd1ebea92587cdea41b9aa2cff47358bf2f32f6",
+        "remoteMain": "cfd1ebea92587cdea41b9aa2cff47358bf2f32f6",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Commons": {
+        "head": "49187d47da882d5470deac982bb383486c90202c",
+        "remoteMain": "49187d47da882d5470deac982bb383486c90202c",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.PolymorphicSerializations": {
+        "head": "2cbec6a66e2174adc7c5d431c1b1f0d28abd5647",
+        "remoteMain": "2cbec6a66e2174adc7c5d431c1b1f0d28abd5647",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Conversations": {
+        "head": "4ab8f9060d9d16302c1132734f0b234b4489b8a5",
+        "remoteMain": "4ab8f9060d9d16302c1132734f0b234b4489b8a5",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.EventStore": {
+        "head": "3b2350e7c1fff640131f8101596c78a59e31a03f",
+        "remoteMain": "3b2350e7c1fff640131f8101596c78a59e31a03f",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Memories": {
+        "head": "68a78d475c7ae8b77193e308dfb8c8f5e4cc0826",
+        "remoteMain": "68a78d475c7ae8b77193e308dfb8c8f5e4cc0826",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Tenants": {
+        "head": "ac7b6ba9edd88c197701fa1d1503cf2743ee022a",
+        "remoteMain": "ac7b6ba9edd88c197701fa1d1503cf2743ee022a",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Parties": {
+        "head": "d0a01fbadc5c6d9df56a39e6b1e4e831df9bdfd1",
+        "remoteMain": "d0a01fbadc5c6d9df56a39e6b1e4e831df9bdfd1",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Builds": {
+        "head": "717e5ab29569fc57b0f43415f1aee2fc93441859",
+        "remoteMain": "a1e0c310b1f1a50d78e6132890fae6bcba769f6d",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.FrontComposer": {
+        "head": "66250f89230e1b261b51ce873c83d96176a9d325",
+        "remoteMain": "66250f89230e1b261b51ce873c83d96176a9d325",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.McpCli": {
+        "head": "c9ffbd5c9f6bc100ecbf6ac13acf4fbe50a498a9",
+        "remoteMain": "c9ffbd5c9f6bc100ecbf6ac13acf4fbe50a498a9",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      },
+      "references/Hexalith.Platform": {
+        "head": "8ccb479e391564ce982309f106504cf8329c0a43",
+        "remoteMain": "8ccb479e391564ce982309f106504cf8329c0a43",
+        "dirty": "",
+        "fetchExit": 0,
+        "publishedAncestor": true
+      }
+    }
+  },
+  "delivery": {
+    "status": "User explicitly instructed push all changes to main after disclosure of the baseline audit-policy and CI pin failures; authorized delivery proceeds without weakening either gate. Exact commit and remote delivery are recorded in Git.",
+    "existingCiPinExpected": "264e17d3185c87b72b0757dd66a13040793756bb",
+    "existingCiPinActual": "717e5ab29569fc57b0f43415f1aee2fc93441859"
+  }
+}

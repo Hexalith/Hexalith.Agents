@@ -1027,3 +1027,11 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-workflow-hardening-items.md`
   summary: Qualify noncooperative automatic-interaction owner reads against an accepted operation deadline before claiming a wall-clock recovery bound.
   evidence: Review BH-1 confirms that both baseline and current initial/refresh owner reads can await a noncooperative host indefinitely; the new observer bounds 64 completed polls and pacing only. Default readers refuse EXT-HOST-1 immediately, and no accepted live reader is supplied. The owner must define the shared operation budget/cancellation and resource-reclamation contract and qualify never-completing readers before making a wall-clock claim. No local host timeout policy is invented by this batch.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-command-admission-and-replay-items.md`
+  summary: Qualify retained pre-fix camelCase automatic-command descriptors before claiming upgrade retry compatibility.
+  evidence: Review BH-1: the former case-sensitive reader computes different intent for camelCase, while the inspected InteractionCommandDispatch writes PascalCase. No accepted installed host or retained camelCase inventory is supplied. An owner inventory and exact retained-descriptor retry must settle exposure; do not invent compatibility for ambiguous old intents.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-five-deferred-command-admission-and-replay-items.md`
+  summary: Reconcile the Agents all-severity audit contract with the shared Builds catalog exemptions before claiming a green package gate.
+  evidence: Builds 717e5ab29569fc57b0f43415f1aee2fc93441859 exempts NU1901 and NU1902 in Props/Directory.Packages.props. BuildContractConformanceTests.OrdinaryReleaseShouldRejectAllAuditFindings fails both with the five patches and clean Agents baseline 492a0217dfa08f1dc57b5d24840a257c1bd30861, with identical policy-input hashes. No audit/test was weakened; shared-owner reconciliation is separate from the five command patches.

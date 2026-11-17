@@ -23,6 +23,15 @@ public sealed class AutomaticInteractionPhaseGuardTests
     [InlineData("authority-revision", AutomaticInteractionRejectionReason.InvalidAuthority)]
     [InlineData("authority-digest", AutomaticInteractionRejectionReason.InvalidAuthority)]
     [InlineData("authority-status", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("authority-catalog-revision", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("authority-observation", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("authority-reason", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("authority-metric", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("authority-disposition", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("authority-undefined-status", AutomaticInteractionRejectionReason.InvalidAuthority)]
+    [InlineData("lease-other-phase", AutomaticInteractionRejectionReason.LeaseCommitRequired)]
+    [InlineData("content-digest-misplaced", AutomaticInteractionRejectionReason.ProtectedContentRequired)]
+    [InlineData("digest-key-version-misplaced", AutomaticInteractionRejectionReason.ProtectedContentRequired)]
     [InlineData("authority-misplaced", AutomaticInteractionRejectionReason.InvalidAuthority)]
     [InlineData("output-missing", AutomaticInteractionRejectionReason.ProtectedContentRequired)]
     [InlineData("output-tenant", AutomaticInteractionRejectionReason.ProtectedContentRequired)]
@@ -33,7 +42,8 @@ public sealed class AutomaticInteractionPhaseGuardTests
     [InlineData("output-misplaced", AutomaticInteractionRejectionReason.ProtectedContentRequired)]
     public void InvalidFactRejectsForItsOwnReasonAndReplaysWithoutAcceptedPhaseChange(string invalid, AutomaticInteractionRejectionReason reason)
     {
-        var target = invalid.StartsWith("authority-", StringComparison.Ordinal) && invalid != "authority-misplaced"
+        ArgumentNullException.ThrowIfNull(invalid);
+        var target = invalid == "lease-other-phase" ? AutomaticInteractionStep.ProviderInvocationAuthorized : invalid.StartsWith("authority-", StringComparison.Ordinal) && invalid != "authority-misplaced"
             ? AutomaticInteractionStep.ProviderInvocationAuthorized
             : invalid.StartsWith("output-", StringComparison.Ordinal) && invalid != "output-misplaced"
                 ? AutomaticInteractionStep.GeneratedVersionRecorded : invalid == "ordering"
@@ -53,6 +63,16 @@ public sealed class AutomaticInteractionPhaseGuardTests
             "authority-revision" => valid with { OutputAuthority = valid.OutputAuthority! with { DecisionRevision = 0 } },
             "authority-digest" => valid with { OutputAuthority = valid.OutputAuthority! with { ContractDigest = "invalid" } },
             "authority-status" => valid with { OutputAuthority = valid.OutputAuthority! with { FailureStatus = AgentInteractionStatus.Unknown } },
+            "authority-catalog-revision" => valid with { OutputAuthority = valid.OutputAuthority! with { CatalogActivationRevision = 0 } },
+            "authority-observation" => valid with { OutputAuthority = valid.OutputAuthority! with { ObservationId = "invalid" } },
+            "authority-reason" => valid with { OutputAuthority = valid.OutputAuthority! with { ReasonId = " " } },
+            "authority-metric" => valid with { OutputAuthority = valid.OutputAuthority! with { MetricId = " " } },
+            "authority-disposition" => valid with { OutputAuthority = valid.OutputAuthority! with { OpenLeaseDispositionId = " " } },
+            "authority-undefined-status" => valid with { OutputAuthority = valid.OutputAuthority! with { FailureStatus = (AgentInteractionStatus)int.MaxValue } },
+            "lease-other-phase" => valid with { LeaseId = state.AutomaticFacts[AutomaticInteractionStep.ContextReadRecorded].LeaseId,
+                LeaseCommitRevision = state.AutomaticFacts[AutomaticInteractionStep.ContextReadRecorded].LeaseCommitRevision },
+            "content-digest-misplaced" => valid with { ContentDigest = new string('a', 64) },
+            "digest-key-version-misplaced" => valid with { DigestKeyVersion = "fixture-digest-v1" },
             "authority-misplaced" => valid with { OutputAuthority = new(1, new string('a', 64), AgentInteractionStatus.SafetyFailed, "reason", "metric", "disposition", 1, new string('b', 64)) },
             "output-missing" => valid with { Output = null },
             "output-tenant" => valid with { Output = valid.Output! with { Target = valid.Output.Target with { TenantId = "other-tenant" } } },

@@ -67,7 +67,20 @@ public sealed class InteractionCommandAuthorityTests
             DomainResult result = interaction ? AgentInteractionAggregate.Handle((dynamic)command, state, envelope) : ConversationAgentStateAggregate.Handle((dynamic)command, directory, envelope);
             if (authority == "correct")
             {
-                result.IsRejection.ShouldBeFalse(); result.IsNoOp.ShouldBeFalse(); result.Events.ShouldNotBeEmpty();
+                result.IsRejection.ShouldBeFalse(); result.IsNoOp.ShouldBeFalse();
+                string expectedEvent = commandType switch
+                {
+                    nameof(RegisterInteractionPermit) => nameof(InteractionCreationPermitted),
+                    nameof(AcknowledgeInteractionCreation) => nameof(InteractionCreationAcknowledged),
+                    nameof(AcquireConversationEffectLease) => nameof(ConversationEffectLeaseAcquired),
+                    nameof(CommitConversationEffect) => nameof(ConversationEffectCommitted),
+                    nameof(SettleConversationEffectLease) => nameof(ConversationEffectLeaseSettled),
+                    nameof(CancelConversationEffectLease) => nameof(ConversationEffectLeaseCancelled),
+                    nameof(EnterConversationDeletionClosing) => nameof(ConversationDeletionClosingEntered),
+                    nameof(CreatePermittedAgentInteraction) => "PermittedAgentInteractionCreated",
+                    _ => "WorkflowStartCheckpoint",
+                };
+                result.Events.Single().GetType().Name.ShouldBe(expectedEvent);
             }
             else
             {
@@ -86,7 +99,31 @@ public sealed class InteractionCommandAuthorityTests
                 else { directory.Apply((dynamic)item); }
             }
             string after = interaction ? JsonSerializer.Serialize(state) : JsonSerializer.Serialize(directory);
-            if (authority == "correct") { after.ShouldNotBe(before); }
+            if (authority == "correct")
+            {
+                after.ShouldNotBe(before);
+                foreach (string? deniedKey in new string?[] { null, foreign })
+                {
+                    var deniedEnvelope = envelope with { Extensions = deniedKey is null ? null : new Dictionary<string, string>(StringComparer.Ordinal) { [deniedKey] = "true" } };
+                    DomainResult denied = interaction ? AgentInteractionAggregate.Handle((dynamic)command, state, deniedEnvelope) : ConversationAgentStateAggregate.Handle((dynamic)command, directory, deniedEnvelope);
+                    denied.IsRejection.ShouldBeTrue(); denied.IsNoOp.ShouldBeFalse();
+                    if (interaction) { denied.Events.Single().ShouldBeOfType<AutomaticInteractionRejected>().Reason.ShouldBe(AutomaticInteractionRejectionReason.InvalidTarget); }
+                    else
+                    {
+                        var reason = commandType is nameof(CommitConversationEffect) or nameof(SettleConversationEffectLease) or nameof(CancelConversationEffectLease)
+                            ? ConversationDirectoryRejectionReason.LeaseNotFound : ConversationDirectoryRejectionReason.InvalidTarget;
+                        denied.Events.Single().ShouldBeOfType<ConversationDirectoryRejected>().Reason.ShouldBe(reason);
+                    }
+                    foreach (var item in denied.Events)
+                    {
+                        if (interaction) { state.Apply((dynamic)item); }
+                        else { directory.Apply((dynamic)item); }
+                    }
+                    (interaction ? JsonSerializer.Serialize(state) : JsonSerializer.Serialize(directory)).ShouldBe(after);
+                }
+                DomainResult retry = interaction ? AgentInteractionAggregate.Handle((dynamic)command, state, envelope) : ConversationAgentStateAggregate.Handle((dynamic)command, directory, envelope);
+                retry.IsNoOp.ShouldBeTrue();
+            }
             else { after.ShouldBe(before); }
             if (interaction)
             {
