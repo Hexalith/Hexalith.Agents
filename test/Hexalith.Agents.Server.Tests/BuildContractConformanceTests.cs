@@ -33,7 +33,7 @@ public sealed class BuildContractConformanceTests
     }
 
     [Fact]
-    public void OrdinaryReleaseShouldRejectAllAuditFindings()
+    public void OrdinaryReleaseShouldEvaluateTheHighAndCriticalAuditPolicy()
     {
         using JsonDocument evaluation = EvaluateMsBuild(
             ModuleLayout.SourceProjectFile("Hexalith.Agents.Contracts"),
@@ -48,16 +48,14 @@ public sealed class BuildContractConformanceTests
         properties.GetProperty("TreatWarningsAsErrors").GetString().ShouldBe("true");
         string[] exemptions = (properties.GetProperty("WarningsNotAsErrors").GetString() ?? string.Empty)
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        exemptions.ShouldNotContain("NU1901");
-        exemptions.ShouldNotContain("NU1902");
+        exemptions.ShouldContain("NU1901");
+        exemptions.ShouldContain("NU1902");
         exemptions.ShouldNotContain("NU1903");
         exemptions.ShouldNotContain("NU1904");
         exemptions.ShouldNotContain("NU1900");
         exemptions.ShouldNotContain("NU1905");
         string[] suppressed = (properties.GetProperty("NoWarn").GetString() ?? string.Empty)
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        suppressed.ShouldNotContain("NU1901");
-        suppressed.ShouldNotContain("NU1902");
         suppressed.ShouldNotContain("NU1903");
         suppressed.ShouldNotContain("NU1904");
         suppressed.ShouldNotContain("NU1900");
