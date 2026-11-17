@@ -19,14 +19,14 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -42,7 +42,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -51,7 +51,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -158,49 +158,49 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Admin.Abstractions",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.DomainService",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Gateway",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Server",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Server.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.ServiceDefaults",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -251,7 +251,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -316,7 +316,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -372,35 +372,35 @@
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-        "sha256": "149b96fbd8a58307250f90bf226ff633ab220321e35a08cc7769de542891f183"
+        "sha256": "1bab8c0da9ecc47c4949a2eaecad4e91863885bd604de9c563504025cbd6612b"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
-        "sha256": "f07347d4ed081e05e16cd815b58a5b520670ad20c1be26089dc3298b20481824"
+        "sha256": "dc1e1abffa50ecf993455ca5779e4bd0358df8fff4f991c49ca0a5456e30c6de"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e"
       }
@@ -563,49 +563,49 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Admin.Abstractions",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.DomainService",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Gateway",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Server",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.Server.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.ServiceDefaults",
-        "version": "5.1.1",
+        "version": "5.2.0",
         "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -696,35 +696,35 @@
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-        "sha256": "149b96fbd8a58307250f90bf226ff633ab220321e35a08cc7769de542891f183"
+        "sha256": "1bab8c0da9ecc47c4949a2eaecad4e91863885bd604de9c563504025cbd6612b"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
-        "sha256": "f07347d4ed081e05e16cd815b58a5b520670ad20c1be26089dc3298b20481824"
+        "sha256": "dc1e1abffa50ecf993455ca5779e4bd0358df8fff4f991c49ca0a5456e30c6de"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.0.1",
+        "version": "5.1.0",
         "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e"
       }
@@ -890,49 +890,49 @@
       "package": "Hexalith.EventStore.Admin.Abstractions",
       "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Client",
       "path": "buildTransitive/Hexalith.EventStore.Client.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Contracts",
       "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.DomainService",
       "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Gateway",
       "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Server",
       "path": "buildTransitive/Hexalith.EventStore.Server.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.ServiceDefaults",
       "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.1.1"
+      "version": "5.2.0"
     },
     {
       "kind": "import",
@@ -1022,36 +1022,36 @@
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-      "sha256": "149b96fbd8a58307250f90bf226ff633ab220321e35a08cc7769de542891f183",
-      "version": "5.0.1"
+      "sha256": "1bab8c0da9ecc47c4949a2eaecad4e91863885bd604de9c563504025cbd6612b",
+      "version": "5.1.0"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
-      "sha256": "f07347d4ed081e05e16cd815b58a5b520670ad20c1be26089dc3298b20481824",
-      "version": "5.0.1"
+      "sha256": "dc1e1abffa50ecf993455ca5779e4bd0358df8fff4f991c49ca0a5456e30c6de",
+      "version": "5.1.0"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
       "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51",
-      "version": "5.0.1"
+      "version": "5.1.0"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
       "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac",
-      "version": "5.0.1"
+      "version": "5.1.0"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
       "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e",
-      "version": "5.0.1"
+      "version": "5.1.0"
     }
   ]
 }
