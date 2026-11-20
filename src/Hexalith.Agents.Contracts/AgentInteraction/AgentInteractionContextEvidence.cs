@@ -3,7 +3,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// <summary>
 /// Safe, audit-ready evidence of one Conversation context decision (AC2 "safe context evidence"; AC4 "audit-safe
 /// metadata"; FR-24, FR-25). Recorded on both <see cref="Events.AgentInteractionContextReady"/> and
-/// <see cref="Events.AgentInteractionContextBlocked"/> so an authorized administrator can distinguish a full vs
+/// <see cref="Events.AgentInteractionContextBlocked"/> so a scoped inspector or eligible proposal approver can distinguish a full vs
 /// bounded vs blocked context decision and see the budget math behind it.
 /// </summary>
 /// <remarks>

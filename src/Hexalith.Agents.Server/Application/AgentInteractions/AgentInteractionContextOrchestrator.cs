@@ -172,7 +172,7 @@ public sealed class AgentInteractionContextOrchestrator
         {
             // The Conversations authorized read keys on a security principal — pass ActorUserId as callerPrincipalId.
             return await _contextReader
-                .ReadAsync(request.TenantId, request.SourceConversationId, request.CallerPartyId, request.ActorUserId, ct)
+                .ReadAsync(request.TenantId, request.SourceConversationId, request.CallerPartyId, request.ActorUserId, request.CorrelationId, ct)
                 .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

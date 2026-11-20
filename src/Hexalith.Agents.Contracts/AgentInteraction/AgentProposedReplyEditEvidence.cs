@@ -4,8 +4,8 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
 /// Safe, audit-ready evidence of one Proposed-Agent-Reply edit attempt, recorded on
-/// <see cref="Events.ProposedAgentReplyEdited"/> and <see cref="Events.ProposedAgentReplyEditFailed"/> so an authorized
-/// administrator can see WHICH proposal was edited (or attempted), against which Source Conversation, producing which new
+/// <see cref="Events.ProposedAgentReplyEdited"/> and <see cref="Events.ProposedAgentReplyEditFailed"/> so a scoped inspector or eligible
+/// proposal approver can see which proposal was edited (or attempted), against which Source Conversation, producing which new
 /// edited version, FROM which source version, by which Approver, and under which policy basis — without any edited content
 /// (AC1, AC3, AC4; AD-5, AD-14). It mirrors <see cref="AgentProposedReplyEvidence"/>: safe ids only, symmetric across
 /// success + failure.

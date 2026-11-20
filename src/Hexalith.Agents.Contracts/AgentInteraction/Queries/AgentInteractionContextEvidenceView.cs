@@ -2,7 +2,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction.Queries;
 
 /// <summary>
 /// Safe, audit-ready projection of an Agent Call's Conversation context evidence for authorized inspection (AC2, AC3,
-/// AC4; FR-25). The <see cref="Evidence"/> and <see cref="BlockReason"/> let an authorized administrator distinguish a
+/// AC4; FR-25). The <see cref="Evidence"/> and <see cref="BlockReason"/> let a scoped inspector or eligible proposal approver distinguish a
 /// full vs bounded vs blocked context decision without exposing anything sensitive.
 /// </summary>
 /// <remarks>

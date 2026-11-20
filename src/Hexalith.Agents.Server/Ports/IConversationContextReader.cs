@@ -30,4 +30,8 @@ public interface IConversationContextReader
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The safe conversation-context read result (load outcome + loaded messages + freshness).</returns>
     Task<ConversationContextReadResult> ReadAsync(string tenantId, string sourceConversationId, string callerPartyId, string callerPrincipalId, CancellationToken ct);
+
+    /// <summary>Reads the conversation within the correlation scope of the current operation.</summary>
+    Task<ConversationContextReadResult> ReadAsync(string tenantId, string sourceConversationId, string callerPartyId, string callerPrincipalId, string correlationId, CancellationToken ct)
+        => ReadAsync(tenantId, sourceConversationId, callerPartyId, callerPrincipalId, ct);
 }

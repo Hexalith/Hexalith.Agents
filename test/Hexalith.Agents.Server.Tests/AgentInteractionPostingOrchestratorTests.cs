@@ -370,6 +370,19 @@ public sealed class AgentInteractionPostingOrchestratorTests
         await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
+    [Fact]
+    public async Task Pending_append_retains_generated_state_until_confirmation()
+    {
+        StubPartyAndVersionAndMembership();
+        _poster.AppendAgentMessageAsync(Arg.Any<ConversationAppendRequest>(), Arg.Any<CancellationToken>())
+            .Returns(ConversationAppendResult.AwaitingConfirmation, new ConversationAppendResult(ConversationAppendOutcome.Posted));
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Generated);
+        await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Posted);
+        await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
+    }
+
     // ===== Helpers =====
 
     private void StubHappy()

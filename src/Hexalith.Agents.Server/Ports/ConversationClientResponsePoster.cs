@@ -1,10 +1,13 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Hexalith.Conversations.Client;
+using Hexalith.Conversations.Contracts.Agents;
 using Hexalith.Conversations.Contracts.Commands;
+using Hexalith.Conversations.Contracts.Errors;
 using Hexalith.Conversations.Contracts.Identifiers;
 using Hexalith.Conversations.Contracts.Participants;
 using Hexalith.Conversations.Contracts.Queries;
@@ -29,13 +32,7 @@ namespace Hexalith.Agents.Server.Ports;
 /// or logged here (AD-14).
 /// </para>
 /// <para>
-/// <b>Membership establish has no public seam.</b> <c>IConversationClient</c> does not expose
-/// <c>AddParticipantAsync</c> and no API route maps <c>AddParticipantCommand</c> (verified — Conversations commit
-/// <c>46df0cd</c>). Therefore, when the Agent is not already a participant, this returns
-/// <see cref="ConversationMembershipOutcome.SeamUnavailable"/> (fail closed). When Conversations exposes a public
-/// <c>AddParticipantAsync(AddParticipantCommand,…)</c> (AD-6 / proposed Story 2.0a), wire the establish path at the marked
-/// extension point below to return <see cref="ConversationMembershipOutcome.Established"/> — no Agents contract change is
-/// required.
+/// This adapter verifies existing AI membership. Enabling membership creation requires the separately qualified owner binding.
 /// </para>
 /// </remarks>
 public sealed class ConversationClientResponsePoster : IConversationResponsePoster
@@ -75,7 +72,9 @@ public sealed class ConversationClientResponsePoster : IConversationResponsePost
             // participant list — membership is a trust-bearing decision (AD-7), and a revoked-but-not-yet-projected removal
             // would otherwise read as Present and post. Fail closed, mirroring ConversationClientContextReader (Task 7:
             // "stale conversation → ConversationUnavailable").
-            if (!details.Freshness.AllowsTrustBearingDecision())
+            if (details.TenantId != query.TenantId || details.ConversationId != query.ConversationId
+                || result.Value.FreshnessState != details.Freshness.FreshnessState
+                || !details.Freshness.AllowsTrustBearingDecision())
             {
                 return ConversationMembershipResult.ConversationUnavailable;
             }
@@ -84,9 +83,6 @@ public sealed class ConversationClientResponsePoster : IConversationResponsePost
             bool present = details.Participants.Any(p =>
                 p.ParticipantPartyId == agentParty && p.ParticipantType == ParticipantType.AiAgent);
 
-            // Present → proceed. Absent → there is no public membership-establish seam today, so fail closed (AD-6, AD-7).
-            // Extension point (AD-6 / Story 2.0a): when IConversationClient exposes AddParticipantAsync, call it here for
-            // the absent case and return ConversationMembershipResult with ConversationMembershipOutcome.Established.
             return present
                 ? new ConversationMembershipResult(ConversationMembershipOutcome.Present)
                 : ConversationMembershipResult.SeamUnavailable;
@@ -120,17 +116,60 @@ public sealed class ConversationClientResponsePoster : IConversationResponsePost
                 authorPartyId,
                 request.Text);
 
-            ConversationClientResult<ConversationCommandAcceptedResult> result = await _client.AppendMessageAsync(command, ct).ConfigureAwait(false);
+            var lookup = new ConversationAgentReadQuery(metadata.TenantId, command.ConversationId, command.MessageId);
+            ConversationAppendResult? observed = await ObserveMessageAsync(lookup, authorPartyId, request, ct).ConfigureAwait(false);
+            if (observed is not null)
+            {
+                return observed;
+            }
 
-            // Conversations dedupes on the caller-supplied MessageId/IdempotencyKey, so a retry is a safe no-op (AD-13).
-            return result.IsSuccess
-                ? new ConversationAppendResult(ConversationAppendOutcome.Posted)
-                : new ConversationAppendResult(ConversationAppendOutcome.PostRejected);
+            // Only a current source observation of absence permits submission, including on replay.
+            ConversationClientResult<ConversationCommandAcceptedResult> result = await _client.AppendMessageAsync(command, ct).ConfigureAwait(false);
+            observed = await ObserveMessageAsync(lookup, authorPartyId, request, ct).ConfigureAwait(false);
+            if (observed is not null)
+            {
+                return observed;
+            }
+
+            // Only an explicit, non-retryable validation refusal plus an authoritative absence is conclusive.
+            return result.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.UnprocessableEntity
+                && result.Error is { Errors.Count: > 0 } rejection
+                && rejection.Errors.All(error => error.Category == ConversationErrorCategory.Validation && !error.IsRetryable)
+                    ? new ConversationAppendResult(ConversationAppendOutcome.PostRejected)
+                    : ConversationAppendResult.AwaitingConfirmation;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // Fail closed (AD-12) — the Conversations error text never crosses this boundary (AD-14).
-            return ConversationAppendResult.AdapterFailure;
+            // A lost acknowledgement cannot distinguish failure from an already-persisted append.
+            return ConversationAppendResult.AwaitingConfirmation;
         }
+    }
+
+    // A null return is an authoritative absence, the only result that permits an idempotent append.
+    private async Task<ConversationAppendResult?> ObserveMessageAsync(ConversationAgentReadQuery query, PartyId author, ConversationAppendRequest request, CancellationToken ct)
+    {
+        ConversationAgentReadResult observation = await _client.GetAgentConversationAsync(query, ct).ConfigureAwait(false);
+        if (observation.TenantId != query.TenantId || observation.ConversationId != query.ConversationId
+            || observation.SourceContractVersion != 1 || observation.SourceRevision is not >= 0
+            || observation.ObservedAt is null || string.IsNullOrWhiteSpace(observation.ObservationId)
+            || !observation.AgentParticipantPresent)
+        {
+            return ConversationAppendResult.AwaitingConfirmation;
+        }
+
+        if (observation.Outcome == ConversationAgentsOutcome.Absent && observation.Messages is null or { Count: 0 })
+        {
+            return null;
+        }
+
+        return observation.Outcome == ConversationAgentsOutcome.Available
+            && observation.Messages is [var message]
+            && message.MessageId == query.MessageId && message.AuthorPartyId == author
+            && !message.Deleted && !message.Redacted && message.EditedAt is null
+            && string.Equals(message.Text, request.Text, StringComparison.Ordinal)
+            && (message.Provenance is null || (message.Provenance.AiGenerated
+                && string.Equals(message.Provenance.AgentCallTraceReference, request.AgentCallTraceReference, StringComparison.Ordinal)))
+                ? new ConversationAppendResult(ConversationAppendOutcome.Posted)
+                : ConversationAppendResult.AwaitingConfirmation;
     }
 }

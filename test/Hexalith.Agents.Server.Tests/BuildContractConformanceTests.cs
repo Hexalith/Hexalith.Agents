@@ -459,6 +459,22 @@ public sealed class BuildContractConformanceTests
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
+        // Each probe selects its own build mode and catalog, including deliberately incomplete fixture layouts.
+        // The outer Debug build's producer imports belong to a different evaluation.
+        foreach (string variable in new[]
+        {
+            "CustomBeforeDirectoryBuildProps",
+            "CustomAfterMicrosoftCommonProps",
+            "CustomBeforeDirectoryBuildTargets",
+            "CustomAfterDirectoryBuildTargets",
+            "AfterMicrosoftNETSdkTargets",
+            "HEXALITH_SOURCE_MAPPING_HASH",
+            "Configuration",
+        })
+        {
+            startInfo.Environment.Remove(variable);
+        }
+
         foreach (string argument in arguments)
         {
             startInfo.ArgumentList.Add(argument);

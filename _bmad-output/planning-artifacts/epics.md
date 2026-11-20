@@ -1370,6 +1370,8 @@ So that catalog truth is administered once while every tenant sees and selects o
 
 **Acceptance Criteria:**
 
+**November audit regression criterion.** For duplicate catalog delivery, use the checkpoint of the addressed stream, including a pre-upgrade tenant catalog. A wholly checkpointed batch produces no write. A mixed batch validates every pending event and rejects a gap before writing. Compare allocations for a duplicate on catalogs of 10, 100 and 1,000 entries.
+
 **Given** an AD-30 `Platform` principal and valid Provider/model capability and pricing metadata
 **When** a create, update, enable, or disable command is accepted
 **Then** the command targets reserved tenant `system` and one `ProviderCatalog` stream per (`ProviderId`, `ModelId`) and durably records label, platform enablement, text-generation capability, positive context/output/timeout limits, secret reference/configured state, versioned pricing units/currency, and a non-reusable monotonic CapabilityVersion
@@ -1613,6 +1615,8 @@ So that the domain service and UI run with their real platform dependencies with
 - **Forward dependencies:** None; unavailable Provider, tokenizer, or safety execution remains blocked through readiness and is not simulated as available.
 
 **Acceptance Criteria:**
+
+**November audit regression criterion.** Start the distributed Release executable using its real service registrations. Verify the supported operation groups, an authenticated dependency-unavailable response when an owner is absent, and the configured projection path in the platform fixture. Record the capability evidence in the launch readiness register.
 
 **Given** the exact Available EXT-HOST-1 and EXT-TOPOLOGY-1 targets
 **When** the fixture resets, seeds, and starts
@@ -1879,6 +1883,19 @@ So that old clients cannot reactivate removed safety-override or self-approval b
 | NegativeEvidence | CallerCannotApproveOwnCallTests; OverrideCannotBypassSafetyTests; DirectLegacyCommandCannotMutateTests |
 | Result | Blocked — backlog; requires Stories 5.4 and 5.5 and EXT-CONV-AI-1 is currently Uncommitted |
 
+### Story 5.11: Restore Reproducible Build and Host Verification
+
+As a module maintainer, I can build the recorded dependency set, install the shipped packages and start the server from a fresh checkout. Contributors and release operators can see which checks passed for each configuration.
+
+**Acceptance Criteria:**
+
+- All 13 direct submodules resolve to the exact commits recorded in the parent. Start with an empty cache and pass the Debug source build, including the Conversations adapters and their tests.
+- Build and test Release, verify installation of each of the six packages and their combined consumer, and review the resolved executable import paths, hashes and versions.
+- Start the built server in its own process. Verify the documented credential and dependency responses. Compare the supported versioned method/path inventory with the registered routes and verify the legacy provider-status refusal.
+- Run the product checks, Python tooling and a nonpublishing release rehearsal from the documented prerequisites. Coordinate shared workflow delivery with Hexalith.CiCd and require a green run at the resulting parent revision.
+
+**Owners and evidence.** The module developer owns package, host and route checks. The dependency owners supply reachable revisions. CiCd owns the delivered workflow. See the [course correction](sprint-change-proposal-2026-11-20.md) for the starting evidence and handoff.
+
 ## Epic 6: One Safe Automatic Conversation Response
 
 A Conversation Participant can use the sole **Call hexa** action and receive exactly one safe attributed response, or a precise fail-closed outcome before any unsafe Provider or Conversation effect.
@@ -1972,6 +1989,8 @@ So that no partial or unauthorized context is represented as a complete answer.
 - **Forward dependencies:** None; the story ends at a protected exact prepared-input/context result and performs no Provider call.
 
 **Acceptance Criteria:**
+
+**November audit regression criterion.** Require the Conversations response to identify the requested tenant and conversation before using participants or measuring text. Exercise both mismatches independently. A stale or mismatched result returns a safe refusal. Carry the operation correlation identifier through the context read.
 
 **Given** an accepted interaction and current tenant/Conversation authorization
 **When** the context activity loads the Source Conversation
@@ -2223,6 +2242,8 @@ So that the Conversation contains one attributable AI message and no membership 
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
+
+**November audit regression criterion.** A successful append submission keeps the deterministic reply pending until authoritative evidence identifies the durable message, author and target conversation in the intended tenant. Exercise delayed visibility, rejection, conflicting evidence and restart after a lost acknowledgement. Recovery must preserve the logical message identity.
 
 **Given** the current Agent Party identity under the selected `EXT-PARTIES-1` branch, source Conversation authorization, allowed generated version, and Available EXT-CONV-AI-1 target
 **When** Agents establishes membership
@@ -2578,6 +2599,8 @@ So that only the reviewed response becomes a Conversation Message attributed to 
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
+
+**November audit regression criterion.** Require the same terminal Conversations evidence as Story 6.6 for the approved version. Verify that an accepted submission cannot display a posted outcome and that rechecking the approval after an uncertain response cannot post a second message.
 
 **Given** a pending proposal, selected existing VersionId, and current approval authority
 **When** approval executes at the expected EventStore revision
@@ -3350,6 +3373,8 @@ So that sensitive content can be examined without granting ambient Conversation 
 - **Forward dependencies:** None. `RQ-1` may consume its bounded evidence but Story 8.8 does not execute the release gate.
 
 **Acceptance Criteria:**
+
+**November audit regression criterion.** Authorize the specific subject, tenant, interaction and disclosure before reading. After the asynchronous read, verify the returned scope and the grant's continuing validity before rendering. Cover tenant operations, own-call status, the resolved approver and justified inspector. Delay a read past expiry and verify that no evidence is disclosed.
 
 **Given** a current Participant with Source Conversation read access
 **When** posted provenance is inspected

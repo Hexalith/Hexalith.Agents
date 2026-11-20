@@ -396,6 +396,20 @@ SM-C1..SM-C5 are calculated and reported with the launch-health family at the sa
 
 Missing samples or an ineligible cohort produce `InsufficientEvidence` in the launch-health review and never silently pass. Two consecutive SM-3 or SM-7 misses require the recorded Product disable-or-continue decision and feed the FR-28 kill-switch trigger review. `product-metrics` is the only trigger source.
 
+## Module capabilities and owner qualification
+
+Use this inventory when qualifying a specific build. The shared host admits human operations through EventStore authentication. An anonymous request must receive 401. An admitted caller can receive 503 when a required dependency is unavailable. Platform supplies the production credentials and per-operation authority. The SDK’s callbacks retain their separate transport policies.
+
+| Workflow | Available module evidence | Evidence required in the owner topology |
+| --- | --- | --- |
+| Configure a tenant agent | Package process startup and setup gateway/query tests | Platform and EventStore must demonstrate one authorized write through the gateway, its durable projection and an authorized read for the same tenant. |
+| Govern provider catalog and tenant enablement | Projection/replay tests, client and UI tests, shared store registration | Platform must resolve the reserved system-scope command status and reach a terminal catalog receipt. Verify that tenant enablement and operator authority remain distinct. |
+| Call the agent and post an automatic reply | Workflow recovery tests and adapter contract checks | Platform, Parties, Conversations and provider owners must qualify identity, protected content, readiness and scoped context. The same deterministic reply must appear exactly once across an interrupted append and restart. |
+| Approve and post a selected version | Proposal orchestration, version and confirmation tests | The Conversations owner must confirm the approved version's durable message in the expected tenant and conversation. Exercise both a delayed confirmation and an owner rejection. |
+| Inspect status and protected evidence | Per-operation authority and expiry tests with synthetic metadata | The Platform authority and protected state reader must supply current actor, resource, purpose and validity evidence. A grant expiring during a read must prevent disclosure. |
+
+Capture the module commit, installed owner versions, fixture identity, pass/fail, expected outcome, and durable evidence reference for each live check. Keep the existing dependency and RQ-1 decision records authoritative. [November sprint correction](sprint-change-proposal-2026-11-20.md) · [External dependency register](external-dependency-register.md)
+
 ## Live-Seam Matrix
 
 The matrix is the home of the AD-17 bind-and-test atomicity rule (approved sprint change proposal of 2026-08-04). Every row maps one seam to its current authority, its `BindingStatus` (`Deferred`, `DeferredOutOfV1`, or `Live`), and the `Hexalith.Agents.IntegrationTests` lane that must pass in the same change that flips it to `Live`. Story 5.1 owns the verifier that enforces the matrix; Story 5.6 creates the project and covers the projection and query seams that Stories 5.2 and 5.3 bound before it existed.

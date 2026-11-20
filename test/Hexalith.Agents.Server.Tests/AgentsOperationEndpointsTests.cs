@@ -54,8 +54,16 @@ public sealed class AgentsOperationEndpointsTests
         app.MapAgentsOperationEndpoints().RequireAuthorization("operators").WithMetadata("shared-operation-convention");
         RouteEndpoint[] routes = ((IEndpointRouteBuilder)app).DataSources.SelectMany(source => source.Endpoints)
             .OfType<RouteEndpoint>().ToArray();
-        routes.ShouldContain(endpoint => endpoint.RoutePattern.RawText!.StartsWith("/api/v1/agents/operations", StringComparison.Ordinal));
-        routes.ShouldContain(endpoint => endpoint.RoutePattern.RawText!.StartsWith("/api/agents/operations", StringComparison.Ordinal));
+        static string[] Inventory(RouteEndpoint[] routes, string prefix) => routes
+            .Where(endpoint => endpoint.RoutePattern.RawText!.StartsWith(prefix, StringComparison.Ordinal))
+            .SelectMany(endpoint => endpoint.Metadata.GetRequiredMetadata<IHttpMethodMetadata>().HttpMethods
+                .Select(method => method + " " + endpoint.RoutePattern.RawText![prefix.Length..]))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        string[] legacy = Inventory(routes, "/api/agents/operations/");
+        legacy.ShouldNotBeEmpty();
+        Inventory(routes, "/api/v1/agents/operations/").ShouldBe(legacy);
+
         foreach (RouteEndpoint endpoint in routes)
         {
             endpoint.Metadata.GetMetadata<IAuthorizeData>()!.Policy.ShouldBe("operators");
@@ -374,15 +382,17 @@ public sealed class AgentsOperationEndpointsTests
         routes.ShouldContain(("/api/agents/operations/agents/{agentId}/configuration", HttpMethods.Get));
     }
 
-    [Fact]
-    public async Task The_status_read_forwards_the_expected_configuration_version_to_the_client()
+    [Theory]
+    [InlineData("/api/agents/operations/agents/{agentId}/status")]
+    [InlineData("/api/v1/agents/operations/agents/{agentId}/status")]
+    public async Task The_status_read_forwards_the_expected_configuration_version_to_the_client(string route)
     {
         IAgentAdministrationOperations administration = StubbedSetupReads();
 
         await using WebApplication app = BuildApp(AgentsClientWith(administration));
         _ = await InvokeEndpointAsync(
             app,
-            "/api/agents/operations/agents/{agentId}/status",
+            route,
             queryString: "?expectedConfigurationVersion=7",
             ("agentId", "agent-1")).ConfigureAwait(true);
 

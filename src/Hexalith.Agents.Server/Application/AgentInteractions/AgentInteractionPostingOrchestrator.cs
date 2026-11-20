@@ -92,7 +92,12 @@ public sealed class AgentInteractionPostingOrchestrator
 
         // Assemble the server-trusted posting result from the impure steps (each fail-closed). The sensitive content is
         // used only transiently inside PostAsync (handed to the poster's append) and rides into the aggregate NOWHERE (AD-14).
-        AgentResponsePostingResult result = await PostAsync(request, ct).ConfigureAwait(false);
+        AgentResponsePostingResult? result = await PostAsync(request, ct).ConfigureAwait(false);
+        if (result is null)
+        {
+            // Generated is the durable state behind the automatic PostingPending presentation.
+            return new AgentInteractionPostingOutcomeResult(request.AgentInteractionId, AgentInteractionStatus.Generated);
+        }
 
         // Build the server-trusted post command — any client-supplied value is discarded. The interaction id mirrors the
         // envelope aggregate id (Story 2.1).
@@ -121,7 +126,7 @@ public sealed class AgentInteractionPostingOrchestrator
     // Assembles the server-trusted posting result: read Agent Party → read selected version → ensure membership → append.
     // Every step is fail-closed; the first failing step short-circuits to a content-free failure result so the pure policy
     // records a fail-closed audit and no Conversation Message is created (AD-6, AD-12).
-    private async Task<AgentResponsePostingResult> PostAsync(AgentInteractionPostingRequest request, CancellationToken ct)
+    private async Task<AgentResponsePostingResult?> PostAsync(AgentInteractionPostingRequest request, CancellationToken ct)
     {
         // (2) Read the Agent's linked Party identity + posting-time validity (the snapshot does NOT carry it — AD-7). Not
         // available/disabled/not-linked → PartyIdentityUnavailable.
@@ -158,6 +163,11 @@ public sealed class AgentInteractionPostingOrchestrator
 
         // (6) Append the message authored by the Agent Party. The sensitive content stays inside the adapter (AD-14).
         ConversationAppendResult append = await AppendAsync(request, agentPartyId, version.GeneratedContent, messageId, idempotencyKey, ct).ConfigureAwait(false);
+
+        if (append.Outcome == ConversationAppendOutcome.AwaitingConfirmation)
+        {
+            return null;
+        }
 
         // (7) Assemble the server-trusted result with the outcome + safe ids — never the content.
         return new AgentResponsePostingResult(
@@ -230,7 +240,7 @@ public sealed class AgentInteractionPostingOrchestrator
                 generatedContent,
                 messageId,
                 idempotencyKey,
-                request.CorrelationId);
+                request.CorrelationId) { AgentCallTraceReference = request.AgentInteractionId };
             return await _poster.AppendAgentMessageAsync(appendRequest, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

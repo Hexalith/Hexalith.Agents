@@ -37,15 +37,21 @@ internal static class AgentResponsePostingIdentity
     internal static string DeriveIdempotencyKey(string agentInteractionId, string versionId)
         => Derive(IdempotencyKeyTag, agentInteractionId, versionId);
 
+    // The EventStore command uses a canonical ULID. The external Conversation identities remain SHA-256 hex.
+    internal static string DerivePendingApprovalId(string agentInteractionId, string versionId)
+        => new NUlid.Ulid(Digest("pending-approval", agentInteractionId, versionId).AsSpan(0, 16)).ToString();
+
     private static string Derive(string purposeTag, string agentInteractionId, string versionId)
+        => Convert.ToHexStringLower(Digest(purposeTag, agentInteractionId, versionId));
+
+    private static byte[] Digest(string purposeTag, string agentInteractionId, string versionId)
     {
         var builder = new StringBuilder();
         AppendComponent(builder, purposeTag);
         AppendComponent(builder, agentInteractionId);
         AppendComponent(builder, versionId);
 
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(builder.ToString()));
-        return Convert.ToHexStringLower(hash);
+        return SHA256.HashData(Encoding.UTF8.GetBytes(builder.ToString()));
     }
 
     private static void AppendComponent(StringBuilder builder, string? value)

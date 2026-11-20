@@ -285,7 +285,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             // The regeneration re-read keys on the actor security principal; authorization was already settled at the gate
             // (Story 2.2) and at the approver check above, so the auxiliary caller-party reference is not carried here.
             return await _contextReader
-                .ReadAsync(request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, ct)
+                .ReadAsync(request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct)
                 .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

@@ -6,8 +6,9 @@ using Hexalith.Agents.Server.Ports;
 namespace Hexalith.Agents.Server.Application.Queries;
 
 /// <summary>Serves canonical audit availability reads.</summary>
-public sealed class GetAgentAuditAvailabilityQueryHandler(IAgentInteractionAuditStateReader reader, ITenantAccessReader tenantAccessReader)
-    : AgentInteractionAuditQueryHandlerBase(reader, tenantAccessReader)
+public sealed class GetAgentAuditAvailabilityQueryHandler(IAgentInteractionAuditStateReader reader, ITenantAccessReader tenantAccessReader,
+    IAgentInteractionAuditAuthority? auditAuthority = null)
+    : AgentInteractionAuditQueryHandlerBase(reader, tenantAccessReader, auditAuthority)
 {
     /// <inheritdoc />
     public override string QueryType => GetAgentAuditAvailabilityQuery.QueryType;

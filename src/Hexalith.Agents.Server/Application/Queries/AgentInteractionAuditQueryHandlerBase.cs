@@ -15,7 +15,8 @@ namespace Hexalith.Agents.Server.Application.Queries;
 /// <summary>Shared fail-closed base for AgentInteraction audit query handlers.</summary>
 public abstract class AgentInteractionAuditQueryHandlerBase(
     IAgentInteractionAuditStateReader reader,
-    ITenantAccessReader tenantAccessReader) : IDomainQueryHandler
+    ITenantAccessReader tenantAccessReader,
+    IAgentInteractionAuditAuthority? auditAuthority = null) : IDomainQueryHandler
 {
     private static readonly JsonSerializerOptions s_jsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -46,17 +47,29 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
             return QueryResult.Failure("Forbidden");
         }
 
-        bool isAuthorized = await HasTenantAccessAsync(query, cancellationToken).ConfigureAwait(false);
+        var target = new AgentAuditReadTarget(query.TenantId, query.UserId, query.AggregateId, QueryType);
+        AgentInteractionAuditGrant? grant = await ReadGrantAsync(target, cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
-        if (!isAuthorized)
+        if (grant is null || !grant.Authorizes(target))
         {
             return QueryResult.FromPayload(ToElement(CreateNotAuthorizedPayload(query.CorrelationId)));
         }
 
-        AgentInteractionAuditStateReadResult read = await _reader
-            .ReadAsync(query.TenantId, query.AggregateId, cancellationToken)
-            .ConfigureAwait(false);
+        AgentInteractionAuditStateReadResult read;
+        try
+        {
+            read = await _reader.ReadAsync(query.TenantId, query.AggregateId, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            read = AgentInteractionAuditStateReadResult.Unavailable;
+        }
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (!grant.Validity.IsCurrent)
+        {
+            return QueryResult.FromPayload(ToElement(CreateNotAuthorizedPayload(query.CorrelationId)));
+        }
 
         // A scoped request does not prove the returned stream's scope. Verify authoritative provenance before
         // inspecting state or rendering any ids, evidence, counts, or availability from a misrouted read.
@@ -67,7 +80,23 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
             return QueryResult.FromPayload(ToElement(CreateUnavailablePayload(query.CorrelationId)));
         }
 
-        return QueryResult.FromPayload(ToElement(CreatePayload(read.State, query.CorrelationId, read.IsFresh)));
+        if (read.State is not null && !grant.Includes(read.State))
+        {
+            return QueryResult.FromPayload(ToElement(CreateNotAuthorizedPayload(query.CorrelationId)));
+        }
+
+        // A caller's own-call grant covers only the outcome. The full status view contains configuration,
+        // routing and identity metadata reserved for operations users. Use the contract's empty defaults.
+        object payload = grant.Audience == AgentAuditAudience.Caller && read.State is not null
+            ? AgentInteractionAuditInspection.GetStatus(new AgentInteractionState
+            {
+                IsRequested = read.State.IsRequested,
+                AgentInteractionId = read.State.AgentInteractionId,
+                Status = read.State.Status,
+            }, isAuthorized: true)
+            : CreatePayload(read.State, query.CorrelationId, read.IsFresh);
+        JsonElement rendered = ToElement(payload);
+        return QueryResult.FromPayload(grant.Validity.IsCurrent ? rendered : ToElement(CreateNotAuthorizedPayload(query.CorrelationId)));
     }
 
     /// <summary>Creates the typed success payload from the rehydrated state.</summary>
@@ -90,11 +119,34 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
             ? AgentOperationResult<T>.Failed(AgentOperationErrorCode.NotFound, correlationId)
             : AgentOperationResult<T>.Succeeded(value, correlationId: correlationId);
 
-    private async Task<bool> HasTenantAccessAsync(QueryEnvelope query, CancellationToken cancellationToken)
+    private async Task<AgentInteractionAuditGrant?> ReadGrantAsync(AgentAuditReadTarget target, CancellationToken cancellationToken)
     {
-        TenantAccessReadResult access = await _tenantAccessReader
-            .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
-            .ConfigureAwait(false);
-        return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true };
+        try
+        {
+            if (auditAuthority is not null)
+            {
+                return await auditAuthority.AuthorizeAsync(target, cancellationToken).ConfigureAwait(false);
+            }
+
+            // The built-in projection can establish tenant administration only. All other audiences
+            // require current resource-scoped evidence supplied by the host.
+            if (!AgentInteractionAuditGrant.IsOperationalQuery(target.QueryType))
+            {
+                return null;
+            }
+
+            TenantAccessReadResult access = await _tenantAccessReader
+                .ReadAsync(target.TenantId, target.Subject, callerPartyId: string.Empty, cancellationToken)
+                .ConfigureAwait(false);
+            return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true, Authority: { } validity, CurrentActor: { } actor }
+                && actor.Subject == target.Subject && actor.TenantId == target.TenantId
+                ? new(target, AgentAuditAudience.TenantOperations, validity)
+                : null;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return null;
+        }
     }
 }

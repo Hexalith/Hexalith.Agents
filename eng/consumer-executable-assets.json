@@ -19,14 +19,14 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -42,7 +42,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -51,7 +51,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -158,49 +158,49 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Admin.Abstractions",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.DomainService",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Gateway",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Server",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Server.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.ServiceDefaults",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -251,7 +251,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -316,7 +316,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -563,49 +563,49 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Admin.Abstractions",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.DomainService",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Gateway",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Server",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.Server.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.ServiceDefaults",
-        "version": "5.2.0",
+        "version": "5.3.0",
         "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
@@ -890,49 +890,49 @@
       "package": "Hexalith.EventStore.Admin.Abstractions",
       "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Client",
       "path": "buildTransitive/Hexalith.EventStore.Client.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Contracts",
       "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.DomainService",
       "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Gateway",
       "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Server",
       "path": "buildTransitive/Hexalith.EventStore.Server.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.ServiceDefaults",
       "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.2.0"
+      "version": "5.3.0"
     },
     {
       "kind": "import",

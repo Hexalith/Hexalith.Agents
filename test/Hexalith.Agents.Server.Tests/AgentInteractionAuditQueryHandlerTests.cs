@@ -9,6 +9,7 @@ using Hexalith.Agents.Server.Application.Queries;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.EventStore.Contracts.Queries;
 
+using NSubstitute;
 using Shouldly;
 
 namespace Hexalith.Agents.Server.Tests;
@@ -142,7 +143,11 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     public async Task Posting_handler_unavailable_reader_returns_unavailable_not_success()
     {
         var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Unavailable);
-        var handler = new GetAgentPostingEvidenceQueryHandler(reader, new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)));
+        IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
+        authority.AuthorizeAsync(Arg.Any<AgentAuditReadTarget>(), Arg.Any<CancellationToken>())
+            .Returns(call => new AgentInteractionAuditGrant(call.Arg<AgentAuditReadTarget>(), AgentAuditAudience.Participant,
+                Validity(), ConversationId: "conversation-1"));
+        var handler = new GetAgentPostingEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority);
 
         QueryResult result = await handler.ExecuteAsync(Envelope(GetAgentPostingEvidenceQuery.QueryType), CancellationToken.None);
 
@@ -265,7 +270,23 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     private sealed class StubTenantAccessReader(TenantAccessReadResult result) : ITenantAccessReader
     {
         public Task<TenantAccessReadResult> ReadAsync(string tenantId, string actorUserId, string callerPartyId, CancellationToken ct)
-            => Task.FromResult(result);
+            => Task.FromResult(result with
+            {
+                Authority = Validity(),
+                CurrentActor = Actor(tenantId, actorUserId),
+            });
+    }
+
+    internal static CurrentHumanActorEvidence Actor(string tenant, string subject)
+    {
+        var clock = new Story54TimeProvider();
+        return new(tenant, subject, "actor", "party", 1, 1, clock.Now, clock.Now.AddMinutes(1));
+    }
+
+    private static AgentAuthorityValidity Validity()
+    {
+        var clock = new Story54TimeProvider();
+        return new(clock, clock.Now, clock.Now.AddMinutes(1));
     }
 }
 

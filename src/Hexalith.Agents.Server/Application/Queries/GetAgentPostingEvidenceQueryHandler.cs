@@ -7,8 +7,9 @@ using Hexalith.Agents.Server.Ports;
 namespace Hexalith.Agents.Server.Application.Queries;
 
 /// <summary>Serves safe AgentInteraction posting evidence reads.</summary>
-public sealed class GetAgentPostingEvidenceQueryHandler(IAgentInteractionAuditStateReader reader, ITenantAccessReader tenantAccessReader)
-    : AgentInteractionAuditQueryHandlerBase(reader, tenantAccessReader)
+public sealed class GetAgentPostingEvidenceQueryHandler(IAgentInteractionAuditStateReader reader, ITenantAccessReader tenantAccessReader,
+    IAgentInteractionAuditAuthority? auditAuthority = null)
+    : AgentInteractionAuditQueryHandlerBase(reader, tenantAccessReader, auditAuthority)
 {
     /// <inheritdoc />
     public override string QueryType => GetAgentPostingEvidenceQuery.QueryType;

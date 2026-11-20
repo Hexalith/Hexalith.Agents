@@ -53,6 +53,21 @@ public sealed class ProviderCatalogEventStoreIntegrationTests
     }
 
     [Fact]
+    public async Task A_mixed_replay_validates_the_pending_suffix_before_advancing_the_stream()
+    {
+        await ProjectAsync(Created());
+        int writes = _store.BatchCount;
+
+        (await ProjectAsync(Created(), Updated(sequence: 3))).Status.ShouldBe(ProjectionDispatchStatus.Retryable);
+        _store.BatchCount.ShouldBe(writes);
+        (await ProjectAsync(Updated(sequence: 2), Created())).Status.ShouldBe(ProjectionDispatchStatus.Completed);
+        _store.BatchCount.ShouldBe(writes + 1);
+        Persisted().Entries.ShouldHaveSingleItem().CapabilityVersion.ShouldBe(2);
+        (await ProjectAsync(Updated(sequence: 2), Created())).Status.ShouldBe(ProjectionDispatchStatus.AlreadyCompleted);
+        _store.BatchCount.ShouldBe(writes + 1);
+    }
+
+    [Fact]
     public async Task A_duplicate_delivery_of_an_already_folded_slice_changes_nothing()
     {
         await ProjectAsync(Created());

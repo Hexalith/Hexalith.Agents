@@ -14,6 +14,7 @@ using Hexalith.Agents.Server;
 using Hexalith.Agents.Server.Api;
 using Hexalith.Agents.Server.Composition;
 using Hexalith.EventStore.DomainService;
+using Hexalith.EventStore.ServiceDefaults.Authentication;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,6 @@ AgentDomainHostComposition.Configure(builder);
 WebApplication app = builder.Build();
 
 app.UseEventStoreDomainService();
-app.MapAgentsOperationEndpoints();
+app.MapAgentsOperationEndpoints().RequireAuthorization(EventStoreHttpHostSecurityExtensions.HumanPolicy);
 
 app.Run();

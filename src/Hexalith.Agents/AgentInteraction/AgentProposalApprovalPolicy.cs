@@ -37,6 +37,29 @@ internal static class AgentProposalApprovalPolicy
         };
     }
 
+    internal static DomainResult Reconcile(string interactionId, AgentProposedReplyApprovalEvidence pending, AgentProposalApprovalResult observation)
+    {
+        // A replay may learn the outcome of the existing approval. It cannot replace its actor or its intent.
+        if (observation.AuthorizationVerdict != ApproverPolicyValidationStatus.Valid
+            || pending.ProposalId != observation.ProposalId || pending.SourceConversationId != observation.SourceConversationId
+            || pending.ApprovedVersionId != observation.SelectedVersionId || pending.MessageId != observation.MessageId
+            || pending.IdempotencyKey != observation.IdempotencyKey || pending.AgentPartyId != observation.AgentPartyId)
+        {
+            return DomainResult.NoOp();
+        }
+
+        if (observation.Outcome is AgentProposalApprovalOutcome.Posted or AgentProposalApprovalOutcome.IdempotentPosted
+            && pending.MessageId == observation.PostedConversationMessageId && !string.IsNullOrEmpty(pending.MessageId))
+        {
+            return DomainResult.Success([new ProposedAgentReplyPosted(interactionId,
+                pending with { PostedConversationMessageId = observation.PostedConversationMessageId })]);
+        }
+
+        return observation.Outcome == AgentProposalApprovalOutcome.PostRejected
+            ? DomainResult.Success([new ProposedAgentReplyPostingFailed(interactionId, AgentProposalApprovalFailureReason.PostRejected, pending)])
+            : DomainResult.NoOp();
+    }
+
     internal static AgentInteractionStatus Decide(AgentProposalApprovalResult result)
     {
         ArgumentNullException.ThrowIfNull(result);

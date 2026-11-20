@@ -123,6 +123,34 @@ public sealed class AgentInteractionProposalApprovalAggregateTests
     }
 
     [Fact]
+    public void Pending_replays_preserve_the_approval_and_accept_only_its_terminal_message()
+    {
+        AgentInteractionState state = StateProposalCreated();
+        var pending = ApprovalResult(AgentProposalApprovalOutcome.Approved);
+        ApplyAll(state, Approve(pending, state));
+        Approve(pending, state).IsNoOp.ShouldBeTrue();
+
+        var posted = ApprovalResult(AgentProposalApprovalOutcome.Posted);
+        Approve(posted with { PostedConversationMessageId = "other" }, state).IsNoOp.ShouldBeTrue();
+        var terminal = Approve(posted with { ApproverPartyId = "second-authorized-approver" }, state);
+        var receipt = terminal.Events.Single().ShouldBeOfType<ProposedAgentReplyPosted>();
+        receipt.Evidence.ApproverPartyId.ShouldBe(pending.ApproverPartyId);
+        ApplyAll(state, terminal);
+        Approve(posted, state).IsNoOp.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Explicit_rejection_after_pending_records_only_the_terminal_failure()
+    {
+        AgentInteractionState state = StateProposalCreated();
+        ApplyAll(state, Approve(ApprovalResult(AgentProposalApprovalOutcome.Approved), state));
+        var rejected = Approve(ApprovalResult(AgentProposalApprovalOutcome.PostRejected), state);
+        rejected.Events.Single().ShouldBeOfType<ProposedAgentReplyPostingFailed>();
+        ApplyAll(state, rejected);
+        state.Status.ShouldBe(AgentInteractionStatus.ProposalPostingFailed);
+    }
+
+    [Fact]
     public void Empty_selected_version_records_approval_failed_with_selected_version_missing()
     {
         AgentInteractionState state = StateProposalCreated();

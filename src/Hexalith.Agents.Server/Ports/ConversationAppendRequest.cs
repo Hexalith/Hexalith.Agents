@@ -19,4 +19,8 @@ public sealed record ConversationAppendRequest(
     string Text,
     string MessageId,
     string IdempotencyKey,
-    string CorrelationId);
+    string CorrelationId)
+{
+    /// <summary>Gets the stable Agent Call reference used to verify any persisted Conversations provenance.</summary>
+    public string? AgentCallTraceReference { get; init; }
+}

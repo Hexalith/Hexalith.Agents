@@ -93,6 +93,15 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
         }
 
         AgentProposalApprovalResult result = await ApproveAndPostAsync(request, verdict, ct).ConfigureAwait(false);
+        if (request.ProposalState == ProposedAgentReplyState.PostingPending
+            && result.Outcome is not (AgentProposalApprovalOutcome.Posted or AgentProposalApprovalOutcome.PostRejected))
+        {
+            // A transient dependency failure cannot settle an append that was previously submitted.
+            return new AgentInteractionProposalApprovalOutcomeResult(request.SelectedVersionId,
+                AgentResponsePostingIdentity.DeriveMessageId(request.AgentInteractionId, request.SelectedVersionId),
+                AgentInteractionStatus.ProposalPostingPending);
+        }
+
         await DispatchAsync(request, result, ct).ConfigureAwait(false);
         return new AgentInteractionProposalApprovalOutcomeResult(
             request.SelectedVersionId,
@@ -233,7 +242,7 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
                 content,
                 messageId,
                 idempotencyKey,
-                request.CorrelationId);
+                request.CorrelationId) { AgentCallTraceReference = request.AgentInteractionId };
             return await _poster.AppendAgentMessageAsync(appendRequest, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -248,8 +257,12 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
         CancellationToken ct)
     {
         var command = new ApproveProposedAgentReply(request.AgentInteractionId, result);
+        // Pending and terminal observations are separate commands even on a replay of the same approval.
+        string commandId = result.Outcome == AgentProposalApprovalOutcome.Approved
+            ? AgentResponsePostingIdentity.DerivePendingApprovalId(request.AgentInteractionId, request.SelectedVersionId)
+            : request.MessageId;
         var envelope = new AgentCommandIntent(
-            request.MessageId,
+            commandId,
             request.TenantId,
             InteractionDomain,
             request.AgentInteractionId,
@@ -294,6 +307,7 @@ public sealed class AgentInteractionProposalApprovalOrchestrator
 
     private static AgentProposalApprovalOutcome MapAppendOutcome(ConversationAppendOutcome outcome) => outcome switch
     {
+        ConversationAppendOutcome.AwaitingConfirmation => AgentProposalApprovalOutcome.Approved,
         ConversationAppendOutcome.Posted => AgentProposalApprovalOutcome.Posted,
         ConversationAppendOutcome.PostRejected => AgentProposalApprovalOutcome.PostRejected,
         ConversationAppendOutcome.ConversationUnavailable => AgentProposalApprovalOutcome.ConversationUnavailable,

@@ -169,6 +169,17 @@ class Story59VerifierTests(unittest.TestCase):
         self.assertFalse((self.scratch / "new-output").exists())
         self.assertEqual(self.calls(), [])
 
+    def test_repository_local_temp_is_refused_and_the_private_directory_is_removed(self) -> None:
+        local_temp = self.root / "temporary files"
+        local_temp.mkdir()
+        self.environment["TMPDIR"] = str(local_temp)
+        result = self.run_verifier()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("outside the source checkout", result.stdout + result.stderr)
+        self.assertEqual(list(local_temp.iterdir()), [])
+        self.assertFalse(self.artifacts.exists())
+        self.assertEqual(self.calls(), [])
+
     def test_failed_build_retains_failed_preparation_receipt(self) -> None:
         result = self.run_verifier(scenario="build-failure")
         self.assertNotEqual(result.returncode, 0)

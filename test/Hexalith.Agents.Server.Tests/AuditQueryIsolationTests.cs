@@ -3,6 +3,7 @@ using System.Text.Json;
 using Hexalith.Agents.AgentInteraction;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.AgentInteraction.Queries;
 using Hexalith.Agents.Server.Application.Queries;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.EventStore.Contracts.Queries;
@@ -68,10 +69,7 @@ public sealed class AuditQueryIsolationTests
         for (int index = 0; index < 9; index++)
         {
             IAgentInteractionAuditStateReader reader = Reader(AgentInteractionAuditStateReadResult.Available("foreign-tenant", "foreign-interaction", State()));
-            ITenantAccessReader tenant = Substitute.For<ITenantAccessReader>();
-            tenant.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-                .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Unauthorized, false));
-            AgentInteractionAuditQueryHandlerBase handler = Handler(index, reader, tenant);
+            AgentInteractionAuditQueryHandlerBase handler = Handler(index, reader, Substitute.For<IAgentInteractionAuditAuthority>());
 
             QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType), CancellationToken.None);
 
@@ -111,14 +109,13 @@ public sealed class AuditQueryIsolationTests
         {
             using var cancellation = new CancellationTokenSource();
             IAgentInteractionAuditStateReader reader = Reader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
-            ITenantAccessReader tenant = Substitute.For<ITenantAccessReader>();
-            tenant.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-                .Returns(_ =>
-                {
-                    cancellation.Cancel();
-                    return new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true);
-                });
-            AgentInteractionAuditQueryHandlerBase handler = Handler(index, reader, tenant);
+            IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
+            authority.AuthorizeAsync(Arg.Any<AgentAuditReadTarget>(), Arg.Any<CancellationToken>()).Returns(_ =>
+            {
+                cancellation.Cancel();
+                return (AgentInteractionAuditGrant?)null;
+            });
+            AgentInteractionAuditQueryHandlerBase handler = Handler(index, reader, authority);
 
             await Should.ThrowAsync<OperationCanceledException>(() => handler.ExecuteAsync(Envelope(handler.QueryType), cancellation.Token));
 
@@ -145,6 +142,112 @@ public sealed class AuditQueryIsolationTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TenantAuthorityMustRemainCurrentUntilTheReadCompletes(bool expireDuringRead)
+    {
+        var clock = new Story54TimeProvider();
+        AgentAuthorityValidity? lifetime = expireDuringRead ? new(clock, clock.Now, clock.Now.AddSeconds(1)) : null;
+        ITenantAccessReader tenant = Substitute.For<ITenantAccessReader>();
+        tenant.ReadAsync("tenant-1", "user-1", string.Empty, Arg.Any<CancellationToken>())
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)
+            {
+                Authority = lifetime,
+                CurrentActor = AgentInteractionAuditQueryHandlerTests.Actor("tenant-1", "user-1"),
+            });
+        IAgentInteractionAuditStateReader reader = Substitute.For<IAgentInteractionAuditStateReader>();
+        reader.ReadAsync("tenant-1", "interaction-1", Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            clock.Now = clock.Now.AddSeconds(1);
+            return AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State());
+        });
+        var handler = new GetAgentInteractionStatusQueryHandler(reader, tenant);
+
+        QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType), CancellationToken.None);
+
+        result.GetPayload().GetProperty("status").GetString().ShouldBe("NotAuthorized");
+        await reader.Received(expireDuringRead ? 1 : 0).ReadAsync("tenant-1", "interaction-1", Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(AgentAuditAudience.TenantOperations, "approver", "poison-conversation", "proposal", null, false)]
+    [InlineData(AgentAuditAudience.EligibleApprover, "approver", "poison-conversation", "proposal", null, true)]
+    [InlineData(AgentAuditAudience.EligibleApprover, "approver", "other", "proposal", null, false)]
+    [InlineData(AgentAuditAudience.EligibleApprover, "approver", "poison-conversation", "other", null, false)]
+    [InlineData(AgentAuditAudience.EligibleApprover, "poison-party", "poison-conversation", "proposal", null, false)]
+    [InlineData(AgentAuditAudience.ComplianceInspector, null, "poison-conversation", null, "case", true)]
+    [InlineData(AgentAuditAudience.ComplianceInspector, null, "poison-conversation", null, null, false)]
+    public async Task ContextRequiresTheMatchingProposalOrGovernedCase(AgentAuditAudience audience, string? party,
+        string conversation, string? proposal, string? inspectionCase, bool allowed)
+    {
+        AgentInteractionState state = State();
+        state.ProposalEvidence = new("proposal", "poison-conversation", "version", 1, 1, null);
+        IAgentInteractionAuditStateReader reader = Reader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", state));
+        var clock = new Story54TimeProvider();
+        IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
+        authority.AuthorizeAsync(Arg.Any<AgentAuditReadTarget>(), Arg.Any<CancellationToken>()).Returns(call =>
+            new AgentInteractionAuditGrant(call.Arg<AgentAuditReadTarget>(), audience, new(clock, clock.Now, clock.Now.AddMinutes(1)),
+                party, conversation, proposal, inspectionCase));
+        var handler = new GetAgentInteractionContextEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority);
+
+        QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType), CancellationToken.None);
+
+        result.GetPayload().GetProperty("status").GetString().ShouldBe(allowed ? "Success" : "NotAuthorized");
+    }
+
+    [Theory]
+    [InlineData("poison-party", true)]
+    [InlineData("other-party", false)]
+    public async Task CallerStatusDisclosesOnlyTheOutcomeOfTheirOwnCall(string party, bool allowed)
+    {
+        var clock = new Story54TimeProvider();
+        IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
+        authority.AuthorizeAsync(Arg.Any<AgentAuditReadTarget>(), Arg.Any<CancellationToken>()).Returns(call =>
+            new AgentInteractionAuditGrant(call.Arg<AgentAuditReadTarget>(), AgentAuditAudience.Caller,
+                new(clock, clock.Now, clock.Now.AddMinutes(1)), PartyId: party));
+        var handler = new GetAgentInteractionStatusQueryHandler(
+            Reader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State())), new DeferredTenantAccessReader(), authority);
+
+        QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType), CancellationToken.None);
+
+        var payload = result.Payload<AgentInteractionInspectionResult>();
+        payload.Status.ShouldBe(allowed ? AgentInteractionInspectionStatus.Success : AgentInteractionInspectionStatus.NotAuthorized);
+        if (allowed)
+        {
+            payload.View.ShouldNotBeNull().Status.ShouldBe(AgentInteractionStatus.Requested);
+        }
+        JsonSerializer.Serialize(result.GetPayload()).ShouldNotContain("poison");
+    }
+
+    [Theory]
+    [InlineData("tenant")]
+    [InlineData("resource")]
+    [InlineData("subject")]
+    [InlineData("operation")]
+    public async Task MisroutedAuthorityRefusesBeforeStateAccess(string fault)
+    {
+        var clock = new Story54TimeProvider();
+        var expected = new AgentAuditReadTarget("tenant-1", "user-1", "interaction-1", GetAgentInteractionStatusQuery.QueryType);
+        AgentAuditReadTarget returned = fault switch
+        {
+            "tenant" => expected with { TenantId = "other" },
+            "resource" => expected with { InteractionId = "other" },
+            "subject" => expected with { Subject = "other" },
+            _ => expected with { QueryType = GetAgentInteractionContextEvidenceQuery.QueryType },
+        };
+        IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
+        authority.AuthorizeAsync(expected, Arg.Any<CancellationToken>()).Returns(new AgentInteractionAuditGrant(
+            returned, AgentAuditAudience.TenantOperations, new(clock, clock.Now, clock.Now.AddMinutes(1))));
+        IAgentInteractionAuditStateReader reader = Reader(AgentInteractionAuditStateReadResult.Unavailable);
+        var handler = new GetAgentInteractionStatusQueryHandler(reader, new DeferredTenantAccessReader(), authority);
+
+        QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType), CancellationToken.None);
+
+        result.GetPayload().GetProperty("status").GetString().ShouldBe("NotAuthorized");
+        await reader.DidNotReceiveWithAnyArgs().ReadAsync(default!, default!, default);
+    }
+
     private static IAgentInteractionAuditStateReader Reader(AgentInteractionAuditStateReadResult read)
     {
         IAgentInteractionAuditStateReader reader = Substitute.For<IAgentInteractionAuditStateReader>();
@@ -152,26 +255,39 @@ public sealed class AuditQueryIsolationTests
         return reader;
     }
 
-    private static ITenantAccessReader Authorized()
+    private static IAgentInteractionAuditAuthority Authorized()
     {
-        ITenantAccessReader tenant = Substitute.For<ITenantAccessReader>();
-        tenant.ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true));
-        return tenant;
+        var clock = new Story54TimeProvider();
+        IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
+        authority.AuthorizeAsync(Arg.Any<AgentAuditReadTarget>(), Arg.Any<CancellationToken>()).Returns(call =>
+        {
+            AgentAuditReadTarget target = call.Arg<AgentAuditReadTarget>();
+            AgentAuditAudience audience = target.QueryType switch
+            {
+                GetAgentPostingEvidenceQuery.QueryType => AgentAuditAudience.Participant,
+                GetAgentInteractionContextEvidenceQuery.QueryType or GetAgentProposalApprovalEvidenceQuery.QueryType
+                    or GetAgentProposalEditEvidenceQuery.QueryType or GetAgentProposalRegenerationEvidenceQuery.QueryType
+                    => AgentAuditAudience.ComplianceInspector,
+                _ => AgentAuditAudience.TenantOperations,
+            };
+            return new AgentInteractionAuditGrant(target, audience, new(clock, clock.Now, clock.Now.AddMinutes(1)),
+                ConversationId: "poison-conversation", InspectionCaseId: "case-1");
+        });
+        return authority;
     }
 
-    private static AgentInteractionAuditQueryHandlerBase Handler(int index, IAgentInteractionAuditStateReader reader, ITenantAccessReader tenant)
+    private static AgentInteractionAuditQueryHandlerBase Handler(int index, IAgentInteractionAuditStateReader reader, IAgentInteractionAuditAuthority authority)
         => index switch
         {
-            0 => new GetAgentInteractionStatusQueryHandler(reader, tenant),
-            1 => new GetAgentInteractionGateEvidenceQueryHandler(reader, tenant),
-            2 => new GetAgentInteractionContextEvidenceQueryHandler(reader, tenant),
-            3 => new GetAgentGenerationEvidenceQueryHandler(reader, tenant),
-            4 => new GetAgentPostingEvidenceQueryHandler(reader, tenant),
-            5 => new GetAgentProposalEditEvidenceQueryHandler(reader, tenant),
-            6 => new GetAgentProposalRegenerationEvidenceQueryHandler(reader, tenant),
-            7 => new GetAgentProposalApprovalEvidenceQueryHandler(reader, tenant),
-            _ => new GetAgentAuditAvailabilityQueryHandler(reader, tenant),
+            0 => new GetAgentInteractionStatusQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            1 => new GetAgentInteractionGateEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            2 => new GetAgentInteractionContextEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            3 => new GetAgentGenerationEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            4 => new GetAgentPostingEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            5 => new GetAgentProposalEditEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            6 => new GetAgentProposalRegenerationEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            7 => new GetAgentProposalApprovalEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority),
+            _ => new GetAgentAuditAvailabilityQueryHandler(reader, new DeferredTenantAccessReader(), authority),
         };
 
     private static QueryEnvelope Envelope(string queryType)

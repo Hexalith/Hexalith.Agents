@@ -66,20 +66,18 @@ public sealed class ProviderCatalogProjectionHandler(
             .GetAsync<ProviderCatalogReadModel>(storeName, key, cancellationToken)
             .ConfigureAwait(false);
 
-        if (ProviderCatalogProjectionFold.GetDeliveryFailureReason(
-                request.Events,
-                ProviderCatalogProjectionFold.Checkpoint(current.Value, request.TenantId, request.AggregateId)) is { } deliveryFailure)
+        long checkpoint = ProviderCatalogProjectionFold.Checkpoint(current.Value, request.TenantId, request.AggregateId);
+        if (current.Value is not null && Array.TrueForAll(request.Events, item => item.SequenceNumber <= checkpoint))
+        {
+            return DomainProjectionHandlerResult.AlreadyCompleted();
+        }
+
+        if (ProviderCatalogProjectionFold.GetDeliveryFailureReason(request.Events, checkpoint) is { } deliveryFailure)
         {
             return DomainProjectionHandlerResult.Retryable(deliveryFailure);
         }
 
         ProviderCatalogReadModel next = ProviderCatalogProjectionFold.Fold(request, current.Value);
-        if (current.Value is not null
-            && next.StreamSequences.GetValueOrDefault(request.AggregateId)
-                == ProviderCatalogProjectionFold.Checkpoint(current.Value, request.TenantId, request.AggregateId))
-        {
-            return DomainProjectionHandlerResult.AlreadyCompleted();
-        }
 
         var batch = new ReadModelBatch(
             new ReadModelBatchScope(storeName, request.TenantId, Domain, request.AggregateId, ProjectionType, dispatchId),

@@ -106,7 +106,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     [Fact]
     public async Task Stale_read_returns_context_blocked_context_not_fresh()
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Stale, null, 0, false));
         CaptureDispatch();
 
@@ -121,7 +121,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     [InlineData(AgentInteractionContextLoadOutcome.Unavailable)]
     public async Task Hidden_or_unavailable_read_returns_context_blocked_context_unavailable(AgentInteractionContextLoadOutcome loadOutcome)
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(loadOutcome, null, 0, false));
         CaptureDispatch();
 
@@ -181,7 +181,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         // A snapshot that recorded no provider/model id cannot have a budget — the orchestrator must fail closed to a
         // zeroed budget WITHOUT calling the catalog (no needless cross-tenant read; AC2/AD-9).
         IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SecretConversationText, _sampleCreatedAt)];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
         _tokenMeasurer.MeasureAsync(Arg.Any<IReadOnlyList<ConversationContextMessage>>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ConversationContextTokenMeasurement(true, 1_000));
@@ -200,7 +200,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     {
         // A reader that reports Loaded but hands back no messages is a degraded/contract-violating read — the orchestrator
         // must NOT proceed to measure a null payload; it fails closed to Unavailable (FR-21; AD-12).
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, null, 0, true));
         CaptureDispatch();
 
@@ -217,7 +217,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     [Fact]
     public async Task A_context_reader_that_throws_fails_closed_without_an_unhandled_exception_or_raw_error()
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("conversations transport blew up: secret-bearing detail"));
         CaptureDispatch();
 
@@ -261,7 +261,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     [Fact]
     public async Task A_genuine_cancellation_propagates_and_no_command_is_dispatched()
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .ThrowsAsync(new OperationCanceledException());
         CaptureDispatch();
 
@@ -328,7 +328,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         // The orchestrator's only collaborators are read ports + the command dispatcher — there is structurally no
         // provider adapter, no IConversationClient.AppendMessageAsync, and no proposal creation on this path (AC3). The
         // conversation seam is a READ (IConversationContextReader.ReadAsync), and exactly one context command is dispatched.
-        await _contextReader.Received(1).ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>());
+        await _contextReader.Received(1).ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>());
         await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         LastDispatched().ShouldNotBeNull().CommandType.ShouldBe(nameof(BuildAgentInteractionContext));
     }
@@ -403,7 +403,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     private void StubLoaded(int tokenCount)
     {
         IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SecretConversationText, _sampleCreatedAt)];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
         _tokenMeasurer.MeasureAsync(Arg.Any<IReadOnlyList<ConversationContextMessage>>(), ProviderId, ModelId, Arg.Any<CancellationToken>())
             .Returns(new ConversationContextTokenMeasurement(true, tokenCount));

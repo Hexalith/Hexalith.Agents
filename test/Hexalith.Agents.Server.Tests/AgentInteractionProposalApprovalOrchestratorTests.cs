@@ -216,6 +216,29 @@ public sealed class AgentInteractionProposalApprovalOrchestratorTests
     }
 
     [Fact]
+    public async Task Pending_and_confirmed_receipts_have_distinct_command_ids_and_the_same_conversation_message()
+    {
+        StubAuthorized();
+        StubVersionAvailable();
+        StubPartyAvailable();
+        StubMembershipPresent();
+        CaptureDispatch();
+        StubAppend(ConversationAppendOutcome.AwaitingConfirmation);
+
+        var pending = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+        pending.Status.ShouldBe(AgentInteractionStatus.ProposalPostingPending);
+        string pendingId = _dispatched.ShouldNotBeNull().MessageId;
+        NUlid.Ulid.Parse(pendingId).ToString().ShouldBe(pendingId);
+        JsonSerializer.Deserialize<ApproveProposedAgentReply>(_dispatched.Payload)!.Result.PostedConversationMessageId.ShouldBeEmpty();
+
+        StubAppend(ConversationAppendOutcome.Posted);
+        var confirmed = await Orchestrator.ExecuteAsync(Request() with { ProposalState = ProposedAgentReplyState.PostingPending }, CancellationToken.None);
+        confirmed.Status.ShouldBe(AgentInteractionStatus.ProposalPosted);
+        confirmed.MessageId.ShouldBe(pending.MessageId);
+        _dispatched.MessageId.ShouldNotBe(pendingId);
+    }
+
+    [Fact]
     public async Task Posting_identity_is_deterministic_so_a_retry_targets_the_same_message()
     {
         StubAuthorized();

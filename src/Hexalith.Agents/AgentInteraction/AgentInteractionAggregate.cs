@@ -510,11 +510,15 @@ public partial class AgentInteractionAggregate : EventStoreAggregate<AgentIntera
                 return DomainResult.NoOp();
             }
 
+            if (requested.ProposalState == ProposedAgentReplyState.PostingPending && requested.ProposalApprovalEvidence is { } pending)
+            {
+                return AgentProposalApprovalPolicy.Reconcile(interactionId, pending, command.Result);
+            }
+
             bool approvable = requested.ProposalState is ProposedAgentReplyState.Pending
                 or ProposedAgentReplyState.Edited
                 or ProposedAgentReplyState.Regenerated
                 or ProposedAgentReplyState.Approved
-                or ProposedAgentReplyState.PostingPending
                 or ProposedAgentReplyState.PostingFailed;
             if (!approvable)
             {

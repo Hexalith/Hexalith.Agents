@@ -30,7 +30,7 @@ public static class AgentsOperationEndpoints
         RouteGroupBuilder shared = endpoints.MapGroup(string.Empty);
         shared.AddEndpointFilter<AgentDependencyAvailabilityFilter>();
         shared.AddEndpointFilter<AgentOperationHttpStatusFilter>();
-        RouteGroupBuilder group = shared.MapGroup("/api/agents/operations");
+        RouteGroupBuilder legacy = shared.MapGroup("/api/agents/operations");
         RouteGroupBuilder versioned = shared.MapGroup("/api/v1/agents/operations");
         versioned.MapGet("/providers/commands/{targetTenantId}/{messageId}", (
             string targetTenantId, string messageId,
@@ -39,23 +39,28 @@ public static class AgentsOperationEndpoints
             client.ProviderCatalog.GetCommandWriteOutcomeAsync(targetTenantId, messageId,
                 new AgentOperationOptions(correlationId), cancellationToken));
 
+        legacy.MapGet("/providers/commands/{targetTenantId}/{messageId}", (
+            [FromHeader(Name = "X-Correlation-ID")] string? correlationId) =>
+            AgentOperationResult.Failed(AgentOperationErrorCode.Rejected, CanonicalCorrelationId(correlationId)));
+
+        MapOperations(versioned);
+        MapOperations(legacy);
+        return shared;
+    }
+
+    private static void MapOperations(RouteGroupBuilder group)
+    {
         MapProviderCatalog(group);
         MapAgentAdministration(group);
         MapInteractions(group);
         MapProposalWorkflow(group);
         MapStatus(group);
         MapAudit(group);
-
-        return shared;
     }
 
     private static void MapProviderCatalog(RouteGroupBuilder group)
     {
         RouteGroupBuilder providers = group.MapGroup("/providers");
-
-        providers.MapGet("/commands/{targetTenantId}/{messageId}", (
-            [FromHeader(Name = "X-Correlation-ID")] string? correlationId) =>
-            AgentOperationResult.Failed(AgentOperationErrorCode.Rejected, CanonicalCorrelationId(correlationId)));
 
         providers.MapGet("/tenant", (bool includeDisabled, IAgentsClient client, CancellationToken cancellationToken) =>
             client.ProviderCatalog.ListTenantEntriesAsync(includeDisabled, cancellationToken: cancellationToken));

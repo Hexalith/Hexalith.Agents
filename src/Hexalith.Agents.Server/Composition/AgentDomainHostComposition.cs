@@ -2,12 +2,16 @@ using Hexalith.Agents.Client;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
+using Hexalith.EventStore.Client.Registration;
+using Hexalith.EventStore.ServiceDefaults.Authentication;
 using Hexalith.Parties.Client.Extensions;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Hexalith.Agents.Server.Composition;
 
@@ -26,6 +30,26 @@ internal static class AgentDomainHostComposition
 
         // Domain-service collaborators consume the shared SDK's transitive Dapr client.
         builder.Services.AddDaprClient();
+        builder.Services.AddEventStoreReadModelStore();
+
+        // The operations API consumes human credentials. Domain callbacks keep the SDK's separate workload policy.
+        IConfigurationSection humanJwt = builder.Configuration.GetSection(EventStoreWorkloadAuthenticationDefaults.JwtContractSection);
+        if (humanJwt.Exists())
+        {
+            builder.Services.AddOptions<JwtBearerAuthenticationOptions>().Bind(humanJwt).ValidateOnStart();
+            builder.Services.AddSingleton<IValidateOptions<JwtBearerAuthenticationOptions>, ValidateJwtBearerAuthenticationOptions>();
+            builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerAuthenticationOptions>();
+            builder.Services.AddAuthentication().AddJwtBearer();
+        }
+        else
+        {
+            builder.Services.AddAuthentication().AddJwtBearer(options =>
+                options.Events.OnMessageReceived = context =>
+                {
+                    context.NoResult();
+                    return Task.CompletedTask;
+                });
+        }
 
         // Optional sibling clients validate their configuration when present.
         if (builder.Configuration.GetSection("Parties").Exists())

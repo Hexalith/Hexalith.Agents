@@ -11,8 +11,10 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(HexalithConversationsFromSource)' != 'true'">
-    <Compile Remove="ConversationClientContextReaderTests.cs" />
-    <Compile Remove="ConversationClientResponsePosterTests.cs" />
+    <!-- Exercise the same source adapters against the approved package catalog while the Release host keeps its deferred bindings. -->
+    <PackageReference Include="Hexalith.Conversations.Client" />
+    <Compile Include="../../src/Hexalith.Agents.Server/Ports/ConversationClientContextReader.cs" Link="Ports/ConversationClientContextReader.cs" />
+    <Compile Include="../../src/Hexalith.Agents.Server/Ports/ConversationClientResponsePoster.cs" Link="Ports/ConversationClientResponsePoster.cs" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(HexalithPartiesFromSource)' == 'true'">

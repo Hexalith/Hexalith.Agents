@@ -33,10 +33,6 @@ namespace Hexalith.Agents.Server.Ports;
 /// </remarks>
 public sealed class ConversationClientContextReader : IConversationContextReader
 {
-    // The authorized read requires a non-empty correlation id; a stable safe constant is used since the port carries no
-    // per-call trace id (no PII, no content — AD-14). The live binding can thread a real correlation id when finalized.
-    private const string ContextReadCorrelationId = "agents-conversation-context-read";
-
     private readonly IConversationClient _client;
 
     /// <summary>Initializes a new instance of the <see cref="ConversationClientContextReader"/> class.</summary>
@@ -48,7 +44,11 @@ public sealed class ConversationClientContextReader : IConversationContextReader
     }
 
     /// <inheritdoc />
-    public async Task<ConversationContextReadResult> ReadAsync(string tenantId, string sourceConversationId, string callerPartyId, string callerPrincipalId, CancellationToken ct)
+    public Task<ConversationContextReadResult> ReadAsync(string tenantId, string sourceConversationId, string callerPartyId, string callerPrincipalId, CancellationToken ct)
+        => ReadAsync(tenantId, sourceConversationId, callerPartyId, callerPrincipalId, Guid.NewGuid().ToString("N"), ct);
+
+    /// <inheritdoc />
+    public async Task<ConversationContextReadResult> ReadAsync(string tenantId, string sourceConversationId, string callerPartyId, string callerPrincipalId, string correlationId, CancellationToken ct)
     {
         try
         {
@@ -56,13 +56,13 @@ public sealed class ConversationClientContextReader : IConversationContextReader
                 SchemaVersion.Current,
                 new TenantId(tenantId),
                 callerPrincipalId,
-                ContextReadCorrelationId,
+                correlationId,
                 new ConversationId(sourceConversationId));
 
             ConversationClientResult<ConversationDetailResult> result = await _client.GetConversationAsync(query, ct).ConfigureAwait(false);
 
             return result is { IsSuccess: true, Value: { } detail }
-                ? Map(detail)
+                ? Map(detail, query)
                 : ConversationContextReadResult.Unavailable;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -73,7 +73,7 @@ public sealed class ConversationClientContextReader : IConversationContextReader
     }
 
     // Maps the Conversations detail result to the safe load classification (AD-6/AD-12 vocabulary).
-    private static ConversationContextReadResult Map(ConversationDetailResult detail)
+    private static ConversationContextReadResult Map(ConversationDetailResult detail, GetConversationQuery query)
     {
         if (detail.Details is not { } details)
         {
@@ -88,6 +88,12 @@ public sealed class ConversationClientContextReader : IConversationContextReader
         }
 
         // Details present but not trust-bearing (stale/degraded freshness) → cannot be loaded fresh enough (AC3).
+        if (details.TenantId != query.TenantId || details.ConversationId != query.ConversationId
+            || detail.FreshnessState != details.Freshness.FreshnessState)
+        {
+            return ConversationContextReadResult.Unavailable;
+        }
+
         if (!details.Freshness.AllowsTrustBearingDecision())
         {
             return new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Stale, null, 0, false);

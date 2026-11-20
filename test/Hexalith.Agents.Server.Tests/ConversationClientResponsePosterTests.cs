@@ -5,9 +5,14 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Hexalith.Agents.Contracts.Agent;
+using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Contracts.AgentInteraction.Commands;
+using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Ports;
 
 using Hexalith.Conversations.Client;
+using Hexalith.Conversations.Contracts.Agents;
 using Hexalith.Conversations.Contracts.Commands;
 using Hexalith.Conversations.Contracts.Errors;
 using Hexalith.Conversations.Contracts.Identifiers;
@@ -50,6 +55,24 @@ public sealed class ConversationClientResponsePosterTests
     private readonly IConversationClient _client = Substitute.For<IConversationClient>();
 
     private ConversationClientResponsePoster Poster => new(_client);
+
+    public ConversationClientResponsePosterTests()
+    {
+        _client.GetAgentConversationAsync(Arg.Any<ConversationAgentReadQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Observation(ConversationAgentsOutcome.Absent));
+    }
+
+    [Theory]
+    [InlineData("other", SourceConversationId)]
+    [InlineData(TenantId, "other")]
+    public async Task Foreign_details_cannot_prove_membership(string tenant, string conversation)
+    {
+        var details = new ConversationDetailsV1(SchemaVersion.Current, new TenantId(tenant),
+            new ConversationId(conversation), FreshFreshness(), "Active", Participants: [Participant(AgentPartyId, ParticipantType.AiAgent)]);
+        StubGetConversation(Visible(details));
+
+        (await EnsureMembership()).Outcome.ShouldBe(ConversationMembershipOutcome.ConversationUnavailable);
+    }
 
     // ===== Membership verify: present only when the Agent PartyId is an AiAgent participant (AC1) =====
 
@@ -170,7 +193,7 @@ public sealed class ConversationClientResponsePosterTests
     // ===== Append: authored by the Agent Party with the deterministic identity (AC2, AC3) =====
 
     [Fact]
-    public async Task Append_success_authors_the_message_as_the_agent_party_with_the_deterministic_identity()
+    public async Task Acceptance_keeps_the_exact_agent_message_pending_until_the_source_confirms_it()
     {
         AppendMessageCommand? captured = null;
         _client.AppendMessageAsync(Arg.Do<AppendMessageCommand>(c => captured = c), Arg.Any<CancellationToken>())
@@ -178,7 +201,7 @@ public sealed class ConversationClientResponsePosterTests
 
         ConversationAppendResult result = await Append();
 
-        result.Outcome.ShouldBe(ConversationAppendOutcome.Posted);
+        result.Outcome.ShouldBe(ConversationAppendOutcome.AwaitingConfirmation);
 
         AppendMessageCommand command = captured.ShouldNotBeNull();
         command.ConversationId.ShouldBe(new ConversationId(SourceConversationId));
@@ -196,7 +219,8 @@ public sealed class ConversationClientResponsePosterTests
     {
         _client.AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>())
             .Returns(ConversationClientResult<ConversationCommandAcceptedResult>.Failure(
-                new ConversationErrorResult([Error()]), HttpStatusCode.BadRequest));
+                new ConversationErrorResult([new ConversationError(SchemaVersion.Current, ConversationErrorCode.CommandValidationFailed,
+                    ConversationErrorCategory.Validation, IsRetryable: false, CorrelationId)]), HttpStatusCode.BadRequest));
 
         ConversationAppendResult result = await Append();
 
@@ -204,7 +228,7 @@ public sealed class ConversationClientResponsePosterTests
     }
 
     [Fact]
-    public async Task A_thrown_append_fails_closed_to_adapter_failure_without_propagating_the_content_or_error()
+    public async Task A_lost_append_acknowledgement_keeps_the_result_unconfirmed()
     {
         // The thrown error carries both a secret and the generated content — neither may cross the boundary; the adapter
         // fails closed (AD-12) and the result is a safe enum only (AD-14).
@@ -213,7 +237,7 @@ public sealed class ConversationClientResponsePosterTests
 
         ConversationAppendResult result = await Append();
 
-        result.Outcome.ShouldBe(ConversationAppendOutcome.AdapterFailure);
+        result.Outcome.ShouldBe(ConversationAppendOutcome.AwaitingConfirmation);
     }
 
     [Fact]
@@ -226,6 +250,114 @@ public sealed class ConversationClientResponsePosterTests
     }
 
     // ===== Helpers =====
+
+    [Fact]
+    public async Task A_later_exact_source_receipt_confirms_an_accepted_message_without_resending()
+    {
+        var absent = Observation(ConversationAgentsOutcome.Absent);
+        var confirmed = Observation(ConversationAgentsOutcome.Available, MessageIdValue, AgentPartyId);
+        _client.GetAgentConversationAsync(Arg.Is<ConversationAgentReadQuery>(q =>
+            q.TenantId == new TenantId(TenantId) && q.ConversationId == new ConversationId(SourceConversationId)
+            && q.MessageId == new MessageId(MessageIdValue)), Arg.Any<CancellationToken>())
+            .Returns(absent, absent, confirmed);
+        _client.AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>()).Returns(AcceptedSuccess());
+
+        (await Append()).Outcome.ShouldBe(ConversationAppendOutcome.AwaitingConfirmation);
+        (await Append()).Outcome.ShouldBe(ConversationAppendOutcome.Posted);
+        await _client.Received(1).AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Restart_after_lost_acknowledgement_confirms_one_persisted_message_through_the_automatic_orchestrator()
+    {
+        const string interaction = "call-1";
+        const string version = "version-1";
+        var request = new AgentInteractionPostingRequest("command-1", CorrelationId, TenantId, interaction, "hexa",
+            SourceConversationId, AgentResponseMode.Automatic, ActorPrincipalId);
+        var party = Substitute.For<IAgentPartyReader>();
+        party.ReadAsync(TenantId, "hexa", Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyReadResult(AgentPartyReadOutcome.Available, AgentPartyId));
+        var versions = Substitute.For<IAgentGeneratedVersionReader>();
+        versions.ReadSelectedVersionAsync(TenantId, interaction, Arg.Any<CancellationToken>())
+            .Returns(new AgentGeneratedVersionReadResult(AgentGeneratedVersionReadOutcome.Available, version, GeneratedContentText));
+        var dispatcher = Substitute.For<IAgentCommandDispatcher>();
+        AgentCommandIntent? receipt = null;
+        _ = dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(intent => receipt = intent), Arg.Any<CancellationToken>());
+        StubGetConversation(Visible(Details(Participant(AgentPartyId, ParticipantType.AiAgent))));
+
+        var persisted = new Dictionary<MessageId, AppendMessageCommand>();
+        _client.GetAgentConversationAsync(Arg.Any<ConversationAgentReadQuery>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                var query = call.Arg<ConversationAgentReadQuery>();
+                return query.MessageId is { } key && persisted.TryGetValue(key, out var command)
+                    ? Observation(ConversationAgentsOutcome.Available, key.Value, command.AuthorPartyId.Value)
+                    : Observation(ConversationAgentsOutcome.Absent);
+            });
+        _client.AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                var command = call.Arg<AppendMessageCommand>();
+                persisted.Add(command.MessageId, command);
+                return Task.FromException<ConversationClientResult<ConversationCommandAcceptedResult>>(
+                    new HttpRequestException("Acknowledgement lost"));
+            });
+
+        var first = new AgentInteractionPostingOrchestrator(party, versions, Poster, dispatcher);
+        (await first.ExecuteAsync(request, CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Generated);
+        receipt.ShouldBeNull();
+        var restarted = new AgentInteractionPostingOrchestrator(party, versions, Poster, dispatcher);
+        (await restarted.ExecuteAsync(request, CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.Posted);
+
+        var posted = System.Text.Json.JsonSerializer.Deserialize<PostAgentResponse>(receipt.ShouldNotBeNull().Payload)!.Result;
+        posted.PostedVersionId.ShouldBe(version);
+        persisted.Single().Key.Value.ShouldBe(posted.MessageId);
+        await _client.Received(1).AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("other", SourceConversationId, MessageIdValue, AgentPartyId)]
+    [InlineData(TenantId, "other", MessageIdValue, AgentPartyId)]
+    [InlineData(TenantId, SourceConversationId, "other", AgentPartyId)]
+    [InlineData(TenantId, SourceConversationId, MessageIdValue, OtherPartyId)]
+    public async Task Inconsistent_source_proof_neither_confirms_nor_retries_the_append(string tenant, string conversation,
+        string message, string author)
+    {
+        var proof = Observation(ConversationAgentsOutcome.Available, message, author) with
+        {
+            TenantId = new TenantId(tenant),
+            ConversationId = new ConversationId(conversation),
+        };
+        _client.GetAgentConversationAsync(Arg.Any<ConversationAgentReadQuery>(), Arg.Any<CancellationToken>()).Returns(proof);
+
+        (await Append()).Outcome.ShouldBe(ConversationAppendOutcome.AwaitingConfirmation);
+        await _client.DidNotReceive().AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("different", false, false)]
+    [InlineData(GeneratedContentText, true, false)]
+    [InlineData(GeneratedContentText, false, true)]
+    public async Task A_conflicting_or_undisclosable_message_cannot_confirm_the_selected_version(string text, bool redacted, bool wrongTrace)
+    {
+        var proof = Observation(ConversationAgentsOutcome.Available, MessageIdValue, AgentPartyId);
+        var message = proof.Messages!.Single() with
+        {
+            Text = text,
+            Redacted = redacted,
+            Provenance = wrongTrace ? new AgentMessageProvenance("wrong-call", true, false) : null,
+        };
+        _client.GetAgentConversationAsync(Arg.Any<ConversationAgentReadQuery>(), Arg.Any<CancellationToken>())
+            .Returns(proof with { Messages = [message] });
+
+        (await Append()).Outcome.ShouldBe(ConversationAppendOutcome.AwaitingConfirmation);
+        await _client.DidNotReceive().AppendMessageAsync(Arg.Any<AppendMessageCommand>(), Arg.Any<CancellationToken>());
+    }
+
+    private static ConversationAgentReadResult Observation(ConversationAgentsOutcome outcome, string? message = null, string? author = null)
+        => new(outcome, new TenantId(TenantId), new ConversationId(SourceConversationId), 1, _generatedAt, "checkpoint",
+            Messages: message is null ? null : [new ConversationAgentMessage(new MessageId(message), new PartyId(author!),
+                GeneratedContentText, _eventTimestamp, null, false, false, null)], AgentParticipantPresent: true);
 
     private Task<ConversationMembershipResult> EnsureMembership(string agentPartyId = AgentPartyId)
         => Poster.EnsureAiAgentParticipantAsync(

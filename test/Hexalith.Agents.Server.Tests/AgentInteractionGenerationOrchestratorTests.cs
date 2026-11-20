@@ -278,7 +278,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
     [Fact]
     public async Task A_conversation_re_read_failure_returns_generation_failed_invalid_context_without_invoking_the_provider()
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(ConversationContextReadResult.Unavailable);
         CaptureDispatch();
 
@@ -292,7 +292,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
     [Fact]
     public async Task A_context_reader_that_throws_fails_closed_to_invalid_context()
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("conversations transport blew up: secret"));
         CaptureDispatch();
 
@@ -455,7 +455,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
 
         // The orchestrator's only collaborators are read ports + the provider adapter + the command dispatcher — there is
         // structurally no IConversationClient.AppendMessageAsync and no proposal creation on this path (Story 2.5/3.1).
-        await _contextReader.Received(1).ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>());
+        await _contextReader.Received(1).ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>());
         await _generationProvider.Received(1).GenerateAsync(Arg.Any<AgentGenerationProviderRequest>(), Arg.Any<CancellationToken>());
         await _dispatcher.Received(1).DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
         LastDispatched().ShouldNotBeNull().CommandType.ShouldBe(nameof(GenerateAgentOutput));
@@ -505,7 +505,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
     [Fact]
     public async Task A_genuine_cancellation_propagates_and_no_command_is_dispatched()
     {
-        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .ThrowsAsync(new OperationCanceledException());
         CaptureDispatch();
 
@@ -532,7 +532,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
     private void StubLoadedConversation()
     {
         IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SourceConversationText, _sampleCreatedAt)];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
     }
 

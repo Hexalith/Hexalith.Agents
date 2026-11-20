@@ -63,6 +63,22 @@ public sealed class ConversationClientContextReaderTests
         result.IsFresh.ShouldBeTrue();
     }
 
+    [Theory]
+    [InlineData("other", SourceConversationId)]
+    [InlineData(TenantId, "other")]
+    public async Task Foreign_details_cannot_supply_context(string returnedTenant, string returnedConversation)
+    {
+        var details = new ConversationDetailsV1(SchemaVersion.Current, new TenantId(returnedTenant),
+            new ConversationId(returnedConversation), FreshFreshness(), "Active", Messages: [Message("private", _eventTimestamp)]);
+        StubGetConversation(ConversationClientResult<ConversationDetailResult>.Success(
+            ConversationDetailResult.Visible(SchemaVersion.Current, details, "ok"), HttpStatusCode.OK));
+
+        (await Read()).ShouldBe(ConversationContextReadResult.Unavailable);
+        await _client.Received(1).GetConversationAsync(Arg.Is<GetConversationQuery>(q =>
+            q.CorrelationId == "context-trace" && q.TenantId == new TenantId(TenantId)
+            && q.ConversationId == new ConversationId(SourceConversationId)), Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task Hidden_maps_to_unauthorized()
     {
@@ -189,7 +205,7 @@ public sealed class ConversationClientContextReaderTests
     // ===== Helpers =====
 
     private Task<ConversationContextReadResult> Read()
-        => Reader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, CallerPrincipalId, CancellationToken.None);
+        => Reader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, CallerPrincipalId, "context-trace", CancellationToken.None);
 
     private void StubGetConversation(ConversationClientResult<ConversationDetailResult> result)
         => _client.GetConversationAsync(Arg.Any<GetConversationQuery>(), Arg.Any<CancellationToken>()).Returns(result);

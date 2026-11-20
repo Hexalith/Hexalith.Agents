@@ -5,8 +5,9 @@ using Hexalith.Agents.Server.Ports;
 namespace Hexalith.Agents.Server.Application.Queries;
 
 /// <summary>Serves safe AgentInteraction gate evidence reads.</summary>
-public sealed class GetAgentInteractionGateEvidenceQueryHandler(IAgentInteractionAuditStateReader reader, ITenantAccessReader tenantAccessReader)
-    : AgentInteractionAuditQueryHandlerBase(reader, tenantAccessReader)
+public sealed class GetAgentInteractionGateEvidenceQueryHandler(IAgentInteractionAuditStateReader reader, ITenantAccessReader tenantAccessReader,
+    IAgentInteractionAuditAuthority? auditAuthority = null)
+    : AgentInteractionAuditQueryHandlerBase(reader, tenantAccessReader, auditAuthority)
 {
     /// <inheritdoc />
     public override string QueryType => GetAgentInteractionGateEvidenceQuery.QueryType;

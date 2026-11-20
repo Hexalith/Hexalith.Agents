@@ -197,7 +197,7 @@ public sealed class AgentInteractionGenerationOrchestrator
             // The generation re-read keys on the actor security principal; authorization was already settled at the gate
             // (Story 2.2), so the auxiliary caller-party reference is not carried on the generation request.
             return await _contextReader
-                .ReadAsync(request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, ct)
+                .ReadAsync(request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct)
                 .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

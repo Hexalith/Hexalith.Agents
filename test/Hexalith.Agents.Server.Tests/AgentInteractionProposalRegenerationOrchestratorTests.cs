@@ -140,7 +140,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         outcome.Status.ShouldBe(AgentInteractionStatus.Unknown);
         outcome.RegeneratedVersionId.ShouldBeEmpty();
         await _generationProvider.DidNotReceive().GenerateAsync(Arg.Any<AgentGenerationProviderRequest>(), Arg.Any<CancellationToken>());
-        await _contextReader.DidNotReceive().ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _contextReader.DidNotReceive().ReadAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), "corr-1", Arg.Any<CancellationToken>());
         await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>());
     }
 
@@ -409,7 +409,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     public async Task A_conversation_re_read_failure_returns_regeneration_failed_invalid_context_without_invoking_the_provider()
     {
         StubResolved();
-        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(ConversationContextReadResult.Unavailable);
         CaptureDispatch();
 
@@ -562,7 +562,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     private void StubLoadedConversation()
     {
         IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SourceConversationText, _sampleCreatedAt)];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
     }
 

@@ -20,6 +20,9 @@ public enum ConversationAppendOutcome
 
     /// <summary>The append adapter failed (it threw or returned a fail-closed adapter outcome) — fail closed; no error text exposed (AD-14).</summary>
     AdapterFailure,
+
+    /// <summary>The append has no definitive outcome yet. Reconcile the same message identity on retry.</summary>
+    AwaitingConfirmation,
 }
 
 /// <summary>
@@ -30,6 +33,9 @@ public sealed record ConversationAppendResult(ConversationAppendOutcome Outcome)
 {
     /// <summary>Gets the fail-closed conversation-unavailable result (the deferred default).</summary>
     public static ConversationAppendResult ConversationUnavailable { get; } = new(ConversationAppendOutcome.ConversationUnavailable);
+
+    /// <summary>Gets the result for an unconfirmed submission or lookup.</summary>
+    public static ConversationAppendResult AwaitingConfirmation { get; } = new(ConversationAppendOutcome.AwaitingConfirmation);
 
     /// <summary>Gets the fail-closed adapter-failure result.</summary>
     public static ConversationAppendResult AdapterFailure { get; } = new(ConversationAppendOutcome.AdapterFailure);

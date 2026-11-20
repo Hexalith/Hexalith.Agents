@@ -3,7 +3,7 @@
 .SYNOPSIS
 Verifies the approved Story 5.9 preparation; full qualification remains blocked by Stories 5.5 and 5.7.
 .DESCRIPTION
-Copies source into a run-with-temp workspace, builds Debug with source references, runs focused xUnit v3
+Copies source into a private temporary workspace, builds Debug with source references, runs focused xUnit v3
 classes and every owning project, and saves logs/results outside the disposable workspace. By default the
 command reports the unmet full-story gates after checking preparation. -PreparationOnly selects the bounded
 approved scope; its success establishes no live readiness, Provider exclusion, or dependency availability.
@@ -24,16 +24,27 @@ if (-not $ArtifactsPath) {
 $ArtifactsPath = [IO.Path]::GetFullPath($ArtifactsPath)
 
 if (-not $InDisposableWorkspace) {
-    $arguments = @('pwsh', '-NoProfile', '-File', $PSCommandPath, '-InDisposableWorkspace', '-ArtifactsPath', $ArtifactsPath)
+    $arguments = @('-NoProfile', '-File', $PSCommandPath, '-InDisposableWorkspace', '-ArtifactsPath', $ArtifactsPath)
     if ($PreparationOnly) { $arguments += '-PreparationOnly' }
-    & run-with-temp @arguments
-    exit $LASTEXITCODE
+    $workspaceTemp = & mktemp -d
+    try {
+        & env "TMPDIR=$workspaceTemp" "TMP=$workspaceTemp" "TEMP=$workspaceTemp" pwsh @arguments
+        $result = $LASTEXITCODE
+    }
+    finally {
+        Remove-Item -LiteralPath $workspaceTemp -Recurse -Force
+    }
+    exit $result
 }
 if (-not $env:TMPDIR -or -not (Test-Path -LiteralPath $env:TMPDIR -PathType Container)) {
-    throw 'A private TMPDIR supplied by run-with-temp is required.'
+    throw 'A private TMPDIR is required inside the verifier workspace.'
 }
 # Resolve every existing symlink component, including an ancestor of a not-yet-created output path.
 $canonicalTemp = [IO.Path]::TrimEndingDirectorySeparator([string] (& realpath -m -- $env:TMPDIR))
+$sourceRoot = [IO.Path]::TrimEndingDirectorySeparator([string] (& realpath -e -- $root))
+if ($canonicalTemp -ceq $sourceRoot -or $canonicalTemp.StartsWith("$sourceRoot/", [StringComparison]::Ordinal)) {
+    throw 'TMPDIR must be outside the source checkout.'
+}
 $ArtifactsPath = [IO.Path]::TrimEndingDirectorySeparator([string] (& realpath -m -- $ArtifactsPath))
 if ($ArtifactsPath -ceq $canonicalTemp -or
     $ArtifactsPath.StartsWith($canonicalTemp.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal)) {
