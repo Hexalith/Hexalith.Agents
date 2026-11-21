@@ -1,6 +1,6 @@
-"""Agents release inventory and caller-owned archive protection."""
+"""Agents release package inventory."""
 from __future__ import annotations
-import json,zipfile
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from xml.etree import ElementTree
@@ -64,39 +64,3 @@ def load_packages() -> list[ReleasePackage]:
         seen_projects.add(project)
         result.append(ReleasePackage(package_id, project))
     return result
-
-
-def archive_package_id(path: Path) -> str | None:
-    """Read an archive identity, returning None for caller-owned or malformed archives."""
-    try:
-        with zipfile.ZipFile(path) as archive:
-            nuspecs = [name for name in archive.namelist() if name.casefold().endswith(".nuspec")]
-            if len(nuspecs) != 1:
-                return None
-            root = ElementTree.fromstring(archive.read(nuspecs[0]))
-            ids = [
-                (element.text or "").strip()
-                for element in root.iter()
-                if element.tag.rsplit("}", 1)[-1] == "id" and (element.text or "").strip()
-            ]
-            return ids[0] if len(ids) == 1 else None
-    except (OSError, ElementTree.ParseError, zipfile.BadZipFile):
-        return None
-
-
-def validate_output_directory(output: Path) -> None:
-    """Reject repository source/configuration directories as package output targets."""
-    if output == ROOT:
-        raise ValueError(f"package output must not be the repository root: {output}")
-    protected = [ROOT / "src", ROOT / "test", ROOT / "references", ROOT / ".git"]
-    for path in protected:
-        resolved = path.resolve()
-        if output == resolved or resolved in output.parents:
-            raise ValueError(f"package output must not be a repository source/configuration path: {output}")
-
-
-def clean_manifest_archives(output: Path, package_ids: frozenset[str]) -> None:
-    """Remove only archives whose embedded identity belongs to this manifest."""
-    for archive in [*output.glob("*.nupkg"), *output.glob("*.snupkg")]:
-        if archive_package_id(archive) in package_ids:
-            archive.unlink()

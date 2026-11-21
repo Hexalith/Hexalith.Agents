@@ -6,14 +6,11 @@ in this repository. Run the commands below from the repository root.
 ## Setup
 
 Install the .NET SDK selected by `global.json`, Python 3.10 or later, PowerShell
-7, and Node.js 24.10 or later (Node 22.14 or later within version 22 is also
-supported by `package.json`). Initialize only the root-declared submodules:
+7, and Node.js 24.10 or later. Initialize only the root-declared submodules:
 
 ```bash
 mapfile -t paths < <(git config -f .gitmodules --get-regexp path | awk '{print $2}')
 git -c submodule.recurse=false submodule update --init -- "${paths[@]}"
-npm ci --ignore-scripts
-npm audit signatures
 ```
 
 The submodule commands require Bash. Check `git submodule status` for a
@@ -21,10 +18,7 @@ leading space on every direct dependency. A leading minus means the module
 is uninitialized. If a remote refuses the recorded revision, capture the path
 and SHA for its owner before running source-mode checks.
 
-The active commit-lint workflow and legacy release planner resolve their Node
-packages from the root lockfile. Retire the manifest and lockfile together
-after the CiCd owner delivers and verifies replacement entry points. Story
-5.9 preparation also requires a POSIX shell environment, GNU coreutils and
+Story 5.9 preparation also requires a POSIX shell environment, GNU coreutils and
 rsync. The verifier creates and removes its own private temporary directory.
 
 ## Build and test
@@ -123,7 +117,7 @@ register or establish live readiness.
 The Release build resolves the external libraries from packages using the
 shared Builds catalog. Run the same package floors and product consumer checks
 locally from the repository root. Package consumer qualification requires the
-Linux tracing prerequisites in the release policy below.
+Linux tracing prerequisites described under Package consumer qualification below.
 
 ```bash
 set -e
@@ -150,97 +144,19 @@ its consumer, package, version, path and SHA-256.
 ## Commits and pull requests
 
 Use Conventional Commits for commit messages and PR titles, for example
-`fix(release): reject unsafe package paths`. The commitlint workflow checks PR
+`fix(release): reject unsafe package paths`. The shared CI guard checks PR
 titles and commits pushed to `main`; dependency updates follow the same rule.
-Validate a message before committing it:
-
-```bash
-printf '%s\n' 'fix(release): reject unsafe package paths' > /tmp/agents-commit-message.txt
-npx --no-install commitlint --edit /tmp/agents-commit-message.txt
-git commit -F /tmp/agents-commit-message.txt
-```
-
-Semantic-release uses `.releaserc.json` and commit history to calculate releases:
-`fix` normally selects a patch, `feat` a minor, and a breaking change a major.
-Other types alone normally do not trigger publication. The planner reads that
-same configuration. `node eng/semantic-release-plan.mjs` computes the decision
-using an isolated local mirror without publishing. Put analysis options in the
-configured commit-analyzer and release-notes-generator plugin tuples. The planner
-rejects top-level `analyzeCommits`, `generateNotes` and `extends` settings to avoid
-silently planning a different release from publication. Additional plugins and
-exec analysis hooks also require planner support before they can be used.
+Before every push, run `python3 references/Hexalith.Builds/check.py`; it also
+checks the committed `origin/main..HEAD` messages locally.
 
 ## Release policy
 
-Releases are manually dispatched through `.github/workflows/release.yml` from
-the current green `main` tip. A push to `main` runs CI; it does not dispatch a
-release. The repository variable `HEXALITH_RELEASE_PUBLISH_ENABLED` must equal
-the string `true` to enable publication. Otherwise the workflow stays green,
-reports the freeze in its job summary, and skips publication and its assertions.
+CI/CD and releases are owned by Hexalith.CiCd. Releases come from the shared
+Builds pipeline through the centrally scheduled nightly release; the delivered
+release caller and its configuration are CiCd-owned. Propose release changes in
+Hexalith.CiCd.
 
-Both publication workflows use the protected `production` environment and
-NuGet trusted publishing. Set the repository variable
-`NUGET_TRUSTED_PUBLISHING_USER` to the individual policy creator's NuGet.org
-profile username, including for organization-owned packages; do not use the
-organization name. Configure separate GitHub Actions policies for
-`Hexalith/Hexalith.Agents`, one for `release.yml` and one for
-`recover-release.yml`, each matching the `production` environment. Authorize
-both workflow identities to publish all six packages in
-`eng/release-packages.json`: `Hexalith.Agents.Contracts`,
-`Hexalith.Agents.EventStore`, `Hexalith.Agents.Client`, `Hexalith.Agents`,
-`Hexalith.Agents.UI` and `Hexalith.Agents.Testing`.
-
-Each publication job requests `id-token: write`; the pinned `NuGet/login` action
-exchanges that identity for a short-lived publication credential. Only that
-action's output is passed to the publisher scripts as `NUGET_API_KEY`. Stored
-API-key secrets are ignored. A missing or mismatched policy, or a failed login,
-blocks publication; correct the policy/account/workflow/environment match
-before retrying. Disabled publication jobs do not request credentials.
-
-The release workflow reserves the semantic-release version and packs the six
-manifest packages. It validates archives and an isolated
-consumer, proves package versions absent, and rechecks the exact green main
-source before the first push. Publication sends only validated manifest/version
-archives; unrelated files are preserved. It then verifies NuGet presence and the
-GitHub Release's source, six downloaded archives and retained provenance. Each GitHub asset must match
-its API SHA-256 digest, byte length and package identity. NuGet presence requires
-downloading every exact package and comparing all ordinary archive members with
-the release artifacts. Both gates validate package boundaries and enforce archive
-and expanded-content limits. Existing versions fail the release;
-`--skip-duplicate` is not used. Before publication, the root-owned
-`eng/github-release-publisher.mjs` semantic-release hook creates a draft release
-containing all six original archives and `release-provenance.json` (repository,
-version, exact source SHA/tag, archive byte lengths and SHA-256 hashes). It
-replaces the GitHub publisher plugin so only one release is created. The draft
-is finalized only after complete NuGet content verification; failures retain it.
-Presence verification allows ninety ten-second waits (fifteen minutes), plus
-bounded request time, for NuGet indexing after accepted uploads. If indexing
-still times out, retain the draft and original archives and recover that exact
-release once the feed is available; do not repack or choose a new version merely
-because the accepted uploads are not yet indexed.
-
-To recover a partial push, dispatch `.github/workflows/recover-release.yml` from
-`main` with the original version and source SHA. The protected `production`
-environment, publication freeze and `release-production` concurrency group also
-apply to recovery. Recovery requires the original source still to be current
-green main, its exact existing tag and original unpublished draft. It downloads
-those original archives, checks GitHub asset digests and provenance, validates
-every archive, then probes the full immutable NuGet set and compares every
-existing package before any missing push. A collision, unconfirmed probe,
-changed main or archive mismatch refuses every missing push. It never repacks or
-runs ordinary release planning. After missing pushes, it verifies the complete
-remote content set before finalizing the draft. If main has advanced, recovery
-requires a new approved procedure; this workflow provides no older-source exception.
-
-The NuGet comparison permits only changes to the root `.signature.p7s` member:
-[NuGet.org repository signing](https://devblogs.microsoft.com/dotnet/introducing-repository-signatures/)
-adds or countersigns that entry while preserving other package contents. This is
-content comparison, not cryptographic signature verification. Run the presence
-CLI with `--package-directory <original-archives>`; the GitHub CLI verifier requires
-`--asset-directory <downloaded-assets>`. The release workflow supplies both.
-It preflights release metadata before downloading, caps downloaded files at 64 MiB,
-then runs full archive verification. Metadata-only success explicitly states that
-contents have not yet been verified.
+## Package consumer qualification
 
 Dependency validation retains nuspec include/exclude metadata and checks ordinary
 dependency build selection. Analyzer and `buildTransitive` selection have separate
@@ -412,10 +328,7 @@ provisioning, production readiness, or DW-6/DW-19/DW-21.
 ## Updating the Builds dependency
 
 The CiCd owner coordinates the Builds revision, reusable workflows, and release
-preparation. Agents' legacy workflow currently checks a different Builds commit
-from the parent gitlink and invokes retired story scripts. The Release checks
-above provide local product evidence while that owner updates the delivered
-workflows.
+preparation. The Release checks above provide local product evidence.
 
 Before accepting a Builds change, verify the candidate catalog against the
 package authority check, EventStore floor, full Release suites and isolated
