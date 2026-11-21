@@ -1,0 +1,81 @@
+# Hexalith Agents architecture validation
+
+21 November 2026 · Initiative architecture · Agents `2b21256` · Assumption index 16
+
+> **Changes required.** The spine gives owners clear rules for withholding an uncertain post or export key. Several implementation paths still permit a different result. The most consequential differences concern when to release a caller or Provider slot, how to recover generated output, and which checks precede storing an edited reply. **Release gate RQ-1 remains NOT READY.**
+
+The review found **7 high, 3 medium and 1 low** findings. No critical finding was identified. Counts combine overlapping reviewer observations.
+
+## Workflow and data integrity
+
+### H1 · Release the caller slot when the Confirmation call ends
+
+FR-8 ends the Confirmation call at `ProposalCreated`. FR-32 limits concurrent nonterminal **calls**. The diagram reaches the human decision before showing the ordinary caller-slot release, then places release beside workflow purge. With a limit of one and a proposal awaiting review overnight, one implementation admits the caller’s next call while another rejects it. Purging the workflow at proposal creation would also lose the still-active review process. [Spine, AD-21 and sequence lines 972–986 and 1013–1015](ARCHITECTURE-SPINE.md) · [PRD, lines 307 and 785](../../prds/prd-agents-2026-06-23/prd.md)
+
+**Correction and proof.** Have the workflow release the original slot once against the committed `ProposalCreated` revision. Keep the proposal workflow running. Its terminal commit starts proposal-content retention. With a one-slot limit, restart immediately after creation and verify that a second call can proceed while the first proposal remains reviewable. Preserve Automatic mode’s separate posting-terminal rule.
+
+### H2 · Keep capacity occupied while a timed-out Provider may still be running
+
+AD-13 makes an indeterminate attempt terminal for public reporting. AD-24 and the capacity register permit reclamation after a recorded terminal attempt. With system capacity one, attempt A can time out and become `Indeterminate` while its Provider still runs. Reclaiming the slot admits B and breaches the limit. Holding A’s budget and suppressing a retry do not limit B. [Spine, AD-13 line 446 and AD-24 line 586](ARCHITECTURE-SPINE.md) · [Readiness register, line 467](../../launch-readiness-register.md)
+
+**Owner action and proof.** Architecture and the capacity owner must specify what proves that A has stopped, or qualify an upstream bound that guarantees termination. Preserve the active capacity claim while that evidence is unknown. Test B’s admission before and after authoritative closure, including allocator restart.
+
+### H3 · Define a recoverable command boundary for generated output
+
+AD-18 allows a replay-safe activity to dispatch at most one trusted command. AD-27 gives one activity custody of transient output through safety and protected persistence. The sequence asks that activity to reserve and commit a directory lease, persist the version on the interaction, and settle the lease. If the process dies after lease commit and before version persistence, the durable lease identifies the work, but the current Provider contract does not guarantee retrieval of the exact output bytes. [Spine, AD-18 line 512, AD-27 line 608 and sequence lines 926–939](ARCHITECTURE-SPINE.md) · [Provider owner contract](../../external-dependency-register.md)
+
+**Owner action and proof.** Architecture must identify the owner of each command and specify the permitted recovery outcome when the bytes are gone. Crash on both sides of the version append. Recovery must converge without exposing uncommitted content, dispatching a second chargeable request, or manufacturing a version.
+
+### H4 · Show the checks required before storing a human edit
+
+The Confirmation sequence groups edit, regenerate and approve, but depicts a safety check only on approval. FR-15 and FR-27 require classification before storing the edit. An always-blocked edit could therefore enter version history and stay there even if every later approval were refused. AD-8 also binds edits and regeneration to a prospective eligible-approver check. [Spine, AD-8 and sequence lines 973–983](ARCHITECTURE-SPINE.md) · [PRD, lines 412 and 724](../../prds/prd-agents-2026-06-23/prd.md)
+
+**Correction and proof.** Give edit its own branch under the committed mutation lease. Demonstrate that an always-blocked edit adds no version, a restricted edit stores its marker and cannot be approved, and an edit leaving no eligible approver is refused. Show the corresponding eligibility check before regeneration and keep the approval-time rescan.
+
+## Readiness register and story handoff
+
+### H5 · Register the four deferred decisions so runtime can enforce their scopes
+
+The PRD names OQ-35 through OQ-38 and requires governed decision records. AD-17 requires stable decision identities, minimum versions and affected evaluations. The register lists the older decision rows, but supplies no corresponding entries for these four questions. A checker built from the enumerated rows cannot identify which missing record blocks a particular operation. The safe behavior in the spine is already explicit. [Spine, AD-17 and Blocking Open Decisions](ARCHITECTURE-SPINE.md) · [Readiness register, lines 96–115](../../launch-readiness-register.md) · [PRD, line 1118](../../prds/prd-agents-2026-06-23/prd.md)
+
+**Owner action and proof.** Publish the governed identities, minimum versions and affected scopes while the outcomes remain open. Omit one record at a time. Verify that the affected operation returns `OpenDecision` and an unrelated operation remains evaluable. Include RQ-1 only where a governing contract names it.
+
+### H6 · Posting stories can pass without proof that an old append has closed
+
+AD-6 and FR-18 require proof that every earlier dispatch can no longer commit before a negative exit after a possible append. Story fixtures accept typed absence for retry, or absence or removal for an otherwise permitted abandonment. Those fixtures can pass while a delayed earlier append is still able to make the reply visible. [Spine, AD-5 and AD-6](ARCHITECTURE-SPINE.md) · [Epics, lines 2637 and 2691](../../epics.md) · [PRD, lines 446–450](../../prds/prd-agents-2026-06-23/prd.md)
+
+**Correction and proof.** Update the fixtures to delay the original append across the negative lookup. Assert that the current phase and identity survive restart, and that the eventual matching message wins. Retain the exemption when no append was ever attempted. The Conversations owner still owes the finality contract under OQ-36.
+
+### H7 · First export-key delivery after a deletion seal needs the same guard on recovery
+
+AD-22 withholds a first release when deletion of the same export overlaps delivery and the custodian cannot establish the order. The matrix and Story 8.2 allow a `NotDelivered` recovery to retry on current actor authority and expiry. Both checks can pass after deletion seals. A recipient who already holds the ciphertext could then decrypt it. [Spine, AD-22 line 568](ARCHITECTURE-SPINE.md) · [Readiness register, lines 303–305](../../launch-readiness-register.md) · [Epics, line 2974](../../epics.md)
+
+**Correction and proof.** Apply the OQ-38 guard to first release and retry of an undelivered grant. Exercise both orderings and a lost acknowledgement. Preserve a proven earlier `Delivered` receipt by its original identity. Governance, Security and the custodians retain the ordering decision.
+
+## Other findings
+
+| Priority | Finding | Correction and verification |
+| --- | --- | --- |
+| Medium | **Automatic posting can inherit two expiry durations.** AD-4 snapshots expiry when requested. FR-11 uses configuration at acceptance. A change from one hour to 24 hours between those events changes the verdict two hours later. | Pin the acceptance-time duration used for the Automatic posting window and replay from that value. [Spine, AD-4 line 307](ARCHITECTURE-SPINE.md) · [PRD, line 351](../../prds/prd-agents-2026-06-23/prd.md) |
+| Medium | **The pending retention-expiry request lacks a durable owner and identity.** AD-22 requires one request across duplicate timers, hold release and restart. The register identifies a retention projection. A projection rebuild and a timer replay need a common authoritative fact. | Specify the owning stream, identity and deduplication rule for eligibility alone. Replay concurrent timer and hold-release deliveries and rebuild the projection. Destructive authority stays with OQ-35. [Spine, line 564](ARCHITECTURE-SPINE.md) · [Readiness register, line 514](../../launch-readiness-register.md) · [Epics, line 2911](../../epics.md) |
+| Medium | **AD-29 leaves the length unit implicit.** For the opaque component `é`, the shipped .NET implementation prefixes one UTF-16 code unit. A UTF-8 byte-count implementation prefixes two and produces a different interaction ID. | Preserve the shipped format, specify the unit and publish a cross-language golden vector. For inputs `t, hexa, c, p, é`, the respective SHA-256 prefixes are `b8a3d7cf` and `c7ec9af0`. [Spine, AD-29 line 624](ARCHITECTURE-SPINE.md) · [Interaction identity implementation](../../../../src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionIdentity.cs) |
+| Low | **Hosted CI has passed on the exact parent SHA.** The delivery-debt row still lists that result as outstanding. | Record the successful run against `2b21256`. Keep the same-revision nonpublishing rehearsal as a separate evidence gap. [Spine, line 1512](ARCHITECTURE-SPINE.md) · [GitHub Actions run 44899631836](https://github.com/Hexalith/Hexalith.Agents/actions/runs/44899631836) |
+
+## Release evidence and scope
+
+Parties, Conversations, Secrets and Host have committed contracts. All four still require qualifying owner evidence at their registered targets. The successful hosted CI run covers the committed parent revision. It does not exercise the uncommitted spine or prove owner availability. A same-revision nonpublishing release rehearsal is still outstanding. [External dependency register](../../external-dependency-register.md) · [Launch-readiness register](../../launch-readiness-register.md)
+
+The previous validation’s emergency-containment, step-9 refusal, uncertain-append and first-key-release rules are present in the revised spine. H6 and H7 concern downstream instructions that still permit weaker behavior. The current review also confirmed the separation between a public indeterminate Provider outcome and its outstanding financial reservation. H2 concerns the separate capacity claim. [November 20 validation](VALIDATION-REPORT-2026-11-20.md)
+
+Known source gaps remain tracked separately from the findings above. Approval can call Conversations before its durable posting intent, the posting adapter can accept missing provenance, a nonblank credential handle can make a model selectable, and dependency filtering can precede the retired route’s authenticated 422 refusal. This document review ran no product tests, live owner commands or release rehearsal. [Spine delivery-debt inventory](ARCHITECTURE-SPINE.md#architecture-contract-versus-delivery-debt)
+
+## Verification record
+
+| Check | Result |
+| --- | --- |
+| Reviewed artifact | Working-copy spine dated 2026-11-21, SHA-256 <code>57cbc4a3746b3abd627f3e6ca5958016813d106f91c5538952a8e84b7d9f15fb</code> |
+| Parent and dependencies | Agents <code>2b212567fc546cef1d194c9ff778b082fc80fccb</code>. Twelve direct checkouts differ from the parent pins. The previous sync could not fetch ten recorded SHAs. Package checks used the recorded Builds v6.4.4 catalog. |
+| Architecture checks | BMAD linter reported zero findings. All 31 decision IDs and titles match the parent. Four Mermaid diagrams parsed, and all 132 local source and companion entries resolved. |
+| Review boundary | The validation wrote the reports and four review records. The spine and decision log retained their starting SHA-256 values. |
+
+[Rubric and handoff review](reviews/review-2026-11-21-validate-rubric.md) · [Technology and release evidence](reviews/review-2026-11-21-validate-current.md) · [Behavior across implementations](reviews/review-2026-11-21-validate-divergence.md) · [Data integrity and recovery](reviews/review-2026-11-21-validate-integrity.md)

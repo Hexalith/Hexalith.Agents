@@ -1,0 +1,23 @@
+# Initiative architecture update rubric
+
+21 November 2026 · Agents `2b21256` · Assumption index 16
+
+**Pass.** All eleven November 21 findings are addressed in the architecture and implementation handoff. During review, a negative Conversations lookup could still be combined with a later closure after the message had already committed. The finalized AD-6, both posting branches, FR-18, v8 matrix, dependency contract notes and story fixtures now require the owner observation to cover closure of every earlier dispatch. A message committed in the intervening interval resolves to `Posted`. OQ-36 remains open until the owners qualify that evidence.
+
+| Validation finding | Rubric result and acceptance case |
+| --- | --- |
+| H1 · Caller slot | AD-13, AD-21, the sequence and the caller-release matrix row bind release to the committed `ProposalCreated` revision. A one-slot caller can start a second call after restart while the first proposal remains reviewable. Its terminal proposal event starts retention. |
+| H2 · Provider capacity | AD-13 and AD-24 distinguish the public indeterminate outcome, the financial reservation and the allocator's active claim. With capacity one, a second call waits for authoritative cessation of the first invocation, including across restart. |
+| H3 · Generated output | AD-18 permits one custody activity to coordinate independently replayable one-command steps. AD-27 and v8 close or recover the exact child lease before conditional negative settlement. A version and `OutputUnavailable` compete for one target disposition. A stale writer adopts the winner. The workflow receives either the committed sealed reference or a safe result. |
+| H4 · Human edits | AD-8, AD-20, the sequence and the proposal story check prospective approvers and classify the edit before version storage. Restricted content carries its marker. Regeneration checks prospective eligibility before Provider work, and approval rescans the selected version. |
+| H5 · Open decisions | The v8 register names the four stable decision IDs, minimum version 1 and their affected branches. Missing authority blocks destructive expiry, negative post-dispatch resolution, a same-attempt retry, or overlapping first key delivery. Recording eligibility, exact positive confirmation, initial admission and recovery of prior delivery retain their separate rules. |
+| H6 · Posting finality | The stories exercise delay and restart for both modes. The owner observes the original identity at or after the closure checkpoint, or atomically with closure. A prior absent read cannot hide a message committed before closure. |
+| H7 · First key release | AD-22, both v8 delivery variants and Story 8.2 withhold first delivery while deletion ordering is unknown, including retry of an undelivered grant. A lost acknowledgement recovers the original receipt. |
+| M1 · Automatic expiry | AD-4 and Story 6.6 record the configuration revision and duration at acceptance. A configuration change between request and acceptance produces one posting-window bound on replay. |
+| M2 · Retention eligibility | AD-22, the timer matrix row and Story 8.1 bind one content-free event to the interaction and terminal base revision. Concurrent timer/hold-release delivery and projection rebuild converge on that event. Destruction requires separate OQ-35 authority. |
+| M3 · Identifier framing | AD-29 specifies UTF-16 code-unit lengths, UTF-8 encoding and preserved input. An independent implementation reproduced the complete 64-character hash for the published non-ASCII vector. |
+| L1 · Hosted CI | GitHub run 44899631836 reports success on full SHA `2b212567fc546cef1d194c9ff778b082fc80fccb`. The nonpublishing rehearsal and configured owner receipts remain outstanding. [Hosted run](https://github.com/Hexalith/Hexalith.Agents/actions/runs/44899631836) |
+
+The 31 AD identifiers and titles match the parent revision, in order. Each contains Binds, Prevents and Rule. The BMAD linter returned zero findings. Mermaid parsed both flowcharts, the execution sequence and the class diagram. The release and host boundaries distinguish the local checkout, package selections, registered owner targets and qualification evidence. Four dependencies are Committed and zero are Available. RQ-1 remains **NOT READY**. These results concern specification and cross-document consistency. Runtime acceptance and owner qualification require the recorded tests and receipts.
+
+[Architecture spine](../ARCHITECTURE-SPINE.md) · [Validation findings](../VALIDATION-REPORT-2026-11-21.md) · [PRD](../../../prds/prd-agents-2026-06-23/prd.md) · [Readiness register](../../../launch-readiness-register.md) · [Epic and story handoff](../../../epics.md)
