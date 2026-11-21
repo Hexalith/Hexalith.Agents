@@ -1,79 +1,20 @@
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
+  workflow_dispatch:
+permissions: {}
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
-permissions:
-  contents: read
-
 jobs:
   ci:
-    uses: Hexalith/Hexalith.Builds/.github/workflows/domain-ci.yml@264e17d3185c87b72b0757dd66a13040793756bb
+    uses: "Hexalith/Hexalith.Builds/.github/workflows/ci.yml@v6.4.4"
+    permissions: {"actions": "write", "contents": "write"}
     with:
-      additional-sdk-version: '11.0.100'
-      solution: Hexalith.Agents.slnx
-      test-platform: microsoft-testing-platform
-      run-consumer-validation: true
-      unit-test-projects: |
-        test/Hexalith.Agents.Contracts.Tests
-        test/Hexalith.Agents.Client.Tests
-        test/Hexalith.Agents.Tests
-        test/Hexalith.Agents.Server.Tests
-        test/Hexalith.Agents.UI.Tests
-
-  agents-policy:
-    name: Agents package and tooling policy
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          submodules: false
-      - name: Initialize root-declared submodules
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t paths < <(git config -f .gitmodules --get-regexp path | awk '{print $2}')
-          git -c submodule.recurse=false submodule update --init -- "${paths[@]}"
-      - name: Require the pinned Builds workflow source
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git -C references/Hexalith.Builds rev-parse HEAD)" = "264e17d3185c87b72b0757dd66a13040793756bb"
-      - uses: actions/setup-dotnet@v6.0.0
-        with:
-          global-json-file: global.json
-          dotnet-version: '11.0.100'
-      - uses: actions/setup-node@v7.0.0
-        with:
-          node-version: '24'
-      - name: Install locked JavaScript tooling
-        run: |
-          npm ci --ignore-scripts
-          npm audit signatures
-      - name: Enforce shared package authority
-        shell: pwsh
-        run: |
-          $exclusions = @(Get-Content -LiteralPath ./eng/package-authority-exclusions.txt |
-            Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and -not $_.TrimStart().StartsWith('#') }) -join ';'
-          ./references/Hexalith.Builds/Tools/validate-consumer-package-authority.ps1 -RepositoryRoot . -CatalogPath ./references/Hexalith.Builds/Props/Directory.Packages.props -ExcludedPath $exclusions
-      - name: Enforce EventStore package floor
-        shell: pwsh
-        run: ./eng/verify-story-5.2.ps1 -PackageFloorOnly
-      - name: Enforce package test floors without skips
-        shell: pwsh
-        run: ./eng/verify-story.ps1 -Story 5.1 -DependencyMode Package
-      - name: Enforce Story 5.2 focused and regression evidence
-        shell: pwsh
-        run: ./eng/verify-story-5.2.ps1 -SkipBuild -Configuration Release
-      - name: Run tooling contract tests
-        run: python3 -m unittest discover -s tests/tooling -p '*_test.py'
+      job-timeout-minutes: 30
+    secrets:
+      registry-pull-username: ${{ secrets.HEXALITH_REGISTRY_PULL_USERNAME }}
+      registry-pull-password: ${{ secrets.HEXALITH_REGISTRY_PULL_PASSWORD }}
