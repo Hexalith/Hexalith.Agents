@@ -1,0 +1,19 @@
+# Adversarial divergence review · November 20, 2026
+
+**Final disposition. Pass.** All three findings below are closed in the revised architecture. This recheck covers the document only.
+
+| Original finding | Verified resolution in the current spine |
+| --- | --- |
+| Indeterminate reservation settlement | AD-21 line 530 moves an unresolved reservation to `Unreconciled` at the hold deadline. The full amount continues to count until audited settlement or period close. |
+| Discarded versions reaching posting | The diagram records or discards the version at lines 899–904, settles costs and leases at lines 907–909, and requires a committed generated version for both response modes at lines 910 and 934. |
+| Early expiry of an in-flight post | AD-28 line 608 limits the two-second tolerance to scheduling. Both diagram branches at lines 925 and 962 require authoritative absence together with a definitive refusal or the elapsed business deadline. |
+
+**Verdict at review.** Three passages can yield conflicting decisions about money, posting or expiry. The November rules for same-attempt retry and scoped disclosure otherwise supply a consistent implementation boundary.
+
+| Severity | Evidence in the reviewed spine | Required reconciliation |
+| --- | --- | --- |
+| High · Indeterminate reservation settlement | AD-21 line 530 says that at the hold deadline the reservation “then settles `ChargedAtMaximum`” and also that an overdue unresolved reservation becomes `Unreconciled` and stays counted. ARCH-A-6 line 1494, PRD FR-28 line 748 and OQ-6 line 1087 place automatic settlement at period close. | At hold expiry mark the reservation `Unreconciled` and keep it counted. Settle it once by the audited operator action or at period close. Check a hold expiring before month-end, then race operator settlement and period close against the same revision. |
+| High · Discarded versions can reach posting in the diagram | The sequence at lines 870–875 discards a safety-allowed output if Closing cancels the version reservation. Its next decision at lines 882–883 and 906 still uses “output allowed” to enter automatic posting or confirmation. AD-27 line 600 requires a durable protected version. | Require the committed generated-version revision in both continuation conditions. Preserve settlement of the Provider, budget and capacity before ending the discarded-output path. The cancellation case must emit no system approval, proposal or Conversation append. |
+| Medium · A timer can settle an in-flight post early | AD-5 line 309 and AD-6 line 323 require authoritative absence plus expiration of the stored deadline or a definitive refusal. AD-28 line 606 calls `deadline - 2 seconds` elapsed. Both diagram branches at lines 897 and 934 also leave the grouping of absence and timeout open to two readings. | Restrict early tolerance to scheduling a wakeup. Without a definitive refusal, compare the authoritative time against the exact deadline. State the guard as “authoritative absence AND (definitive refusal OR stored deadline reached).” Test one second early and at the exact deadline, each with both absence and an unavailable lookup. |
+
+The retry choice serializes with terminal settlement at the interaction revision. The original amount, attempt identity, prepared fingerprint, Provider key and capacity fence remain bound while retry is eligible (AD-20 line 522 and AD-21 line 532). The audit read checks the permitted subject, resource and disclosure before reading and scope and current grant before returning (AD-12 line 413). The reviewed diagrams retain posting authorization before external append and wait for a durable matching observation after a lost acknowledgement (lines 891–901 and 928–938). Current source and owner qualification gaps remain recorded separately in the November evidence table.
