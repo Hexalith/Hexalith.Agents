@@ -17,6 +17,9 @@ public sealed class ForbiddenHostingOwnershipTests
 
     private static readonly string[] _hostingProjectSuffixes = [".AppHost", ".Aspire", ".ServiceDefaults"];
 
+    // Hexalith.CiCd owns these delivered files; module tests do not assert their text.
+    private static readonly string[] _cicdOwnedFiles = [".github/hexalith-ci.json", ".github/dependabot.yml"];
+
     [Fact]
     public void RepositoryOwnedPathsShouldContainNoHostingProjectOrConfiguration()
     {
@@ -119,6 +122,8 @@ public sealed class ForbiddenHostingOwnershipTests
     {
         string relative = Path.GetRelativePath(ModuleLayout.ModuleRoot, path).Replace('\\', '/');
         return !relative.StartsWith("references/", StringComparison.OrdinalIgnoreCase)
+            && !relative.StartsWith(".github/workflows/", StringComparison.Ordinal)
+            && !_cicdOwnedFiles.Contains(relative, StringComparer.Ordinal)
             && !relative.StartsWith("_bmad", StringComparison.OrdinalIgnoreCase)
             && !relative.StartsWith(".git/", StringComparison.OrdinalIgnoreCase)
             && !relative.StartsWith("artifacts/", StringComparison.OrdinalIgnoreCase)

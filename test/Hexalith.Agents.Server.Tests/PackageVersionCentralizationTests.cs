@@ -17,11 +17,26 @@ public sealed class PackageVersionCentralizationTests
     private const int ProcessTimeoutMilliseconds = 120_000;
     // The whole repository validator evaluates each project and its authoritative catalog.
     private const int RepositoryValidationTimeoutMilliseconds = 600_000;
+    private const string ArchivedExclusionPrefix = "_bmad-output/implementation-artifacts/tests/owner-delivery-2026-10-08/";
+    private const string ApprovedPlatformExclusionPrefix = "_bmad-output/implementation-artifacts/tests/deferred-state-dependencies-2026-11-16/";
+
+    // The only approved non-archived authority exclusions: frozen foreign Platform evidence.
+    private static readonly string[] _approvedPlatformExclusions =
+    [
+        ApprovedPlatformExclusionPrefix + "coordinator-final-dependencies/platform/catalog/20261116T134852Z-668b8b128a6b4ff098a9ce224c0649ed/artifacts/platform-components/catalog-reader/Hexalith.Platform.CatalogBuilder.csproj",
+        ApprovedPlatformExclusionPrefix + "coordinator-final-dependencies/platform/local-inputs/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj",
+        ApprovedPlatformExclusionPrefix + "platform-corrected/platform/catalog/20261116T123849Z-724c847ff7be495aacb4b30f5f9942c3/artifacts/platform-components/catalog-reader/Hexalith.Platform.CatalogBuilder.csproj",
+        ApprovedPlatformExclusionPrefix + "platform-corrected/platform/local-inputs/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj",
+        ApprovedPlatformExclusionPrefix + "platform-final-correction/platform/catalog/20261116T124513Z-deb728e7995344b9a55088ff50964492/artifacts/platform-components/catalog-reader/Hexalith.Platform.CatalogBuilder.csproj",
+        ApprovedPlatformExclusionPrefix + "platform-final-correction/platform/local-inputs/Hexalith.Platform/src/Hexalith.Platform.Composition/Hexalith.Platform.Composition.csproj",
+    ];
 
     [Fact]
     public async Task WholeRepositoryShouldHaveOnePackageVersionAuthorityAsync()
     {
-        string exclusions = string.Join(';', File.ReadAllLines(ModuleLayout.RootFile("eng/package-authority-exclusions.txt"))
+        string[] exclusionLines = File.ReadAllLines(ModuleLayout.RootFile("eng/package-authority-exclusions.txt"));
+        AssertOnlyApprovedAuthorityExclusions(exclusionLines);
+        string exclusions = string.Join(';', exclusionLines
             .Where(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith('#')));
         ProcessStartInfo startInfo = new()
         {
@@ -102,6 +117,35 @@ public sealed class PackageVersionCentralizationTests
             string.Empty,
             " VersionOverride=\"0.0.1\"",
             "Consumer.csproj contains PackageReference VersionOverride metadata '0.0.1'.");
+
+    private static void AssertOnlyApprovedAuthorityExclusions(string[] lines)
+    {
+        string[] entries = lines
+            .Select(line => line.Trim())
+            .Where(line => line.Length > 0 && !line.StartsWith('#'))
+            .ToArray();
+
+        entries.ShouldNotBeEmpty("The package authority exclusion list must not be empty.");
+        entries.Distinct(StringComparer.Ordinal).Count().ShouldBe(entries.Length, "Package authority exclusions must be unique.");
+        entries
+            .Where(entry => !entry.StartsWith(ArchivedExclusionPrefix, StringComparison.Ordinal))
+            .ShouldBe(
+                _approvedPlatformExclusions,
+                ignoreOrder: true,
+                "Only archived evidence and the six approved Platform snapshots may be excluded from package authority validation.");
+        foreach (string entry in entries)
+        {
+            (entry.StartsWith(ArchivedExclusionPrefix, StringComparison.Ordinal)
+                || _approvedPlatformExclusions.Contains(entry, StringComparer.Ordinal))
+                .ShouldBeTrue($"Package authority exclusion '{entry}' is neither archived evidence nor an approved Platform snapshot.");
+            entry.EndsWith(".csproj", StringComparison.Ordinal)
+                .ShouldBeTrue($"Package authority exclusion '{entry}' must name a .csproj file.");
+            (entry.Contains('*') || entry.Contains('?') || entry.Split('/').Contains(".."))
+                .ShouldBeFalse($"Package authority exclusion '{entry}' must not contain a wildcard or '..' segment.");
+            File.Exists(ModuleLayout.RootFile(entry))
+                .ShouldBeTrue($"Package authority exclusion '{entry}' must name an existing project file.");
+        }
+    }
 
     private static bool HasInlineVersion(XElement packageReference)
         => packageReference.Attributes().Any(attribute =>
