@@ -11,7 +11,7 @@ import zipfile
 from pathlib import Path
 from xml.etree import ElementTree
 
-from nuget_package_fixtures import PACKAGE_IDS, SCRIPT, VALIDATOR, VERSION, corrupt_archive_member, write_inventory, write_package
+from nuget_package_fixtures import PACKAGE_IDS, SCRIPT, VALIDATOR, VERSION, write_inventory, write_package
 
 
 class NuGetPackageValidationTests(unittest.TestCase):
@@ -190,16 +190,6 @@ class NuGetPackageValidationTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "exactly one metadata container"):
                     self.validate(path)
 
-    def test_publication_rejects_corrupt_assembly_bytes_before_emitting_paths(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            paths = write_inventory(root)
-            corrupt_archive_member(paths[-1], f"lib/net11.0/{PACKAGE_IDS[-1]}.dll")
-            result = self.run_cli(root, "--publication-version", VERSION)
-            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-            self.assertEqual(result.stdout, "")
-            self.assertIn("corrupt archive member", result.stderr)
-
     def run_cli(self, directory: Path, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run([sys.executable, str(SCRIPT), str(directory), *args],
             text=True, capture_output=True, timeout=10)
@@ -211,57 +201,14 @@ class NuGetPackageValidationTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(result.stdout, f"Validated {len(PACKAGE_IDS)} Hexalith.Agents packages at {VERSION}.\n")
 
-    def test_cli_rejects_extra_archives_but_publication_selects_only_the_manifest(self) -> None:
+    def test_cli_rejects_extra_archives(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            paths = write_inventory(root)
+            write_inventory(root)
             unrelated = root / "Unrelated.Package.9.9.9.nupkg"
             unrelated.write_bytes(b"unrelated archive must not be read or pushed")
             result = self.run_cli(root)
             self.assertNotEqual(result.returncode, 0)
-            result = self.run_cli(root, "--publication-version", VERSION)
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertEqual(result.stdout.splitlines(), sorted(str(path) for path in paths))
-            self.assertEqual(unrelated.read_bytes(), b"unrelated archive must not be read or pushed")
-
-    def test_publication_preflights_missing_wrong_identity_and_wrong_version(self) -> None:
-        for fault in ("missing", "wrong identity", "wrong version", "symlink"):
-            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                paths = write_inventory(root)
-                target = paths[-1]
-                if fault == "missing":
-                    target.unlink()
-                elif fault == "symlink":
-                    content = root / "outside.nupkg"
-                    target.rename(content)
-                    target.symlink_to(content)
-                else:
-                    field = "id" if fault == "wrong identity" else "version"
-                    write_package(root, PACKAGE_IDS[-1], mutate=lambda metadata: setattr(metadata.find(field), "text", "Other"))
-                result = self.run_cli(root, "--publication-version", VERSION)
-                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-                self.assertEqual(result.stdout, "", "preflight must finish before emitting any push paths")
-                self.assertIn("validate-nuget-packages:", result.stderr)
-                self.assertNotIn("Traceback", result.stderr)
-
-    def test_cli_rejects_invalid_publication_versions_without_emitting_paths(self) -> None:
-        for version in ("", "../1.2.3", "1.2", "1.2.3\nInjected", "01.2.3", "1.2.3-..", "1.2.3-01"):
-            with self.subTest(version=version), tempfile.TemporaryDirectory() as directory:
-                result = self.run_cli(Path(directory), "--publication-version", version)
-                self.assertEqual(result.returncode, 1)
-                self.assertEqual(result.stdout, "")
-                self.assertIn("invalid publication version", result.stderr)
-
-    def test_publication_accepts_valid_prerelease_and_build_metadata(self) -> None:
-        for version in ("0.0.0", "1.2.3-rc.1", "1.2.3-0", "1.2.3+build.01", "1.2.3-1a+build.1"):
-            with self.subTest(version=version), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                for package_id in PACKAGE_IDS:
-                    write_package(root, package_id, version=version)
-                result = self.run_cli(root, "--publication-version", version)
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                self.assertEqual(len(result.stdout.splitlines()), len(PACKAGE_IDS))
 
 
 if __name__ == "__main__":

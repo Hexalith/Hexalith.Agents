@@ -139,7 +139,9 @@ python3 scripts/check-built-packages.py
 The hook packs six libraries and checks each in isolation and in combination.
 Review any changed executable import against the actual restored package before
 updating `eng/consumer-executable-assets.json`. Each approved row identifies
-its consumer, package, version, path and SHA-256.
+its consumer, kind, package, version, path and SHA-256. Versions of packages
+from the Builds central catalog are recorded as `$catalog` and the produced
+Agents UI version as `$produced`.
 
 ## Commits and pull requests
 
@@ -239,8 +241,8 @@ sources and an authenticated positive control against the exact accepted host.
 That qualification remains open under DW-21.
 
 `eng/consumer-executable-assets.json` is the reviewed executable asset
-policy. CI refuses additions, removals, version changes, hash changes and changed
-per-consumer selection. Retain `--receipt <path>` for dependency-change reviews.
+policy. CI refuses additions, removals, Agents version changes, hash changes and
+changed per-consumer selection. Retain `--receipt <path>` for dependency-change reviews.
 `--write-baseline <candidate-path>` only generates a candidate: inspect every
 selected package/path/version/hash and each consumer graph before explicitly
 replacing the policy. Build exclusions alone never establish analyzer purity.

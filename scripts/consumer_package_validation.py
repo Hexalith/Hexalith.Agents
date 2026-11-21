@@ -145,13 +145,21 @@ def executable_asset_receipt(assets: dict, packages: Path, analyzers: list[str],
                 if "processObserverSha256" in observation else []}
 
 
+AGENTS_PACKAGE_IDS = frozenset(package_id.casefold() for package_id in (
+    "Hexalith.Agents", "Hexalith.Agents.Client", "Hexalith.Agents.Contracts",
+    "Hexalith.Agents.EventStore", "Hexalith.Agents.Testing", "Hexalith.Agents.UI"))
+
+
 def policy_selection(selected: list[dict], produced_version: str | None = None) -> list[dict]:
-    """Bind UI imports to the validated release version while keeping every path and byte fingerprint exact."""
+    """Bind UI imports to the validated release version and Builds-catalog package versions to one placeholder,
+    while keeping every kind, package, path and byte fingerprint exact."""
     result = []
     for entry in selected:
         value = dict(entry)
         if produced_version is not None and value.get("package") == "Hexalith.Agents.UI" and value.get("version") == produced_version:
             value["version"] = "$produced"
+        elif "version" in value and str(value.get("package", "")).casefold() not in AGENTS_PACKAGE_IDS:
+            value["version"] = "$catalog"
         result.append(value)
     return result
 
@@ -162,7 +170,7 @@ def enforce_asset_policy(receipts: list[dict], policy: dict, produced_version: s
                      for entry in policy_selection(receipt["selected"], produced_version)})
     expected = sorted(json.dumps(entry, sort_keys=True) for entry in policy.get("selected", []))
     per_consumer = {receipt["consumer"]: policy_selection(receipt["selected"], produced_version) for receipt in receipts}
-    if policy.get("schemaVersion") != 2 or actual != expected or per_consumer != policy.get("consumers"):
+    if policy.get("schemaVersion") != 3 or actual != expected or per_consumer != policy.get("consumers"):
         raise ValueError("consumer executable asset baseline changed; review package/version/path/SHA-256 "
             f"before updating eng/consumer-executable-assets.json; added={sorted(set(actual)-set(expected))}; "
             f"removed={sorted(set(expected)-set(actual))}")
@@ -174,6 +182,7 @@ def prepare_consumer(directory: Path, package_directory: Path, identities: list[
     directory.mkdir(parents=True, exist_ok=True)
     (directory / "Directory.Build.props").write_text("<Project />\n")
     (directory / "Directory.Build.targets").write_text("<Project />\n")
+    (directory / ".editorconfig").write_text("root = true\n")
     shutil.copyfile(ROOT / "global.json", directory / "global.json")
     package_versions = "\n".join(
         f'    <PackageVersion Include="{package_id}" Version="{version}" />'
@@ -294,7 +303,7 @@ def validate_consumer_assets(directory: Path, package_directory: Path, identitie
 
 
 def consumer_receipt(directory: Path, label: str, observation: dict) -> dict:
-    """Qualify the exact observed build through the shared schema-2 ownership policy."""
+    """Qualify the exact observed build through the shared schema-3 ownership policy."""
     assets = json.loads((directory / "obj/project.assets.json").read_text())
     return {"consumer": label, **executable_asset_receipt(assets, directory / "packages",
         observation["analyzers"], observation["imports"], directory, observation)}

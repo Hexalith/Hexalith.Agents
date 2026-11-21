@@ -26,13 +26,6 @@ MAX_MEMBERS = 10_000
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "eng" / "release-packages.json"
-NUMERIC_IDENTIFIER = r"(?:0|[1-9][0-9]*)"
-PRERELEASE_IDENTIFIER = rf"(?:{NUMERIC_IDENTIFIER}|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)"
-VERSION_PATTERN = re.compile(
-    rf"{NUMERIC_IDENTIFIER}\.{NUMERIC_IDENTIFIER}\.{NUMERIC_IDENTIFIER}"
-    rf"(?:-{PRERELEASE_IDENTIFIER}(?:\.{PRERELEASE_IDENTIFIER})*)?"
-    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
-)
 
 # Exact .NET 11 package closures; framework-provided dependencies are omitted by packing.
 EXPECTED_DEPENDENCIES = {
@@ -542,33 +535,10 @@ def validate_directory(package_directory: Path) -> tuple[list[PackageMetadata], 
     return metadata, common_version
 
 
-def publication_paths(package_directory: Path, version: str) -> list[Path]:
-    """Preflight the complete manifest/version set, ignoring unrelated archives."""
-    if not VERSION_PATTERN.fullmatch(version):
-        raise ValueError(f"invalid publication version: {version!r}")
-    paths: list[Path] = []
-    for package_id in sorted(expected_package_ids()):
-        path = package_directory / f"{package_id}.{version}.nupkg"
-        if path.is_symlink() or not path.is_file():
-            raise ValueError(f"missing regular publication archive: {path.name}")
-        validate_archive_limits(path)
-        metadata = read_metadata(path)
-        if metadata.package_id != package_id or metadata.version != version:
-            raise ValueError(f"{path.name}: archive identity does not match manifest/version")
-        validate_package(metadata, path, version)
-        paths.append(path)
-    return paths
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("package_directory", type=Path)
-    parser.add_argument("--publication-version", help="print only validated manifest archive paths for this version")
     args = parser.parse_args()
-    if args.publication_version is not None:
-        for path in publication_paths(args.package_directory.resolve(), args.publication_version):
-            print(path)
-        return 0
     metadata, version = validate_directory(args.package_directory.resolve())
     print(f"Validated {len(metadata)} Hexalith.Agents packages at {version}.")
     return 0

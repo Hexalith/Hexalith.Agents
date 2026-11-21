@@ -136,7 +136,7 @@ def main() -> int:
         args.receipt.parent.mkdir(parents=True, exist_ok=True)
         args.receipt.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     produced_version = next(iter(versions))
-    policy = {"schemaVersion": 2, "consumers": {result["consumer"]: policy_selection(result["selected"], produced_version)
+    policy = {"schemaVersion": 3, "consumers": {result["consumer"]: policy_selection(result["selected"], produced_version)
               for result in receipts}, "selected": [json.loads(entry) for entry in sorted({
         json.dumps(entry, sort_keys=True) for result in receipts for entry in policy_selection(result["selected"], produced_version)})]}
     if args.write_baseline:

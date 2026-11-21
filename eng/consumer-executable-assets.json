@@ -1,39 +1,39 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "consumers": {
     "Hexalith.Agents": [
       {
         "kind": "analyzer",
         "package": "Dapr.Common",
-        "version": "1.19.1",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
         "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d"
       },
       {
         "kind": "assembly",
         "package": "Dapr.Common",
-        "version": "1.19.1",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
         "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.Binder",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
         "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
       }
@@ -42,7 +42,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -51,7 +51,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -60,189 +60,189 @@
       {
         "kind": "analyzer",
         "package": "Dapr.Common",
-        "version": "1.19.1",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
         "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d"
       },
       {
         "kind": "analyzer",
         "package": "MessagePackAnalyzer",
-        "version": "3.1.12",
+        "version": "$catalog",
         "path": "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
         "sha256": "5f775566f26ae1680020c092822fd912571c95450d371c805e8fe9ab43415071"
       },
       {
         "kind": "analyzer",
         "package": "MessagePackAnalyzer",
-        "version": "3.1.12",
+        "version": "$catalog",
         "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
         "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.AspNetCore.OpenApi",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
         "sha256": "7cafbb9be7ac6aa47d00ed110868a2deaed5f27b677430dfbd1407535a9c827c"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
         "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
         "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
       },
       {
         "kind": "analyzer",
         "package": "StackExchange.Redis",
-        "version": "3.4.35",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
         "sha256": "6d57750dadc0bdbd3c6eed558ca918b6fa83b50b242cd519a3ed8fa10504e3ad"
       },
       {
         "kind": "analyzer",
         "package": "StackExchange.Redis",
-        "version": "3.4.35",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/StackExchange.Redis.CodeFixes.dll",
         "sha256": "5e96e6853dea09cd2f4a60a13ebf03d492fcb9a838e9cb76a69d88673c7fb7fc"
       },
       {
         "kind": "assembly",
         "package": "Dapr.Common",
-        "version": "1.19.1",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
         "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d"
       },
       {
         "kind": "assembly",
         "package": "MessagePackAnalyzer",
-        "version": "3.1.12",
+        "version": "$catalog",
         "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
         "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.AspNetCore.OpenApi",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
         "sha256": "7cafbb9be7ac6aa47d00ed110868a2deaed5f27b677430dfbd1407535a9c827c"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
         "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
         "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
       },
       {
         "kind": "assembly",
         "package": "StackExchange.Redis",
-        "version": "3.4.35",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
         "sha256": "6d57750dadc0bdbd3c6eed558ca918b6fa83b50b242cd519a3ed8fa10504e3ad"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Admin.Abstractions",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.DomainService",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Gateway",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Server",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Server.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.ServiceDefaults",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.Binder",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
         "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.UserSecrets",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net10.0/Microsoft.Extensions.Configuration.UserSecrets.props",
         "sha256": "86b99fddc852eccc697226bd728a988e24f5d0b1f033e1aef00451664282cb3a"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.UserSecrets",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net10.0/Microsoft.Extensions.Configuration.UserSecrets.targets",
         "sha256": "3476ca9b775cf3b9ac91dbde397db5ba96c9095b790652103248578fd2ffc6cb"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Http.Resilience",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets",
         "sha256": "ace26888263cfa33f11aba321dfedaadeef83b82521225c4f9c60c48925d768c"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.props",
         "sha256": "cf216bb832dba54ffd5e0653d5727158228b9fcf08e0012166068e53e8887ad5"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets",
         "sha256": "9f20e6ab1056c314c79c8e99202afe601b555347fcea29a4644e4dece2c59f91"
       }
@@ -251,7 +251,7 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       }
@@ -260,28 +260,28 @@
       {
         "kind": "analyzer",
         "package": "Fluxor.Blazor.Web",
-        "version": "6.11.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
         "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a"
       },
       {
         "kind": "analyzer",
         "package": "System.Reactive",
-        "version": "7.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
         "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
       },
       {
         "kind": "assembly",
         "package": "Fluxor.Blazor.Web",
-        "version": "6.11.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
         "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a"
       },
       {
         "kind": "assembly",
         "package": "System.Reactive",
-        "version": "7.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
         "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
       },
@@ -316,91 +316,91 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "build/Hexalith.FrontComposer.Shell.targets",
         "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.targets",
         "sha256": "c64f9477511bfd0ff5f36b60dfef7ea8627f9c10cfab91f98bdaa7f3ccac9bd1"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.targets",
         "sha256": "a813e7ba42e84e543b939bd00971064d53c207f422cd6b119b279e7f7bf60d3c"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.FrontComposer.Shell.targets",
         "sha256": "73ee75c9bca90a6715b91c46866ed09ffac410d0f26dec4675eb522f06d2455a"
       },
       {
         "kind": "import",
         "package": "Microsoft.AspNetCore.Components.Analyzers",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
         "sha256": "6c7c21c0237728a3be1db9c97651d48a442d82e669c991bc19c712bfc8a30e0f"
       },
       {
         "kind": "import",
         "package": "Microsoft.AspNetCore.Components.Analyzers",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
         "sha256": "4aa2bb7438904f47c969e14b8e7a406f5ff24865cd543aaade59b42d994dfa89"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.Binder",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
         "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
         "sha256": "1bab8c0da9ecc47c4949a2eaecad4e91863885bd604de9c563504025cbd6612b"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
         "sha256": "dc1e1abffa50ecf993455ca5779e4bd0358df8fff4f991c49ca0a5456e30c6de"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e"
       }
@@ -409,126 +409,126 @@
       {
         "kind": "analyzer",
         "package": "Dapr.Common",
-        "version": "1.19.1",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
         "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d"
       },
       {
         "kind": "analyzer",
         "package": "Fluxor.Blazor.Web",
-        "version": "6.11.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
         "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a"
       },
       {
         "kind": "analyzer",
         "package": "MessagePackAnalyzer",
-        "version": "3.1.12",
+        "version": "$catalog",
         "path": "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
         "sha256": "5f775566f26ae1680020c092822fd912571c95450d371c805e8fe9ab43415071"
       },
       {
         "kind": "analyzer",
         "package": "MessagePackAnalyzer",
-        "version": "3.1.12",
+        "version": "$catalog",
         "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
         "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.AspNetCore.OpenApi",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
         "sha256": "7cafbb9be7ac6aa47d00ed110868a2deaed5f27b677430dfbd1407535a9c827c"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
         "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
         "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
       },
       {
         "kind": "analyzer",
         "package": "StackExchange.Redis",
-        "version": "3.4.35",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
         "sha256": "6d57750dadc0bdbd3c6eed558ca918b6fa83b50b242cd519a3ed8fa10504e3ad"
       },
       {
         "kind": "analyzer",
         "package": "StackExchange.Redis",
-        "version": "3.4.35",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/StackExchange.Redis.CodeFixes.dll",
         "sha256": "5e96e6853dea09cd2f4a60a13ebf03d492fcb9a838e9cb76a69d88673c7fb7fc"
       },
       {
         "kind": "analyzer",
         "package": "System.Reactive",
-        "version": "7.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
         "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
       },
       {
         "kind": "assembly",
         "package": "Dapr.Common",
-        "version": "1.19.1",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
         "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d"
       },
       {
         "kind": "assembly",
         "package": "Fluxor.Blazor.Web",
-        "version": "6.11.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
         "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a"
       },
       {
         "kind": "assembly",
         "package": "MessagePackAnalyzer",
-        "version": "3.1.12",
+        "version": "$catalog",
         "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
         "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.AspNetCore.OpenApi",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
         "sha256": "7cafbb9be7ac6aa47d00ed110868a2deaed5f27b677430dfbd1407535a9c827c"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
         "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
         "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
       },
       {
         "kind": "assembly",
         "package": "StackExchange.Redis",
-        "version": "3.4.35",
+        "version": "$catalog",
         "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
         "sha256": "6d57750dadc0bdbd3c6eed558ca918b6fa83b50b242cd519a3ed8fa10504e3ad"
       },
       {
         "kind": "assembly",
         "package": "System.Reactive",
-        "version": "7.0.0",
+        "version": "$catalog",
         "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
         "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad"
       },
@@ -563,168 +563,168 @@
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Admin.Abstractions",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Client",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Client.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Contracts",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.DomainService",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Gateway",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.Server",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.Server.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.EventStore.ServiceDefaults",
-        "version": "5.4.0",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
         "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "build/Hexalith.FrontComposer.Shell.targets",
         "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.targets",
         "sha256": "c64f9477511bfd0ff5f36b60dfef7ea8627f9c10cfab91f98bdaa7f3ccac9bd1"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.targets",
         "sha256": "a813e7ba42e84e543b939bd00971064d53c207f422cd6b119b279e7f7bf60d3c"
       },
       {
         "kind": "import",
         "package": "Hexalith.FrontComposer.Shell",
-        "version": "6.0.1",
+        "version": "$catalog",
         "path": "buildTransitive/Hexalith.FrontComposer.Shell.targets",
         "sha256": "73ee75c9bca90a6715b91c46866ed09ffac410d0f26dec4675eb522f06d2455a"
       },
       {
         "kind": "import",
         "package": "Microsoft.AspNetCore.Components.Analyzers",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
         "sha256": "6c7c21c0237728a3be1db9c97651d48a442d82e669c991bc19c712bfc8a30e0f"
       },
       {
         "kind": "import",
         "package": "Microsoft.AspNetCore.Components.Analyzers",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
         "sha256": "4aa2bb7438904f47c969e14b8e7a406f5ff24865cd543aaade59b42d994dfa89"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.Binder",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
         "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.UserSecrets",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net10.0/Microsoft.Extensions.Configuration.UserSecrets.props",
         "sha256": "86b99fddc852eccc697226bd728a988e24f5d0b1f033e1aef00451664282cb3a"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Configuration.UserSecrets",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net10.0/Microsoft.Extensions.Configuration.UserSecrets.targets",
         "sha256": "3476ca9b775cf3b9ac91dbde397db5ba96c9095b790652103248578fd2ffc6cb"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Http.Resilience",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets",
         "sha256": "ace26888263cfa33f11aba321dfedaadeef83b82521225c4f9c60c48925d768c"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.props",
         "sha256": "cf216bb832dba54ffd5e0653d5727158228b9fcf08e0012166068e53e8887ad5"
       },
       {
         "kind": "import",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
-        "version": "11.0.0",
+        "version": "$catalog",
         "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets",
         "sha256": "9f20e6ab1056c314c79c8e99202afe601b555347fcea29a4644e4dece2c59f91"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
         "sha256": "1bab8c0da9ecc47c4949a2eaecad4e91863885bd604de9c563504025cbd6612b"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
         "sha256": "dc1e1abffa50ecf993455ca5779e4bd0358df8fff4f991c49ca0a5456e30c6de"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac"
       },
       {
         "kind": "import",
         "package": "Microsoft.FluentUI.AspNetCore.Components",
-        "version": "5.1.0",
+        "version": "$catalog",
         "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
         "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e"
       }
@@ -736,126 +736,126 @@
       "package": "Dapr.Common",
       "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
       "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d",
-      "version": "1.19.1"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "Fluxor.Blazor.Web",
       "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
       "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a",
-      "version": "6.11.0"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "MessagePackAnalyzer",
       "path": "analyzers/roslyn4.3/cs/MessagePack.Analyzers.CodeFixes.dll",
       "sha256": "5f775566f26ae1680020c092822fd912571c95450d371c805e8fe9ab43415071",
-      "version": "3.1.12"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "MessagePackAnalyzer",
       "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
       "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299",
-      "version": "3.1.12"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "Microsoft.AspNetCore.OpenApi",
       "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
       "sha256": "7cafbb9be7ac6aa47d00ed110868a2deaed5f27b677430dfbd1407535a9c827c",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
       "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
       "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "StackExchange.Redis",
       "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
       "sha256": "6d57750dadc0bdbd3c6eed558ca918b6fa83b50b242cd519a3ed8fa10504e3ad",
-      "version": "3.4.35"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "StackExchange.Redis",
       "path": "analyzers/dotnet/cs/StackExchange.Redis.CodeFixes.dll",
       "sha256": "5e96e6853dea09cd2f4a60a13ebf03d492fcb9a838e9cb76a69d88673c7fb7fc",
-      "version": "3.4.35"
+      "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "System.Reactive",
       "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
       "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad",
-      "version": "7.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "Dapr.Common",
       "path": "analyzers/dotnet/cs/Dapr.Common.Generators.dll",
       "sha256": "dee753aa7e6e4ea0303b48fc66d97a060d084a118b5206125539aa360352f20d",
-      "version": "1.19.1"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "Fluxor.Blazor.Web",
       "path": "analyzers/dotnet/cs/Fluxor.Blazor.Web.Analyzers.dll",
       "sha256": "0facec57610941c4aad6039d67936b80b4aed94193d6ba3a4a1276a3356d235a",
-      "version": "6.11.0"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "MessagePackAnalyzer",
       "path": "analyzers/roslyn4.3/cs/MessagePack.SourceGenerator.dll",
       "sha256": "e703844e5de11820560e2b198212d58cad437e0475380d5f67b60a0dcf07c299",
-      "version": "3.1.12"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "Microsoft.AspNetCore.OpenApi",
       "path": "analyzers/dotnet/cs/Microsoft.AspNetCore.OpenApi.SourceGenerators.dll",
       "sha256": "7cafbb9be7ac6aa47d00ed110868a2deaed5f27b677430dfbd1407535a9c827c",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
       "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
       "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "StackExchange.Redis",
       "path": "analyzers/dotnet/cs/StackExchange.Redis.Build.dll",
       "sha256": "6d57750dadc0bdbd3c6eed558ca918b6fa83b50b242cd519a3ed8fa10504e3ad",
-      "version": "3.4.35"
+      "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "System.Reactive",
       "path": "analyzers/dotnet/System.Reactive.Analyzers.dll",
       "sha256": "c042dd12f724c60c71c046430cc278463c082e42e85c7b3933127fa14ec682ad",
-      "version": "7.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
@@ -890,168 +890,168 @@
       "package": "Hexalith.EventStore.Admin.Abstractions",
       "path": "buildTransitive/Hexalith.EventStore.Admin.Abstractions.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Client",
       "path": "buildTransitive/Hexalith.EventStore.Client.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Contracts",
       "path": "buildTransitive/Hexalith.EventStore.Contracts.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.DomainService",
       "path": "buildTransitive/Hexalith.EventStore.DomainService.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Gateway",
       "path": "buildTransitive/Hexalith.EventStore.Gateway.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.Server",
       "path": "buildTransitive/Hexalith.EventStore.Server.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.EventStore.ServiceDefaults",
       "path": "buildTransitive/Hexalith.EventStore.ServiceDefaults.targets",
       "sha256": "8d88cb4885ebde15cdb5b16b26fea3dacfb21c3d0eb74a6da3e7878fbec4f54a",
-      "version": "5.4.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "build/Hexalith.FrontComposer.Shell.targets",
       "sha256": "ec3ae654c41f2dca3e9979108028c20634b7f4a99aa5732d6751691d6ef3ccfc",
-      "version": "6.0.1"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "build/Microsoft.AspNetCore.StaticWebAssets.targets",
       "sha256": "c64f9477511bfd0ff5f36b60dfef7ea8627f9c10cfab91f98bdaa7f3ccac9bd1",
-      "version": "6.0.1"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "buildMultiTargeting/Hexalith.FrontComposer.Shell.targets",
       "sha256": "a813e7ba42e84e543b939bd00971064d53c207f422cd6b119b279e7f7bf60d3c",
-      "version": "6.0.1"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Hexalith.FrontComposer.Shell",
       "path": "buildTransitive/Hexalith.FrontComposer.Shell.targets",
       "sha256": "73ee75c9bca90a6715b91c46866ed09ffac410d0f26dec4675eb522f06d2455a",
-      "version": "6.0.1"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.AspNetCore.Components.Analyzers",
       "path": "build/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
       "sha256": "6c7c21c0237728a3be1db9c97651d48a442d82e669c991bc19c712bfc8a30e0f",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.AspNetCore.Components.Analyzers",
       "path": "buildTransitive/netstandard2.0/Microsoft.AspNetCore.Components.Analyzers.targets",
       "sha256": "4aa2bb7438904f47c969e14b8e7a406f5ff24865cd543aaade59b42d994dfa89",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.Extensions.Configuration.Binder",
       "path": "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets",
       "sha256": "1f9571c12725c07ddb6bad48f1cec803bf860203d2cffdc68b94ef2b1084a010",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.Extensions.Configuration.UserSecrets",
       "path": "buildTransitive/net10.0/Microsoft.Extensions.Configuration.UserSecrets.props",
       "sha256": "86b99fddc852eccc697226bd728a988e24f5d0b1f033e1aef00451664282cb3a",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.Extensions.Configuration.UserSecrets",
       "path": "buildTransitive/net10.0/Microsoft.Extensions.Configuration.UserSecrets.targets",
       "sha256": "3476ca9b775cf3b9ac91dbde397db5ba96c9095b790652103248578fd2ffc6cb",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.Extensions.Http.Resilience",
       "path": "buildTransitive/net8.0/Microsoft.Extensions.Http.Resilience.targets",
       "sha256": "ace26888263cfa33f11aba321dfedaadeef83b82521225c4f9c60c48925d768c",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.props",
       "sha256": "cf216bb832dba54ffd5e0653d5727158228b9fcf08e0012166068e53e8887ad5",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "buildTransitive/net8.0/Microsoft.Extensions.Telemetry.Abstractions.targets",
       "sha256": "9f20e6ab1056c314c79c8e99202afe601b555347fcea29a4644e4dece2c59f91",
-      "version": "11.0.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
       "sha256": "1bab8c0da9ecc47c4949a2eaecad4e91863885bd604de9c563504025cbd6612b",
-      "version": "5.1.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "build/Microsoft.AspNetCore.StaticWebAssets.props",
       "sha256": "dc1e1abffa50ecf993455ca5779e4bd0358df8fff4f991c49ca0a5456e30c6de",
-      "version": "5.1.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "build/Microsoft.FluentUI.AspNetCore.Components.props",
       "sha256": "a0c8334649677304f9eb88453fed84de58421ad0cfdabb314223a36d0a741a51",
-      "version": "5.1.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "buildMultiTargeting/Microsoft.FluentUI.AspNetCore.Components.props",
       "sha256": "a8fbfc6b19ffc746531b919dd4a9c4acb42d803bef731469964538b884cdd3ac",
-      "version": "5.1.0"
+      "version": "$catalog"
     },
     {
       "kind": "import",
       "package": "Microsoft.FluentUI.AspNetCore.Components",
       "path": "buildTransitive/Microsoft.FluentUI.AspNetCore.Components.props",
       "sha256": "79f511414a009a879a887713b8d6ef2c4a04f23e05ab96768d5631621532207e",
-      "version": "5.1.0"
+      "version": "$catalog"
     }
   ]
 }

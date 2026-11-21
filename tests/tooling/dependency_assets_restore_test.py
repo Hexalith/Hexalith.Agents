@@ -192,7 +192,7 @@ public sealed class ProbeTask : Microsoft.Build.Utilities.Task {
                             self.assertTrue(any(item["kind"] == "native" and item["path"] == "tools/libProbeNative.so" for item in receipt["selected"]))
                             self.assertTrue(any(item["path"] == "build/conditional.xml" for item in receipt["selected"]))
                             self.assertEqual(receipt["systemProcessObservers"][0]["name"], "strace")
-                            baseline = {"schemaVersion": 2, "selected": receipt["selected"], "consumers": {package_id: receipt["selected"]}}
+                            baseline = {"schemaVersion": 3, "selected": receipt["selected"], "consumers": {package_id: receipt["selected"]}}
                             shared.enforce_asset_policy([receipt], baseline)
                         else:
                             expected = "mutation" if action == "restore-native" else "unattributed executable load" if action in ("byte-loaded", "dynamic") else "unobserved"
@@ -374,7 +374,8 @@ public sealed class ProbeTask : Microsoft.Build.Utilities.Task {
                     self.assertTrue(all(item["package"] in {"Probe.Leaf", "Probe.Transitive"} and item["version"] == "1.0.0"
                         and len(item["sha256"]) == 64 for item in selected))
                     receipt["consumer"] = name
-                    baseline = {"schemaVersion": 2, "selected": selected, "consumers": {name: selected}}
+                    reviewed = CONSUMER.policy_selection(selected)
+                    baseline = {"schemaVersion": 3, "selected": reviewed, "consumers": {name: reviewed}}
                     CONSUMER.enforce_asset_policy([receipt], baseline)
                     if imports_build:
                         helper = root / "packages/probe.leaf/1.0.0/build/helper.xml"
@@ -433,11 +434,12 @@ public sealed class ProbeTask : Microsoft.Build.Utilities.Task {
                         with self.assertRaisesRegex(ValueError, "unowned executable consumer asset"):
                             CONSUMER.executable_asset_receipt(assets, root / "packages",
                                 [item["Identity"] for item in evaluated["Items"]["Analyzer"]], imports, root, unowned_native)
-                    for field, value in (("sha256", "0" * 64), ("version", "2.0.0"),
-                                         ("path", "analyzers/unreviewed.dll")):
+                    for field, value in (("sha256", "0" * 64), ("path", "analyzers/unreviewed.dll")):
                         changed = [*selected[:-1], {**selected[-1], field: value}]
                         with self.assertRaisesRegex(ValueError, "baseline changed"):
                             CONSUMER.enforce_asset_policy([{**receipt, "selected": changed}], baseline)
+                    # Builds-catalog package versions are not part of the reviewed executable identity.
+                    CONSUMER.enforce_asset_policy([{**receipt, "selected": [*selected[:-1], {**selected[-1], "version": "2.0.0"}]}], baseline)
                     with self.assertRaisesRegex(ValueError, "baseline changed"):
                         CONSUMER.enforce_asset_policy([{**receipt, "consumer": "unreviewed-consumer"}], baseline)
 

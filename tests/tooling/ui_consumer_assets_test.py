@@ -1,4 +1,4 @@
-"""Only the validated UI release version is variable in the executable import policy."""
+"""Only the validated UI release version and Builds-catalog versions are variable in the executable import policy."""
 import copy
 import importlib.util
 from pathlib import Path
@@ -50,14 +50,14 @@ class UiConsumerAssetsTests(unittest.TestCase):
             with zipfile.ZipFile(path) as archive, self.assertRaisesRegex(ValueError, "ambiguous normalized"):
                 archive_file_inventory(archive)
 
-    def test_no_receipt_still_checks_archive_inventory_and_schema2_policy(self):
+    def test_no_receipt_still_checks_archive_inventory_and_schema3_policy(self):
         import json
         from nuget_package_fixtures import PACKAGE_IDS, VERSION, write_inventory, corrupt_archive_member
         with tempfile.TemporaryDirectory(prefix="agents-cli-contract-") as temporary:
             root = Path(temporary); feed = root / "feed"; feed.mkdir(); archives = write_inventory(feed)
             receipt = root / "absent/receipt.json"
             policy = root / "policy.json"
-            policy.write_text(json.dumps({"schemaVersion": 2, "selected": [],
+            policy.write_text(json.dumps({"schemaVersion": 3, "selected": [],
                 "consumers": {label: [] for label in [*PACKAGE_IDS, "combined"]}}))
             def consumer(directory, identities, all_identities, label):
                 return {"consumer": label, "selected": []}
@@ -66,9 +66,11 @@ class UiConsumerAssetsTests(unittest.TestCase):
                     patch.object(CONSUMER, "validate_consumer", side_effect=consumer) as build:
                 self.assertEqual(CONSUMER.main(), 0)
                 self.assertEqual(build.call_count, 7); self.assertFalse(receipt.exists())
-                policy.write_text(json.dumps({"schemaVersion": 1, "selected": [], "consumers": {}}))
-                with self.assertRaisesRegex(ValueError, "baseline changed"):
-                    CONSUMER.main()
+                for schema in (1, 2):
+                    policy.write_text(json.dumps({"schemaVersion": schema, "selected": [],
+                        "consumers": {label: [] for label in [*PACKAGE_IDS, "combined"]}}))
+                    with self.subTest(schema=schema), self.assertRaisesRegex(ValueError, "baseline changed"):
+                        CONSUMER.main()
                 build.reset_mock()
                 corrupt_archive_member(archives[0], "lib/net11.0/" + PACKAGE_IDS[0] + ".dll")
                 with self.assertRaises((ValueError, __import__("zipfile").BadZipFile)):
@@ -80,7 +82,7 @@ class UiConsumerAssetsTests(unittest.TestCase):
                   "path": "buildTransitive/Hexalith.Agents.UI.targets", "sha256": "a" * 64}
         expected = {**actual, "version": "$produced"}
         return ([{"consumer": "UI", "selected": [actual]}],
-                {"schemaVersion": 2, "consumers": {"UI": [expected]}, "selected": [expected]})
+                {"schemaVersion": 3, "consumers": {"UI": [expected]}, "selected": [expected]})
 
     def test_only_validated_produced_version_varies_without_mutating_actual_receipt(self):
         receipts, policy = self.fixture()
@@ -200,13 +202,45 @@ class UiConsumerAssetsTests(unittest.TestCase):
             self.assertEqual(marker.read_text(), "finished")
             self.assertTrue((root / "detached.log").read_text().endswith("complete\n"))
 
-    def test_external_versions_are_never_normalized(self):
+    def external_fixture(self, package="External.Library", version="$catalog"):
         receipts, policy = self.fixture()
-        receipts[0]["selected"][0]["package"] = "External.Library"
-        policy["consumers"]["UI"][0]["package"] = "External.Library"
-        policy["selected"][0]["package"] = "External.Library"
+        receipts[0]["selected"][0]["package"] = package
+        for entry in (policy["consumers"]["UI"][0], policy["selected"][0]):
+            entry.update(package=package, version=version)
+        return receipts, policy
+
+    def test_external_versions_are_never_produced(self):
+        receipts, policy = self.external_fixture(version="$produced")
         with self.assertRaises(ValueError):
             CONSUMER.enforce_asset_policy(receipts, policy, "1.2.3")
+
+    def test_catalog_versions_vary_without_mutating_actual_receipt(self):
+        receipts, policy = self.external_fixture()
+        original = copy.deepcopy(receipts)
+        CONSUMER.enforce_asset_policy(receipts, policy, "1.2.3")
+        self.assertEqual(original, receipts)
+        receipts[0]["selected"][0]["version"] = "9.9.9"
+        CONSUMER.enforce_asset_policy(receipts, policy, "1.2.3")
+        CONSUMER.enforce_asset_policy(receipts, policy)
+        del receipts[0]["selected"][0]["version"]
+        with self.assertRaises(ValueError):
+            CONSUMER.enforce_asset_policy(receipts, policy)
+        receipts, policy = self.external_fixture(version="1.2.3")
+        with self.assertRaises(ValueError):
+            CONSUMER.enforce_asset_policy(receipts, policy, "1.2.3")
+
+    def test_catalog_paths_bytes_kinds_and_package_identities_remain_exact(self):
+        for field in ("path", "sha256", "kind", "package"):
+            receipts, policy = self.external_fixture()
+            receipts[0]["selected"][0][field] = "unreviewed"
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                CONSUMER.enforce_asset_policy(receipts, policy, "1.2.3")
+
+    def test_agents_versions_are_never_catalog_normalized(self):
+        for package in ("Hexalith.Agents.Contracts", "hexalith.agents.ui"):
+            receipts, policy = self.external_fixture(package)
+            with self.subTest(package=package), self.assertRaises(ValueError):
+                CONSUMER.enforce_asset_policy(receipts, policy, "1.2.3")
 
 
 if __name__ == "__main__":
