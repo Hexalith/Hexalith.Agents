@@ -16,7 +16,9 @@ public static class AgentInteractionWorkflowServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services); ArgumentNullException.ThrowIfNull(availability);
         if (availability.Check("OD-DAPR-SECURITY-1") is { } blocker) { throw new NotSupportedException($"DependencyNotAvailable({blocker.RecordId})"); }
         services.AddDaprWorkflow(options => { options.RegisterWorkflow<AutomaticInteractionWorkflow>(); options.RegisterActivity<ExecuteAutomaticInteractionStepActivity>(); });
-        services.Replace(ServiceDescriptor.Singleton<IInteractionWorkflowScheduler, DaprInteractionWorkflowScheduler>());
+        services.Replace(ServiceDescriptor.Singleton<IInteractionWorkflowScheduler>(provider =>
+            new DaprInteractionWorkflowScheduler(
+                provider.GetService<IDaprWorkflowClient>() ?? provider.GetRequiredService<DaprWorkflowClient>())));
         return services;
     }
 }

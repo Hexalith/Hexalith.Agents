@@ -2,7 +2,10 @@ using System.Reflection;
 using System.Text.Json;
 using Dapr.Workflow;
 using Hexalith.Agents.Contracts.AgentInteraction;
+using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Application.Workflows;
+using Hexalith.Agents.Server.Ports;
+using NSubstitute;
 using Shouldly;
 
 namespace Hexalith.Agents.Server.Tests;
@@ -46,5 +49,98 @@ public sealed class WorkflowExecutionStateBoundaryTests
         Should.Throw<JsonException>(() => JsonSerializer.Deserialize<WorkflowExecutionState>(json));
         Should.Throw<ArgumentException>(() => WorkflowExecutionStateValidation.Validate(fixture.Input with { RequestReference = fixture.Input.RequestReference with { TenantId = "tenant-b" } }));
         Should.Throw<ArgumentException>(() => WorkflowExecutionStateValidation.Validate(fixture.Input with { Status = (WorkflowExecutionStatus)999 }));
+    }
+
+    [Theory]
+    [InlineData("plaintext-conversation")]
+    [InlineData("non-digest-interaction")]
+    [InlineData("plaintext-reference-digest")]
+    [InlineData("zero-workflow-revision")]
+    [InlineData("negative-workflow-revision")]
+    [InlineData("zero-reference-revision")]
+    [InlineData("negative-reference-revision")]
+    public async Task MalformedInputIsRefusedBeforeSchedulingOrReadingOwners(string invalidField)
+    {
+        var fixture = new AutomaticInteractionReplayFixture();
+        var client = Substitute.For<IDaprWorkflowClient>();
+        var scheduler = new DaprInteractionWorkflowScheduler(client);
+        var directory = Substitute.For<IConversationAgentStateReader>();
+        var interaction = Substitute.For<IAgentInteractionStateReader>();
+        var dispatcher = Substitute.For<IAgentCommandDispatcher>();
+        var effects = Substitute.For<IAutomaticInteractionStepEffects>();
+        var steps = new AutomaticInteractionStepOrchestrator(directory, interaction, dispatcher, effects);
+        var workflowContext = Substitute.For<WorkflowContext>();
+        var input = fixture.Input;
+        var malformed = invalidField switch
+        {
+            "plaintext-conversation" => input with { ConversationId = "a plaintext request" },
+            "non-digest-interaction" => input with
+            {
+                AgentInteractionId = "not-a-digest",
+                RequestReference = input.RequestReference with { AgentInteractionId = "not-a-digest" },
+            },
+            "plaintext-reference-digest" => input with
+            {
+                RequestReference = input.RequestReference with { ContentDigest = "a plaintext request" },
+            },
+            "zero-workflow-revision" => input with { EventRevision = 0 },
+            "negative-workflow-revision" => input with { EventRevision = -1 },
+            "zero-reference-revision" => input with { RequestReference = input.RequestReference with { EventRevision = 0 } },
+            "negative-reference-revision" => input with { RequestReference = input.RequestReference with { EventRevision = -1 } },
+            _ => throw new ArgumentOutOfRangeException(nameof(invalidField)),
+        };
+
+        workflowContext.InstanceId.Returns(malformed.AgentInteractionId);
+
+        var scheduleError = await Should.ThrowAsync<ArgumentException>(() => scheduler.EnsureScheduledAsync(malformed, CancellationToken.None));
+        var stepError = await Should.ThrowAsync<ArgumentException>(() => steps.ExecuteAsync(malformed, CancellationToken.None));
+        var workflowError = await Should.ThrowAsync<ArgumentException>(() => new AutomaticInteractionWorkflow().RunAsync(workflowContext, malformed));
+
+        scheduleError.Message.ShouldStartWith("InvalidWorkflowExecutionState");
+        stepError.Message.ShouldStartWith("InvalidWorkflowExecutionState");
+        workflowError.Message.ShouldStartWith("InvalidWorkflowExecutionState");
+        workflowContext.ReceivedCalls().ShouldNotContain(call => call.GetMethodInfo().Name == nameof(WorkflowContext.CallActivityAsync));
+        client.ReceivedCalls().ShouldBeEmpty();
+        directory.ReceivedCalls().ShouldBeEmpty();
+        interaction.ReceivedCalls().ShouldBeEmpty();
+        dispatcher.ReceivedCalls().ShouldBeEmpty();
+        effects.ReceivedCalls().ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData("digest")]
+    [InlineData("revision")]
+    public async Task ReferenceMustMatchThePersistedRequestBeforeExecutingAStep(string mismatchedField)
+    {
+        var fixture = new AutomaticInteractionReplayFixture();
+        var scheduler = Substitute.For<IInteractionWorkflowScheduler>();
+        var recovery = new InteractionOutboxRecoveryOrchestrator(fixture, fixture, fixture, scheduler);
+        var intake = new AutomaticInteractionIntakeOrchestrator(
+            fixture, Substitute.For<IAgentDependencyAvailability>(), fixture, fixture, fixture, recovery);
+        (await intake.ExecuteAsync(fixture.Request, CancellationToken.None)).Status.ShouldBe(AutomaticInteractionIntakeStatus.Scheduled);
+        fixture.Restart();
+        var input = scheduler.ReceivedCalls().ShouldHaveSingleItem().GetArguments()[0].ShouldBeOfType<WorkflowExecutionState>();
+        input.RequestReference.ContentDigest.ShouldBe(fixture.Directory.ShouldNotBeNull().Permits[fixture.InteractionId].Permit.RequestDigest);
+        input.RequestReference.EventRevision.ShouldBe(fixture.Interaction.ShouldNotBeNull().PermittedCreation.ShouldNotBeNull().Revision);
+        var mismatched = input with
+        {
+            RequestReference = mismatchedField == "digest"
+                ? input.RequestReference with { ContentDigest = new string('b', 64) }
+                : input.RequestReference with { EventRevision = input.RequestReference.EventRevision + 1 },
+        };
+        string before = fixture.Snapshot();
+        int dispatchCount = fixture.Dispatches.Count;
+
+        var error = await Should.ThrowAsync<InvalidOperationException>(() => fixture.Steps().ExecuteAsync(mismatched, CancellationToken.None));
+
+        error.Message.ShouldBe("InvalidAuthoritativeInteraction");
+        fixture.Dispatches.Count.ShouldBe(dispatchCount);
+        fixture.Snapshot().ShouldBe(before);
+        fixture.Effects.Observed.ShouldBeEmpty();
+        fixture.Effects.Settlements.ShouldBeEmpty();
+
+        var next = await fixture.Steps().ExecuteAsync(input, CancellationToken.None);
+        next.EventRevision.ShouldBeGreaterThan(input.EventRevision);
+        fixture.Interaction.ShouldNotBeNull().AutomaticFacts.ShouldContainKey(AutomaticInteractionStep.WorkflowStartCheckpoint);
     }
 }
