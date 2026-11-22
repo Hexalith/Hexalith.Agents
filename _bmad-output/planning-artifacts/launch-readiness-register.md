@@ -2,7 +2,7 @@
 title: Hexalith Agents Launch Readiness Register
 status: active
 created: 2026-08-02
-updated: 2026-11-21
+updated: 2026-11-22
 project: agents
 authority: sprint-change-proposal-2026-09-09-2.md
 release_gate: RQ-1
@@ -583,4 +583,4 @@ No qualifying evidence was supplied when this register was created. The initial 
 
 ## Current Release Decision
 
-`RQ-1`: **NOT READY**. Every minimum gate is `InsufficientEvidence`, critical external dependencies are `Uncommitted`, and no production-like tenant scope, source versions, authoritative timestamps, validity periods, or qualifying Levels 4/5 evidence references have been accepted.
+`RQ-1`: **NOT READY**. All 18 minimum gates record `InsufficientEvidence`. Four external contracts are `Committed` (Parties, Conversations AI, Secrets and Host), eight are `Uncommitted` and none is `Available`. An evaluation uses only the dependencies in its qualification profile. Release still requires an identified production-like tenant scope, source versions, authoritative timestamps, validity periods and qualifying Levels 4/5 receipts. [External dependency register](external-dependency-register.md)

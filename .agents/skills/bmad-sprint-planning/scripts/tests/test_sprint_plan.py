@@ -176,6 +176,27 @@ def test_unknown_keys_and_comments_survive_regenerate(tmp_path, capsys):
     assert "# my own note" in status_file.read_text(encoding="utf-8")
 
 
+@pytest.mark.parametrize("tracked", ["full", "short", None])
+def test_long_story_identity_survives_refresh(tmp_path, capsys, tracked):
+    title = "Reject Prohibited Cost-Control Postures At Readiness Recording"
+    slug = title.lower().replace(" ", "-")
+    full = f"5-9-{slug}"
+    short = f"5-9-{slug[:60]}"
+    expected = short if tracked == "short" else full
+    epics = f"## Epic List\n## Epic 5: Setup\n### Story 5.9: {title}\n## Release Gate Outside the Story Backlog\n"
+    existing = None
+    if tracked:
+        existing = f"development_status:\n  {expected}: in-progress  # waiting for an owner\n"
+    status_file = run_generate(tmp_path, epics_text=epics, existing=existing, stories=[f"spec-{full}"])
+    result = out_json(capsys)
+    assert result["dropped_orphans"] == [] and result["warnings"] == []
+    dev = load(status_file)["development_status"]
+    assert list(dev) == ["epic-5", expected, "epic-5-retrospective"]
+    assert dev[expected] == ("in-progress" if tracked else "backlog")
+    if tracked:
+        assert "# waiting for an owner" in status_file.read_text(encoding="utf-8")
+
+
 def test_fresh_rebuild_ignores_existing_statuses(tmp_path, capsys):
     status_file = run_generate(tmp_path, existing=EXISTING, extra=("--fresh",))
     result = out_json(capsys)

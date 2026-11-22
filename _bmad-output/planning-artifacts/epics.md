@@ -30,11 +30,11 @@ This document provides the complete epic and story breakdown for Hexalith Agents
 
 ## Replacement Authority — 2026-09-09
 
-The approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09.md`, its approved PRD-validation follow-through proposal, approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09-2.md`, current PRD, Architecture Spine, UX spines, external-dependency register, launch-readiness register, and active Epics 5–8 are the machine-visible implementation authority. The 2026-08-02 proposal remains historical replacement evidence where it does not conflict with this correction. The second proposal's superseded 29-story count is historical; the later approved additions 5.9, 5.10, 6.8, and 7.7 remain active, for exactly 33 stories.
+The approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09.md`, its approved PRD-validation follow-through proposal, approved `/home/administrator/projects/hexalith/agents/_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-09-2.md`, current PRD, Architecture Spine, UX spines, external-dependency register, launch-readiness register, and active Epics 5–8 are the machine-visible implementation authority. The 2026-08-02 proposal remains historical replacement evidence where it does not conflict with this correction. The second proposal's superseded 29-story count is historical; the later approved additions 5.9, 5.10, 6.8, and 7.7 brought the September baseline to 33 stories.
 
 Epics 1–4 and every completed story beneath them remain unchanged historical delivery evidence with status `completed`. Their completion proves only the evidence recorded at the time; it does not establish live production conformance, current callability, or release readiness. Any conflicting historical criterion is `mustNotImplement` and resolves through the replacement-authority map in `epic-5-superseded-2026-08-01.md` without rewriting the completed story text.
 
-The former 18-story Epic 5 is superseded and non-executable. Active forward work consists only of replacement Epics 5–8 and exactly 33 stories. `RQ-1` remains a non-estimated release gate outside the story backlog; it aggregates completed evidence and never owns missing implementation.
+The former 18-story Epic 5 is superseded and non-executable. The [November correction](sprint-change-proposal-2026-11-20.md) added Story 5.11. Epics 5–8 now contain 34 stories (11, 8, 7 and 8 respectively), alongside the 26 historical stories in Epics 1–4. `RQ-1` remains a non-estimated release gate outside the story backlog; it aggregates completed evidence and never owns missing implementation.
 
 ## Requirements Inventory
 
@@ -168,7 +168,7 @@ NFR10: Cost Control - Hard numeric per-tenant monthly and per-call caps warn at 
 - NFR-13 evidence covers every interactive V1 route and high-impact state for WCAG 2.2 AA, keyboard/focus/semantic/live-region behavior, whole-string English/French parity, FrontComposer/Fluent V5 inheritance, and restrictive-viewport blocking.
 - NFR-14 uses authenticated browser-monotonic, kind-discriminated samples correlated to safe server evidence; each sample kind requires at least 30 production-like executions and missing/invalid ticks, correlation, localized live-region mutation, or samples yields `InsufficientEvidence`.
 - Public contracts are versioned and additive-first. Evidence Levels retain PRD meanings: Level 1 structure, Level 2 pure behavior, Level 3 fail-closed deferred seam, Level 4 live component, and Level 5 production-like cross-system evidence.
-- The active stack baseline is the Architecture Spine's current Stack table. The root SDK `10.0.401` with `latestPatch`, `net10.0`, C# 14, and `.slnx` selections remain explicit; every dependency/package-reference version comes exclusively from the root-recorded Hexalith.Builds catalog. At the current Builds gitlink `a74e783bd253d8f9f6b8bed22e65855ac0f96306`, the effective selections include EventStore `3.106.0`, the Dapr .NET/Actors/Workflow family `1.18.7`, FluentValidation `12.1.1`, OpenTelemetry `1.18.0`, Fluent UI Blazor `5.0.0-rc.5-26219.1`, xUnit v3 `4.0.1`, Microsoft.NET.Test.Sdk `18.10.1`, Shouldly `4.3.0`, NSubstitute `6.2.0`, and bunit `2.11.3`. Story 5.1 compatibility evidence covers only Dapr Client/ASP.NET/Actors as currently consumed through EventStore; Workflow remains Story 6.1 work, and `ARCH-A-15` stays open pending exact Security + Builds Maintainer approval of `OD-DAPR-SECURITY-1`. Story compatibility floors may constrain the shared selection but may not create an Agents-local pin. Hosting plus Provider/Agent Framework SDKs remain unselected until their dependency records commit them. MediatR `14.2.0` is declared transitively by the `Hexalith.Agents.EventStore` integration package; the platform service that first loads it owns license compliance before deployment.
+- Build with the SDK selected by the root `global.json` (11.0.100, latestPatch), `net11.0`, C# 15 and the `.slnx` solution. The parent-recorded Builds catalog owns all package versions. At Agents `412528e` it selects EventStore 5.4.0 and Dapr 1.19.1 from Builds `fe68718b`. Server references Dapr Workflow through an explicit opt-in. Security and the Builds Maintainer must approve the matching tuple under `OD-DAPR-SECURITY-1` and Story 6.1 must supply Workflow compatibility evidence. Story floors constrain the shared catalog. Platform owns hosting and licensing for MediatR where first loaded. Provider/Agent Framework SDK selection belongs to the provider contract. [Architecture stack](architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md#stack)
 - The external-dependency register is the only commitment authority for all twelve records: `EXT-CONV-AI-1`, `EXT-CONV-UI-1`, optional `EXT-CONV-RETRACTION-1`, `EXT-HOST-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1`, `EXT-SECRETS-1`, `EXT-EXPORT-STORE-1`, `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, and `EXT-PARTIES-1`; any `Uncommitted` record blocks launch evidence for its consuming stories. Optional retraction has no consumer unless Product selects OQ-23's branch. The register's `EXT-PARTIES-1` development allowance permits its fourteen direct human/identity consumers — Stories 5.2, 5.4, 5.5, 6.6, 7.1–7.5, 8.1–8.4, and 8.8 — to build against Branch-B-compatible identity-by-id behavior where applicable, but cannot establish human actor-binding, separation-of-duty, launch evidence, or `RQ-1` until the record is `Available` and its compatibility command passes.
 - The launch-readiness register is the machine-testable callability and qualification authority. `RQ-1` is a non-estimated release gate outside the development backlog and currently returns NOT READY.
 
@@ -1243,7 +1243,7 @@ So that every later Agents change is built and consumed through the corrected pl
 **Dependencies:**
 
 - **Prior stories:** None.
-- **External:** The original `EXT-HOST-1` entry gate was satisfied by the Platform Maintainer's accepted 2026-08-09 commitment for the platform-owned host boundary. The later expanded, currently `Uncommitted` host contract does not reopen this completed boundary story; Story 5.6 owns production-like composition and live-host compatibility.
+- **External:** The original `EXT-HOST-1` entry gate was satisfied by the Platform Maintainer's accepted 2026-08-09 commitment for the platform-owned host boundary. The expanded host contract reached `Committed` on October 10. Story 5.6 owns production-like composition and live-host compatibility.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -1273,7 +1273,7 @@ So that every later Agents change is built and consumed through the corrected pl
 **Then** a named source/package/boundary/basic test gate fails with a support-safe diagnostic that identifies Hexalith.Builds as the package-version owner
 **And** the gate never weakens warnings-as-errors or initializes nested submodules.
 
-**Given** the expanded current `EXT-HOST-1` contract is Uncommitted, missing an immutable target, date, or executable compatibility command
+**Given** an expanded `EXT-HOST-1` contract is Uncommitted because it lacks an immutable target, date, or executable compatibility command
 **When** Story 5.1 completion and live-host readiness are evaluated
 **Then** the completed build/package boundary remains valid while Story 5.6 and production-like host qualification stay fail-closed
 **And** no local path, package already present, historical AppHost, or Story 5.1 evidence is inferred as current live-host availability.
@@ -1302,10 +1302,10 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 **Dependencies:**
 
 - **Prior stories:** 5.1.
-- **External:** `EXT-PARTIES-1` remains `Uncommitted`. This story may develop the create-only provisioner against Branch-B-compatible immutable identity-by-id behavior, but that work is not launch evidence and cannot satisfy `RQ-1`; no selected branch may be claimed until the register records owner acceptance.
+- **External:** The Parties owner committed Branch B for `EXT-PARTIES-1`. The create-only provisioner uses the immutable tenant-scoped Party ID. Launch qualification requires the exact-target owner command to pass and the register to record `Available`.
 - **Forward dependencies:** None; activation and integrated identity readiness are not claimed by this story.
 
-**Package promotion evidence:** The `>=3.105.0` EventStore floor is satisfied only by the effective value imported from Hexalith.Builds. The current shared catalog selects published `3.106.0`; an Agents-local version property or `PackageVersion` item is a failing boundary condition, not completion evidence.
+**Package promotion evidence:** The `>=3.105.0` EventStore floor is satisfied only by the effective value imported from Hexalith.Builds. The September completion used published `3.106.0`. The parent-recorded catalog at `412528e` selects `5.4.0`. An Agents-local version property or `PackageVersion` item fails this check.
 
 **Acceptance Criteria:**
 
@@ -1350,7 +1350,7 @@ So that the durable Agent state I see is replayable, current, and safe to automa
 | TestOrArtifact | AgentConfigurationAggregateTests; AgentLifecycleConfigurationVersionTests; AgentConfigurationEventStoreIntegrationTests; AgentSetupQueryTests; AgentConfigurationUiTests; persisted read-model fixture |
 | VerificationCommand | pwsh ./eng/verify-story-5.2.ps1 |
 | NegativeEvidence | AgentConfigurationAuthorizationTests.CrossTenantCommandIsDeniedBeforeMutation; AgentConfigurationAuthorizationTests.CrossTenantQueryDisclosesNothing; duplicate/conflict/replay cases |
-| Result | Not run — backlog; requires Story 5.1, and `EXT-PARTIES-1` remains Uncommitted for launch evidence and `RQ-1` |
+| Result | Done under the recorded September review. Platform composition and immutable provisioning follow-up remain tracked. Branch B is Committed and requires exact-target availability for live use. |
 
 ### Story 5.3: Govern Provider Models And Pricing Through Live Operations
 
@@ -1428,7 +1428,7 @@ So that catalog truth is administered once while every tenant sees and selects o
 | TestOrArtifact | ProviderCatalogMigrationTests; ProviderCatalogAggregateTests; TenantProviderEnablementAggregateTests; DataHandlingAcceptanceAggregateTests; DataHandlingGraceDeadlineTests; ProviderCatalogEventStoreIntegrationTests; ProviderCatalogQueryTests; ProviderCatalogUiTests; DataHandlingAcceptanceUiTests; secret poison-sweep report |
 | VerificationCommand | pwsh ./eng/verify-story-5.3.ps1 |
 | NegativeEvidence | ProviderCatalogAuthorizationTests.CrossTenantSelectionIsDenied; ProviderCatalogAuthorizationTests.TenantPrincipalCannotMutatePlatformCatalogOrEnablement; DataHandlingAcceptanceIsolationTests; StaleSupersededOrUnjustifiedDataHandlingDecisionTests; GraceCannotExtendAcrossUnacceptedVersionsTests; ProviderCatalogVersionRegressionTests; ProviderCatalogMigrationConflictTests; ProviderSecretLeakTests; invalid pricing/limit cases |
-| Result | Reopened — backlog under `NC-5.3-PLATFORM-CATALOG-SCOPE`; shipped tenant-scoped implementation is migration source and historical evidence, not final conformance |
+| Result | Done under the September 27 review. NC-5.3-PLATFORM-CATALOG-SCOPE remains open for legacy inventory, DW-21 and live sidecar evidence. |
 
 ### Story 5.4: Prove Trusted Principal Tenant Party And Approver Readiness
 
@@ -1504,7 +1504,7 @@ So that revoked, ambiguous, stale, or cross-tenant authority can never make **he
 | TestOrArtifact | TrustedPrincipalIngressTests; ReservedExtensionHmacVerificationTests; TrustedEnvelopeReplayAggregateTests; ReplayRegistrarLeastPrivilegeIntegrationTests; SecurityEventLogAggregateTests; SecurityObservationRoutingTests; SecurityAuditSpoolRecoveryIntegrationTests; TenantAccessProjectionTests; PartyReadinessIntegrationTests; ApproverPolicyResolutionIntegrationTests; revocation/replay/security-spool evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-5.4.ps1 |
 | NegativeEvidence | TrustedPrincipalIngressTests.ClientReservedKeysAreStripped; ReservedExtensionHmacVerificationTests.ForgedUntaggedWrongFamilyAndWrongScopeAreDenied; ReplayRegistrarCannotMutateOtherStreamsOrBeCalledByPublicHumanWorkflowOrHandlerTests; CrossTenantChangedFieldNonceReuseTests; ReplayExactDuplicateReusesStoredFirstSeenAndRetentionTests; ReplayLedgerUnavailableFailsTargetDispatchTests; CrossTenantDenialNeverWritesClaimedTargetSecurityStreamTests; SecurityRecorderCannotMutateOtherStreamsOrDispatchCommandsTests; SecuritySpoolUnavailableFailsBeforeTargetCommandTests; TenantPartyApproverIsolationTests.CrossTenantIdentifiersAreDeniedBeforeSideEffects; TenantAccessRevocationTests.RevocationImmediatelyBlocksReadiness; gap/stale/ambiguous/PII poison cases |
-| Result | Ready for dev — prior Stories 5.1 and 5.2 are done, full-story approval is recorded, and all four dependencies are Committed. Live seam execution and completion remain blocked until each relevant record is Available with passing exact-target compatibility evidence. |
+| Result | In progress. The four owner commitments satisfy development entry. Each consuming live path requires its passing exact-target evidence and Available record. [Owner results](../implementation-artifacts/tests/story-5-4-owner-qualification-2026-10-18/README.md) |
 
 ### Story 5.5: Publish Authoritative Readiness And Provider-State Contracts
 
@@ -1602,7 +1602,7 @@ So that callability, Provider degradation, evidence freshness, and blockers cann
 | TestOrArtifact | LaunchReadinessGateAggregateTests; ArchitectureDecisionCatalogAggregateTests; ArchitectureDecisionCatalogActivationTests; ArchitectureDecisionRecordAggregateTests; ArchitectureDecisionRecorderScopeBootstrapTests; ArchitectureDecisionAuthorityManifestIntegrationTests; ArchitectureDecisionPredecessorGovernanceTests; ArchitectureDecisionReadinessProjectionTests; RequiredDecisionMissingStreamTests; PrdDeferredDecisionMaterializationTests; LaunchReadinessMigrationTests; LaunchReadinessProjectionTests; ProviderReadinessContractTests; ApiV1AgentsRouteTests; OperationGateMatrixV8ParityTests; readiness UI contract snapshot |
 | VerificationCommand | pwsh ./eng/verify-story-5.5.ps1 |
 | NegativeEvidence | ReadinessIsolationTests.CrossTenantRegistryQueryDisclosesNothing; StaleNewestObservationDoesNotFallBackTests; UnknownProviderReasonAndOldMatrixVersionBlockTests; UnauthorizedProducerAndWrongScopeKindTests; MissingDecisionCatalogEmitsOpenDecisionCatalogDetailTests; MissingCatalogListedDecisionEmitsOpenDecisionTests; IncompleteWrongMinimumOrConflictingCatalogManifestCannotActivateTests; CatalogActivationLostAckAndConcurrentSuccessorTests; OpenRecorderScopeDeniesEveryNormalDecisionPrincipalTests; BootstrapCannotChooseSourcePublishCatalogOrTouchAnotherDecisionTests; BootstrapWrongProposedSourceSameActorChangedDigestAndLostAckTests; FirstCatalogMustEqualBootstrapCommittedVersionAndDigestTests; PlatformPrincipalCannotRecordArchitectureDecisionTests; ReleaseRecorderActorCannotAppearInAnyApprovalEvidenceTests; SuccessorCannotSelfReduceQuorumApproversOrAffectedEvaluationsTests; PendingDecisionCannotRemoveEffectiveBlockerTests; PendingSuccessorCannotBlockRecordedBranchRecoveryTests; UnsignedWrongRoleAndMismatchedDecisionManifestTests; PlanningDocumentCannotSupplyRuntimeDecisionTests |
-| Result | Blocked — backlog; EXT-PROVIDER-1 and EXT-SECRETS-1 are currently Uncommitted, OD-RELEASE-RECORDER-SCOPE-1 is Open, and the selected identity dependency is unresolved |
+| Result | Backlog. `EXT-PROVIDER-1` still needs a commitment. `EXT-SECRETS-1` needs live qualification. OD-RELEASE-RECORDER-SCOPE-1 is Open and the recorder identity dependency is unresolved. |
 
 ### Story 5.6: Compose Agents In The Platform-Owned Production-Like Host
 
@@ -1663,7 +1663,7 @@ So that the domain service and UI run with their real platform dependencies with
 | TestOrArtifact | StructuralSeedConformanceTests; Hexalith.Agents.IntegrationTests; LiveSeamMatrixParityTests; PlatformHostTopologyTests; DaprAccessControlRouteTests; PlatformSecretResolutionTests; topology version/reset/seed/capture manifest; LR-TOPOLOGY observation |
 | VerificationCommand | pwsh ./eng/verify-story-5.6.ps1 |
 | NegativeEvidence | PlatformHostIsolationTests.CrossTenantRoutesAndEvidenceAreDenied; SecretPoisonSweepTests; ForbiddenModuleHostAndConditionalSkipTests; unavailable-resource fixture |
-| Result | Not run — backlog; EXT-HOST-1, EXT-SECRETS-1, and EXT-TOPOLOGY-1 are currently Uncommitted |
+| Result | Backlog. `EXT-HOST-1` and `EXT-SECRETS-1` need live qualification. `EXT-PROTECTION-1` and `EXT-TOPOLOGY-1` still need commitments. |
 
 ### Story 5.7: Activate hexa Only When Setup Gates Pass
 
@@ -1781,7 +1781,7 @@ So that erasure is enforceable without breaking EventStore replay.
 | TestOrArtifact | PayloadProtectionAvailabilityAttestationTests; PayloadProtectionLiveTests; ProtectedContentReplayTests; LegacyPlaintextInventoryAndCutoverBlockTests; HoldPinProtectionTests; WorkflowContentSweepTests; protection evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-5.8.ps1 |
 | NegativeEvidence | PayloadProtectionIsolationTests.CrossTenantKeysCannotUnprotectOrCorrelate; OpenOrMismatchedInstructionProtectionDecisionTests; NoOpProtectionCannotSatisfyLiveEvidenceTests; PlaintextPoisonSweepTests; HeldDekCannotBeDestroyedTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1 and EXT-SECRETS-1 are Uncommitted, OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 is Open, and any nonempty legacy-plaintext deployment is additionally blocked by Open OD-LEGACY-PLAINTEXT-DISPOSITION-1 |
+| Result | Backlog. `EXT-PROTECTION-1` and `EXT-SECRETS-1` need live qualification. OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 is Open. Legacy plaintext in the deployment also requires OD-LEGACY-PLAINTEXT-DISPOSITION-1. |
 
 ### Story 5.9: Reject Prohibited Cost-Control Postures At Readiness Recording
 
@@ -1833,7 +1833,7 @@ So that production-like enablement can never pass without hard enforcement.
 | TestOrArtifact | ProhibitedCostControlPosturePolicyTests; AgentLaunchReadinessBlockerTests; CostPostureMigrationReplayTests; ReadinessCostPostureApiUiParityTests |
 | VerificationCommand | pwsh ./eng/verify-story-5.9.ps1 |
 | NegativeEvidence | ReportingOnlyAndAcceptedRiskCannotEnableTests; UnknownCostPostureFailsClosedTests; ProhibitedPostureCannotInvokeProviderTests |
-| Result | Not run — backlog; requires Stories 5.5 and 5.7 |
+| Result | Backlog. The approved preparatory work is complete. Full Story 5.9 still requires Stories 5.5 and 5.7. [Preparation record](../implementation-artifacts/spec-5-9-reject-prohibited-cost-control-postures-at-readiness-recording.md) |
 
 ### Story 5.10: Retire Prohibited Safety And Caller Policy Inputs
 
@@ -1885,7 +1885,7 @@ So that old clients cannot reactivate removed safety-override or self-approval b
 | TestOrArtifact | DeprecatedConfigurationValueTests; ApproverPolicyCallerRejectionTests; SafetyOverrideRejectionTests; ApproverPolicyUiSupportedSourceTests; PackageConsumerCompatibilityTests |
 | VerificationCommand | pwsh ./eng/verify-story-5.10.ps1 |
 | NegativeEvidence | CallerCannotApproveOwnCallTests; OverrideCannotBypassSafetyTests; DirectLegacyCommandCannotMutateTests |
-| Result | Blocked — backlog; requires Stories 5.4 and 5.5 and EXT-CONV-AI-1 is currently Uncommitted |
+| Result | Backlog. Requires Stories 5.4 and 5.5. `EXT-CONV-AI-1` needs live qualification. |
 
 ### Story 5.11: Restore Reproducible Build and Host Verification
 
@@ -1900,7 +1900,7 @@ As a module maintainer, I can build the recorded dependency set, install the shi
 
 **Owners and evidence.** The module developer owns package, host and route checks. The dependency owners supply reachable revisions. CiCd owns the delivered workflow. See the [course correction](sprint-change-proposal-2026-11-20.md) for the starting evidence and handoff.
 
-Hosted product CI passed on parent `2b21256`. The nonpublishing release rehearsal still needs evidence from the same revision. [CI run 44899631836](https://github.com/Hexalith/Hexalith.Agents/actions/runs/44899631836)
+At `412528e`, a fresh checkout resolved all 13 parent pins and hosted Release CI passed. The Debug/source solution built with zero warnings and errors, and all 37 Conversations source-adapter tests passed. The CiCd owner still owes a nonpublishing rehearsal for this candidate. The earlier receipts remain attributed to their tested revisions. [Current CI](https://github.com/Hexalith/Hexalith.Agents/actions/runs/44922636989) · [Qualification checklist](../implementation-artifacts/spec-5-11-restore-reproducible-build-and-host-verification.md)
 
 ## Epic 6: One Safe Automatic Conversation Response
 
@@ -1987,7 +1987,7 @@ So that restart and replay preserve EventStore truth without duplicating executi
 | TestOrArtifact | ConversationInteractionDirectoryAggregateTests; InteractionDirectoryMigrationBootstrapPrincipalAndWriteFenceTests; InteractionDirectoryMigrationCutoverTests; InteractionDirectoryRepairFenceCheckpointRaceTests; InteractionDirectoryMigrationRepairEpochBridgeTests; InteractionDirectoryMigrationActiveDeletionScopeFencePreservationTests; InteractionPermitCreationOutboxTests; ConversationEffectLeaseCommitRaceTests; WorkflowStartOutboxTests; Fr8OrderedAcceptanceApproverResolutionAndMembershipLeaseTests; UserProposalActionIntentOutboxRecoveryTests; ProviderOutputSafetyDecisionPhasePinTests; PreProviderCapacityDeletionDispositionTests; GeneratedProposalMutationLeaseTests; GenerationFailureProviderLeaseTests; AutomaticInteractionWorkflowTests; AutomaticInteractionRestartIntegrationTests; RecoveryCohortManifest; LR-RECOVERY partial observation for workflow-owned identities |
 | VerificationCommand | pwsh ./eng/verify-story-6.1.ps1 |
 | NegativeEvidence | AutomaticInteractionIsolationTests.CrossTenantCallStartsNoWorkflow; ConversationDeletionBarrierRejectsBeforePermitInteractionWorkflowAndProviderTests; PermitAndCreationOutboxLostAckTests; WorkflowStartImmediatelyBeforeAndAfterLeaseCommitAndBarrierClosingTests; ApproverResolutionImmediatelyBeforeAndAfterLeaseCommitAndBarrierClosingTests; UserActionIntentImmediatelyBeforeAndAfterCommitClosingAndApiCrashTests; StaleReservedWorkerCannotActAfterClosingTests; Fr8RateApproverContextBudgetAndSafetyFailuresCreateNoMembershipEffectTests; MembershipCommitImmediatelyBeforeAndAfterClosingEffectiveTests; ProviderCannotStartWithoutPhasePinnedOutputSafetyDecisionTests; OutputSafetySuccessorCannotRelabelAuthorizedAttemptTests; PreProviderCapacityCannotRemainQueuedOrAdmittedAfterClosingTests; GeneratedOutputDiscardedWhenProposalMutationCommitLosesTests; GenerationFailureCannotInventProposalVersionOrRetainOutputTests; LegacyMigrationWrongPrincipalWrongTenantWrongStreamAndCircularGateTests; LegacyDirectoryMigrationStaleDisconnectedRestoredWriterAndProvedEmptyTests; MigrationRepairFenceMustPrecedeCohortFreezeTests; MigrationRepairOldEpochOutboxUserIntentCommittedLeaseReservedLeaseActiveDeletionFenceAndRestoreTests; LegacyPlaintextCannotReachDirectoryReadyTests; CrossTenantProtectionKeyAliasSubstitutionTests; ProjectionLagCannotErasePermitTests; AlternateDurableOwnerGuardTests; DuplicateCommandTimerAndVersionRecoveryTests; OpenOrMismatchedDaprSecurityDecisionBlocksWorkloadTests |
-| Result | Blocked — backlog; EXT-HOST-1, EXT-PROTECTION-1, EXT-SECRETS-1, EXT-PARTIES-1, EXT-CONV-AI-1, and EXT-TOPOLOGY-1 are currently Uncommitted; OD-DAPR-SECURITY-1 and OD-INITIAL-OUTPUT-SAFETY-STATUS-1 are Open; any nonempty legacy-plaintext deployment is additionally blocked by OD-LEGACY-PLAINTEXT-DISPOSITION-1 and the absent outcome-specific procedure |
+| Result | In progress. The approved Goal A covers deterministic Level 2 recovery. Goal B migration and live restart qualification are outstanding. Host, Secrets, Parties and Conversations are Committed. Protection and Topology are Uncommitted. Live execution requires the applicable Available records and governed decisions. OD-DAPR-SECURITY-1 and OD-INITIAL-OUTPUT-SAFETY-STATUS-1 are Open. A nonempty legacy-plaintext deployment also requires OD-LEGACY-PLAINTEXT-DISPOSITION-1 and its outcome-specific procedure. |
 
 ### Story 6.2: Use The Complete Authorized Conversation Or Block
 
@@ -2038,7 +2038,7 @@ So that no partial or unauthorized context is represented as a complete answer.
 | TestOrArtifact | CompleteConversationContextTests; ConversationContextIntegrationTests; ProviderTokenizerCompatibilityTests; ContextRevalidationTests; no-content evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-6.2.ps1 |
 | NegativeEvidence | ConversationContextIsolationTests.CrossTenantContextIsDeniedBeforeReadDisclosure; NoTruncationSummaryWindowRetrievalTests; UnsupportedTokenizerAndStaleCapabilityTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-TOKEN-1, and EXT-CONV-AI-1 are currently Uncommitted |
+| Result | Backlog. `EXT-PROTECTION-1`, `EXT-TOKEN-1` and `EXT-CONV-AI-1` must be Available for the live authorized-context read. |
 
 ### Story 6.3: Block Unsafe Prompt Context Or Output
 
@@ -2107,7 +2107,7 @@ So that unsafe or unauthorized content cannot enter generation, proposal, or pos
 | TestOrArtifact | TwoStageSafetyPolicyTests; ContentSafetyAdapterIntegrationTests; SafetyVerdictEpochAggregateTests; SafetyVerdictIndexAggregateTests; SafetyVerdictDirectoryProjectionTests; ActiveTenantCohortManifestTests; ProvisionDuringSafetyEpochTests; UnindexedConversationSafetyInitializationTests; SafetyVerdictRescanRecoveryLiveTests; DigestKeyRotationRescanTests; NoWeakerRetryTests; ProviderAuthorizationOutputSafetyDecisionPhasePinTests; OutputSafetyDecisionSelectedStatusAndNoRetainedContentTests; content-safe rescan evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-6.3.ps1 |
 | NegativeEvidence | SafetyTenantIsolationTests.CrossTenantAndUnauthorizedDataAreAlwaysBlocked; OldEpochVerdictCannotAuthorizeCallTests; MissingLostOrConflictingRescanAckTests; ProjectionNotCaughtUpCannotActivateEpochTests; ConcurrentTenantCannotEscapeSafetyInitializationTests; AbsentDirectoryKeyCannotAuthorizeUnscannedConversationTests; ExpiredLeaseCannotActivateEpochTests; UnboundedOrInvalidRescanProfileTests; OpenOrMismatchedOutputSafetyDecisionBlocksBeforeProviderTests; DecisionSuccessorCannotRelabelAuthorizedOutputSafetyFailureTests; ApproverOverrideDoesNotExistTests; AlwaysBlockedRestrictedCategoryMatrixTests; raw-content poison sweep |
-| Result | Blocked — backlog; EXT-SAFETY-1, EXT-SECRETS-1, and EXT-CONV-AI-1 are currently Uncommitted, and OD-INITIAL-OUTPUT-SAFETY-STATUS-1 is Open |
+| Result | Backlog. `EXT-SAFETY-1`, `EXT-PROTECTION-1`, `EXT-SECRETS-1` and `EXT-CONV-AI-1` need live qualification. OD-INITIAL-OUTPUT-SAFETY-STATUS-1 is Open. |
 
 ### Story 6.4: Generate Within Hard Cost Reservations
 
@@ -2190,7 +2190,7 @@ So that retries and crashes cannot overspend or duplicate Provider work.
 | TestOrArtifact | AgentsIdentityAttemptTests; PreparedProviderAttemptTests; ProviderAttemptDataHandlingVersionEvidenceTests; JointRateConcurrencyDecisionVersionTests; RateAdmissionTwoScopeDecisionTests; RatePreparationBoundTests; RateResetDerivationTests; OpenInteractionLeaseDecisionTests; BudgetDispositionDecisionTests; RetryTimeSafetyFailurePreservesInvocationSettlementTests; BudgetLedgerAggregateTests; BudgetLedgerConcurrencyTests; BudgetReservationIsolationTests; ProviderAdapterIdempotencyIntegrationTests; ProviderOutcomeRecoveryTests; decision/ack failure-injection and usage/reconciliation manifests |
 | VerificationCommand | pwsh ./eng/verify-story-6.4.ps1 |
 | NegativeEvidence | LedgerIsolationTests.CrossTenantRateOpenBudgetPrepareCommitAbortReleaseSettleAndStatusAreDenied; OpenOrMismatchedRateConcurrencyDecisionTouchesNoLedgerTests; RateDeadlineMismatchTests; PreparationDeadlineAtOrAfterEitherResetTests; EitherResetBeforeBothAcknowledgementsAbortsTests; RateResetCannotUseLedgerReceiptTimeTests; PreAcceptanceSafetyFailedLeaseAbortTests; RetryTimeSafetyFailureCannotChangeBudgetDispositionTests; RecoveryCannotReleaseBudgetFromAbsentInvocationTests; ReleasedReservationCannotAuthorizeInvocationTests; ProviderInvocationWithoutAdmissionTests; ConcurrentBudgetOverspendTests; RetryDoubleChargeAndChangedFingerprintTests; ProviderSecretAndRawErrorPoisonSweepTests |
-| Result | Blocked — backlog; EXT-PROVIDER-1 and EXT-SECRETS-1 are currently Uncommitted and OD-RATE-CONCURRENCY-CONSUMPTION-1 is Open |
+| Result | Backlog. `EXT-PROVIDER-1`, `EXT-PROTECTION-1` and `EXT-SECRETS-1` need live qualification. OD-RATE-CONCURRENCY-CONSUMPTION-1 is Open. |
 
 ### Story 6.5: Enforce Capacity Backpressure And Tenant Fairness
 
@@ -2261,7 +2261,7 @@ So that the Conversation contains one attributable AI message and no membership 
 **Dependencies:**
 
 - **Prior stories:** 5.4 and 6.3 through 6.5.
-- **External:** EXT-CONV-AI-1 must be Available and its exact membership/posting compatibility command must pass. `EXT-PARTIES-1`'s selected branch must be Available for launch evidence; Branch-B-compatible identity-by-id development is permitted while it is Uncommitted but cannot satisfy `RQ-1`.
+- **External:** EXT-CONV-AI-1 must be Available and its exact membership/posting compatibility command must pass. `EXT-PARTIES-1`'s selected branch must be Available for launch evidence; the committed Branch B contract permits identity-by-id development. Live use requires the registered owner evidence.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -2327,7 +2327,7 @@ So that the Conversation contains one attributable AI message and no membership 
 | TestOrArtifact | ConversationAgentStateAggregateTests; ExternalRemovalAndReadmissionTests; CurrentMirrorDirectionOutcomeTests; MirrorSupersessionAndLateOutcomeTests; MirrorRefusalRemediationTests; MembershipMirrorOutboxTests; PartyIdentityBranchCompatibilityTests; AiMembershipCompatibilityTests; AutomaticPostingIntegrationTests; ConversationPostingRecoveryTests; AutomaticResponseAuditCompletenessTests; LR-CONVERSATIONS-MEMBERSHIP-POSTING observation |
 | VerificationCommand | pwsh ./eng/verify-story-6.6.ps1 |
 | NegativeEvidence | ConversationsPostingIsolationTests.CrossTenantMembershipAndAppendAreDenied; DuplicateMembershipAndMessageRetryTests; DirectConversationStreamWriteGuardTests |
-| Result | Not run — backlog; EXT-CONV-AI-1 and EXT-PARTIES-1 are currently Uncommitted for launch evidence |
+| Result | Backlog. `EXT-CONV-AI-1` and `EXT-PARTIES-1` must pass their registered qualification commands for live membership and posting. |
 
 ### Story 6.7: Call hexa And Follow Automatic Status Accessibly
 
@@ -2448,7 +2448,7 @@ So that structural unavailability fails closed without generic fallbacks or inco
 | TestOrArtifact | RuntimeContractAdditiveMemberTests; CurrentMirrorContractCompatibilityTests; SafeContextBudgetEvidenceTests; MembershipGateContractTests; UnknownValueFailClosedTests; RegisterRuntimeVocabularyBoundaryTests |
 | VerificationCommand | pwsh ./eng/verify-story-6.8.ps1 |
 | NegativeEvidence | MissingBudgetTermCannotBecomeContextReadyTests; UnknownRuntimeValueCannotPassTests; RegisterOnlyBlockerDoesNotLeakIntoAgentAggregateTests |
-| Result | Blocked — backlog; required external seams are currently Uncommitted |
+| Result | Backlog. See the external dependencies above for the live paths. The missing contract members have separate deterministic checks. |
 
 ## Epic 7: Complete Confirmation And Approval
 
@@ -2566,7 +2566,7 @@ So that I can correct the draft without overwriting what **hexa** generated.
 | TestOrArtifact | AgentsIdentityProposalVersionTests; ProposalEditAggregateTests; ProposalEditHumanActorBindingIntegrationTests; ProposalEditIntentOutboxRecoveryTests; ProposalEditConcurrencyTests; ProposalVersionHistoryQueryTests; ProposalEditorComponentTests; edit evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.2.ps1 |
 | NegativeEvidence | ProposalEditIsolationTests.CrossTenantEditAndHistoryAreDenied; MissingStaleNonHumanOrMismatchedEditActorBindingTests; ProtectedEditReadCannotPrecedeIntentLeaseCommitTests; EditApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingBeforeAfterEditIntentCommitTests; TerminalProposalEditTests; PriorVersionOverwriteGuardTests; raw-content telemetry poison sweep |
-| Result | Blocked — backlog; requires Story 7.1 and EXT-PROTECTION-1/EXT-CONV-AI-1/EXT-PARTIES-1 are currently Uncommitted |
+| Result | Backlog. Requires Story 7.1 and live qualification for the external seams listed above. |
 
 ### Story 7.3: Regenerate Under Fresh Gates
 
@@ -2619,7 +2619,7 @@ So that a new version cannot reuse stale authority or changed inputs under an ol
 | TestOrArtifact | AgentsIdentityRegenerationTests; ProposalRegenerationAggregateTests; RegenerationHumanActorBindingIntegrationTests; RegenerationUserActionIntentOutboxTests; RegenerationApproverSegregationTests; RegenerationAuthorizationAtomicityTests; RegenerationFreshGateIntegrationTests; RegenerationRetryRecoveryTests; ProposalVersionHistoryTests; regeneration evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.3.ps1 |
 | NegativeEvidence | RegenerationIsolationTests.CrossTenantRegenerationIsDeniedBeforeProvider; MissingStaleNonHumanOrMismatchedRegenerationActorBindingTests; RegenerationDependencyReadCannotPrecedeIntentLeaseCommitTests; RegenerationApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingBeforeAfterRegenerationIntentCommitTests; RegenerationRequesterCannotApproveGeneratedVersionTests; NoSecondEligibleApproverBlocksBeforeProviderTests; MissingRegenerationAuthorizedFactBlocksProviderTests; StaleChangedFingerprintAndWeakerPolicyTests; TerminalExpiryRaceAndDuplicateVersionTests |
-| Result | Not run — backlog; required external seams are currently Uncommitted |
+| Result | Backlog. The registered external seams still lack the live evidence required for regeneration. |
 
 ### Story 7.4: Approve And Post One Selected Version
 
@@ -2690,7 +2690,7 @@ So that only the reviewed response becomes a Conversation Message attributed to 
 | TestOrArtifact | ProposalApprovalAggregateTests; ProposalApprovalHumanActorBindingIntegrationTests; ProposalApprovalIntentOutboxRecoveryTests; DurableBeforePostOrderingTests; ApprovalAndPostingEffectLeaseSequenceParityTests; BeginPostingAggregateTests; RegenerationRequesterApprovalExclusionTests; ApprovedVersionPostingIntegrationTests; ApprovalPostingRecoveryTests; ApprovalUiStateTests; approval/post audit-completeness manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.4.ps1 |
 | NegativeEvidence | ProposalApprovalIsolationTests.CrossTenantApprovalPostingAndAuditAreDenied; MissingStaleNonHumanOrMismatchedApprovalActorBindingTests; ApprovalApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingEffectiveImmediatelyBeforeAndAfterApprovalIntentApprovalSafetyPrePostSafetyConversationReadBeginPostingAndAppendTests; ProtectedDependencyReadCannotPrecedeEffectCommitTests; ExternalAppendBeforePostingPendingTests; ApprovalPostingResultCannotShareOneCommandTests; TerminalRaceAfterPostingPendingTests; WrongVersionAndDuplicatePostTests; ApprovalExpiryConcurrencyTests; ApprovedIsNotPostedUiTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-SAFETY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 are currently Uncommitted, and ARCH-A-14 is unretired |
+| Result | Backlog. `EXT-PROTECTION-1`, `EXT-SAFETY-1`, `EXT-CONV-AI-1` and `EXT-PARTIES-1` need live qualification. ARCH-A-14 is unretired. |
 
 ### Story 7.5: Reject Or Abandon A Proposal
 
@@ -2754,7 +2754,7 @@ So that rejected or intentionally abandoned content becomes terminal and can nev
 | TestOrArtifact | ProposalNonPostingResolutionTests; ProposalResolutionHumanActorBindingIntegrationTests; ProposalResolutionIntentOutboxRecoveryTests; ProposalResolutionConcurrencyTests; ProposalResolutionUiTests; SafetyFailureAbandonmentTests; MembershipLossAbandonmentTests; terminal evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-7.5.ps1 |
 | NegativeEvidence | ProposalResolutionIsolationTests.CrossTenantRejectAbandonAndHistoryAreDenied; MissingStaleNonHumanOrMismatchedResolutionActorBindingTests; ResolutionDependencyReadCannotPrecedeIntentLeaseCommitTests; ResolutionApiCrashCannotLoseOrChangeCommittedIntentTests; ClosingBeforeAfterResolutionIntentCommitTests; TerminalMutationGuardTests; ConcurrentApproveRejectAbandonTests; SafetyOrMembershipFailureCannotStrandAbandonTests; RetryStillRequiresFullPostingRevalidationTests |
-| Result | Blocked — backlog; requires Story 7.1 and EXT-CONV-AI-1/EXT-PARTIES-1 are currently Uncommitted |
+| Result | Backlog. Requires Story 7.1. `EXT-CONV-AI-1` and `EXT-PARTIES-1` need live qualification. |
 
 ### Story 7.6: Expire A Proposal Deterministically
 
@@ -2875,7 +2875,7 @@ So that a failed post can be resolved without misreporting a confirmed post or a
 | TestOrArtifact | ProposedAgentReplyTransitionTableTests; ProposalDetailPostingFailedRecoveryTests; CanAdministrativeRetryContractTests; AutomaticAdministrativeRetryConcurrencyTests; ProposalQueueStateParityTests; LateConfirmedMessageLookupTests; KillSwitchProposalStateTests; ProposalStateApiUiParityTests |
 | VerificationCommand | pwsh ./eng/verify-story-7.7.ps1 |
 | NegativeEvidence | PostingFailedIsNotTerminalTests; PostedCannotRetryOrAbandonTests; MissingOrUnavailableMessageLookupCannotExitTests; CrossTenantProposalRecoveryDisclosesNothingTests |
-| Result | Blocked — backlog; required external seams are currently Uncommitted |
+| Result | Backlog. The recovery paths require live qualification of the external seams listed above. |
 
 ## Epic 8: Governance Operations And Release Qualification
 
@@ -3043,7 +3043,7 @@ So that approved evidence can be transferred without exposing secrets, unrelated
 | TestOrArtifact | AuditExportAggregateTests; GovernanceScopeV1CanonicalPredicateTests; ExportHumanActorBindingIntegrationTests; ExportPrepareRecoveryDispositionTests; ExportPrepareLifecycleVersionPinTests; EncryptedExportIntegrationTests; ExportProtectionFenceTests; ExportCommitDecisionAndAcknowledgementTests; ExportKeyDeliveryAuthorizeEffectResultRecoveryTests; ExportAbortCleanupFailureInjectionTests; ExportExpiryAndReplayTests; ExportUiContractTests; encrypted export manifest, actor-binding evidence, key-delivery outcome evidence, partial-output cleanup receipts, and no-leak scan |
 | VerificationCommand | pwsh ./eng/verify-story-8.2.ps1 |
 | NegativeEvidence | AuditExportIsolationTests.CrossTenantRequestInspectDownloadAndReplayAreDenied; GovernanceScopeMalformedUnknownCrossTenantAndUnverifiableMembershipTests; HumanExactConversationExportCannotExecuteWhileDecisionOpenTests; ClassUtcRangeCannotExecuteWhileDecisionOpenTests; MissingStaleNonHumanUnavailableOrSameActorExportApprovalTests; PlatformApproverDoesNotRequireInventedTenantPartyTests; RevokedExportRoleTests; OpenOrMismatchedExportLifecycleDecisionTests; LifecycleSuccessorCannotRelabelPreparedArtifactTests; LifecycleSwitchRequiresCleanupCompleteAbortAndNewPrepareTests; ExportRecoveryCannotChooseOrSwitchDispositionTests; ExportCannotReadBeforeFencePrepareTests; ExportCannotDeliverKeyBeforeFenceDecisionAndAuditExportAcknowledgementTests; ExportKeyDeliveryCrossTenantChangedIdentityExpiryRevocationAndLostAckTests; ExportKeyNeverTraversesAgentsTests; MissingAuditExportAcknowledgementCannotHideFenceCommittedCopyFromDeletionTests; ExportCommitLostAckAndConcurrentRevisionTests; PartialArtifactUnknownOrCleanupFailureRetainsFenceTests; SecretResolutionFailureTests; PlaintextArtifactPoisonScan; ManifestMismatchAndExpiredDownloadTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-SECRETS-1, EXT-EXPORT-STORE-1, and EXT-PARTIES-1 are Uncommitted, OD-EXPORT-LIFECYCLE-1 is Open, Story 8.1 is required, and human exact-Conversation/class-range scopes retain only their named conditional blockers |
+| Result | Backlog. Requires Story 8.1 and live qualification for `EXT-PROTECTION-1`, `EXT-SECRETS-1`, `EXT-EXPORT-STORE-1` and `EXT-PARTIES-1`. OD-EXPORT-LIFECYCLE-1 is Open. The human exact-Conversation and class/range decisions apply to their respective scopes. |
 
 ### Story 8.3: Delete Protected Content And Purge Projections
 
@@ -3157,7 +3157,7 @@ So that immutable history retains only a support-safe tombstone and no content-b
 | VerificationCommand | pwsh ./eng/verify-story-8.3.ps1 |
 | NegativeEvidence | ProtectedDeletionIsolationTests.CrossTenantRequestConfirmInspectAndReplayAreDenied; GovernanceScopeMalformedUnknownCrossTenantAndUnverifiableMembershipTests; HumanExactConversationOperatorDeletionCannotExecuteWhileDecisionOpenTests; ClassUtcRangeCannotExecuteWhileDecisionOpenTests; OperatorDeletionWorkflowWrongRequestActorScopeCandidateOrdinalAndRevisionTests; OperatorDeletionRefreezeCannotExpandApprovedScopeTests; OperatorNonterminalOwnerCannotReachEffectiveWhileDispositionOpenTests; ConversationDeletionSourceOutageBackfillPoisonAndAckLossTests; ConversationDeletionSignalCrossTenantStaleChangedReplayAndLostAckTests; ConversationDeletionSignalCannotMintSecondLogicalIdTests; BothOriginPermitIntentAcquireCommitAndRateOpenBudgetCapacityAuthorizationImmediatelyBeforeAndAfterAdmissionFenceTests; PreGlobalCutViolationCannotWedgeOrInventArtifactInvalidationTests; ConcurrentViolationDetectionCannotAssignTwoSuccessorOrdinalsTests; MultipleViolationsBeforeSuccessorBindingCannotWedgeOrSkipGapTests; AcceptedAdmissionViolationRequiresHigherOrdinalFullOwnerRecutTests; SuccessorAdmissionOrdinalCannotHidePriorViolationOrReopenEffectiveTests; ExistingContentFenceCannotBeSilentlyReusedReinstalledOrLeftOnOldTokenTests; PostDestructionAdmissionViolationCannotEnterContentContainmentOrCompleteTests; CandidateCannotBuildBeforeEverySameOrdinalOwnerCutAndZeroSinceInstallProofTests; ApproverResolutionAndUserActionIntentImmediatelyBeforeAndAfterClosingTests; StaleCancelledWorkerCannotStartEffectTests; PreProviderCapacityCannotRemainManifestedAfterEffectiveTests; MembershipAndGeneratedOutputImmediatelyBeforeAndAfterEffectiveTests; CreationOutboxAndInteractionAppendLostAckTests; CommittedEffectLeaseAckLossAndUnknownOutcomeTests; ProjectionLagCannotOmitInteractionTests; DeletionWorkflowCannotReserveAcquireInvokeOrInventSettlementTests; CandidateCannotPrepareBeforeCurrentContentBindingTests; HoldAfterBarrierAuthorizationBeforeSealMakesAuthorizationLoseTests; BarrierAuthorizationWithoutExactGuardCompareTokenRejectedTests; BarrierReauthorizationBeforeStaleResultRecordedRejectedTests; OpenArmedHoldContenderAdvancesNeitherBranchTests; HoldRegistrationLostAckCannotDisappearTests; DirectLedgerReadThenProtectionFenceAppendCannotAuthorizeDestructionTests; AdmissionAppendRacingBarrierCommitHasExactlyOneWinnerTests; MultiKeyDeletionCannotReuseBarrierReceiptPerKeyTests; DestroyDekManifestCannotPartiallySucceedOrMintSecondBatchTests; LostManifestBatchOutcomeUsesExactLookupTests; SealedBatchCannotExpireOrRenewIntoSecondAuthorityTests; ContainmentProtectionEffectWithoutGuardIssuedCapabilityRejectedTests; ContainmentDuplicateConcurrentAndLostIssuanceTests; CompromiseRevocationAndBatchConsumptionHaveExactlyOneWinnerTests; FenceRemovalAuthorizationAndDestructionBarrierCannotBothWinTests; MigrationSuccessorCannotDropAdmissionOrdinalGapChainOwnerCycleContentBindingHoldContenderCompareAuthorizationStaleResultSealBatchGuardIssuedStateOrProtectionOwnerOutcomeTests; PostStartInScopeContentViolationRequiresDistinctContainmentBatchTests; OutsideScopeOrUnresolvableViolationBlocksCompletionTests; ConversationDeletionCannotUseLocalAbortOrHumanOriginFieldsTests; OperatorAbortFenceRemovalAndCutReleaseBlockedWhileDecisionOpenTests; MissingStaleOrSameActorDeletionApprovalTests; ActiveOrPreparingHoldCannotBeRejectedOrBypassedTests; DeferredDeletionCannotPrepareBeforeLastHoldGuardReleaseTests; OpenOrMismatchedInstructionProtectionDecisionBlocksAllStoryAuthorizationTests; LegacyPlaintextCannotEnterDeletionInventoryTests; ReducedInteractionOnlyDeletionCannotBypassOq31Tests; ExportFreeDeletionCannotReadOrFabricateLifecycleDecisionTests; ExportBearingDeletionCannotPrepareOrDestroyWithoutPhasePinnedLifecycleStoreTests; PreparingOrCleanupPendingExportBlocksDeletionTests; PartialProjectionFailureTests; DuplicateDeletionDeliveryTests; DeletedContentForensicScan |
 | AdditionalV21NegativeEvidence | CallerPresentedStaleOrdinalCannotChooseViolationPartitionTests; MissingAcceptanceReceiptCannotLeaveCurrentZeroCleanTests; PostStartHoldOpenOrMismatchedCannotDispatchAcceptedBatchTests; PostStartHoldCannotIssueOrDispatchContainmentBatchOrCompleteTests; StaleOrBatchIssueOnlyCannotReachProtectionTests; SameAliasDistinctResourceCannotMintSecondCapabilityTests; WrongTenantAliasCannotUseAlreadyDestroyedReceiptTests; SignatureWithoutExactGuardIssuedStateRejectedTests; WrongAudienceOrRevokedCapabilityKeyRejectedTests; CompromisedKeyCannotRaceReattestationIntoTwoActiveCredentialsTests; DirectCompletionAppendRejectedTests; LateAdmissionContentHoldCoverageDispatchOrCapabilityMutationMakesCompletionAuthorizationStaleTests |
-| Result | Blocked — backlog; common dependencies remain Uncommitted and OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 blocks all Story 8.3 authorization. Class/range scope, human operator exact-Conversation scope, operator nonterminal convergence, and operator cancellation remain safely blocked only at their named Open decisions; exact-interaction and source-approved exact-Conversation eligible Resume/retry paths stay evaluable. Nonempty legacy plaintext and optional export/armed-contention branches retain their conditional blockers. Stories 8.1 and 6.1 plus the common admission/effect-cut/content-fence implementation are required |
+| Result | Blocked — backlog; common dependencies lack live qualification and OD-PRD-OQ31-INSTRUCTION-PROTECTION-1 blocks all Story 8.3 authorization. Class/range scope, human operator exact-Conversation scope, operator nonterminal convergence, and operator cancellation remain safely blocked only at their named Open decisions; exact-interaction and source-approved exact-Conversation eligible Resume/retry paths stay evaluable. Nonempty legacy plaintext and optional export/armed-contention branches retain their conditional blockers. Stories 8.1 and 6.1 plus the common admission/effect-cut/content-fence implementation are required |
 
 ### Story 8.4: Operate Safety Cost And Governance Policies
 
@@ -3231,7 +3231,7 @@ So that future Agent Calls use explicit current controls and no UI or API path c
 | TestOrArtifact | ContentSafetyPolicyAggregateTests; TenantGovernancePolicyAggregateTests; AgentSafetyConfigurationRemovalTests; GovernancePolicyApiUiParityTests; PolicyActivationAndSafetyEpochTests; SafetyVerdictRescanRecoveryLiveTests; DigestKeyRotationRescanTests; PolicyHighWaterMarkTests; Sm4IncidentConfirmationAndContainmentTests; TriggerReviewDecisionAndPullTests; KillSwitchRecoveryTests; governance-policy activation evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-8.4.ps1 |
 | NegativeEvidence | GovernancePolicyIsolationTests.CrossTenantCreatePublishInspectAndReplayAreDenied; RevokedPolicyAdminTests; PolicyCannotActivateWithMissingFiniteManifestAckOrInvalidRescanProfileTests; PostCheckpointTenantOrConversationCannotExtendActivationBarrierTests; RotatedKeyCannotReuseOldVerdictTests; WeakerRetryAndApproverOverrideTests; InvalidBudgetPolicyTests; ConflictingPendingCommandTests; Sm4PullWithoutExactConfirmationIsDeniedTests; ReviewPullWithoutCurrentDecisionIsDeniedTests; PlatformAuthorityDoesNotInventTenantPartyTests; KillSwitchLostAckAndWrongRevisionTests |
-| Result | Blocked — backlog; requires Stories 5.3, 5.5, 6.3, and 6.4, EXT-SECRETS-1 is currently Uncommitted, and the Release-Operator branch additionally needs EXT-PARTIES-1 |
+| Result | Backlog. Requires Stories 5.3, 5.5, 6.3 and 6.4. `EXT-SECRETS-1` needs live qualification. The Release Operator branch also needs `EXT-PARTIES-1`. |
 
 ### Story 8.5: Calculate Runtime And Product Metrics Deterministically
 
@@ -3244,7 +3244,7 @@ So that evidence is classified consistently without treating formula fixtures as
 **Dependencies:**
 
 - **Prior stories:** 5.5 for readiness-record contracts and the authoritative runtime/product source events emitted by Stories 6.1–7.6.
-- **External:** `EXT-TOPOLOGY-1` must be `Available` for live production-like source observations and qualification-session evidence, and `EXT-CONV-AI-1` must be `Available` for the SM-2 active-Conversation count or equivalent Conversations-side event feed; both are currently `Uncommitted`. Pure calculator fixtures do not bypass these live-evidence dependencies for story completion.
+- **External:** `EXT-TOPOLOGY-1` must be `Available` for live production-like source observations and qualification-session evidence, and `EXT-CONV-AI-1` must be `Available` for the SM-2 active-Conversation count or equivalent Conversations-side event feed; the topology contract is `Uncommitted` and the Conversations contract is `Committed`. Pure calculator fixtures do not bypass these live-evidence dependencies for story completion.
 - **Forward dependencies:** None.
 
 **Acceptance Criteria:**
@@ -3285,7 +3285,7 @@ So that evidence is classified consistently without treating formula fixtures as
 | TestOrArtifact | RuntimeMetricCalculatorTests; ProductMetricCalculatorTests; WindowCohortLateDataTests; MetricInsufficiencyTests; versioned measurement-contract and fixture manifests |
 | VerificationCommand | pwsh ./eng/verify-story-8.5.ps1 |
 | NegativeEvidence | MetricIsolationTests.CrossTenantSourceCohortAndDetailAccessAreDenied; FixtureCannotProduceLivePassTests; InsufficientSampleAndMissingTimestampTests; ConflictingDuplicateObservationTests; CounterMetricGuardTests |
-| Result | Blocked — backlog; EXT-TOPOLOGY-1 and EXT-CONV-AI-1 are Uncommitted and prior runtime/product source events are required |
+| Result | Backlog. Requires prior runtime and product events. `EXT-TOPOLOGY-1` and `EXT-CONV-AI-1` need live qualification. |
 
 ### Story 8.6: Prove Accessible Localized Responsive And Performant UI
 
@@ -3464,7 +3464,7 @@ So that sensitive content can be examined without granting ambient Conversation 
 | TestOrArtifact | AuditInspectionAggregateTests; AuditInspectionHumanActorBindingIntegrationTests; AuditInspectionApiUiParityTests; AuditInspectionLiveTests; InspectionReviewWindowTests; inspection actor-binding evidence manifest |
 | VerificationCommand | pwsh ./eng/verify-story-8.8.ps1 |
 | NegativeEvidence | AuditInspectionIsolationTests.CrossTenantWrongRoleUnapprovedAndOverRateReadsAreDenied; MissingStaleNonHumanUnavailableOrSameActorInspectionApprovalTests; PlatformApproverDoesNotRequireInventedTenantPartyTests; ForgedCompliancePrincipalTests; ErasedContentCannotBeRevivedTests; InspectionSurvivesSourceDeletionTests |
-| Result | Blocked — backlog; EXT-PROTECTION-1, EXT-TOPOLOGY-1, EXT-CONV-AI-1, and EXT-PARTIES-1 are Uncommitted |
+| Result | Backlog. `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, `EXT-CONV-AI-1` and `EXT-PARTIES-1` need live qualification for protected evidence disclosure. |
 
 ## Release Gate RQ-1 — Outside The Story Backlog
 

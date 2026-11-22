@@ -18,6 +18,7 @@ Enable administrators to configure tenant-scoped `hexa` through live public oper
 - Story 5.8: Protect Sensitive Agent Content At The EventStore Boundary
 - Story 5.9: Reject Prohibited Cost-Control Postures At Readiness Recording
 - Story 5.10: Retire Prohibited Safety And Caller Policy Inputs
+- Story 5.11: Restore Reproducible Build and Host Verification
 
 ## Requirements & Constraints
 

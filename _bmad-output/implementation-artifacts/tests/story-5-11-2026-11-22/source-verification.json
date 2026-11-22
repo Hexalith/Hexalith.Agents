@@ -1,0 +1,46 @@
+{
+  "verified_at_utc": "2026-11-22T08:24:42+00:00",
+  "agents_commit": "412528ed47dfa9bd33453784e70aaedc6dc2214d",
+  "direct_gitlinks_verified_from_empty_cache": {
+    "Hexalith.AI.Tools": "87a738ceeba8975c0b087bc5ecee7dfbc14bf73c",
+    "Hexalith.Builds": "fe68718b6c074a6b500a7191e3554a1d39e17688",
+    "Hexalith.CiCd": "fc696e17a52e8d4bc055d397e57aae1e23bb9b8f",
+    "Hexalith.Commons": "258f9d20e33bd0ae411cf8b3836a26a131f5b9ae",
+    "Hexalith.Conversations": "08953f5eed404228a2b8bd41c7d2bf5eaaab543a",
+    "Hexalith.EventStore": "2b8895f18d962bcc7648ec62859351e79460c33c",
+    "Hexalith.FrontComposer": "431aa71b49406481f9b8616a568c36162f39e0ae",
+    "Hexalith.McpCli": "e79b7f8b64303397ce9dfd856ed2111b513ade88",
+    "Hexalith.Memories": "45fb2308eb11cf5072c6330a9f6bdad3fbf30cd5",
+    "Hexalith.Parties": "b89039b1cf56970595bca0b2ab33f37b91d19914",
+    "Hexalith.Platform": "0aacf13244fa6b1d9e08d627149d72cf12229167",
+    "Hexalith.PolymorphicSerializations": "c6d0dfce6dc4f9a0699a51f80baf021ba5ef5d60",
+    "Hexalith.Tenants": "6f70a9981a589c1542c99db9601859eaa37660a9"
+  },
+  "initialized_nested_worktrees": 0,
+  "dotnet_sdk": "11.0.100",
+  "configuration": "Debug",
+  "source_mapping": {
+    "producer": "Hexalith.Builds.Module.Cli",
+    "package_version": "6.4.4",
+    "mapping_hash": "edbdfc79074b0bc33ac9f808f6546926326578f668a210758ce394714a2ebad0"
+  },
+  "solution_build": {
+    "solution": "Hexalith.Agents.slnx",
+    "warnings": 0,
+    "errors": 0
+  },
+  "tests": {
+    "passed_by_project": {
+      "Hexalith.Agents.Client.Tests": 7,
+      "Hexalith.Agents.Contracts.Tests": 2005,
+      "Hexalith.Agents.Server.Tests": 2207,
+      "Hexalith.Agents.Tests": 1086,
+      "Hexalith.Agents.UI.Tests": 1362
+    },
+    "passed": 6667,
+    "failed": 0,
+    "skipped": 0,
+    "conversations_source_adapter_tests_included": 37
+  },
+  "hosted_release_configuration_ci": "https://github.com/Hexalith/Hexalith.Agents/actions/runs/44922636989/job/136901781255"
+}

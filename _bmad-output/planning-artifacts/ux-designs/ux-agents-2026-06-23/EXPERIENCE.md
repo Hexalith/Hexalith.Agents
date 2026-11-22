@@ -3,7 +3,7 @@ name: Hexalith Agents
 description: Behavioral spine for the Hexalith Agents FrontComposer UI. Owns surfaces, routes, policies, states, interactions, accessibility, and journeys for governed AI participation in Conversations. DESIGN.md owns visuals.
 status: final
 created: 2026-06-23
-updated: 2026-10-28
+updated: 2026-11-22
 sources:
   - ../../briefs/brief-agents-2026-06-23/brief.md
   - ../../prds/prd-agents-2026-06-23/prd.md
@@ -1034,7 +1034,7 @@ Failure path: a queued call is admitted and continues UJ-2 from step 5.
 
 Where this spine is ahead of the code or the contracts. Every row names the story that closes it, so a correction is never unowned.
 
-**Three of `epics.md`'s 33 active stories are named nowhere in this pair, and that is deliberate rather than an omission.** Story **5.6** (*Compose Agents In The Platform-Owned Production-Like Host*), Story **5.8** (*Protect Sensitive Agent Content At The EventStore Boundary*) and Story **8.5** (*Calculate Runtime And Product Metrics Deterministically*) build host composition, an EventStore protection boundary and metric calculation; none renders a surface, a control, a state or a string, so a spine reference would be a citation without a consequence. Their UI-visible effects are carried where they surface: 5.8's unavailability is the `PayloadProtectionUnavailable` blocker in § Launch readiness rules and § Audit governance rules, and 8.5's outputs are the rates § Launch readiness rules renders for the trigger review. Story **5.9** is not in this set — it renders the recorded cost-control posture field and its recording control, and it is now carried on the Launch readiness row of § Information Architecture and in § Launch readiness rules.
+**Four of the 34 stories in Epics 5–8 deliver work outside the UI.** Story **5.6** composes the Platform host, **5.8** protects EventStore content, **5.11** verifies builds, packages and host startup, and **8.5** calculates product metrics. Their UI-visible effects are carried where they surface: 5.8's unavailability is the `PayloadProtectionUnavailable` blocker in § Launch readiness rules and § Audit governance rules, and 8.5's outputs are the rates § Launch readiness rules renders for the trigger review. Story **5.9** is not in this set — it renders the recorded cost-control posture field and its recording control, and it is now carried on the Launch readiness row of § Information Architecture and in § Launch readiness rules.
 
 ### Contracts that must grow
 

@@ -50,7 +50,7 @@ Let a Conversation Participant use the sole Conversation-owned **Call hexa** act
 - **Workflow:** Dapr Workflow is the sole durable owner, and its instance id is `AgentInteractionId`. A non-terminal instance is never re-created. Workflow history is execution state; EventStore is truth.
   - Microsoft Agent Framework may run only inside a generation activity, after `EXT-PROVIDER-1` commits.
   - DurableAgent, MCP, A2A, in-memory workers and alternate owners must not exist.
-  - Dapr Workflow is not yet used by any project; Story 6.1 owns its adoption and compatibility evidence. Versions come only from the Hexalith.Builds catalog (Dapr `1.18.7`), with no local pins.
+  - Server already references Dapr Workflow through an explicit opt-in. The parent-recorded Builds catalog at `fe68718b` selects Dapr `1.19.1`. Security and the Builds Maintainer own approval of that tuple. Decision v2 is Open against the older `1.18.7` tuple. [Architecture stack](../planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md#stack)
   - Live workloads need an approved, runtime-matched `OD-DAPR-SECURITY-1`.
 - **Commands:** an impure fail-closed orchestrator wraps a pure aggregate and dispatches at most one trusted command per step. Authorized I/O is split into authorize → effect → result. The twin-policy `Evaluate`/`Decide` pair shares one `Compute`.
 - **Intake:** `RegisterInteractionPermit` on `ConversationAgentState` appends a content-free permit and a creation outbox holding sealed `ProtectedContent` under the interaction DEK, selected by key alias. This is not acceptance. The outbox creates the exact `AgentInteraction`, whose first append emits the directory acknowledgement and the workflow-start outbox.
@@ -87,7 +87,7 @@ Let a Conversation Participant use the sole Conversation-owned **Call hexa** act
   - 6.6 needs 5.4 and 6.3–6.5.
   - 6.7 needs 6.1–6.6.
   - Story 7.7 consumes 6.8.
-- **Prerequisites for 6.1:** Stories 5.5–5.8, still backlog at compile time.
+- **Story 6.1 execution.** The approved Goal A allows deterministic Level 2 development ahead of Stories 5.5–5.8. For live adoption, those stories supply the required setup and protection. Goal B migration, the owner decisions and production-like restart evidence remain open. [Approved story scope](spec-6-1-start-and-recover-an-automatic-interaction.md)
 - **External status (register, 2026-10-19):**
   - `EXT-HOST-1`, `EXT-SECRETS-1`, `EXT-PARTIES-1` (Branch B) and `EXT-CONV-AI-1` are `Committed` but none is `Available`; their owner commands exited 1 on 2026-10-18.
   - `EXT-PROTECTION-1`, `EXT-TOPOLOGY-1`, `EXT-PROVIDER-1`, `EXT-SAFETY-1`, `EXT-TOKEN-1` and `EXT-CONV-UI-1` are `Uncommitted`.

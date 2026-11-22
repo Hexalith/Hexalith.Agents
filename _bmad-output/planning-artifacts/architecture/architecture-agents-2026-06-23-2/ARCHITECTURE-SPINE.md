@@ -7,7 +7,7 @@ paradigm: event-sourced Dapr-Workflow-orchestrated hexagonal Hexalith domain mod
 scope: Hexalith Agents module in the agents workspace
 status: final
 created: 2026-06-23
-updated: 2026-11-21
+updated: 2026-11-22
 architecture_assumption_index_version: 16
 binds:
   - PRD FR-1..FR-34
@@ -1130,12 +1130,12 @@ sequenceDiagram
 | C# language | `15` from root `Directory.Build.props` |
 | Solution format | `.slnx` |
 | Package management | Central Package Management via an import-only Agents `Directory.Packages.props` that resolves `Hexalith.Builds/Props/Directory.Packages.props` in supported standalone and parent/sibling layouts. Hexalith.Builds is the sole package-version authority: Agents declares no `PackageVersion`, dependency-version property, or `VersionOverride`; compatibility floors are checked against the effective imported selection. |
-| Hexalith.Builds | Parent gitlink `fe68718b6c074a6b500a7191e3554a1d39e17688` records the imported catalog at Agents `2b21256` (Builds v6.4.4). |
-| Hexalith.EventStore | Parent gitlink `3f3311f3585d687d1d676307f33d4d04727c6239`. The catalog selects `5.4.0` in Agents package mode. |
-| Hexalith.Conversations | Parent gitlink `cf2d07d343c7f166be10c375e4a3b0c85fa9b6bd`. |
-| Hexalith.Parties | Parent gitlink `20b0fafc24929a9f458644184e8b0faf3d9997ab`. |
-| Hexalith.Tenants | Parent gitlink `40fcebf15cdb5b6d892b06d8cba007d4720ff1a4`. |
-| Hexalith.FrontComposer | Parent gitlink `90882e9b6b59e0799a4e982f62af572b848a0673`. The catalog selects `6.0.1` for Shell. |
+| Hexalith.Builds | Parent gitlink `fe68718b6c074a6b500a7191e3554a1d39e17688` records the imported catalog at Agents `412528e` (Builds v6.4.4). |
+| Hexalith.EventStore | Parent gitlink `2b8895f18d962bcc7648ec62859351e79460c33c`. The catalog selects `5.4.0` in Agents package mode. |
+| Hexalith.Conversations | Parent gitlink `08953f5eed404228a2b8bd41c7d2bf5eaaab543a`. |
+| Hexalith.Parties | Parent gitlink `b89039b1cf56970595bca0b2ab33f37b91d19914`. |
+| Hexalith.Tenants | Parent gitlink `6f70a9981a589c1542c99db9601859eaa37660a9`. |
+| Hexalith.FrontComposer | Parent gitlink `431aa71b49406481f9b8616a568c36162f39e0ae`. The catalog selects `6.0.1` for Shell. |
 | Hosting (Aspire, Dapr hosting integrations) | Platform owns topology. `EXT-HOST-1` and `EXT-SECRETS-1` are committed at `Hexalith.Platform@abbec4093715c1db854433119b32d4e16df20d08`. Availability requires their registered owner receipts. |
 | Dapr .NET packages | Builds selects Client, ASP.NET Core, Actors and Workflow `1.19.1`. Security and the Builds Maintainer must reconcile the current tuple against the open `OD-DAPR-SECURITY-1` before qualification. |
 | Dapr Workflow | `1.19.1` selected by Builds and directly referenced by Server. Story 6.1 supplies the opt-in under AD-18. Default host composition leaves it disabled. |
@@ -1152,7 +1152,7 @@ sequenceDiagram
 | Provider SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
 | Agent Framework SDK | `Unselected` until `EXT-PROVIDER-1` is committed |
 
-The source revisions above are the gitlinks recorded by Agents `2b21256`. The November 21 pull checked out each of the 13 direct modules at its fetched upstream `main`. Only PolymorphicSerializations matches the parent in that checkout. Ten parent gitlinks could not be fetched by SHA. Builds and CiCd have retrievable pins and newer upstream heads. Use the parent-pinned Builds catalog for package versions and the dependency register for qualification targets.
+The table records the direct gitlinks at Agents `412528e`. On November 22 a fresh checkout fetched all 13 recorded revisions. Ten local upstream `main` checkouts were ahead of those pins. The November 21 fetch failures belong to the earlier parent `2b21256`. Use the parent-pinned Builds catalog for package versions and the external dependency register for owner qualification targets. [Story 5.11 evidence](../../../implementation-artifacts/spec-5-11-restore-reproducible-build-and-host-verification.md)
 
 The September Windows review for `CVE-2026-69522` identified `18.9.0-beta1.26405.2` as the patched `Microsoft.DiaSymReader.Native` component floor. Its dated finding is recorded under ARCH-A-4. Apply the component floor to any future direct reference. The November verification and remaining hosted work are recorded in [Story 5.11](../../../implementation-artifacts/spec-5-11-restore-reproducible-build-and-host-verification.md).
 
@@ -1572,7 +1572,7 @@ Non-human Workflow automation cannot satisfy a human second-party requirement in
 
 ## Architecture Contract Versus Delivery Debt
 
-The November 21 review uses Agents `2b21256`. Test counts below belong to the November 20 qualification record at `05ddee8`. The decisions above govern implementation. [Sprint status](../../../implementation-artifacts/sprint-status.yaml) tracks story delivery.
+The November 21 review uses Agents `2b21256`. Test counts below belong to the November 20 qualification record at `05ddee8`. The decisions above govern implementation. The [November 22 Story 5.11 checklist](../../../implementation-artifacts/spec-5-11-restore-reproducible-build-and-host-verification.md) records the subsequent clean checkout and verification at `412528e`. [Sprint status](../../../implementation-artifacts/sprint-status.yaml) tracks story delivery.
 
 | November evidence and remaining work | Owner and verification |
 | --- | --- |

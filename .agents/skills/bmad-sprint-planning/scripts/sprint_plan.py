@@ -45,8 +45,8 @@ EPIC_RE = re.compile(r"^#{1,3}\s*Epic\s+(\d+)\s*:?\s*(.*?)\s*#*\s*$", re.IGNOREC
 STORY_RE = re.compile(
     r"^#{2,4}\s*Story\s+(\d+)\.(\d+[a-z]?)\s*:?\s*(.*?)\s*#*\s*$", re.IGNORECASE
 )
-# Heading lines that mention Epic/Story but failed the strict patterns above.
-SUSPECT_RE = re.compile(r"^#{1,4}\s.*\b(?:epic|story)\b", re.IGNORECASE)
+# Flag malformed entry headings, leaving narrative headings and the epic index alone.
+SUSPECT_RE = re.compile(r"^#{1,4}\s+(?:epic|story)\b(?!\s+list\s*#*\s*$)", re.IGNORECASE)
 FENCE_RE = re.compile(r"^\s{0,3}(?:```|~~~)")
 
 # The key grammar for sprint-status.yaml. The trailing [a-z]? matches
@@ -130,11 +130,10 @@ class JsonArgumentParser(argparse.ArgumentParser):
         sys.exit(2)
 
 
-def _slug(text, maxlen=60):
+def _slug(text):
     # Unicode-aware: a non-Latin title must keep its own characters in the key
     # rather than every such story collapsing onto one shared placeholder.
     slug = re.sub(r"[^\w]+", "-", str(text).lower(), flags=re.UNICODE).strip("-")
-    slug = slug[:maxlen].strip("-")
     if not slug:
         # Nothing sluggable (punctuation/emoji only): a short content hash keeps
         # the key deterministic and distinct instead of a bare "untitled".
@@ -169,7 +168,7 @@ def _normalize(raw):
     return status, raw in LEGACY_STATUS
 
 
-def parse_epics(paths):
+def parse_epics(paths, tracked_keys, story_files):
     """Return (entries, warnings). Entries are (key, kind, epic_num) in file order."""
     epics = {}  # epic_num -> [story keys in order]
     warnings = []
@@ -193,7 +192,15 @@ def parse_epics(paths):
             if story_m:
                 epic_num = int(story_m.group(1))
                 story_num = story_m.group(2)
-                key = f"{epic_num}-{story_num}-{_slug(story_m.group(3))}"
+                slug = _slug(story_m.group(3))
+                full_key = f"{epic_num}-{story_num}-{slug}"
+                short_key = f"{epic_num}-{story_num}-{slug[:60].rstrip('-')}"
+                key = short_key
+                if full_key in tracked_keys or (
+                    short_key not in tracked_keys
+                    and (full_key in story_files or f"spec-{full_key}" in story_files)
+                ):
+                    key = full_key
                 stories = epics.setdefault(epic_num, [])
                 if key in stories:
                     warnings.append(f"duplicate story heading '{key}' at {path}:{lineno}")
@@ -254,11 +261,11 @@ def _merge_status(kind, computed, existing_raw, key, warnings, report):
     return existing if rank[existing] >= rank[computed] else computed
 
 
-def build_status(entries, existing_data, stories_dir, warnings):
+def build_status(entries, existing_data, story_files, warnings):
     """Return (development_status CommentedMap, merge report dict)."""
-    existing_status = {}
-    if existing_data is not None:
-        existing_status = dict(existing_data.get("development_status") or {})
+    # Reorder the round-trip mapping in place so annotations stay with their entries.
+    dev = (existing_data or {}).get("development_status") or CommentedMap()
+    existing_status = dict(dev)
     report = {
         "new_entries": [],
         "preserved": 0,
@@ -268,16 +275,11 @@ def build_status(entries, existing_data, stories_dir, warnings):
         "legacy_mapped": [],
         "illegal": [],
     }
-    # One directory scan instead of a stat() per story.
-    story_files = set()
-    if stories_dir and Path(stories_dir).is_dir():
-        story_files = {p.name for p in Path(stories_dir).glob("*.md")}
-    dev = CommentedMap()
     first_epic = True
     for key, kind, _epic_num in entries:
         default = {"epic": "backlog", "story": "backlog", "retro": "optional"}[kind]
         computed = default
-        if kind == "story" and f"{key}.md" in story_files:
+        if kind == "story" and key in story_files:
             computed = "ready-for-dev"
         merged = _merge_status(kind, computed, existing_status.get(key), key, warnings, report)
         if key not in existing_status:
@@ -289,7 +291,8 @@ def build_status(entries, existing_data, stories_dir, warnings):
         if kind == "story" and computed == "ready-for-dev" and existing_status.get(key) in (None, "backlog"):
             report["upgraded_from_disk"].append(key)
         dev[key] = merged
-        if kind == "epic" and not first_epic:
+        dev.move_to_end(key)
+        if kind == "epic" and not first_epic and key not in existing_status:
             dev.yaml_set_comment_before_after_key(key, before="\n")
         if kind == "epic":
             first_epic = False
@@ -301,6 +304,8 @@ def build_status(entries, existing_data, stories_dir, warnings):
         for k in existing_status
         if k not in computed_keys
     ]
+    for orphan in report["dropped_orphans"]:
+        del dev[orphan["key"]]
     report["in_sync"] = (
         not report["new_entries"]
         and not report["dropped_orphans"]
@@ -374,16 +379,18 @@ def _parse_sets(pairs, valid_keys):
 
 
 def cmd_generate(args):
-    entries, warnings = parse_epics(args.epic_file)
+    yaml, existing = _load_existing(args.status_file)
+    tracked_keys = (existing or {}).get("development_status") or {}
+    story_files = {p.stem for p in Path(args.stories_dir).glob("*.md") if p.is_file()}
+    entries, warnings = parse_epics(args.epic_file, tracked_keys, story_files)
     if not entries:
         _fail("no epics or stories parsed from the given epic files", epic_files=args.epic_file)
-    yaml, existing = _load_existing(args.status_file)
     status_path = Path(args.status_file)
     original_bytes = status_path.read_bytes() if status_path.exists() else None
     original_mode = (os.stat(status_path).st_mode & 0o777) if status_path.exists() else None
 
     merge_source = None if args.fresh else existing
-    dev, report = build_status(entries, merge_source, args.stories_dir, warnings)
+    dev, report = build_status(entries, merge_source, story_files, warnings)
 
     # Explicit, user-confirmed statuses (the fix flow). Applied last: repair is
     # the one path allowed to downgrade.
