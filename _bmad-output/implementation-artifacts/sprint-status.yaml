@@ -97,7 +97,7 @@ development_status:
   5-9-reject-prohibited-cost-control-postures-at-readiness-recording: backlog
   # blocked by 5.5/5.7
   5-10-retire-prohibited-safety-and-caller-policy-inputs: backlog
-  5-11-restore-reproducible-build-and-host-verification: in-progress  # Exact pins, Debug/source build, Conversations adapters and hosted CI verified at 412528e. CiCd rehearsal is open.
+  5-11-restore-reproducible-build-and-host-verification: in-progress  # Exact pins, Debug/source build, Conversations adapters and hosted CI verified at 412528e. Hosted CI also green at 0d98305 (job 137152331716, Builds v6.4.4). Nonpublishing rehearsal still deferred pending a Builds+CiCd mode and maintainer un-deferral.
   epic-5-retrospective: optional
   epic-6: in-progress
   6-1-start-and-recover-an-automatic-interaction: in-progress  # Goal A covers Level 2 recovery. Live Workflow adoption awaits the Security and Builds decision for Dapr 1.19.1.
