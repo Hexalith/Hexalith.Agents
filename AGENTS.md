@@ -50,3 +50,24 @@ ranges: these instructions and the shared guard protect the owned portions of
 settings, instruction files and `.gitmodules`. Never install these denies in
 machine-wide settings or work around them through another tool.
 <!-- hexalith-cicd:end -->
+
+<!-- bmad:context -->
+<!-- Verified 2026-11-22 against 596bbf3. Managed by bmad-project-context. -->
+
+## Hexalith.Agents
+
+Hexalith.Agents implements event-sourced agent interactions and provider governance.
+Use `_bmad-output/planning-artifacts/architecture/architecture-agents-2026-06-23-2/ARCHITECTURE-SPINE.md` for design decisions and `_bmad-output/implementation-artifacts/sprint-status.yaml` for current story status.
+
+## Running and verifying
+
+- Use the .NET SDK selected by `global.json` (11.0.100 with `latestPatch`).
+- For Debug builds, follow “Build and test” in `CONTRIBUTING.md`. The published `hexalith-module prepare-build` checks direct dependencies against the parent’s recorded revisions. Use a separate checkout at those revisions when the working copy must stay on upstream `main`.
+- Run Debug builds and per-project tests with the documented `source_dotnet` wrapper. Regenerate its build environment after moving the checkout or changing a submodule pin. Release builds use NuGet packages.
+
+## Command handling
+
+- Authorize provider-catalog writes before checking whether the status reader supports `("system", "provider-catalog")`. Dispatch only when it does.
+- When copying an `AgentCommandIntent` during trusted admission, preserve its exact `Authority` object, identifiers, payload bytes and existing metadata. Add only authenticated `trust:` entries.
+
+<!-- /bmad:context -->
