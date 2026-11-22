@@ -336,14 +336,13 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         // AC2 fail-closed: anything other than a trusted Valid verdict (missing/disabled/ambiguous/unavailable/
         // unauthorized — or an absent/unparseable verdict from a direct-gateway call) rejects the link and changes
         // no state. The Parties dependency is never called from here (AD-3); the verdict is plain trusted data.
-        PartyLinkValidationStatus validation = ReadPartyLinkValidation(envelope);
+        PartyLinkValidationStatus validation = ReadPartyLinkValidation(envelope, command.PartyId);
         if (validation != PartyLinkValidationStatus.Valid)
         {
             return DomainResult.Rejection([new AgentPartyIdentityLinkRejected(agentId, validation)]);
         }
 
-        // Re-asserting the same id is a deterministic no-op (AD-13); a different id while one is already linked is
-        // rejected — changing identity requires the explicit ReplaceAgentPartyIdentity (AC3).
+        // Re-asserting the same id is a deterministic no-op (AD-13). The first linked identity is immutable.
         if (string.Equals(state.PartyId, command.PartyId, StringComparison.Ordinal))
         {
             return AgentSetupDomainResult.AlreadyApplied(state.ConfigurationVersion);
@@ -361,7 +360,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         ], state.ConfigurationVersion + 1);
     }
 
-    /// <summary>Handles explicitly replacing the Agent's linked Party identity with a different one (AC2, AC3; FR-2).</summary>
+    /// <summary>Refuses a retired replacement and preserves the exact same-identity no-op (AC2, AC3; FR-2).</summary>
     /// <param name="command">The replace command (carries only the stable <c>PartyId</c>).</param>
     /// <param name="state">The current Agent state.</param>
     /// <param name="envelope">The command envelope (carries the trusted authorization and Parties-validation extensions).</param>
@@ -383,7 +382,7 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
         }
 
         // AC2 fail-closed: the same trusted-verdict gate applies to a replacement.
-        PartyLinkValidationStatus validation = ReadPartyLinkValidation(envelope);
+        PartyLinkValidationStatus validation = ReadPartyLinkValidation(envelope, command.PartyId);
         if (validation != PartyLinkValidationStatus.Valid)
         {
             return DomainResult.Rejection([new AgentPartyIdentityLinkRejected(agentId, validation)]);
@@ -695,12 +694,19 @@ public class AgentAggregate : EventStoreAggregate<AgentState>
     // *name* (AC2). Numeric/aliased forms (e.g. "1", which Enum.TryParse would otherwise resolve to Valid) are
     // rejected on purpose: the verdict is contractually serialized by name ([JsonStringEnumConverter]), and this
     // gate is kept as strict as the "true"-only Agents-admin check so a surprising value can never become Valid.
-    private static PartyLinkValidationStatus ReadPartyLinkValidation(CommandEnvelope envelope)
-        => envelope.Extensions?.TryGetValue(PartyLinkValidationExtensionKey, out string? value) == true
-            && Enum.TryParse(value, ignoreCase: false, out PartyLinkValidationStatus status)
-            && string.Equals(Enum.GetName(status), value, StringComparison.Ordinal)
-                ? status
-                : PartyLinkValidationStatus.Unknown;
+    private static PartyLinkValidationStatus ReadPartyLinkValidation(CommandEnvelope envelope, string? partyId)
+    {
+        if (envelope.Extensions?.TryGetValue(PartyLinkValidationExtensionKey, out string? value) != true
+            || !Enum.TryParse(value, ignoreCase: false, out PartyLinkValidationStatus status)
+            || !string.Equals(Enum.GetName(status), value, StringComparison.Ordinal))
+        {
+            return PartyLinkValidationStatus.Unknown;
+        }
+
+        return status == PartyLinkValidationStatus.Valid && string.IsNullOrWhiteSpace(partyId)
+            ? PartyLinkValidationStatus.Unavailable
+            : status;
+    }
 
     // Reads the trusted, server-populated provider-readiness verdict from the envelope extension. Fails closed to
     // Unknown when the key is absent, or when its value is not an exact, case-sensitive ProviderSelectionValidationStatus

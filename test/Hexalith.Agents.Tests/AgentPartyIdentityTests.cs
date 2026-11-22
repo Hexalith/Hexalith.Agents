@@ -52,6 +52,29 @@ public sealed class AgentPartyIdentityTests
     // ===== AC2: any non-Valid verdict fails closed — not stored, and MissingPartyIdentity still blocks =====
 
     [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void Valid_verdict_requires_an_actual_party_id_for_link_and_replace(string? partyId)
+    {
+        AgentState state = StateWith(ValidCreate());
+        var link = new LinkAgentPartyIdentity(partyId!);
+        var replace = new ReplaceAgentPartyIdentity(partyId!);
+
+        DomainResult linkResult = AgentAggregate.Handle(link, state, LinkEnvelope(link));
+        DomainResult replaceResult = AgentAggregate.Handle(replace, state, LinkEnvelope(replace));
+
+        foreach (DomainResult result in new[] { linkResult, replaceResult })
+        {
+            result.IsRejection.ShouldBeTrue();
+            result.Events.Single().ShouldBeOfType<AgentPartyIdentityLinkRejected>().Status.ShouldBe(PartyLinkValidationStatus.Unavailable);
+            ApplyAll(state, result);
+        }
+        state.PartyId.ShouldBeNull();
+        state.ConfigurationVersion.ShouldBe(1);
+    }
+
+    [Theory]
     [InlineData(PartyLinkValidationStatus.Missing)]
     [InlineData(PartyLinkValidationStatus.Disabled)]
     [InlineData(PartyLinkValidationStatus.Ambiguous)]

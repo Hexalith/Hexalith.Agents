@@ -18,7 +18,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 /// <param name="TenantId">The interaction's tenant scope (the envelope scope and every read's tenant).</param>
 /// <param name="AgentInteractionId">The deterministic interaction id (the gate's aggregate id; reused from Story 2.1).</param>
 /// <param name="AgentId">The snapshot-recorded target Agent id (drives the readiness read).</param>
-/// <param name="ActorUserId">The authenticated caller (the command-envelope user and the tenant-access principal).</param>
+/// <param name="ActorUserId">The authenticated subject used to resolve the current tenant actor. The verified actor identifies the command user.</param>
 /// <param name="CallerPartyId">The snapshot-recorded caller Party reference (opaque — drives tenant/party/conversation reads; AD-7).</param>
 /// <param name="SourceConversationId">The snapshot-recorded source Conversation reference (opaque — drives the conversation-access read; AD-6).</param>
 /// <param name="ProviderId">The snapshot-recorded provider reference (drives the provider/model readiness read; AD-9).</param>

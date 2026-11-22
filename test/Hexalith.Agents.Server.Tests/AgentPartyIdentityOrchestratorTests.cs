@@ -56,6 +56,29 @@ public sealed class AgentPartyIdentityOrchestratorTests
         JsonSerializer.Deserialize<LinkAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe("party-001");
     }
 
+    [Theory]
+    [InlineData(PartyLinkValidationStatus.Valid, null, false)]
+    [InlineData(PartyLinkValidationStatus.Valid, "", false)]
+    [InlineData(PartyLinkValidationStatus.Valid, "party-002", false)]
+    [InlineData(PartyLinkValidationStatus.Valid, "PARTY-001", false)]
+    [InlineData(PartyLinkValidationStatus.Disabled, "party-002", false)]
+    [InlineData(PartyLinkValidationStatus.Valid, "party-001", true)]
+    public async Task Existing_link_with_inconsistent_directory_identity_carries_only_requested_id_and_unavailable_verdict(
+        PartyLinkValidationStatus directoryVerdict, string? returnedId, bool unavailable)
+    {
+        _directory.ValidateExistingPartyAsync(TenantId, "party-001", Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(directoryVerdict, returnedId) { Dependency = unavailable ? new("EXT-PARTIES-1") : null });
+        CaptureDispatch();
+
+        AgentPartyLinkOutcome outcome = await Orchestrator.ExecuteAsync(Request(partyId: "party-001"), CancellationToken.None);
+
+        outcome.PartyId.ShouldBe("party-001");
+        outcome.Verdict.ShouldBe(PartyLinkValidationStatus.Unavailable);
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
+        JsonSerializer.Deserialize<LinkAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe("party-001");
+        dispatched.Extensions!["party:linkValidation"].ShouldBe("Unavailable");
+    }
+
     [Fact]
     public async Task Client_supplied_reserved_extensions_are_stripped_and_repopulated_from_trusted_sources()
     {
@@ -104,6 +127,19 @@ public sealed class AgentPartyIdentityOrchestratorTests
         _dispatcher.ReceivedCalls().ShouldBeEmpty();
     }
 
+    [Theory]
+    [InlineData((AgentPartyLinkOperation)99, AgentPartyLinkSource.ProvisionNewParty)]
+    [InlineData(AgentPartyLinkOperation.Link, (AgentPartyLinkSource)99)]
+    public async Task Unknown_operation_or_source_stops_before_party_reads_or_effects(
+        AgentPartyLinkOperation operation, AgentPartyLinkSource source)
+    {
+        AgentPartyLinkOutcome result = await Orchestrator.ExecuteAsync(Request("party-001", source: source, operation: operation), CancellationToken.None);
+
+        result.ShouldBe(AgentPartyLinkOutcome.Denied());
+        _directory.ReceivedCalls().ShouldBeEmpty();
+        _dispatcher.ReceivedCalls().ShouldBeEmpty();
+    }
+
     [Fact]
     public async Task Provision_new_links_the_provisioned_party_id()
     {
@@ -118,6 +154,28 @@ public sealed class AgentPartyIdentityOrchestratorTests
         outcome.PartyId.ShouldBe("agent-hexa");
         AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         JsonSerializer.Deserialize<LinkAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe("agent-hexa");
+    }
+
+    [Theory]
+    [InlineData(PartyLinkValidationStatus.Valid, null, false, PartyLinkValidationStatus.Unavailable)]
+    [InlineData(PartyLinkValidationStatus.Valid, " ", false, PartyLinkValidationStatus.Unavailable)]
+    [InlineData(PartyLinkValidationStatus.Valid, "other-party", true, PartyLinkValidationStatus.Unavailable)]
+    [InlineData(PartyLinkValidationStatus.Disabled, "other-party", false, PartyLinkValidationStatus.Disabled)]
+    public async Task Unconfirmed_provisioning_cannot_link_or_echo_an_unverified_id(
+        PartyLinkValidationStatus returnedVerdict, string? returnedId, bool unavailable, PartyLinkValidationStatus expectedVerdict)
+    {
+        _directory.ProvisionAgentPartyAsync(TenantId, Arg.Any<AgentPartyProvisioningRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(returnedVerdict, returnedId) { Dependency = unavailable ? new("EXT-PARTIES-1") : null });
+        CaptureDispatch();
+
+        AgentPartyLinkOutcome outcome = await Orchestrator.ExecuteAsync(
+            Request("caller-selected-id", source: AgentPartyLinkSource.ProvisionNewParty), CancellationToken.None);
+
+        outcome.Verdict.ShouldBe(expectedVerdict);
+        outcome.PartyId.ShouldBe(string.Empty);
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
+        JsonSerializer.Deserialize<LinkAgentPartyIdentity>(dispatched.Payload)!.PartyId.ShouldBe(string.Empty);
+        dispatched.Extensions!["party:linkValidation"].ShouldBe(expectedVerdict.ToString());
     }
 
     [Fact]

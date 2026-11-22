@@ -363,6 +363,27 @@ public sealed class AgentInteractionGateOrchestratorTests
         VerdictFor(AgentInteractionGateCheck.AgentPartyIdentity).ShouldBe(AgentInteractionGateOutcome.Disabled);
     }
 
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("different-party", false)]
+    [InlineData("AGENT-PARTY-001", false)]
+    [InlineData(AgentPartyId, true)]
+    public async Task Ready_agent_requires_available_directory_evidence_for_its_exact_linked_party(string? returnedPartyId, bool unavailable)
+    {
+        StubAllReady();
+        _partyDirectory.ValidateExistingPartyAsync(TenantId, AgentPartyId, Arg.Any<CancellationToken>())
+            .Returns(new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, returnedPartyId)
+            {
+                Dependency = unavailable ? new("EXT-PARTIES-1") : null,
+            });
+        CaptureDispatch();
+
+        AgentInteractionGateOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.Blocked);
+        VerdictFor(AgentInteractionGateCheck.AgentPartyIdentity).ShouldBe(AgentInteractionGateOutcome.Unavailable);
+    }
+
     [Fact]
     public async Task Non_selectable_provider_entry_maps_to_disabled_blocked()
     {
@@ -575,7 +596,7 @@ public sealed class AgentInteractionGateOrchestratorTests
     }
 
     [Fact]
-    public async Task Builds_the_envelope_with_the_trusted_scope_from_the_request()
+    public async Task Builds_the_envelope_with_the_verified_stable_actor_and_requested_command_identity()
     {
         StubAllReady();
         CaptureDispatch();
@@ -586,7 +607,7 @@ public sealed class AgentInteractionGateOrchestratorTests
         dispatched.TenantId.ShouldBe(TenantId);
         dispatched.MessageId.ShouldBe("msg-1");
         dispatched.CorrelationId.ShouldBe("corr-1");
-        dispatched.UserId.ShouldBe("caller-user");
+        dispatched.UserId.ShouldBe("stable-actor");
         dispatched.CausationId.ShouldBeNull();
     }
 

@@ -33,7 +33,7 @@ keys = [*imports, "HEXALITH_SOURCE_MAPPING_HASH", "Configuration"]
 with open(os.environ["STORY_54_CALL_LOG"], "a") as log:
     log.write(json.dumps({"args": args, "environment": {k: os.environ.get(k) for k in keys}}) + "\n")
 scenario = os.environ["STORY_54_SCENARIO"]
-if args[0] == "run":
+if args[:2] == ["tool", "exec"]:
     assert "prepare-build" in args and args[args.index("--mode") + 1] == "source"
     workspace = Path(args[args.index("--workspace") + 1])
     assert not workspace.exists()
@@ -69,8 +69,8 @@ if args[0] == "build":
 assert args[0].endswith(".dll")
 assembly = Path(args[0]).stem
 classes = {
-    "Hexalith.Agents.Tests": ["TrustedEnvelopeReplayTests", "SecurityEventLogTests", "AgentApproverPolicyTests"],
-    "Hexalith.Agents.Server.Tests": ["Story54CurrentEvidenceTests", "Story54BoundaryTests", "PartiesAgentPartyDirectoryTests", "ApproverEvidenceAdmissionTests", "ApproverAuthorityLifetimeTests", "FixtureAgentRouteCatalogTests", "TenantAuthorityAdmissionOrderingTests", "AuthorityCancellationAdmissionTests", "AgentSetupQueryHandlerTests", "AgentSetupApproverBasisTests", "SetupReadCancellationAdmissionTests", "SetupWriteCancellationAdmissionTests", "SetupAuthorityLifetimeTests", "ProviderCatalogAuthorityLifetimeTests", "AuditQueryIsolationTests", "AgentInteractionAuditQueryHandlerTests", "AgentInteractionGateAdmissionTests"],
+    "Hexalith.Agents.Tests": ["TrustedEnvelopeReplayTests", "SecurityEventLogTests", "AgentApproverPolicyTests", "AgentPartyIdentityTests"],
+    "Hexalith.Agents.Server.Tests": ["Story54CurrentEvidenceTests", "Story54BoundaryTests", "PartiesAgentPartyDirectoryTests", "ApproverEvidenceAdmissionTests", "ApproverAuthorityLifetimeTests", "FixtureAgentRouteCatalogTests", "TenantAuthorityAdmissionOrderingTests", "AuthorityCancellationAdmissionTests", "AgentSetupQueryHandlerTests", "AgentSetupApproverBasisTests", "SetupReadCancellationAdmissionTests", "SetupWriteCancellationAdmissionTests", "SetupAuthorityLifetimeTests", "ProviderCatalogAuthorityLifetimeTests", "AuditQueryIsolationTests", "AgentInteractionAuditQueryHandlerTests", "AgentInteractionGateAdmissionTests", "AgentInteractionGateOrchestratorTests", "AgentPartyIdentityOrchestratorTests"],
     "Hexalith.Agents.UI.Tests": ["AgentConfigurationTests", "ApproverPolicyTests"],
 }.get(assembly, ["RequiredProjectTests"])
 root = Element("assemblies")
@@ -95,9 +95,13 @@ class Story54VerifierTests(unittest.TestCase):
         register.parent.mkdir(parents=True)
         register.write_text("\n".join(f"### {record} — retained\n| `AcceptedStatus` | `Committed` |" for record in
                                       ("EXT-PARTIES-1", "EXT-CONV-AI-1", "EXT-SECRETS-1", "EXT-HOST-1")))
-        producer = self.root / "references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj"
-        producer.parent.mkdir(parents=True)
-        producer.touch()
+        self.ci_config = self.root / ".github/hexalith-ci.json"
+        self.ci_config.parent.mkdir()
+        self.ci_config.write_text(json.dumps({"buildsTag": "v7.8.9"}))
+        subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
+        subprocess.run(["git", "add", ".github/hexalith-ci.json"], cwd=self.root, check=True)
+        self.commit_pin()
+        self.ci_config.write_text(json.dumps({"buildsTag": "v0.0.1"}))
         self.log = self.root / "calls.jsonl"
         self.artifacts = self.root / "artifacts"
         binary = self.root / "bin"
@@ -108,6 +112,10 @@ class Story54VerifierTests(unittest.TestCase):
         self.environment = {key: value for key, value in os.environ.items() if key not in (*IMPORTS, "HEXALITH_SOURCE_MAPPING_HASH", "Configuration")}
         self.environment.update(PATH=str(binary) + os.pathsep + os.environ["PATH"], STORY_54_CALL_LOG=str(self.log),
                                 STORY_54_IMPORTS=json.dumps(IMPORTS), STORY_54_REAL_DOTNET=shutil.which("dotnet") or "dotnet")
+
+    def commit_pin(self) -> None:
+        subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.test",
+                        "commit", "-qam", "Pin Builds for the verifier fixture"], cwd=self.root, check=True)
 
     def run_verifier(self, scenario: str = "success", mode: str = "Local") -> subprocess.CompletedProcess[str]:
         return subprocess.run([PWSH, "-NoProfile", "-NonInteractive", "-File", str(self.script), "-Mode", mode,
@@ -124,8 +132,8 @@ class Story54VerifierTests(unittest.TestCase):
         calls = self.calls()
         self.assertEqual(len(calls), 11)
         producer = calls[0]["args"]
-        self.assertEqual(Path(producer[producer.index("--project") + 1]).relative_to(self.root).as_posix(),
-                         "references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj")
+        self.assertEqual(producer[:7], ["tool", "exec", "Hexalith.Builds.Module.Cli@7.8.9", "--configfile",
+                                       str(self.root / "NuGet.config"), "--", "prepare-build"])
         self.assertEqual(producer[producer.index("--manifest") + 1], str(self.root / "module/hexalith.module-manifest.v2.json"))
         for call in calls[1:]:
             if call["args"][0] == "build":
@@ -140,7 +148,7 @@ class Story54VerifierTests(unittest.TestCase):
         for _ in range(2):
             result = self.run_verifier()
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        workspaces = [call["args"][call["args"].index("--workspace") + 1] for call in self.calls() if call["args"][0] == "run"]
+        workspaces = [call["args"][call["args"].index("--workspace") + 1] for call in self.calls() if call["args"][0] == "tool"]
         self.assertEqual(len(set(workspaces)), 2)
         self.assertTrue(all(Path(path).parent == self.artifacts for path in workspaces))
 
@@ -151,8 +159,16 @@ class Story54VerifierTests(unittest.TestCase):
                 self.log.unlink(missing_ok=True)
                 result = self.run_verifier(scenario)
                 self.assertNotEqual(result.returncode, 0)
-                self.assertEqual([call["args"][0] for call in self.calls()], ["run"])
+                self.assertEqual([call["args"][0] for call in self.calls()], ["tool"])
                 self.assertIn("BuildPreparation", result.stdout + result.stderr)
+
+    def test_floating_release_pin_stops_before_tool_execution(self) -> None:
+        self.ci_config.write_text(json.dumps({"buildsTag": "v7.*"}))
+        self.commit_pin()
+        result = self.run_verifier()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("expected an exact Builds release tag", result.stderr)
+        self.assertEqual(self.calls(), [])
 
     def test_environment_is_restored_after_build_failure(self) -> None:
         self.environment.update(Configuration="original", CustomAfterMicrosoftCommonProps="original.props")
@@ -167,7 +183,7 @@ class Story54VerifierTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("caught-build-failure", result.stdout)
         self.assertIn("RESTORED:original:original.props", result.stdout)
-        self.assertEqual([call["args"][0] for call in self.calls()], ["run", "build"])
+        self.assertEqual([call["args"][0] for call in self.calls()], ["tool", "build"])
 
     def test_failed_test_results_still_fail_the_local_gate(self) -> None:
         result = self.run_verifier("test-failure")

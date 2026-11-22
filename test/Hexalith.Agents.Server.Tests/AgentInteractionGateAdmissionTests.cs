@@ -194,6 +194,7 @@ public sealed class AgentInteractionGateAdmissionTests
     [InlineData("missing-deadline")]
     [InlineData("expired-deadline")]
     [InlineData("offset-deadline")]
+    [InlineData("dependency")]
     public async Task MalformedSuccessfulCallerResultStopsBeforeConversationRead(string corruption)
     {
         Configure();
@@ -214,7 +215,11 @@ public sealed class AgentInteractionGateAdmissionTests
             .Returns(_ =>
             {
                 _reads.Add("Caller");
-                return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, partyId) { CallerValidUntil = deadline };
+                return new AgentPartyValidationResult(PartyLinkValidationStatus.Valid, partyId)
+                {
+                    CallerValidUntil = deadline,
+                    Dependency = corruption == "dependency" ? new("EXT-PARTIES-1") : null,
+                };
             });
 
         AgentInteractionGateOutcomeResult result = await Orchestrator().ExecuteAsync(Request(), CancellationToken.None);

@@ -21,4 +21,16 @@ public sealed record AgentPartyValidationResult(PartyLinkValidationStatus Status
 
     /// <summary>Gets the unavailable external record.</summary>
     public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
+
+    /// <summary>Gets the verdict supported by the directory response, including its availability and identity.</summary>
+    internal PartyLinkValidationStatus EffectiveStatus
+        => Dependency is not null || (Status == PartyLinkValidationStatus.Valid && string.IsNullOrWhiteSpace(PartyId))
+            ? PartyLinkValidationStatus.Unavailable
+            : Status;
+
+    /// <summary>Checks the directory verdict against the exact Party that was looked up.</summary>
+    internal PartyLinkValidationStatus StatusForParty(string expectedPartyId)
+        => string.IsNullOrWhiteSpace(expectedPartyId) || (PartyId is not null && PartyId != expectedPartyId)
+            ? PartyLinkValidationStatus.Unavailable
+            : EffectiveStatus;
 }

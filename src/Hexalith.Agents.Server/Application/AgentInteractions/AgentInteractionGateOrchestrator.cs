@@ -119,7 +119,7 @@ public sealed class AgentInteractionGateOrchestrator
         }
         AgentPartyValidationResult callerParty = await ValidatePartyAsync(request.TenantId, request.CallerPartyId, tenant.CurrentActor, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        if (callerParty.Status != PartyLinkValidationStatus.Valid || callerParty.PartyId != request.CallerPartyId
+        if (callerParty.StatusForParty(request.CallerPartyId) != PartyLinkValidationStatus.Valid
             || callerParty.CallerValidUntil is not { } callerValidUntil
             || !HasCurrentActor(tenant, request, started, ref checkedAt, callerValidUntil))
         {
@@ -202,7 +202,7 @@ public sealed class AgentInteractionGateOrchestrator
             payload,
             request.CorrelationId,
             CausationId: null,
-            request.ActorUserId,
+            tenant.CurrentActor.ActorId,
             extensions)
         {
             Authority = approverAuthority is null ? authority : authority.Retain(approverAuthority),
@@ -289,7 +289,7 @@ public sealed class AgentInteractionGateOrchestrator
         }
 
         AgentPartyValidationResult agentParty = await ValidatePartyAsync(tenantId, readiness.PartyId, null, ct).ConfigureAwait(false);
-        return MapPartyVerdict(agentParty.Status);
+        return MapPartyVerdict(agentParty.StatusForParty(readiness.PartyId));
     }
 
     private bool HasCurrentActor(TenantAccessReadResult tenant, AgentInteractionGateRequest request, DateTimeOffset started, ref DateTimeOffset checkedAt, DateTimeOffset? callerValidUntil = null)

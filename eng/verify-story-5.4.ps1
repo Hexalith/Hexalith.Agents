@@ -37,16 +37,20 @@ $projects = @(
 )
 # The producer owns source selection and validation across every root-declared reference. Prepare its
 # imports without starting resources; hand-selected roots cannot enroll newer Conversations builds.
-$producer = Join-Path $root 'references/Hexalith.Builds/src/libraries/Hexalith.Builds.Module.Cli/Hexalith.Builds.Module.Cli.csproj'
+$ciConfig = git -C $root show 'HEAD:.github/hexalith-ci.json' | ConvertFrom-Json
+$buildsTag = $ciConfig.buildsTag
+if ($buildsTag -cnotmatch '\Av(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){2}\z') {
+    throw 'BuildPreparationInvalid: expected an exact Builds release tag in the committed CI configuration.'
+}
+$producer = 'Hexalith.Builds.Module.Cli@' + $buildsTag.Substring(1)
 $manifest = Join-Path $root 'module/hexalith.module-manifest.v2.json'
 $preparationDirectory = Join-Path ([IO.Path]::GetFullPath($ArtifactsPath)) ('build-preparation-' + [Guid]::NewGuid().ToString('N'))
 $preparationLog = Join-Path $ArtifactsPath 'build-preparation.json'
 $preparationErrorLog = Join-Path $ArtifactsPath 'build-preparation.stderr.log'
-if (-not (Test-Path -LiteralPath $producer -PathType Leaf)) { throw 'BuildPreparationProducerMissing' }
 $nativeErrorPreference = $PSNativeCommandUseErrorActionPreference
 try {
     $PSNativeCommandUseErrorActionPreference = $false
-    $preparationOutput = & dotnet run --project $producer --configuration Debug --no-launch-profile --verbosity quiet -- `
+    $preparationOutput = & dotnet tool exec $producer --configfile (Join-Path $root 'NuGet.config') -- `
         prepare-build --manifest $manifest --mode source --workspace $preparationDirectory --output json 2> $preparationErrorLog
     $preparationExitCode = $LASTEXITCODE
 }
@@ -122,8 +126,8 @@ foreach ($name in $projects) {
             [int] $run.GetAttribute('not-run') -ne 0) { throw "IncompleteTestRun: $name" }
     }
     $requiredClasses = switch ($name) {
-        'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests', 'AgentApproverPolicyTests') }
-        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'PartiesAgentPartyDirectoryTests', 'ApproverEvidenceAdmissionTests', 'ApproverAuthorityLifetimeTests', 'FixtureAgentRouteCatalogTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'AgentSetupApproverBasisTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'SetupAuthorityLifetimeTests', 'ProviderCatalogAuthorityLifetimeTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests') }
+        'Hexalith.Agents.Tests' { @('TrustedEnvelopeReplayTests', 'SecurityEventLogTests', 'AgentApproverPolicyTests', 'AgentPartyIdentityTests') }
+        'Hexalith.Agents.Server.Tests' { @('Story54CurrentEvidenceTests', 'Story54BoundaryTests', 'PartiesAgentPartyDirectoryTests', 'ApproverEvidenceAdmissionTests', 'ApproverAuthorityLifetimeTests', 'FixtureAgentRouteCatalogTests', 'TenantAuthorityAdmissionOrderingTests', 'AuthorityCancellationAdmissionTests', 'AgentSetupQueryHandlerTests', 'AgentSetupApproverBasisTests', 'SetupReadCancellationAdmissionTests', 'SetupWriteCancellationAdmissionTests', 'SetupAuthorityLifetimeTests', 'ProviderCatalogAuthorityLifetimeTests', 'AuditQueryIsolationTests', 'AgentInteractionAuditQueryHandlerTests', 'AgentInteractionGateAdmissionTests', 'AgentInteractionGateOrchestratorTests', 'AgentPartyIdentityOrchestratorTests') }
         'Hexalith.Agents.UI.Tests' { @('AgentConfigurationTests', 'ApproverPolicyTests') }
         default { @() }
     }

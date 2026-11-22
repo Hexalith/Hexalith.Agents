@@ -8,12 +8,10 @@ using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Commands;
 using Hexalith.Agents.Server.Ports;
 
-using Hexalith.EventStore.Contracts.Commands;
-
 namespace Hexalith.Agents.Server.Application.Agents;
 
 /// <summary>
-/// Application orchestration for linking/replacing an Agent's (<c>hexa</c>) Party identity (AC1, AC2, AC3; AD-3,
+/// Application orchestration for linking an Agent's (<c>hexa</c>) Party identity (AC1, AC2, AC3; AD-3,
 /// AD-12). It authorizes the actor, resolves the Parties verdict through <see cref="IAgentPartyDirectory"/>
 /// (validate-existing or provision-new), builds the aggregate command carrying only the stable <c>PartyId</c>, and
 /// dispatches it with the <b>server-populated</b> trusted extensions <c>actor:agentsAdmin</c> and
@@ -59,7 +57,7 @@ public sealed class AgentPartyIdentityOrchestrator
         _dispatcher = dispatcher;
     }
 
-    /// <summary>Authorizes, resolves the Parties verdict, and dispatches the link/replace command (AC1, AC2, AC3).</summary>
+    /// <summary>Refuses replacement before lookup and dispatches links with a server-validated Party verdict.</summary>
     /// <param name="request">The sanitized orchestration request.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The orchestration outcome (denied, or dispatched with the computed verdict).</returns>
@@ -69,29 +67,28 @@ public sealed class AgentPartyIdentityOrchestrator
         ct.ThrowIfCancellationRequested();
 
         // (1) Authorize — fail closed before any Parties call or dispatch (AD-12).
-        if (!request.IsAgentsAdmin || request.Operation == AgentPartyLinkOperation.Replace)
+        if (!request.IsAgentsAdmin || request.Operation != AgentPartyLinkOperation.Link
+            || request.Source is not (AgentPartyLinkSource.ExistingParty or AgentPartyLinkSource.ProvisionNewParty))
         {
             return AgentPartyLinkOutcome.Denied();
         }
 
         // (2) Resolve the verdict + stable Party id via the port (validate-existing or provision-new). The Parties
         // PII never crosses this boundary — only { Status, PartyId } return (AC1; AD-7).
-        AgentPartyValidationResult validation = request.Source == AgentPartyLinkSource.ProvisionNewParty
+        string? existingPartyId = request.Source == AgentPartyLinkSource.ExistingParty ? RequireExistingPartyId(request) : null;
+        AgentPartyValidationResult validation = existingPartyId is null
             ? await _directory.ProvisionAgentPartyAsync(
                 request.TenantId,
                 new AgentPartyProvisioningRequest(request.AgentId, request.OrganizationLabel ?? DefaultOrganizationLabel(request.AgentId)),
                 ct).ConfigureAwait(false)
-            : await _directory.ValidateExistingPartyAsync(request.TenantId, RequireExistingPartyId(request), ct).ConfigureAwait(false);
+            : await _directory.ValidateExistingPartyAsync(request.TenantId, existingPartyId, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
 
-        // The id carried on the command: the validated/provisioned id, else the requested id (so a non-Valid
-        // verdict still produces an auditable, well-formed rejected command).
-        string partyId = validation.PartyId ?? request.PartyId ?? string.Empty;
+        // A lookup can attest only the requested identity. Provisioning has no caller-selected fallback id.
+        PartyLinkValidationStatus verdict = existingPartyId is null ? validation.EffectiveStatus : validation.StatusForParty(existingPartyId);
+        string partyId = existingPartyId ?? (verdict == PartyLinkValidationStatus.Valid ? validation.PartyId : null) ?? string.Empty;
 
-        // (3) Build the aggregate command (Link or Replace) — payload carries only the stable PartyId.
-        object command = request.Operation == AgentPartyLinkOperation.Replace
-            ? new ReplaceAgentPartyIdentity(partyId)
-            : new LinkAgentPartyIdentity(partyId);
+        var command = new LinkAgentPartyIdentity(partyId);
 
         // (4) Build the envelope with server-populated trusted extensions (client reserved keys stripped).
         var envelope = new AgentCommandIntent(
@@ -99,18 +96,18 @@ public sealed class AgentPartyIdentityOrchestrator
             request.TenantId,
             AgentDomain,
             request.AgentId,
-            command.GetType().Name,
-            JsonSerializer.SerializeToUtf8Bytes(command, command.GetType()),
+            nameof(LinkAgentPartyIdentity),
+            JsonSerializer.SerializeToUtf8Bytes(command),
             request.CorrelationId,
             CausationId: null,
             request.ActorUserId,
-            BuildTrustedExtensions(request.ClientSuppliedExtensions, validation.Status));
+            BuildTrustedExtensions(request.ClientSuppliedExtensions, verdict));
 
         // (5) Dispatch — always feed the computed verdict (even non-Valid) so the aggregate records an auditable
         // AgentPartyIdentityLinkRejected; the aggregate's independent non-Valid rejection is the security guarantee.
         await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
 
-        return AgentPartyLinkOutcome.FromDispatch(validation.Status, partyId);
+        return AgentPartyLinkOutcome.FromDispatch(verdict, partyId);
     }
 
     private static string DefaultOrganizationLabel(string agentId) => $"Agent {agentId}";
