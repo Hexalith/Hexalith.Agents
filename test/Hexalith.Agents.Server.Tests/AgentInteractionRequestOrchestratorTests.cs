@@ -12,6 +12,7 @@ using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.AgentInteraction.Events;
 using Hexalith.Agents.Contracts.AgentInteraction.Events.Rejections;
+using Hexalith.Agents.Contracts.Security;
 using Hexalith.Agents.Server.Application.AgentInteractions;
 using Hexalith.Agents.Server.Ports;
 
@@ -124,6 +125,57 @@ public sealed class AgentInteractionRequestOrchestratorTests
         id1.Length.ShouldBeLessThanOrEqualTo(256);
         id1.ShouldNotContain(":");
         _aggregateIdRegex.IsMatch(id1).ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task LegacyStreamWithTheSameIdentityLeavesThePermitUnconsumed()
+    {
+        var fixture = new AutomaticInteractionReplayFixture { PersistRejections = true };
+        AutomaticInteractionIntakeRequest input = fixture.Request;
+        var legacy = Request() with
+        {
+            TenantId = input.TenantId,
+            AgentId = input.AgentId,
+            SourceConversationId = input.ConversationId,
+            CallerPartyId = input.CallerPartyId,
+            IdempotencyKey = input.ClientIdempotencyKey,
+        };
+        _reader.ReadAsync(input.TenantId, input.AgentId, Arg.Any<CancellationToken>())
+            .Returns(AgentConfigurationSnapshot.Available(Snapshot()));
+        var legacyOrchestrator = new AgentInteractionRequestOrchestrator(_reader, fixture);
+
+        var legacyOutcome = await legacyOrchestrator.ExecuteAsync(legacy, CancellationToken.None);
+        legacyOutcome.Dispatched.ShouldBeTrue();
+        fixture.Interaction.ShouldNotBeNull().IsRequested.ShouldBeTrue();
+
+        var automaticOutcome = await fixture.StartAsync();
+
+        automaticOutcome.Status.ShouldBe(AutomaticInteractionIntakeStatus.RecoveryRequired);
+        automaticOutcome.AgentInteractionId.ShouldBe(legacyOutcome.Reference.AgentInteractionId);
+        AgentCommandIntent legacyDispatch = fixture.Dispatches.Single(intent => intent.CommandType == nameof(RequestAgentInteraction));
+        AgentCommandIntent permittedDispatch = fixture.Dispatches.Single(intent => intent.CommandType == nameof(CreatePermittedAgentInteraction));
+        permittedDispatch.TenantId.ShouldBe(legacyDispatch.TenantId);
+        permittedDispatch.Domain.ShouldBe(legacyDispatch.Domain);
+        permittedDispatch.AggregateId.ShouldBe(legacyDispatch.AggregateId);
+
+        fixture.Restart();
+        fixture.Directory.ShouldNotBeNull().Permits.Keys.ShouldBe([legacyDispatch.AggregateId]);
+        fixture.Directory.Acknowledgements.ShouldBeEmpty();
+        fixture.Directory.Leases.ShouldBeEmpty();
+        fixture.Interaction.ShouldNotBeNull().IsRequested.ShouldBeTrue();
+        fixture.Interaction.PermittedCreation.ShouldBeNull();
+        fixture.Scheduled.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData("party-001", "idem-001")]
+    [InlineData("party-あ", "client:🌍")]
+    public void LegacyAndPermittedRequestsShareTheStreamForTheSameIdentity(string callerPartyId, string clientKey)
+    {
+        string legacy = AgentInteractionIdentity.Derive(TenantId, AgentId, SourceConversationId, callerPartyId, clientKey);
+        string permitted = ConversationAgentStateIdentity.Interaction(TenantId, AgentId, SourceConversationId, callerPartyId, clientKey);
+
+        legacy.ShouldBe(permitted);
     }
 
     [Fact]

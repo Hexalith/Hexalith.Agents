@@ -63,6 +63,26 @@ public sealed class AutomaticInteractionPublicStatusTests
         }
     }
 
+    [Fact]
+    public void DeletionSuppressedStartIsPubliclyBlockedAfterReplay()
+    {
+        var state = Created();
+        AgentInteractionAuditInspection.GetStatus(state, true).View.ShouldNotBeNull().Status.ShouldBe(AgentInteractionStatus.Requested);
+
+        var fact = new AutomaticInteractionFact(
+            AutomaticInteractionStep.StartSuppressedByDeletion,
+            new string('b', 64),
+            AutomaticInteractionOutcome.Suppressed,
+            2);
+        state.Apply(new StartSuppressedByDeletion(fact));
+
+        AgentInteractionAuditInspection.GetStatus(state, true).View.ShouldNotBeNull().Status.ShouldBe(AgentInteractionStatus.Blocked);
+        var restored = JsonSerializer.Deserialize<AgentInteractionState>(JsonSerializer.Serialize(state)).ShouldNotBeNull();
+        AgentInteractionAuditInspection.GetStatus(restored, true).View.ShouldNotBeNull().Status.ShouldBe(AgentInteractionStatus.Blocked);
+        AgentInteractionAuditInspection.GetStatus(restored, false).View.ShouldBeNull();
+        restored.AutomaticFacts[AutomaticInteractionStep.StartSuppressedByDeletion].ShouldBe(fact);
+    }
+
     [Theory]
     [InlineData(AutomaticInteractionFailureKind.ProviderError, AgentInteractionStatus.GenerationFailed)]
     [InlineData(AutomaticInteractionFailureKind.OutputSafetyDenied, AgentInteractionStatus.Blocked)]
@@ -73,6 +93,7 @@ public sealed class AutomaticInteractionPublicStatusTests
         state.Apply(new ProviderInvocationAuthorized(new(AutomaticInteractionStep.ProviderInvocationAuthorized, new string('b', 64), AutomaticInteractionOutcome.Authorized, 2,
             OutputAuthority: new(1, new string('c', 64), AgentInteractionStatus.Blocked, "reason", "metric", "disposition", 1, new string('d', 64)))));
         state.Apply(new GenerationFailed(new(AutomaticInteractionStep.GenerationFailed, new string('e', 64), AutomaticInteractionOutcome.Failed, 3, FailureKind: kind)));
+        AgentInteractionAuditInspection.GetStatus(state, true).View.ShouldNotBeNull().Status.ShouldBe(expected);
         var restored = JsonSerializer.Deserialize<AgentInteractionState>(JsonSerializer.Serialize(state)).ShouldNotBeNull();
         AgentInteractionAuditInspection.GetStatus(restored, true).View.ShouldNotBeNull().Status.ShouldBe(expected);
     }

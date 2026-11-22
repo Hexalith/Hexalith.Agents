@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="Status">The inspection outcome.</param>
 /// <param name="Readiness">The safe launch-readiness view (non-null only when <see cref="Status"/> is <see cref="AgentInspectionStatus.Success"/>).</param>
 public record AgentLaunchReadinessInspectionResult(
-    AgentInspectionStatus Status,
+    [property: JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.Never)] AgentInspectionStatus Status,
     AgentLaunchReadinessView? Readiness)
 {
     /// <summary>Creates a successful inspection result carrying the given safe launch-readiness view.</summary>

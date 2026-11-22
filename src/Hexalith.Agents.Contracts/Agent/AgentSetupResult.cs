@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -8,7 +10,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="Status">The read outcome.</param>
 /// <param name="Setup">The authoritative setup view (non-null only on <see cref="AgentInspectionStatus.Success"/>).</param>
 public record AgentSetupResult(
-    AgentInspectionStatus Status,
+    [property: JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.Never)] AgentInspectionStatus Status,
     AgentSetupView? Setup)
 {
     /// <summary>Creates a successful setup read carrying the authoritative view.</summary>

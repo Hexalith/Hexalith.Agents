@@ -34,7 +34,6 @@ public sealed class ConversationAgentStateAggregate : EventStoreAggregate<Conver
         {
             return JsonSerializer.Serialize(original.Permit) == JsonSerializer.Serialize(p) ? DomainResult.NoOp() : Reject(ConversationDirectoryRejectionReason.DivergentDuplicate);
         }
-        if (state?.DeletionRequestId is not null) { return Reject(ConversationDirectoryRejectionReason.ConversationClosing); }
         if (command.ExpectedRevision != (state?.Revision ?? 0)) { return Reject(ConversationDirectoryRejectionReason.StaleRevision); }
         return Accept(command, state);
     }
@@ -69,9 +68,6 @@ public sealed class ConversationAgentStateAggregate : EventStoreAggregate<Conver
             || l.Kind == ConversationEffectKind.Unknown || !Enum.IsDefined(l.Kind) || l.WorkflowInstanceId != l.AgentInteractionId
             || l.DirectoryEpochId != p.Permit.DirectoryEpoch.EpochId || string.IsNullOrWhiteSpace(l.OperationFamily) || !Digest(l.OperationIdentity)
             || l.Status != ConversationEffectLeaseStatus.Reserved || l.CommitRevision != 0 || l.ResultRevision != 0 || l.MustSettle) { return Reject(ConversationDirectoryRejectionReason.InvalidLease); }
-        if (state.DeletionRequestId is not null) { return Reject(ConversationDirectoryRejectionReason.ConversationClosing); }
-
-        if (state.DeletionRequestId is not null) { return Reject(ConversationDirectoryRejectionReason.ConversationClosing); }
         if (command.ExpectedRevision != state.Revision) { return Reject(ConversationDirectoryRejectionReason.StaleRevision); }
         return Accept(command, state);
     }
@@ -80,7 +76,6 @@ public sealed class ConversationAgentStateAggregate : EventStoreAggregate<Conver
     {
         ArgumentNullException.ThrowIfNull(command); ArgumentNullException.ThrowIfNull(envelope);
         if (state is null || !TryLease(state, envelope, command.LeaseId, command.AgentInteractionId, command.WorkflowInstanceId, out ConversationEffectLease? lease)) { return Reject(ConversationDirectoryRejectionReason.LeaseNotFound); }
-        if (state!.DeletionRequestId is not null) { return Reject(ConversationDirectoryRejectionReason.ConversationClosing); }
         if (lease!.Status == ConversationEffectLeaseStatus.CancelledBeforeCommit) { return Reject(ConversationDirectoryRejectionReason.LeaseCancelled); }
         if (lease.CommitRevision > 0) { return DomainResult.NoOp(); }
         if (state!.DeletionRequestId is not null) { return Reject(ConversationDirectoryRejectionReason.ConversationClosing); }

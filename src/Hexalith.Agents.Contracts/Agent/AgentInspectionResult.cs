@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.Agent;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace Hexalith.Agents.Contracts.Agent;
 /// <param name="Status">The inspection outcome.</param>
 /// <param name="Agent">The safe status view (non-null only when <see cref="Status"/> is <see cref="AgentInspectionStatus.Success"/>).</param>
 public record AgentInspectionResult(
-    AgentInspectionStatus Status,
+    [property: JsonRequired, JsonIgnore(Condition = JsonIgnoreCondition.Never)] AgentInspectionStatus Status,
     AgentStatusView? Agent)
 {
     /// <summary>Creates a successful inspection result carrying the given safe status view.</summary>

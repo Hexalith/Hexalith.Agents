@@ -53,6 +53,41 @@ public sealed class AgentOperationContractsTests
             .Value.ShouldBe(AgentSetupWriteOutcome.Unknown);
     }
 
+    [Theory]
+    [InlineData(typeof(AgentSetupResult), "Setup")]
+    [InlineData(typeof(AgentInspectionResult), "Agent")]
+    [InlineData(typeof(AgentLaunchReadinessInspectionResult), "Readiness")]
+    public void AgentInspectionRequiresStatusOnTheWire(Type resultType, string payloadProperty)
+    {
+        string bodyWithoutStatus = $$"""{"{{payloadProperty}}":null}""";
+
+        Should.Throw<JsonException>(() => JsonSerializer.Deserialize(bodyWithoutStatus, resultType));
+        Should.Throw<JsonException>(() => JsonSerializer.Deserialize(bodyWithoutStatus, resultType, JsonSerializerOptions.Web));
+    }
+
+    [Theory]
+    [InlineData(typeof(AgentSetupResult))]
+    [InlineData(typeof(AgentInspectionResult))]
+    [InlineData(typeof(AgentLaunchReadinessInspectionResult))]
+    public void AgentInspectionRoundTripsExplicitStatusIncludingLegacyZero(Type resultType)
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+        };
+
+        foreach (AgentInspectionStatus status in Enum.GetValues<AgentInspectionStatus>())
+        {
+            string payload = $$"""{"status":{{(int)status}}}""";
+            object result = JsonSerializer.Deserialize(payload, resultType, options).ShouldNotBeNull();
+
+            string serialized = JsonSerializer.Serialize(result, resultType, options);
+            using JsonDocument document = JsonDocument.Parse(serialized);
+            document.RootElement.GetProperty("status").GetInt32().ShouldBe((int)status);
+            JsonSerializer.Deserialize(serialized, resultType, options).ShouldBe(result);
+        }
+    }
+
     [Fact]
     public void Operation_result_round_trips_status_enums_by_name()
     {
