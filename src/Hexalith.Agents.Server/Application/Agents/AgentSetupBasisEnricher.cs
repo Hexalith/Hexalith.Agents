@@ -33,10 +33,11 @@ internal static class AgentSetupBasisEnricher
             }
         }
 
+        IReadOnlyList<ApproverSourceResolution>? outcomes = resolved is { Dependency: null } ? resolved.Sources : null;
         var basis = new List<ApproverPolicyBasisEntry>();
         for (int index = 0; index < sources.Count; index++)
         {
-            ApproverSourceResolution? item = resolved?.Sources.Count == sources.Count ? resolved.Sources[index] : null;
+            ApproverSourceResolution? item = outcomes?.Count == sources.Count ? outcomes[index] : null;
             ApproverPolicyValidationStatus status = item is null || item.Kind != sources[index].Kind
                 || item.Source != sources[index]
                 || sources[index].Kind is ApproverPolicySourceKind.Caller or ApproverPolicySourceKind.Unknown

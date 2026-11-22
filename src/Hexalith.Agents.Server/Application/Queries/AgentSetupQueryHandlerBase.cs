@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.Agent.Queries;
-using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Serialization;
 using Hexalith.Agents.Server.Ports;
 using Hexalith.Agents.Server.Application.Agents;
@@ -71,7 +70,7 @@ public abstract class AgentSetupQueryHandlerBase(
 
         (AgentAdministrationContext? actor, TenantAccessReadResult? access) = await ReadAuthorityAsync(query, cancellationToken).ConfigureAwait(false);
         bool IsAuthorized() => actor?.IsAuthorized == true
-            && access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
+            && access is { HasFreshGrant: true }
             && access.Authority?.IsCurrent != false;
         if (!IsAuthorized())
         {

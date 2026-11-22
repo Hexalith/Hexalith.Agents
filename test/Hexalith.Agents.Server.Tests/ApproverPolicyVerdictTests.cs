@@ -31,6 +31,16 @@ public sealed class ApproverPolicyVerdictTests
             .ShouldBe(ApproverPolicyValidationStatus.Valid);
 
     [Fact]
+    public void UnavailableDependencyOverridesResolvedApproverVerdicts()
+    {
+        AgentApproverPolicy policy = Policy(1);
+        ApproverPolicyResolutionResult resolution = Result(ApproverSourceOutcome.Resolved) with { Dependency = new("EXT-PARTIES-1") };
+
+        ApproverPolicyVerdict.Evaluate(policy, resolution).ShouldBe(ApproverPolicyValidationStatus.Unavailable);
+        ApproverPolicyVerdict.EvaluateAction(policy, resolution).ShouldBe(ApproverPolicyValidationStatus.Unavailable);
+    }
+
+    [Fact]
     public void Any_unauthorized_source_dominates_every_other_outcome()
         => ApproverPolicyVerdict.Evaluate(Policy(5), Result(
                 ApproverSourceOutcome.Missing,

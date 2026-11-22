@@ -116,6 +116,26 @@ public sealed class ProviderCatalogQueryTests
         }
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UnavailableDependencyOverridesTenantGrant(bool detail)
+    {
+        _tenantAccess.ReadAsync(TenantId, UserId, string.Empty, Arg.Any<CancellationToken>())
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true) { Dependency = new("EXT-SECRETS-1") });
+        ProviderCatalogQueryHandlerBase handler = detail ? GetHandler() : ListHandler();
+        QueryEnvelope query = detail
+            ? Query(handler.QueryType, new GetProviderCatalogEntryQuery("openai", "gpt-4o"), TenantId, false)
+            : Query(handler.QueryType, new ListProviderCatalogEntriesQuery(false), TenantId, false);
+
+        ProviderCatalogInspectionResult result = await ExecuteAsync(handler, query);
+
+        result.Status.ShouldBe(ProviderCatalogInspectionStatus.NotAuthorized);
+        result.Entries.ShouldBeEmpty();
+        _store.GetCount.ShouldBe(0);
+        _gateway.ReceivedCalls().ShouldBeEmpty();
+    }
+
     [Fact]
     public async Task Authorized_tenant_list_and_get_expose_only_enabled_entries_without_platform_configuration()
     {

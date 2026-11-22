@@ -47,6 +47,26 @@ public sealed class AgentInteractionGateAdmissionTests
         _dispatcher.ReceivedCalls().ShouldBeEmpty();
     }
 
+    /// <summary>An unavailable authority dependency stops the gate before the first Party read.</summary>
+    [Fact]
+    public async Task UnavailableDependencyOverridesTenantGrant()
+    {
+        Configure();
+        _tenants.ReadAsync("tenant-a", "subject", "caller", Arg.Any<CancellationToken>())
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)
+            {
+                CurrentActor = Actor(),
+                Dependency = new("EXT-SECRETS-1"),
+            });
+
+        var result = await Orchestrator().ExecuteAsync(Request(), CancellationToken.None);
+
+        result.Status.ShouldBe(AgentInteractionStatus.Denied);
+        _parties.ReceivedCalls().ShouldBeEmpty();
+        _conversations.ReceivedCalls().ShouldBeEmpty();
+        _dispatcher.ReceivedCalls().ShouldBeEmpty();
+    }
+
     /// <summary>Substituted, incomplete or noncurrent tenant-result evidence is rejected without protected reads.</summary>
     [Theory]
     [InlineData("tenant")]

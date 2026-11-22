@@ -26,6 +26,10 @@ public sealed record TenantAccessReadResult(AgentInteractionGateOutcome Outcome,
 
     /// <summary>Gets the unavailable external record, without any claimed resource information.</summary>
     public Hexalith.Agents.Contracts.Security.DependencyNotAvailable? Dependency { get; init; }
+
+    /// <summary>Gets whether the tenant reader reports fresh, satisfied access with no unavailable dependency.</summary>
+    internal bool HasFreshGrant => Dependency is null && IsFresh && Outcome == AgentInteractionGateOutcome.Satisfied;
+
     /// <summary>Gets the fail-closed not-available result (the deferred default) — unavailable and not fresh.</summary>
     public static TenantAccessReadResult Unavailable { get; } = new(AgentInteractionGateOutcome.Unavailable, false);
 }

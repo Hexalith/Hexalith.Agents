@@ -110,7 +110,7 @@ public sealed class AgentInteractionGateOrchestrator
         // proposal or target command follows a denied or uncertain tenant/caller/Conversation read.
         TenantAccessReadResult tenant = await ReadTenantAccessAsync(request, ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        if (tenant is not { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }
+        if (tenant is not { HasFreshGrant: true }
             || !HasCurrentActor(tenant, request, started, ref checkedAt))
         {
             // A denied caller must not address the claimed tenant's Party, Conversation, Agent or catalog,

@@ -138,7 +138,7 @@ public abstract class AgentInteractionAuditQueryHandlerBase(
             TenantAccessReadResult access = await _tenantAccessReader
                 .ReadAsync(target.TenantId, target.Subject, callerPartyId: string.Empty, cancellationToken)
                 .ConfigureAwait(false);
-            return access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true, Authority: { } validity, CurrentActor: { } actor }
+            return access is { HasFreshGrant: true, Authority: { } validity, CurrentActor: { } actor }
                 && actor.Subject == target.Subject && actor.TenantId == target.TenantId
                 ? new(target, AgentAuditAudience.TenantOperations, validity)
                 : null;

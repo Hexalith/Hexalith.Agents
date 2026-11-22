@@ -111,6 +111,22 @@ public sealed class AgentInteractionAuditQueryHandlerTests
     }
 
     [Fact]
+    public async Task UnavailableDependencyOverridesTenantGrant()
+    {
+        var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));
+        var tenant = new StubTenantAccessReader(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true)
+        {
+            Dependency = new("EXT-SECRETS-1"),
+        });
+        var handler = new GetAgentInteractionStatusQueryHandler(reader, tenant);
+
+        QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType, isGlobalAdmin: false), CancellationToken.None);
+
+        result.Payload<AgentInteractionInspectionResult>().Status.ShouldBe(AgentInteractionInspectionStatus.NotAuthorized);
+        reader.Calls.ShouldBe(0);
+    }
+
+    [Fact]
     public async Task Tenant_member_with_stale_access_is_not_authorized_without_state_access()
     {
         var reader = new RecordingAuditStateReader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", State()));

@@ -38,16 +38,29 @@ public sealed class AgentSetupApproverBasisTests
     [Theory]
     [MemberData(nameof(UndefinedSourceCases))]
     public async Task UndefinedApproverSourceRemainsUnavailableAcrossSetupReads(string path, int ordinal)
+        => await AssertUnavailableBasisAsync(path, new((ApproverPolicySourceKind)ordinal, null, null), null);
+
+    /// <summary>All setup reads reflect an unavailable dependency even when the adapter reports a resolved source.</summary>
+    [Theory]
+    [InlineData("status-api")]
+    [InlineData("configuration-api")]
+    [InlineData("status-query")]
+    [InlineData("configuration-query")]
+    public async Task UnavailableDependencyOverridesResolvedApproverBasis(string path)
+        => await AssertUnavailableBasisAsync(path, new(ApproverPolicySourceKind.PredefinedParty, "selected-party", null),
+            new("EXT-PARTIES-1"));
+
+    private static async Task AssertUnavailableBasisAsync(string path, ApproverPolicySource configured,
+        Hexalith.Agents.Contracts.Security.DependencyNotAvailable? dependency)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         const string tenant = "tenant-a";
         const string agent = "hexa";
-        var configured = new ApproverPolicySource((ApproverPolicySourceKind)ordinal, null, null);
         var policy = new AgentApproverPolicy([configured], ApproverPolicyBasisDisclosure.OperatorOnly);
         var resolution = new ApproverPolicyResolutionResult([new(configured.Kind, ApproverSourceOutcome.Resolved)
         {
             Source = configured,
-        }]);
+        }]) { Dependency = dependency };
         var resolver = Substitute.For<IApproverPolicyResolver>();
         resolver.ResolveAsync(tenant, Arg.Any<AgentApproverPolicy>(), Arg.Any<CancellationToken>()).Returns(resolution);
         var store = Substitute.For<IReadModelStore>();

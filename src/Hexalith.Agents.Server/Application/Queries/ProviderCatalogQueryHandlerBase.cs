@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Contracts.Serialization;
@@ -221,6 +220,6 @@ public abstract class ProviderCatalogQueryHandlerBase(
             .ReadAsync(query.TenantId, query.UserId, callerPartyId: string.Empty, cancellationToken)
             .ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
-        return (access is { Outcome: AgentInteractionGateOutcome.Satisfied, IsFresh: true }, access.Authority);
+        return (access.HasFreshGrant, access.Authority);
     }
 }

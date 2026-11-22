@@ -129,6 +129,28 @@ public sealed class AgentSetupQueryHandlerTests
         Encoding.UTF8.GetString(response.PayloadBytes.ShouldNotBeNull()).ShouldNotContain("hexa");
     }
 
+    /// <summary>Both setup queries deny before touching the projection or resolver when authority is unavailable.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UnavailableDependencyOverridesTenantGrant(bool statusQuery)
+    {
+        Seed(configurationVersion: 3, lastSequence: 5);
+        _tenantAccess.ReadAsync(TenantId, UserId, string.Empty, Arg.Any<CancellationToken>())
+            .Returns(new TenantAccessReadResult(AgentInteractionGateOutcome.Satisfied, true) { Dependency = new("EXT-SECRETS-1") });
+        var resolver = Substitute.For<IApproverPolicyResolver>();
+        var options = Options.Create(new AgentSetupReadModelOptions { StateStoreName = StoreName });
+        AgentSetupQueryHandlerBase handler = statusQuery
+            ? new GetAgentStatusQueryHandler(_store, options, _tenantAccess, resolver, _context)
+            : new GetAgentConfigurationQueryHandler(_store, options, _tenantAccess, resolver, _context);
+
+        AgentSetupResult result = await ExecuteAsync(handler, Query(handler.QueryType));
+
+        result.ShouldBe(AgentSetupResult.NotAuthorized());
+        _store.GetCount.ShouldBe(0);
+        resolver.ReceivedCalls().ShouldBeEmpty();
+    }
+
     /// <summary>Current authority can resolve an authenticated subject to a different stable actor identity.</summary>
     [Theory]
     [InlineData(true)]
