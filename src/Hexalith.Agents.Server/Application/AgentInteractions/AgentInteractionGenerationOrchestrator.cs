@@ -141,23 +141,22 @@ public sealed class AgentInteractionGenerationOrchestrator
             return FailedResult(AgentGenerationOutcome.InvalidContext, request, attemptId);
         }
 
-        // (2) Read the model budget/timeout/status from the reused catalog. Disabled/not-text-gen → ProviderDisabled;
-        // read failure / not-found / not-authorized → ProviderUnavailable.
-        ProviderGenerationBudget budget = await ReadBudgetAsync(request, ct).ConfigureAwait(false);
-        if (budget.Outcome != AgentGenerationOutcome.Succeeded)
+        GenerationCatalogRead catalog = await GenerationCatalogRead.ReadAsync(
+            _providerCatalogReader, request.TenantId, request.ProviderId, request.ModelId, request.ProviderCapabilityVersion, ct).ConfigureAwait(false);
+        if (catalog.Entry is not { } entry)
         {
-            return FailedResult(budget.Outcome, request, attemptId);
+            return FailedResult(catalog.Outcome, request, attemptId);
         }
 
         // (3) Invoke the provider behind its adapter, honoring the timeout/retry budget. A thrown adapter → AdapterFailure
         // (no raw provider error leaks; AD-14). A non-success provider outcome (timeout/error/…) maps straight through.
-        AgentGenerationProviderResult providerResult = await InvokeProviderAsync(request, read.Messages, budget, attemptId, ct).ConfigureAwait(false);
+        AgentGenerationProviderResult providerResult = await InvokeProviderAsync(entry, read.Messages, attemptId, ct).ConfigureAwait(false);
         if (providerResult.Outcome != AgentGenerationOutcome.Succeeded || providerResult.GeneratedContent is null)
         {
             AgentGenerationOutcome outcome = providerResult.Outcome == AgentGenerationOutcome.Succeeded
                 ? AgentGenerationOutcome.GenerationError // a "succeeded" result with no content is a degraded provider result
                 : providerResult.Outcome;
-            return FailedResult(outcome, request, attemptId, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(outcome, request, attemptId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
         }
 
         // (4) Content-safety gate — BEFORE any downstream artifact (AC2). Read the effective policy (not-available →
@@ -166,14 +165,14 @@ public sealed class AgentInteractionGenerationOrchestrator
         AgentContentSafetyPolicyReadResult policy = await ReadPolicyAsync(request, ct).ConfigureAwait(false);
         if (!policy.IsAvailable || policy.Policy is null)
         {
-            return FailedResult(AgentGenerationOutcome.PolicyFailure, request, attemptId, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentGenerationOutcome.PolicyFailure, request, attemptId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
         }
 
         ContentSafetyVerdict verdict = await EvaluateSafetyAsync(providerResult.GeneratedContent, policy.Policy, ct).ConfigureAwait(false);
         if (verdict != ContentSafetyVerdict.Passed)
         {
             // Fail closed and carry NO content — the unsafe content never reaches the aggregate (AD-5, AD-14).
-            return FailedResult(AgentGenerationOutcome.ContentSafetyBlocked, request, attemptId, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentGenerationOutcome.ContentSafetyBlocked, request, attemptId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
         }
 
         // (5) Success — carry the generated content as the sole transport into the aggregate, whose success event becomes
@@ -183,7 +182,7 @@ public sealed class AgentInteractionGenerationOrchestrator
             attemptId,
             request.ProviderId,
             request.ModelId,
-            request.ProviderCapabilityVersion,
+            entry.CapabilityVersion,
             policy.PolicyVersion,
             providerResult.GeneratedContent,
             providerResult.PromptTokenCount,
@@ -207,59 +206,22 @@ public sealed class AgentInteractionGenerationOrchestrator
         }
     }
 
-    // Reads the model budget from the reused provider catalog. A missing/not-authorized/degraded read or a throw fails
-    // closed to ProviderUnavailable; a disabled or non-text-capable entry fails closed to ProviderDisabled.
-    private async Task<ProviderGenerationBudget> ReadBudgetAsync(AgentInteractionGenerationRequest request, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(request.ProviderId) || string.IsNullOrWhiteSpace(request.ModelId))
-        {
-            return ProviderGenerationBudget.Failed(AgentGenerationOutcome.ProviderUnavailable);
-        }
-
-        try
-        {
-            ProviderCatalogEntryReadResult result = await _providerCatalogReader
-                .GetEntryAsync(request.TenantId, request.ProviderId, request.ModelId, ct)
-                .ConfigureAwait(false);
-
-            if (result is not { Status: ProviderCatalogInspectionStatus.Success, Entry: { } entry })
-            {
-                return ProviderGenerationBudget.Failed(AgentGenerationOutcome.ProviderUnavailable);
-            }
-
-            if (entry.Status != ProviderModelStatus.Enabled || !entry.SupportsTextGeneration)
-            {
-                return ProviderGenerationBudget.Failed(AgentGenerationOutcome.ProviderDisabled);
-            }
-
-            return ProviderGenerationBudget.Ready(
-                entry.MaxOutputTokenLimit,
-                entry.TimeoutPolicy.RequestTimeoutMilliseconds,
-                entry.TimeoutPolicy.MaxRetries);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return ProviderGenerationBudget.Failed(AgentGenerationOutcome.ProviderUnavailable);
-        }
-    }
-
     private async Task<AgentGenerationProviderResult> InvokeProviderAsync(
-        AgentInteractionGenerationRequest request,
+        ProviderCatalogEntryView entry,
         IReadOnlyList<ConversationContextMessage> messages,
-        ProviderGenerationBudget budget,
         string attemptId,
         CancellationToken ct)
     {
         try
         {
             var providerRequest = new AgentGenerationProviderRequest(
-                request.ProviderId,
-                request.ModelId,
-                request.ProviderCapabilityVersion,
+                entry.ProviderId,
+                entry.ModelId,
+                entry.CapabilityVersion,
                 BuildContextPayload(messages),
-                budget.MaxOutputTokenLimit,
-                budget.RequestTimeoutMilliseconds,
-                budget.MaxRetries,
+                entry.MaxOutputTokenLimit,
+                entry.TimeoutPolicy.RequestTimeoutMilliseconds,
+                entry.TimeoutPolicy.MaxRetries,
                 attemptId);
             return await _generationProvider.GenerateAsync(providerRequest, ct).ConfigureAwait(false);
         }
@@ -322,6 +284,7 @@ public sealed class AgentInteractionGenerationOrchestrator
         AgentGenerationOutcome outcome,
         AgentInteractionGenerationRequest request,
         string attemptId,
+        int? invokedCapabilityVersion = null,
         int promptTokenCount = 0,
         int outputTokenCount = 0)
         => new(
@@ -329,7 +292,7 @@ public sealed class AgentInteractionGenerationOrchestrator
             attemptId,
             request.ProviderId,
             request.ModelId,
-            request.ProviderCapabilityVersion,
+            invokedCapabilityVersion ?? Math.Max(0, request.ProviderCapabilityVersion),
             request.ContentSafetyPolicyVersion,
             GeneratedContent: null,
             promptTokenCount,
@@ -357,19 +320,5 @@ public sealed class AgentInteractionGenerationOrchestrator
         }
 
         return extensions.Count > 0 ? extensions : null;
-    }
-
-    // The safe model-budget/timeout read result. A non-Succeeded outcome short-circuits generation to a fail-closed result.
-    private readonly record struct ProviderGenerationBudget(
-        AgentGenerationOutcome Outcome,
-        int MaxOutputTokenLimit,
-        int RequestTimeoutMilliseconds,
-        int MaxRetries)
-    {
-        public static ProviderGenerationBudget Ready(int maxOutputTokenLimit, int requestTimeoutMilliseconds, int maxRetries)
-            => new(AgentGenerationOutcome.Succeeded, maxOutputTokenLimit, requestTimeoutMilliseconds, maxRetries);
-
-        public static ProviderGenerationBudget Failed(AgentGenerationOutcome outcome)
-            => new(outcome, 0, 0, 0);
     }
 }

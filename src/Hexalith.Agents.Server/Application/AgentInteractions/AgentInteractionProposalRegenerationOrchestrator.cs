@@ -208,24 +208,23 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId);
         }
 
-        // (2) Read the SAME snapshotted model budget/timeout/status from the reused catalog. Disabled/not-text-gen →
-        // ProviderDisabled; read failure / not-found / not-authorized → ProviderUnavailable.
-        ProviderRegenerationBudget budget = await ReadBudgetAsync(request, ct).ConfigureAwait(false);
-        if (budget.Outcome != AgentProposalRegenerationOutcome.Regenerated)
+        GenerationCatalogRead catalog = await GenerationCatalogRead.ReadAsync(
+            _providerCatalogReader, request.TenantId, request.ProviderId, request.ModelId, request.ProviderCapabilityVersion, ct).ConfigureAwait(false);
+        if (catalog.Entry is not { } entry)
         {
-            return FailedResult(budget.Outcome, request, verdict, attemptId, regeneratedVersionId);
+            return FailedResult(MapProviderOutcome(catalog.Outcome), request, verdict, attemptId, regeneratedVersionId);
         }
 
         // (3) Re-invoke the provider behind its adapter, honoring the timeout/retry budget. A thrown adapter → AdapterFailure
         // (no raw provider error leaks; AD-14). A non-success provider outcome maps through; a degraded success (no content)
         // fails closed to AdapterFailure (there is no GenerationError on the regeneration surface).
-        AgentGenerationProviderResult providerResult = await InvokeProviderAsync(request, read.Messages, budget, attemptId, ct).ConfigureAwait(false);
+        AgentGenerationProviderResult providerResult = await InvokeProviderAsync(entry, read.Messages, attemptId, ct).ConfigureAwait(false);
         if (providerResult.Outcome != AgentGenerationOutcome.Succeeded || providerResult.GeneratedContent is null)
         {
             AgentProposalRegenerationOutcome outcome = providerResult.Outcome == AgentGenerationOutcome.Succeeded
                 ? AgentProposalRegenerationOutcome.AdapterFailure // a "succeeded" result with no content is a degraded provider result
                 : MapProviderOutcome(providerResult.Outcome);
-            return FailedResult(outcome, request, verdict, attemptId, regeneratedVersionId, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(outcome, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
         }
 
         // (4) Content-safety gate — BEFORE any downstream artifact. Read the effective policy (not-available → PolicyFailure),
@@ -234,14 +233,14 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         AgentContentSafetyPolicyReadResult policy = await ReadPolicyAsync(request, ct).ConfigureAwait(false);
         if (!policy.IsAvailable || policy.Policy is null)
         {
-            return FailedResult(AgentProposalRegenerationOutcome.PolicyFailure, request, verdict, attemptId, regeneratedVersionId, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentProposalRegenerationOutcome.PolicyFailure, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
         }
 
         ContentSafetyVerdict safety = await EvaluateSafetyAsync(providerResult.GeneratedContent, policy.Policy, ct).ConfigureAwait(false);
         if (safety != ContentSafetyVerdict.Passed)
         {
             // Fail closed and carry NO content — the unsafe content never reaches the aggregate (AD-5, AD-14).
-            return FailedResult(AgentProposalRegenerationOutcome.ContentSafetyBlocked, request, verdict, attemptId, regeneratedVersionId, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentProposalRegenerationOutcome.ContentSafetyBlocked, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
         }
 
         // (5) Success — carry the regenerated content on the new immutable Regenerated version (its sole durable home is the
@@ -254,7 +253,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             providerResult.GeneratedContent,
             request.ProviderId,
             request.ModelId,
-            request.ProviderCapabilityVersion,
+            entry.CapabilityVersion,
             policy.PolicyVersion,
             providerResult.PromptTokenCount,
             providerResult.OutputTokenCount);
@@ -270,7 +269,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             request.RequesterPartyId,
             request.ProviderId,
             request.ModelId,
-            request.ProviderCapabilityVersion,
+            entry.CapabilityVersion,
             policy.PolicyVersion,
             request.ApproverPolicyVersion,
             request.ApproverPolicy?.DisclosureCategory ?? ApproverPolicyBasisDisclosure.Omitted,
@@ -295,59 +294,22 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         }
     }
 
-    // Reads the model budget from the reused provider catalog. A missing/not-authorized/degraded read or a throw fails closed
-    // to ProviderUnavailable; a disabled or non-text-capable entry fails closed to ProviderDisabled.
-    private async Task<ProviderRegenerationBudget> ReadBudgetAsync(AgentInteractionProposalRegenerationRequest request, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(request.ProviderId) || string.IsNullOrWhiteSpace(request.ModelId))
-        {
-            return ProviderRegenerationBudget.Failed(AgentProposalRegenerationOutcome.ProviderUnavailable);
-        }
-
-        try
-        {
-            ProviderCatalogEntryReadResult result = await _providerCatalogReader
-                .GetEntryAsync(request.TenantId, request.ProviderId, request.ModelId, ct)
-                .ConfigureAwait(false);
-
-            if (result is not { Status: ProviderCatalogInspectionStatus.Success, Entry: { } entry })
-            {
-                return ProviderRegenerationBudget.Failed(AgentProposalRegenerationOutcome.ProviderUnavailable);
-            }
-
-            if (entry.Status != ProviderModelStatus.Enabled || !entry.SupportsTextGeneration)
-            {
-                return ProviderRegenerationBudget.Failed(AgentProposalRegenerationOutcome.ProviderDisabled);
-            }
-
-            return ProviderRegenerationBudget.Ready(
-                entry.MaxOutputTokenLimit,
-                entry.TimeoutPolicy.RequestTimeoutMilliseconds,
-                entry.TimeoutPolicy.MaxRetries);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return ProviderRegenerationBudget.Failed(AgentProposalRegenerationOutcome.ProviderUnavailable);
-        }
-    }
-
     private async Task<AgentGenerationProviderResult> InvokeProviderAsync(
-        AgentInteractionProposalRegenerationRequest request,
+        ProviderCatalogEntryView entry,
         IReadOnlyList<ConversationContextMessage> messages,
-        ProviderRegenerationBudget budget,
         string attemptId,
         CancellationToken ct)
     {
         try
         {
             var providerRequest = new AgentGenerationProviderRequest(
-                request.ProviderId,
-                request.ModelId,
-                request.ProviderCapabilityVersion,
+                entry.ProviderId,
+                entry.ModelId,
+                entry.CapabilityVersion,
                 BuildContextPayload(messages),
-                budget.MaxOutputTokenLimit,
-                budget.RequestTimeoutMilliseconds,
-                budget.MaxRetries,
+                entry.MaxOutputTokenLimit,
+                entry.TimeoutPolicy.RequestTimeoutMilliseconds,
+                entry.TimeoutPolicy.MaxRetries,
                 attemptId);
             return await _generationProvider.GenerateAsync(providerRequest, ct).ConfigureAwait(false);
         }
@@ -428,6 +390,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         ApproverPolicyValidationStatus verdict,
         string attemptId,
         string regeneratedVersionId,
+        int? invokedCapabilityVersion = null,
         int promptTokenCount = 0,
         int outputTokenCount = 0)
         => new(
@@ -441,7 +404,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             request.RequesterPartyId,
             request.ProviderId,
             request.ModelId,
-            request.ProviderCapabilityVersion,
+            invokedCapabilityVersion ?? Math.Max(0, request.ProviderCapabilityVersion),
             request.ContentSafetyPolicyVersion,
             request.ApproverPolicyVersion,
             request.ApproverPolicy?.DisclosureCategory ?? ApproverPolicyBasisDisclosure.Omitted,
@@ -468,19 +431,5 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         }
 
         return extensions.Count > 0 ? extensions : null;
-    }
-
-    // The safe model-budget/timeout read result. A non-Regenerated outcome short-circuits regeneration to a fail-closed result.
-    private readonly record struct ProviderRegenerationBudget(
-        AgentProposalRegenerationOutcome Outcome,
-        int MaxOutputTokenLimit,
-        int RequestTimeoutMilliseconds,
-        int MaxRetries)
-    {
-        public static ProviderRegenerationBudget Ready(int maxOutputTokenLimit, int requestTimeoutMilliseconds, int maxRetries)
-            => new(AgentProposalRegenerationOutcome.Regenerated, maxOutputTokenLimit, requestTimeoutMilliseconds, maxRetries);
-
-        public static ProviderRegenerationBudget Failed(AgentProposalRegenerationOutcome outcome)
-            => new(outcome, 0, 0, 0);
     }
 }

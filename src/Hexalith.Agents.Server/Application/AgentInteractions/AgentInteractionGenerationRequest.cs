@@ -21,7 +21,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 /// <param name="SourceConversationId">The snapshot-recorded source Conversation reference (opaque — drives the content re-read; AD-6).</param>
 /// <param name="ProviderId">The snapshot-recorded provider reference (drives the budget read + provider invocation; AD-9).</param>
 /// <param name="ModelId">The snapshot-recorded model reference (drives the budget read + provider invocation; AD-9).</param>
-/// <param name="ProviderCapabilityVersion">The snapshot-recorded provider capability version (recorded on the generated version/evidence; AD-4, AD-10).</param>
+/// <param name="ProviderCapabilityVersion">The minimum live catalog version required for invocation. The invoked version is recorded on the result and its evidence.</param>
 /// <param name="ContentSafetyPolicyVersion">The snapshot-recorded content-safety policy version (carried for audit symmetry; the live effective version is read for the gate).</param>
 /// <param name="ResponseMode">The snapshot-recorded response mode (selects the mode-specific content-safety override, if any; FR-26).</param>
 /// <param name="ActorUserId">The authenticated caller (the command-envelope user and the Conversations authorized-read principal).</param>

@@ -72,6 +72,11 @@ public static class AgentInteractionAuditInspection
             return null;
         }
 
+        if (current.GenerationFailureEvidence is { } failure)
+        {
+            return failure;
+        }
+
         AgentGeneratedVersion? version = current.GeneratedVersions?.LastOrDefault(v => v.Kind == AgentGenerationKind.Generated);
         return version is null
             ? null

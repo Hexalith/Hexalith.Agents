@@ -37,7 +37,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 /// <param name="SourceConversationId">The snapshot-recorded source Conversation reference the regeneration re-reads (opaque — AD-6).</param>
 /// <param name="ProviderId">The snapshot-recorded provider reference (drives the budget read + provider invocation; AD-9).</param>
 /// <param name="ModelId">The snapshot-recorded model reference (drives the budget read + provider invocation; AD-9).</param>
-/// <param name="ProviderCapabilityVersion">The snapshot-recorded provider capability version (recorded on the regenerated version/evidence; AD-4, AD-10).</param>
+/// <param name="ProviderCapabilityVersion">The minimum live catalog version required for invocation. The invoked version is recorded on the result and its evidence.</param>
 /// <param name="ContentSafetyPolicyVersion">The snapshot-recorded content-safety policy version (carried for audit symmetry; the live effective version is read for the gate).</param>
 /// <param name="ResponseMode">The snapshot-recorded response mode (selects the mode-specific content-safety override, if any; FR-26).</param>
 /// <param name="RequesterPartyId">The requesting Approver's stable Party reference (a reference, not PII — AD-7; recorded on the regeneration evidence).</param>

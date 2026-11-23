@@ -63,6 +63,9 @@ public sealed partial class AgentInteractionState
     /// <summary>Gets or sets the safe generation failure-reason classification recorded when generation failed closed (FR-24, AD-12). <see langword="null"/> until a generation-failed/safety-failed decision is recorded.</summary>
     public AgentOutputGenerationFailureReason? GenerationFailureReason { get; set; }
 
+    /// <summary>Gets or sets the safe attempt metadata recorded by the latest initial generation failure.</summary>
+    public AgentGenerationAttemptEvidence? GenerationFailureEvidence { get; set; }
+
     /// <summary>Gets or sets the safe posted-message evidence recorded when the posting decision was made (Audit Evidence; FR-24, AD-14; ids only, never content). <see langword="null"/> until a posting decision is recorded.</summary>
     public AgentPostedMessageEvidence? PostingEvidence { get; set; }
 
@@ -219,6 +222,7 @@ public sealed partial class AgentInteractionState
         }
 
         Status = AgentInteractionStatus.Generated;
+        GenerationFailureEvidence = null;
         var versions = GeneratedVersions is null
             ? new List<AgentGeneratedVersion>()
             : new List<AgentGeneratedVersion>(GeneratedVersions);
@@ -238,6 +242,7 @@ public sealed partial class AgentInteractionState
 
         Status = e.Decision;
         GenerationFailureReason = e.Reason;
+        GenerationFailureEvidence = e.Evidence;
     }
 
     /// <summary>No-op replay handler — the not-generatable rejection carries no state change.</summary>

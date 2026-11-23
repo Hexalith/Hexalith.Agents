@@ -237,6 +237,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     public async Task Content_safety_blocked_returns_regeneration_failed_with_no_content_in_the_envelope_or_result()
     {
         StubHappy();
+        StubEnabledCatalog(capabilityVersion: 5);
         _safetyEvaluator.EvaluateAsync(Arg.Any<ContentSafetyEvaluationRequest>(), Arg.Any<CancellationToken>())
             .Returns(new ContentSafetyEvaluationResult(ContentSafetyVerdict.Blocked, "violence"));
         CaptureDispatch();
@@ -245,6 +246,9 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ProposalRegenerationFailed);
         DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.ContentSafetyBlocked);
+        DispatchedResult().ProviderCapabilityVersion.ShouldBe(5);
+        DispatchedResult().PromptTokenCount.ShouldBe(1_200);
+        DispatchedResult().OutputTokenCount.ShouldBe(350);
         DispatchedResult().RegeneratedVersion.ShouldBeNull();
         Encoding.UTF8.GetString(LastDispatched()!.Payload).ShouldNotContain(RegeneratedContentText);
         JsonSerializer.Serialize(outcome).ShouldNotContain(RegeneratedContentText);
@@ -523,6 +527,14 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     public async Task End_to_end_the_dispatched_regenerate_command_drives_the_aggregate_to_proposal_regenerated()
     {
         StubHappy();
+        var entry = Entry(ProviderModelStatus.Enabled, true) with
+        {
+            CapabilityVersion = 3,
+            ContextWindowTokenLimit = MaxOutputTokenLimit + 1,
+            TimeoutPolicy = new(600_000, 10),
+        };
+        _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
+            .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, entry));
         CaptureDispatch();
 
         AgentInteractionProposalRegenerationOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
@@ -535,8 +547,63 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
 
         ProposedAgentReplyRegenerated regenerated = result.Events[0].ShouldBeOfType<ProposedAgentReplyRegenerated>();
         regenerated.RegeneratedVersion.GeneratedContent.ShouldBe(RegeneratedContentText);
+        regenerated.RegeneratedVersion.ProviderCapabilityVersion.ShouldBe(3);
+        DispatchedResult().ProviderCapabilityVersion.ShouldBe(3);
+        await _generationProvider.Received(1).GenerateAsync(
+            Arg.Is<AgentGenerationProviderRequest>(invocation => invocation.ProviderCapabilityVersion == 3
+                && invocation.RequestTimeoutMilliseconds == 600_000 && invocation.MaxRetries == 10
+                && invocation.MaxOutputTokenLimit == MaxOutputTokenLimit), Arg.Any<CancellationToken>());
         // The orchestrator's returned status and the aggregate's recorded decision agree (shared policy — no drift).
         outcome.Status.ShouldBe(AgentInteractionStatus.ProposalRegenerated);
+    }
+
+    [Theory]
+    [MemberData(nameof(GenerationCatalogRefusals.Cases), MemberType = typeof(GenerationCatalogRefusals))]
+    public async Task RejectedCatalogEvidencePreventsInvocation(string defect)
+    {
+        StubHappy();
+        ProviderCatalogEntryView entry = Entry(ProviderModelStatus.Enabled, true) with { CapabilityVersion = 2 };
+        _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
+            .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, GenerationCatalogRefusals.Apply(defect, entry)));
+        CaptureDispatch();
+
+        await Orchestrator.ExecuteAsync(Request() with { ProviderCapabilityVersion = 2 }, CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.ProviderUnavailable);
+        DispatchedResult().RegeneratedVersion.ShouldBeNull();
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task InvalidSnapshotFloorPreventsInvocation(int floor)
+    {
+        StubHappy();
+        CaptureDispatch();
+
+        await Orchestrator.ExecuteAsync(Request() with { ProviderCapabilityVersion = floor }, CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.ProviderUnavailable);
+        DispatchedResult().ProviderCapabilityVersion.ShouldBe(0);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task InvokedCapabilityVersionSurvivesProviderFailure()
+    {
+        StubHappy();
+        StubEnabledCatalog(capabilityVersion: 4);
+        _generationProvider.GenerateAsync(Arg.Any<AgentGenerationProviderRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new AgentGenerationProviderResult(AgentGenerationOutcome.ProviderTimeout, null, 0, 0));
+        CaptureDispatch();
+
+        await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.ProviderTimeout);
+        DispatchedResult().ProviderCapabilityVersion.ShouldBe(4);
+        await _generationProvider.Received(1).GenerateAsync(
+            Arg.Is<AgentGenerationProviderRequest>(request => request.ProviderCapabilityVersion == 4), Arg.Any<CancellationToken>());
     }
 
     // ===== Helpers =====
@@ -566,9 +633,10 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
     }
 
-    private void StubEnabledCatalog()
+    private void StubEnabledCatalog(int capabilityVersion = 1)
         => _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
-            .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, Entry(ProviderModelStatus.Enabled, supportsTextGeneration: true)));
+            .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success,
+                Entry(ProviderModelStatus.Enabled, supportsTextGeneration: true) with { CapabilityVersion = capabilityVersion }));
 
     private void StubProviderSucceeded()
         => _generationProvider.GenerateAsync(Arg.Any<AgentGenerationProviderRequest>(), Arg.Any<CancellationToken>())
