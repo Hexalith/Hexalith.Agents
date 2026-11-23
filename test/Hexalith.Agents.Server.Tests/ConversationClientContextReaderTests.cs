@@ -2,6 +2,11 @@ namespace Hexalith.Agents.Server.Tests;
 
 using System;
 using System.Net;
+#if HEXALITH_CONVERSATIONS_SOURCE
+using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -182,22 +187,66 @@ public sealed class ConversationClientContextReaderTests
         result.IsFresh.ShouldBeFalse();
     }
 
-    [Fact]
-    public async Task A_failure_client_result_maps_to_unavailable()
+#if HEXALITH_CONVERSATIONS_SOURCE
+    [Theory]
+    [InlineData("omitted", AgentInteractionContextLoadOutcome.Unavailable)]
+    [InlineData("null", AgentInteractionContextLoadOutcome.Unavailable)]
+    [InlineData("empty", AgentInteractionContextLoadOutcome.Loaded)]
+    public async Task Wire_timeline_presence_controls_context_availability(string timeline, AgentInteractionContextLoadOutcome expected)
     {
-        var error = new ConversationError(
-            SchemaVersion.Current,
-            ConversationErrorCode.TenantProjectionStale,
-            ConversationErrorCategory.Freshness,
-            IsRetryable: true,
-            CorrelationId: "trace-1");
+        var response = ConversationDetailResult.Visible(SchemaVersion.Current, Details(FreshFreshness()), "ok");
+        JsonNode body = JsonSerializer.SerializeToNode(response, JsonSerializerOptions.Web).ShouldNotBeNull();
+        JsonObject details = body["details"].ShouldNotBeNull().AsObject();
+        if (timeline == "omitted")
+        {
+            details.Remove("messages").ShouldBeTrue();
+        }
+        else if (timeline == "null")
+        {
+            details["messages"] = null;
+        }
+
+        using var httpClient = new HttpClient(new CallerIdentityReplyHttpMessageHandler((_, _) => Task.FromResult(
+            new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(body.ToJsonString()) })))
+        {
+            BaseAddress = new Uri("https://conversations.example.test/"),
+        };
+        var reader = new ConversationClientContextReader(new ConversationClient(httpClient));
+
+        ConversationContextReadResult result = await reader.ReadAsync(
+            TenantId, SourceConversationId, CallerPartyId, CallerPrincipalId, "context-trace", CancellationToken.None);
+
+        result.Outcome.ShouldBe(expected);
+        result.MessageCount.ShouldBe(0);
+        if (expected == AgentInteractionContextLoadOutcome.Loaded)
+        {
+            result.Messages.ShouldNotBeNull().ShouldBeEmpty();
+            result.IsFresh.ShouldBeTrue();
+        }
+        else
+        {
+            result.ShouldBe(ConversationContextReadResult.Unavailable);
+        }
+    }
+#endif
+
+    [Theory]
+    [InlineData(HttpStatusCode.ServiceUnavailable)]
+    [InlineData(HttpStatusCode.OK)]
+    public async Task A_failure_client_result_maps_to_unavailable(HttpStatusCode status)
+    {
+        ConversationError error = ConversationErrorCatalog.CreateError(
+            status == HttpStatusCode.OK ? ConversationErrorCode.CommandValidationFailed : ConversationErrorCode.TenantProjectionStale,
+            "trace-1");
         StubGetConversation(ConversationClientResult<ConversationDetailResult>.Failure(
-            new ConversationErrorResult([error]), HttpStatusCode.ServiceUnavailable));
+            new ConversationErrorResult([error]), status));
 
         ConversationContextReadResult result = await Read();
 
         result.Outcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
         result.Messages.ShouldBeNull();
+        result.MessageCount.ShouldBe(0);
+        result.IsFresh.ShouldBeFalse();
     }
 
     [Theory]

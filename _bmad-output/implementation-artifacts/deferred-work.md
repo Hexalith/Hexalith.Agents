@@ -1044,6 +1044,8 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: "spec-five-deferred-exact-context-measurement-checks.md"
   summary: Preserve the distinction between an omitted Conversations timeline and an explicitly empty timeline.
   evidence: The Conversations detail contract normalizes null or omitted Messages to an empty list before the Agents adapter receives it. The adapter derives its count from that same list, so the existing scope and freshness checks cannot distinguish omission from a valid empty timeline. Verify the distinction through the owner wire contract.
+  status: done 2026-11-23 for the client wire boundary
+  resolution: `spec-five-deferred-conversation-timeline-checks.md` requires a single explicit timeline array on full Conversations client detail responses. Omitted or null timelines produce unavailable context in the source-bound Agents reader. An explicit empty array remains valid, and bounded and content-free replies retain their handling. The wire check depends on the owner emitting an accurate array. Package publication and binding the live reader in package-mode Agents remain separate.
 
 - source_spec: "spec-five-deferred-exact-context-measurement-checks.md"
   summary: Qualify the Regeneration requester Party reference for context readers that enforce Party participation.
