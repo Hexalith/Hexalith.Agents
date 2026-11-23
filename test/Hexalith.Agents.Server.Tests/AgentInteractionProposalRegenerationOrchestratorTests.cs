@@ -147,6 +147,23 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     }
 
     [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task MissingRequesterPartyDeniesBeforeProtectedWork(string requesterPartyId)
+    {
+        StubHappy();
+
+        AgentInteractionProposalRegenerationOutcomeResult outcome = await Orchestrator.ExecuteAsync(
+            Request() with { RequesterPartyId = requesterPartyId }, CancellationToken.None);
+
+        outcome.NotRegeneratableReason.ShouldBe(AgentProposedReplyNotRegeneratableReason.NotAuthorized);
+        await _resolver.DidNotReceiveWithAnyArgs().ResolveForActorAsync(default!, default!, default!, default);
+        await _contextReader.DidNotReceiveWithAnyArgs().ReadAsync(default!, default!, default!, default!, default!, default);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+        await _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
+    }
+
+    [Theory]
     [InlineData(ProposedAgentReplyState.Pending)]
     [InlineData(ProposedAgentReplyState.Edited)]
     [InlineData(ProposedAgentReplyState.Regenerated)]
@@ -532,7 +549,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         var entry = Entry(ProviderModelStatus.Enabled, true) with
         {
             CapabilityVersion = 3,
-            ContextWindowTokenLimit = MaxOutputTokenLimit + 1,
+            ContextWindowTokenLimit = 20_000,
             TimeoutPolicy = new(600_000, 10),
         };
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
@@ -633,7 +650,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
             "invalid-timestamp" => valid with { Messages = [new(SourceConversationText, default)] },
             _ => throw new ArgumentOutOfRangeException(nameof(defect)),
         };
-        _contextReader.ReadAsync(TenantId, SourceConversationId, string.Empty, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, RequesterPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(invalid);
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
@@ -650,7 +667,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     [InlineData(false, 1)]
     [InlineData(true, -1)]
     [InlineData(true, 0)]
-    [InlineData(true, ContextWindowTokenLimit - MaxOutputTokenLimit + 1)]
+    [InlineData(true, 99_201)]
     public async Task UnavailableInvalidOrOversizeMeasurementPreventsInvocation(bool isAvailable, int count)
     {
         StubHappy();
@@ -693,7 +710,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         ProviderCatalogEntryView entry = Entry(ProviderModelStatus.Enabled, supportsTextGeneration: true) with
         {
             CapabilityVersion = 4,
-            ContextWindowTokenLimit = 800,
+            ContextWindowTokenLimit = 801,
             MaxOutputTokenLimit = 500,
         };
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
@@ -704,15 +721,16 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
             new("later", _sampleCreatedAt.AddMinutes(1)),
             new(SourceConversationText, _sampleCreatedAt),
         ];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, string.Empty, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, RequesterPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Length, true));
         string payload = emptyTimeline ? string.Empty : $"{SourceConversationText}{Environment.NewLine}later{Environment.NewLine}";
         _tokenMeasurer.MeasurePayloadAsync(payload, ProviderId, ModelId, 4, Arg.Any<CancellationToken>())
-            .Returns(new ConversationContextTokenMeasurement(true, emptyTimeline ? 0 : 300));
+            .Returns(new ConversationContextTokenMeasurement(true, emptyTimeline ? 0 : 220));
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.Regenerated);
+        await _contextReader.Received(1).ReadAsync(TenantId, SourceConversationId, RequesterPartyId, ActorUserId, "corr-1", CancellationToken.None);
         await _tokenMeasurer.Received(1).MeasurePayloadAsync(payload, ProviderId, ModelId, 4, CancellationToken.None);
         await _generationProvider.Received(1).GenerateAsync(
             Arg.Is<AgentGenerationProviderRequest>(request => request.ContextPayload == payload && request.ProviderCapabilityVersion == 4 && request.MaxOutputTokenLimit == 500),
@@ -744,7 +762,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     {
         StubHappy();
         CaptureDispatch();
-        _contextReader.ReadAsync(TenantId, SourceConversationId, string.Empty, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+        _contextReader.ReadAsync(TenantId, SourceConversationId, RequesterPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .ThrowsAsync(new TaskCanceledException(SourceConversationText));
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);

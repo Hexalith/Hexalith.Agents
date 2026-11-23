@@ -501,7 +501,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         var entry = Entry(ProviderModelStatus.Enabled, true) with
         {
             CapabilityVersion = 3,
-            ContextWindowTokenLimit = MaxOutputTokenLimit + 1,
+            ContextWindowTokenLimit = 20_000,
             TimeoutPolicy = new(600_000, 10),
         };
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
@@ -634,7 +634,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
     [InlineData(false, 1)]
     [InlineData(true, -1)]
     [InlineData(true, 0)]
-    [InlineData(true, ContextWindowTokenLimit - MaxOutputTokenLimit + 1)]
+    [InlineData(true, 99_201)]
     public async Task UnavailableInvalidOrOversizeMeasurementPreventsInvocation(bool isAvailable, int count)
     {
         StubHappy();
@@ -677,7 +677,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         ProviderCatalogEntryView entry = Entry(ProviderModelStatus.Enabled, supportsTextGeneration: true) with
         {
             CapabilityVersion = 4,
-            ContextWindowTokenLimit = 800,
+            ContextWindowTokenLimit = 801,
             MaxOutputTokenLimit = 500,
         };
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
@@ -692,7 +692,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Length, true));
         string payload = emptyTimeline ? string.Empty : $"{SourceConversationText}{Environment.NewLine}later{Environment.NewLine}";
         _tokenMeasurer.MeasurePayloadAsync(payload, ProviderId, ModelId, 4, Arg.Any<CancellationToken>())
-            .Returns(new ConversationContextTokenMeasurement(true, emptyTimeline ? 0 : 300));
+            .Returns(new ConversationContextTokenMeasurement(true, emptyTimeline ? 0 : 220));
 
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 

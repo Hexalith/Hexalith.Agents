@@ -1,5 +1,6 @@
 using System.Text;
 
+using Hexalith.Agents.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.ProviderCatalog;
 using Hexalith.Agents.Server.Ports;
@@ -61,13 +62,14 @@ internal static class GenerationContext
         }
     }
 
-    /// <summary>Checks that the exact payload fits after reserving the admitted model's output allowance.</summary>
+    /// <summary>Checks that the exact payload fits after reserving the output allowance and safety margin.</summary>
     internal static async Task<bool> FitsAsync(
         IConversationContextTokenMeasurer measurer, string payload, ProviderCatalogEntryView entry, CancellationToken ct)
     {
         ConversationContextTokenMeasurement measurement = await MeasureAsync(measurer, payload, entry, ct).ConfigureAwait(false);
-        return measurement.IsAvailable
-            && measurement.TokenCount <= entry.ContextWindowTokenLimit - entry.MaxOutputTokenLimit;
+        int availableTokens = AgentInteractionContextPolicy.CalculateDefaultBudget(
+            entry.ContextWindowTokenLimit, entry.MaxOutputTokenLimit).AvailableTokens;
+        return measurement.IsAvailable && measurement.TokenCount <= availableTokens;
     }
 
     /// <summary>Measures the exact serialized payload against the admitted catalog entry.</summary>

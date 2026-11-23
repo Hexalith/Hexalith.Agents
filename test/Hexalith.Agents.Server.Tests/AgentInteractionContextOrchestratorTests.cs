@@ -32,7 +32,7 @@ using Shouldly;
 /// unhandled exception, no raw error text); that client-supplied measurement is discarded and reserved extensions are
 /// stripped; that NO provider adapter / Conversations post / proposal is on the path; that the dispatched command and
 /// returned result carry NO raw message text (AD-14); and that all-deferred defaults fail closed to
-/// <c>ContextBlocked(ContextUnavailable)</c>.
+/// <c>ContextBlocked(ContextReadUnavailable)</c>.
 /// </summary>
 public sealed class AgentInteractionContextOrchestratorTests
 {
@@ -67,7 +67,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     [Fact]
     public async Task Loaded_and_fits_dispatches_a_loaded_measurement_and_returns_context_ready()
     {
-        StubLoaded(tokenCount: 1_000);
+        StubLoaded(tokenCount: 99_200);
         CaptureDispatch();
 
         AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
@@ -82,7 +82,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         AgentInteractionContextMeasurement measurement = DispatchedMeasurement();
         measurement.LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Loaded);
-        measurement.FullContextTokenCount.ShouldBe(1_000);
+        measurement.FullContextTokenCount.ShouldBe(99_200);
         measurement.ContextWindowTokenLimit.ShouldBe(ContextWindowTokenLimit);
         measurement.ReservedOutputTokenCount.ShouldBe(MaxOutputTokenLimit);
         measurement.ApprovedBoundedBehavior.ShouldBeNull(); // V1 "full-conversation-v1" approves no bounded behavior
@@ -93,13 +93,13 @@ public sealed class AgentInteractionContextOrchestratorTests
     [Fact]
     public async Task Oversized_full_context_returns_context_blocked()
     {
-        StubLoaded(tokenCount: 500_000); // > 112000 available, no approved bounded behavior
+        StubLoaded(tokenCount: 99_201);
         CaptureDispatch();
 
         AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
-        DispatchedMeasurement().FullContextTokenCount.ShouldBe(500_000);
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(99_201);
     }
 
     // ===== Stale / unauthorized / unavailable reads (AC1, AC3) =====
@@ -118,9 +118,10 @@ public sealed class AgentInteractionContextOrchestratorTests
     }
 
     [Theory]
-    [InlineData(AgentInteractionContextLoadOutcome.Unauthorized)]
-    [InlineData(AgentInteractionContextLoadOutcome.Unavailable)]
-    public async Task Hidden_or_unavailable_read_returns_context_blocked_context_unavailable(AgentInteractionContextLoadOutcome loadOutcome)
+    [InlineData(AgentInteractionContextLoadOutcome.Unauthorized, AgentInteractionContextBlockReason.ContextUnavailable)]
+    [InlineData(AgentInteractionContextLoadOutcome.Unavailable, AgentInteractionContextBlockReason.ContextReadUnavailable)]
+    public async Task FailedReadsRecordTheSafeReason(
+        AgentInteractionContextLoadOutcome loadOutcome, AgentInteractionContextBlockReason reason)
     {
         _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(loadOutcome, null, 0, false));
@@ -129,7 +130,17 @@ public sealed class AgentInteractionContextOrchestratorTests
         AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
-        DispatchedMeasurement().LoadOutcome.ShouldBe(loadOutcome);
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
+        var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(dispatched.Payload).ShouldNotBeNull();
+        command.Measurement.LoadOutcome.ShouldBe(loadOutcome);
+
+        AgentInteractionState state = AuthorizedState();
+        DomainResult decision = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
+        state.Apply(decision.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>());
+        var view = AgentInteractionAuditInspection.GetContextEvidence(state, isAuthorized: true).Evidence.ShouldNotBeNull();
+        view.BlockReason.ShouldBe(reason);
+        view.Evidence.ShouldNotBeNull().Mode.ShouldBe(AgentInteractionContextMode.Blocked);
+        view.Evidence.AvailableContextTokenBudget.ShouldBeNull();
     }
 
     // ===== Budget unobtainable / invalid → ContextBlocked(ModelBudgetUnavailable) (AC2, AC3) =====
@@ -359,19 +370,29 @@ public sealed class AgentInteractionContextOrchestratorTests
         AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
         var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(dispatched.Payload)!;
 
-        var state = new AgentInteractionState();
-        state.Apply(new InteractionRequested(
-            AgentInteractionId, "hexa", CallerPartyId, SourceConversationId, SampleSnapshot(), "prompt", "idem"));
-        state.Apply(new AgentInteractionAuthorized(AgentInteractionId));
+        AgentInteractionState state = AuthorizedState();
         DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
 
         AgentInteractionContextBlocked blocked = result.Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
         blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+        state.Apply(blocked);
+        state.ContextEvidence.ShouldNotBeNull().Mode.ShouldBe(AgentInteractionContextMode.Blocked);
+        state.ContextEvidence.SafetyMarginTokenCount.ShouldBe(12_800);
+        state.ContextEvidence.AvailableContextTokenBudget.ShouldBe(99_200);
         // The orchestrator's returned status and the aggregate's recorded decision agree (shared policy — no drift).
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
     }
 
-    // ===== All-deferred defaults fail closed to ContextBlocked(ContextUnavailable) (AC1; FR-21) =====
+    private static AgentInteractionState AuthorizedState()
+    {
+        var state = new AgentInteractionState();
+        state.Apply(new InteractionRequested(
+            AgentInteractionId, "hexa", CallerPartyId, SourceConversationId, SampleSnapshot(), "prompt", "idem"));
+        state.Apply(new AgentInteractionAuthorized(AgentInteractionId));
+        return state;
+    }
+
+    // ===== All-deferred defaults fail closed to ContextBlocked(ContextReadUnavailable) (AC1; FR-21) =====
 
     [Fact]
     public async Task All_deferred_defaults_fail_closed_to_context_blocked()

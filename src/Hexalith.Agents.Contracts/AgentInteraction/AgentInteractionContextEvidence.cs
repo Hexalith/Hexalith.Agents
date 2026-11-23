@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction;
 
 /// <summary>
@@ -14,7 +16,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// failure, while on an oversized block the <see cref="FullContextTokenCount"/> + budget are recorded so audit shows
 /// the overflow.
 /// </remarks>
-/// <param name="Mode">How the satisfying context was assembled (<see cref="AgentInteractionContextMode.Unknown"/> on a blocked record).</param>
+/// <param name="Mode">How the context check resolved, including <see cref="AgentInteractionContextMode.Blocked"/> on new refusals.</param>
 /// <param name="FullContextTokenCount">The measured token count of the full Source Conversation.</param>
 /// <param name="UsedContextTokenCount">The token count actually used (equals <see cref="FullContextTokenCount"/> for full; the bounded limit for bounded; <c>0</c> when blocked).</param>
 /// <param name="MessageCount">The visible message count of the loaded timeline.</param>
@@ -32,4 +34,17 @@ public record AgentInteractionContextEvidence(
     int ContextWindowTokenLimit,
     int ProviderCapabilityVersion,
     string ContextPolicyReference,
-    string? BoundedBehaviorReference);
+    string? BoundedBehaviorReference)
+{
+    /// <summary>Gets the percentage of the context window reserved as a safety margin, when evaluated.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SafetyMarginPercent { get; init; }
+
+    /// <summary>Gets the window safety margin in whole tokens, when evaluated.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SafetyMarginTokenCount { get; init; }
+
+    /// <summary>Gets the remaining token budget after reserves, which can be negative when the reserves exceed the window.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? AvailableContextTokenBudget { get; init; }
+}

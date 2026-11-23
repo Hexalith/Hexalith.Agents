@@ -310,6 +310,7 @@
   <data name="Agents.CallStatus.Reason.PostingFailed" xml:space="preserve"><value>The response could not be posted to the Conversation.</value></data>
   <data name="Agents.CallStatus.Reason.Unknown" xml:space="preserve"><value>The call could not be completed for an unrecognized reason.</value></data>
   <data name="Agents.CallStatus.Reason.ContextUnavailable" xml:space="preserve"><value>The Conversation context is unavailable.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextReadUnavailable" xml:space="preserve"><value>The Conversation could not be read.</value></data>
   <data name="Agents.CallStatus.Reason.ContextNotFresh" xml:space="preserve"><value>The Conversation context could not be read fresh enough.</value></data>
   <data name="Agents.CallStatus.Reason.ExceedsModelBudget" xml:space="preserve"><value>The context exceeds the model budget.</value></data>
   <data name="Agents.CallStatus.Reason.ModelBudgetUnavailable" xml:space="preserve"><value>The model budget could not be determined.</value></data>

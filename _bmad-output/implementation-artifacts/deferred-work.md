@@ -1047,3 +1047,12 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: "spec-five-deferred-exact-context-measurement-checks.md"
   summary: Qualify the Regeneration requester Party reference for context readers that enforce Party participation.
   evidence: The regeneration read has passed an empty Party reference since before this change. The current Conversations adapter authorizes by ActorUserId and does not use the Party argument. A custom reader using the optional participation cross-check can refuse the empty value. Establish the requester's authoritative Party binding and verify an enrolled reader before changing that behavior.
+  local_evidence: `spec-five-deferred-context-budget-items.md` passes the authorized request's Party and actor to the context reader after approver resolution. Missing Party or actor refuses before the resolver or reader. A participation-aware reader still needs owner qualification in the enrolled host.
+
+- source_spec: `spec-five-deferred-context-budget-items.md`
+  summary: Preserve the safe authorized-read outcome on fresh generation and regeneration attempts.
+  evidence: Both invocation paths discard the typed load outcome and record `InvalidContext`. Attempt evidence can retain the safe load classification while preserving the operation's terminal status.
+
+- source_spec: `spec-five-deferred-context-budget-items.md`
+  summary: Record the final evaluated context budget on the prepared generation or regeneration attempt.
+  evidence: The fresh invocation check consumes the current catalog and timeline independently of readiness. It returns a fit verdict without carrying measured terms into durable attempt evidence, including when the current context is oversized.

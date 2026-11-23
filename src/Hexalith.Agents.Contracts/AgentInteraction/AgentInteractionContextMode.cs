@@ -12,8 +12,7 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// </summary>
 /// <remarks>
 /// Carries no raw content (AD-14) — it is a coarse classification on the safe context evidence. Serialized by name so
-/// an absent value never resolves to a concrete mode; <see cref="Unknown"/> (ordinal 0) is the sentinel (used for a
-/// context-blocked record, which has no usable mode).
+/// an absent value never resolves to a concrete mode. <see cref="Unknown"/> (ordinal 0) is the sentinel.
 /// </remarks>
 [JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionContextMode>))]
 public enum AgentInteractionContextMode
@@ -26,4 +25,7 @@ public enum AgentInteractionContextMode
 
     /// <summary>An approved bounded-context behavior was applied; its reference and bounds are recorded as evidence (AC4).</summary>
     Bounded,
+
+    /// <summary>The context check refused to provide usable Conversation context.</summary>
+    Blocked,
 }

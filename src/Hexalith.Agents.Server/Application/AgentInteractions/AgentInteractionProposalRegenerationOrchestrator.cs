@@ -197,7 +197,9 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
     // Unavailable. A genuine cancellation propagates (the catch deliberately excludes OperationCanceledException).
     private async Task<ApproverPolicyValidationStatus> ResolveAuthorizationAsync(AgentInteractionProposalRegenerationRequest request, CancellationToken ct)
     {
-        if (request.ApproverPolicy is not { Sources.Count: > 0 } policy)
+        if (request.ApproverPolicy is not { Sources.Count: > 0 } policy
+            || string.IsNullOrWhiteSpace(request.RequesterPartyId)
+            || string.IsNullOrWhiteSpace(request.ActorUserId))
         {
             return ApproverPolicyValidationStatus.Incomplete;
         }
@@ -228,7 +230,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
     {
         // (1) Re-read the SAME Source Conversation content fresh (the proposal is linked to it; AD-6). Fail closed → InvalidContext.
         (string? payload, _, _) = await GenerationContext.ReadPayloadAsync(
-            _contextReader, request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
+            _contextReader, request.TenantId, request.SourceConversationId, request.RequesterPartyId, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
         if (payload is null)
         {
             return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId);

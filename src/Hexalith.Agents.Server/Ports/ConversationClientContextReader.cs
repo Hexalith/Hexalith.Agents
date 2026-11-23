@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -60,6 +61,11 @@ public sealed class ConversationClientContextReader : IConversationContextReader
                 new ConversationId(sourceConversationId));
 
             ConversationClientResult<ConversationDetailResult> result = await _client.GetConversationAsync(query, ct).ConfigureAwait(false);
+
+            if (result?.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                return new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Unauthorized, null, 0, false);
+            }
 
             return result is { IsSuccess: true, Value: { } detail }
                 ? Map(detail, query)

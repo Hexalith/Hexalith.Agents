@@ -24,6 +24,8 @@ namespace Hexalith.Agents.Tests;
 /// </summary>
 public sealed class AgentInteractionContextAggregateTests
 {
+    private const int DefaultAvailableContextBudget = 99_200;
+
     // ===== Ready: full context fits (AC2) =====
 
     [Fact]
@@ -41,6 +43,9 @@ public sealed class AgentInteractionContextAggregateTests
         ready.Evidence.BoundedBehaviorReference.ShouldBeNull();
         ready.Evidence.ContextWindowTokenLimit.ShouldBe(ContextWindowTokenLimit);
         ready.Evidence.ReservedOutputTokenCount.ShouldBe(ReservedOutputTokenCount);
+        ready.Evidence.SafetyMarginPercent.ShouldBe(10);
+        ready.Evidence.SafetyMarginTokenCount.ShouldBe(12_800);
+        ready.Evidence.AvailableContextTokenBudget.ShouldBe(DefaultAvailableContextBudget);
         ready.Evidence.ContextPolicyReference.ShouldBe(AgentInteractionSnapshot.DefaultContextPolicyReference);
 
         ApplyAll(state, result);
@@ -80,6 +85,8 @@ public sealed class AgentInteractionContextAggregateTests
 
         AgentInteractionContextBlocked blocked = result.Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
         blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+        blocked.Evidence.Mode.ShouldBe(AgentInteractionContextMode.Blocked);
+        blocked.Evidence.AvailableContextTokenBudget.ShouldBe(DefaultAvailableContextBudget);
         // Evidence records the overflow so audit shows WHY (FullContextTokenCount vs available budget).
         blocked.Evidence.FullContextTokenCount.ShouldBe(200_000);
         blocked.Evidence.ContextWindowTokenLimit.ShouldBe(ContextWindowTokenLimit);
@@ -91,6 +98,7 @@ public sealed class AgentInteractionContextAggregateTests
         ApplyAll(state, result);
         state.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         state.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+        state.ContextEvidence.ShouldNotBeNull().Mode.ShouldBe(AgentInteractionContextMode.Blocked);
     }
 
     [Fact]
@@ -127,18 +135,22 @@ public sealed class AgentInteractionContextAggregateTests
     }
 
     [Theory]
-    [InlineData(AgentInteractionContextLoadOutcome.Unauthorized)]
-    [InlineData(AgentInteractionContextLoadOutcome.Unavailable)]
-    [InlineData(AgentInteractionContextLoadOutcome.Unknown)]
-    public void Unauthorized_or_unavailable_load_blocks_with_context_unavailable(AgentInteractionContextLoadOutcome loadOutcome)
+    [InlineData(AgentInteractionContextLoadOutcome.Unauthorized, AgentInteractionContextBlockReason.ContextUnavailable)]
+    [InlineData(AgentInteractionContextLoadOutcome.Unavailable, AgentInteractionContextBlockReason.ContextReadUnavailable)]
+    [InlineData(AgentInteractionContextLoadOutcome.Unknown, AgentInteractionContextBlockReason.ContextUnavailable)]
+    public void FailedLoadRecordsTheSafeReason(AgentInteractionContextLoadOutcome loadOutcome, AgentInteractionContextBlockReason reason)
     {
         AgentInteractionState state = StateAuthorized();
 
         DomainResult result = Context(Measurement(loadOutcome: loadOutcome), state);
 
         AgentInteractionContextBlocked blocked = result.Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
-        blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ContextUnavailable);
+        blocked.Reason.ShouldBe(reason);
+        blocked.Evidence.Mode.ShouldBe(AgentInteractionContextMode.Blocked);
         blocked.Evidence.FullContextTokenCount.ShouldBe(0);
+        blocked.Evidence.SafetyMarginPercent.ShouldBeNull();
+        blocked.Evidence.SafetyMarginTokenCount.ShouldBeNull();
+        blocked.Evidence.AvailableContextTokenBudget.ShouldBeNull();
     }
 
     // ===== Block: untrustworthy budget (AC2, AC3) =====
@@ -207,15 +219,14 @@ public sealed class AgentInteractionContextAggregateTests
     [Fact]
     public void Full_context_exactly_at_the_available_budget_records_context_ready_full()
     {
-        // The fit rule is FullContextTokenCount <= (window - reserved). At the EXACT boundary the full context must
-        // still fit (inclusive). available = 128000 - 16000 = 112000.
+        // The full context fits at the inclusive boundary of 128000 - 16000 - 12800 tokens.
         AgentInteractionState state = StateAuthorized();
 
-        DomainResult result = Context(Measurement(fullContextTokenCount: ContextWindowTokenLimit - ReservedOutputTokenCount), state);
+        DomainResult result = Context(Measurement(fullContextTokenCount: DefaultAvailableContextBudget), state);
 
         AgentInteractionContextReady ready = result.Events[0].ShouldBeOfType<AgentInteractionContextReady>();
         ready.Evidence.Mode.ShouldBe(AgentInteractionContextMode.Full);
-        ready.Evidence.UsedContextTokenCount.ShouldBe(112_000);
+        ready.Evidence.UsedContextTokenCount.ShouldBe(DefaultAvailableContextBudget);
         result.Events.OfType<AgentInteractionContextBlocked>().ShouldBeEmpty();
     }
 
@@ -225,11 +236,23 @@ public sealed class AgentInteractionContextAggregateTests
         // One token past the boundary with no approved bounded behavior must block — never quietly trim to fit (AC3).
         AgentInteractionState state = StateAuthorized();
 
-        DomainResult result = Context(Measurement(fullContextTokenCount: ContextWindowTokenLimit - ReservedOutputTokenCount + 1), state);
+        DomainResult result = Context(Measurement(fullContextTokenCount: DefaultAvailableContextBudget + 1), state);
 
         AgentInteractionContextBlocked blocked = result.Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
         blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
         result.Events.OfType<AgentInteractionContextReady>().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void MarginRoundsUpEvenWhenTheReservesExceedTheWindow()
+    {
+        DomainResult result = Context(Measurement(fullContextTokenCount: 0, messageCount: 0,
+            contextWindowTokenLimit: 11, reservedOutputTokenCount: 10), StateAuthorized());
+
+        AgentInteractionContextBlocked blocked = result.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>();
+        blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+        blocked.Evidence.SafetyMarginTokenCount.ShouldBe(2);
+        blocked.Evidence.AvailableContextTokenBudget.ShouldBe(-1);
     }
 
     // ===== Bounded behavior boundaries (AC4 — never silent) =====
@@ -255,11 +278,11 @@ public sealed class AgentInteractionContextAggregateTests
         // recorded as evidence (AC4).
         AgentInteractionState state = StateAuthorized();
 
-        DomainResult result = Context(BoundedApprovedMeasurement(boundedLimit: ContextWindowTokenLimit - ReservedOutputTokenCount), state);
+        DomainResult result = Context(BoundedApprovedMeasurement(boundedLimit: DefaultAvailableContextBudget), state);
 
         AgentInteractionContextReady ready = result.Events[0].ShouldBeOfType<AgentInteractionContextReady>();
         ready.Evidence.Mode.ShouldBe(AgentInteractionContextMode.Bounded);
-        ready.Evidence.UsedContextTokenCount.ShouldBe(112_000); // Min(200000 full, 112000 bounded) — the recorded bounds
+        ready.Evidence.UsedContextTokenCount.ShouldBe(DefaultAvailableContextBudget);
         ready.Evidence.BoundedBehaviorReference.ShouldBe("bounded-conversation-test-v1");
     }
 

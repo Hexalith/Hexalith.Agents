@@ -116,10 +116,49 @@ public sealed class AgentInteractionContextContractsTests
     [Fact]
     public void Context_blocked_event_round_trips_with_its_reason_and_evidence()
     {
-        var blocked = new AgentInteractionContextBlocked("interaction-001", AgentInteractionContextBlockReason.ExceedsModelBudget, FullEvidence);
+        var evidence = FullEvidence with
+        {
+            Mode = AgentInteractionContextMode.Blocked,
+            UsedContextTokenCount = 0,
+            SafetyMarginPercent = 10,
+            SafetyMarginTokenCount = 12_800,
+            AvailableContextTokenBudget = 99_200,
+        };
+        var blocked = new AgentInteractionContextBlocked("interaction-001", AgentInteractionContextBlockReason.ExceedsModelBudget, evidence);
         AgentInteractionContextBlocked roundTripped = RoundTrip(blocked);
         roundTripped.Reason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
-        roundTripped.Evidence.ShouldBe(FullEvidence);
+        roundTripped.Evidence.ShouldBe(evidence);
+    }
+
+    [Fact]
+    public void HistoricalBlockedEvidenceKeepsItsUnknownModeAndHasNoMarginTerms()
+    {
+        const string historicalJson = """
+            {
+              "AgentInteractionId": "interaction-001",
+              "Reason": "ContextUnavailable",
+              "Evidence": {
+                "Mode": "Unknown",
+                "FullContextTokenCount": 0,
+                "UsedContextTokenCount": 0,
+                "MessageCount": 0,
+                "ReservedOutputTokenCount": 0,
+                "ContextWindowTokenLimit": 0,
+                "ProviderCapabilityVersion": 0,
+                "ContextPolicyReference": "full-conversation-v1",
+                "BoundedBehaviorReference": null
+              }
+            }
+            """;
+        AgentInteractionContextBlocked historical = JsonSerializer.Deserialize<AgentInteractionContextBlocked>(historicalJson).ShouldNotBeNull();
+
+        historical.Reason.ShouldBe(AgentInteractionContextBlockReason.ContextUnavailable);
+        historical.Evidence.Mode.ShouldBe(AgentInteractionContextMode.Unknown);
+        string json = JsonSerializer.Serialize(historical);
+        json.ShouldNotContain(nameof(AgentInteractionContextEvidence.SafetyMarginPercent));
+        json.ShouldNotContain(nameof(AgentInteractionContextEvidence.SafetyMarginTokenCount));
+        json.ShouldNotContain(nameof(AgentInteractionContextEvidence.AvailableContextTokenBudget));
+        JsonSerializer.Deserialize<AgentInteractionContextBlocked>(json).ShouldBe(historical);
     }
 
     [Fact]
@@ -163,6 +202,8 @@ public sealed class AgentInteractionContextContractsTests
     public void Context_mode_serializes_by_name_and_is_unknown_by_default()
     {
         JsonSerializer.Serialize(AgentInteractionContextMode.Bounded).ShouldBe("\"Bounded\"");
+        JsonSerializer.Serialize(AgentInteractionContextMode.Blocked).ShouldBe("\"Blocked\"");
+        JsonSerializer.Serialize(AgentInteractionContextBlockReason.ContextReadUnavailable).ShouldBe("\"ContextReadUnavailable\"");
         default(AgentInteractionContextMode).ShouldBe(AgentInteractionContextMode.Unknown);
         JsonSerializer.Deserialize<AgentInteractionContextMode>("\"Unknown\"").ShouldBe(AgentInteractionContextMode.Unknown);
     }

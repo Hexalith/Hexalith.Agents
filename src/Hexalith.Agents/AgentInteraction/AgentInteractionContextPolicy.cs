@@ -21,6 +21,8 @@ namespace Hexalith.Agents.AgentInteraction;
 /// </remarks>
 internal static class AgentInteractionContextPolicy
 {
+    private const int DefaultSafetyMarginPercent = 10;
+
     /// <summary>
     /// Evaluates the supplied measurement into the durable context outcome event (AC2, AC3, AC4). Within bounds →
     /// <see cref="AgentInteractionContextReady"/> (full or bounded); otherwise <see cref="AgentInteractionContextBlocked"/>
@@ -50,6 +52,13 @@ internal static class AgentInteractionContextPolicy
     internal static AgentInteractionStatus Decide(AgentInteractionContextMeasurement measurement, int capabilityFloor)
         => Compute(measurement, capabilityFloor).Status;
 
+    /// <summary>Computes the current payload budget, rounding the default safety margin up to a whole token.</summary>
+    internal static (int MarginTokens, int AvailableTokens) CalculateDefaultBudget(int windowTokens, int reservedOutputTokens)
+    {
+        int marginTokens = (int)(((long)windowTokens * DefaultSafetyMarginPercent + 99) / 100);
+        return (marginTokens, windowTokens - reservedOutputTokens - marginTokens);
+    }
+
     // The deterministic budget decision (AC2/AC3/AC4 — the "Context Budget Rules" table). Evaluated in order:
     // (1) load failure → block; (2) untrustworthy budget → block; (3..4) fits → full; (5) approved bounded fits →
     // bounded; (6) oversized with no approved bounded behavior → block (never a silent truncation).
@@ -60,9 +69,12 @@ internal static class AgentInteractionContextPolicy
         // (1) The Conversations read did not load authorized + fresh enough → block; numerics are zeroed (AC1/AC3).
         if (m.LoadOutcome != AgentInteractionContextLoadOutcome.Loaded)
         {
-            AgentInteractionContextBlockReason reason = m.LoadOutcome == AgentInteractionContextLoadOutcome.Stale
-                ? AgentInteractionContextBlockReason.ContextNotFresh
-                : AgentInteractionContextBlockReason.ContextUnavailable; // Unauthorized / Unavailable / Unknown
+            AgentInteractionContextBlockReason reason = m.LoadOutcome switch
+            {
+                AgentInteractionContextLoadOutcome.Stale => AgentInteractionContextBlockReason.ContextNotFresh,
+                AgentInteractionContextLoadOutcome.Unavailable => AgentInteractionContextBlockReason.ContextReadUnavailable,
+                _ => AgentInteractionContextBlockReason.ContextUnavailable,
+            };
             return Blocked(reason, ZeroedEvidence(m));
         }
 
@@ -86,13 +98,27 @@ internal static class AgentInteractionContextPolicy
             return Blocked(AgentInteractionContextBlockReason.ModelBudgetUnavailable, evidence);
         }
 
-        // (3) The space available for context after reserving the configured output tokens (AC2).
-        int availableContextBudget = m.ContextWindowTokenLimit - m.ReservedOutputTokenCount;
+        (int marginTokens, int availableContextBudget) = CalculateDefaultBudget(m.ContextWindowTokenLimit, m.ReservedOutputTokenCount);
+        AgentInteractionContextEvidence measured = new(
+            AgentInteractionContextMode.Blocked,
+            m.FullContextTokenCount,
+            UsedContextTokenCount: 0,
+            m.MessageCount,
+            m.ReservedOutputTokenCount,
+            m.ContextWindowTokenLimit,
+            m.ProviderCapabilityVersion,
+            m.ContextPolicyReference,
+            BoundedBehaviorReference: null)
+        {
+            SafetyMarginPercent = DefaultSafetyMarginPercent,
+            SafetyMarginTokenCount = marginTokens,
+            AvailableContextTokenBudget = availableContextBudget,
+        };
 
         // (4) The full Source Conversation fits → full context (AC2).
         if (m.FullContextTokenCount <= availableContextBudget)
         {
-            return Ready(MeasuredEvidence(m, AgentInteractionContextMode.Full, m.FullContextTokenCount));
+            return Ready(measured with { Mode = AgentInteractionContextMode.Full, UsedContextTokenCount = m.FullContextTokenCount });
         }
 
         // (5) Oversized, but an approved bounded behavior fits → bounded context with its reference recorded (AC4).
@@ -100,35 +126,24 @@ internal static class AgentInteractionContextPolicy
             && bounded.BoundedContextTokenLimit > 0
             && bounded.BoundedContextTokenLimit <= availableContextBudget)
         {
-            int used = Math.Min(m.FullContextTokenCount, bounded.BoundedContextTokenLimit);
-            AgentInteractionContextEvidence evidence = MeasuredEvidence(m, AgentInteractionContextMode.Bounded, used)
-                with { BoundedBehaviorReference = bounded.BehaviorReference };
-            return Ready(evidence);
+            return Ready(measured with
+            {
+                Mode = AgentInteractionContextMode.Bounded,
+                UsedContextTokenCount = bounded.BoundedContextTokenLimit,
+                BoundedBehaviorReference = bounded.BehaviorReference,
+            });
         }
 
         // (6) Oversized with no approved bounded behavior → block (AC3 — never a silent truncation). Evidence records
         // the overflow (FullContextTokenCount + budget) so audit shows WHY.
-        return Blocked(AgentInteractionContextBlockReason.ExceedsModelBudget, MeasuredEvidence(m, AgentInteractionContextMode.Unknown, 0));
+        return Blocked(AgentInteractionContextBlockReason.ExceedsModelBudget, measured);
     }
-
-    // Evidence carrying the measured numerics/budget/policy (for a within-budget decision or a budget/overflow block).
-    private static AgentInteractionContextEvidence MeasuredEvidence(AgentInteractionContextMeasurement m, AgentInteractionContextMode mode, int usedTokens)
-        => new(
-            mode,
-            m.FullContextTokenCount,
-            usedTokens,
-            m.MessageCount,
-            m.ReservedOutputTokenCount,
-            m.ContextWindowTokenLimit,
-            m.ProviderCapabilityVersion,
-            m.ContextPolicyReference,
-            BoundedBehaviorReference: null);
 
     // Evidence for a blocked-before-load record: numerics are 0/Unknown (the read failed before measurement), but the
     // policy reference is retained so audit still shows which policy was in force.
     private static AgentInteractionContextEvidence ZeroedEvidence(AgentInteractionContextMeasurement m)
         => new(
-            AgentInteractionContextMode.Unknown,
+            AgentInteractionContextMode.Blocked,
             FullContextTokenCount: 0,
             UsedContextTokenCount: 0,
             MessageCount: 0,

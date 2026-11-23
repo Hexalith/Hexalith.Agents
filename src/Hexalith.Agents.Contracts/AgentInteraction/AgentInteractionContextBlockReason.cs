@@ -10,9 +10,8 @@ namespace Hexalith.Agents.Contracts.AgentInteraction;
 /// administrator can distinguish context-policy failures (FR-25) without any raw content.
 /// </summary>
 /// <remarks>
-/// <see cref="ContextUnavailable"/> covers both the unauthorized and the unavailable load outcomes (coarse, so no
-/// cross-tenant disclosure — AC1/AD-12). Serialized by name so an absent value never resolves to a concrete reason;
-/// <see cref="Unknown"/> (ordinal 0) is the fail-safe sentinel.
+/// The reasons carry no details about a Conversation or its contents. <see cref="Unknown"/> (ordinal 0)
+/// is the sentinel for absent or unrecognized values.
 /// </remarks>
 [JsonConverter(typeof(UnknownFallbackEnumConverter<AgentInteractionContextBlockReason>))]
 public enum AgentInteractionContextBlockReason
@@ -20,7 +19,7 @@ public enum AgentInteractionContextBlockReason
     /// <summary>Not-a-reason sentinel — an absent/unrecognized classification never resolves to a concrete one.</summary>
     Unknown = 0,
 
-    /// <summary>The Source Conversation could not be loaded (unauthorized or unavailable) — coarse, no cross-tenant disclosure (AC1).</summary>
+    /// <summary>Access was denied or no more specific load outcome was established. Also used by historical records for read failures.</summary>
     ContextUnavailable,
 
     /// <summary>The Source Conversation could not be loaded fresh enough (stale) — context cannot be trusted (AC3).</summary>
@@ -31,4 +30,7 @@ public enum AgentInteractionContextBlockReason
 
     /// <summary>The Provider/model context budget could not be determined or trusted (catalog entry missing/disabled/not text-capable, or invalid limits) — fail closed.</summary>
     ModelBudgetUnavailable,
+
+    /// <summary>The Source Conversation read failed or returned unusable data.</summary>
+    ContextReadUnavailable,
 }

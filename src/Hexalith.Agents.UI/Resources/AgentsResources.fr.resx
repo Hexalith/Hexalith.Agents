@@ -310,6 +310,7 @@
   <data name="Agents.CallStatus.Reason.PostingFailed" xml:space="preserve"><value>La réponse n'a pas pu être publiée dans la conversation.</value></data>
   <data name="Agents.CallStatus.Reason.Unknown" xml:space="preserve"><value>L'appel n'a pas pu aboutir pour une raison non reconnue.</value></data>
   <data name="Agents.CallStatus.Reason.ContextUnavailable" xml:space="preserve"><value>Le contexte de la conversation est indisponible.</value></data>
+  <data name="Agents.CallStatus.Reason.ContextReadUnavailable" xml:space="preserve"><value>La conversation n'a pas pu être lue.</value></data>
   <data name="Agents.CallStatus.Reason.ContextNotFresh" xml:space="preserve"><value>Le contexte de la conversation n'a pas pu être lu de façon suffisamment récente.</value></data>
   <data name="Agents.CallStatus.Reason.ExceedsModelBudget" xml:space="preserve"><value>Le contexte dépasse le budget du modèle.</value></data>
   <data name="Agents.CallStatus.Reason.ModelBudgetUnavailable" xml:space="preserve"><value>Le budget du modèle n'a pas pu être déterminé.</value></data>

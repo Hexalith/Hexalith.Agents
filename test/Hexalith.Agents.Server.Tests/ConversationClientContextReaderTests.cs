@@ -200,6 +200,26 @@ public sealed class ConversationClientContextReaderTests
         result.Messages.ShouldBeNull();
     }
 
+    [Theory]
+    [InlineData(HttpStatusCode.Unauthorized)]
+    [InlineData(HttpStatusCode.Forbidden)]
+    public async Task HttpAccessRefusalIsDistinguishedFromAReadFailure(HttpStatusCode status)
+    {
+        var error = new ConversationError(
+            SchemaVersion.Current,
+            ConversationErrorCode.CommandValidationFailed,
+            ConversationErrorCategory.Validation,
+            IsRetryable: false,
+            CorrelationId: "trace-1");
+        StubGetConversation(ConversationClientResult<ConversationDetailResult>.Failure(new ConversationErrorResult([error]), status));
+
+        ConversationContextReadResult result = await Read();
+
+        result.Outcome.ShouldBe(AgentInteractionContextLoadOutcome.Unauthorized);
+        result.Messages.ShouldBeNull();
+        result.MessageCount.ShouldBe(0);
+    }
+
     [Fact]
     public async Task A_thrown_client_exception_fails_closed_to_unavailable_without_raw_error()
     {
