@@ -227,8 +227,8 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         CancellationToken ct)
     {
         // (1) Re-read the SAME Source Conversation content fresh (the proposal is linked to it; AD-6). Fail closed → InvalidContext.
-        string? payload = await GenerationContext.ReadPayloadAsync(
-            _contextReader, request.TenantId, request.SourceConversationId, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
+        (string? payload, _, _) = await GenerationContext.ReadPayloadAsync(
+            _contextReader, request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
         if (payload is null)
         {
             return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId);

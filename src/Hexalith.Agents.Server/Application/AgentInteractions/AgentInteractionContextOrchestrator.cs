@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,8 +8,6 @@ using Hexalith.Agents.AgentInteraction;
 using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
-using Hexalith.Agents.Contracts.ProviderCatalog;
-using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
 
 using Hexalith.EventStore.Contracts.Commands;
@@ -19,7 +16,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 
 /// <summary>
 /// Application orchestration for Conversation context building (Story 2.3; AC1–AC4; AD-3, AD-11, AD-12). It reads the
-/// authorized Source Conversation content, measures its token count, reads the model budget, resolves the context
+/// authorized Source Conversation content, admits the model budget, measures the exact payload, resolves the context
 /// policy, assembles a server-trusted <see cref="AgentInteractionContextMeasurement"/>, and dispatches the
 /// <see cref="BuildAgentInteractionContext"/> command. The impure reads happen here, outside the pure aggregate, and
 /// feed back through the command (the AD-3 round-trip).
@@ -106,136 +103,51 @@ public sealed class AgentInteractionContextOrchestrator
             BuildTrustedExtensions(request.ClientSuppliedExtensions));
 
         // Submission precedes the aggregate decision. This local evaluation uses the caller's snapshot.
+        ct.ThrowIfCancellationRequested();
         await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
         return new AgentInteractionContextOutcomeResult(request.AgentInteractionId,
             AgentInteractionContextPolicy.Decide(measurement, request.ProviderCapabilityVersion));
     }
 
-    // Assembles the server-trusted measurement: read content → (if loaded) measure tokens + read budget → resolve
-    // policy. Every read is fail-closed; a non-loaded read, an unavailable measurement, or an untrustworthy budget all
-    // produce a measurement the pure policy maps to ContextBlocked.
     private async Task<AgentInteractionContextMeasurement> AssembleMeasurementAsync(AgentInteractionContextRequest request, CancellationToken ct)
     {
-        ConversationContextReadResult read = await ReadContextAsync(request, ct).ConfigureAwait(false);
-        AgentInteractionBoundedContextBehavior? approvedBoundedBehavior = ContextPolicyResolution.Resolve(request.ContextPolicyReference);
-
-        // (1) Not loaded → assemble a measurement with that load outcome and 0 numerics (skip measurement/budget — the
-        // policy maps it to ContextBlocked). The raw messages, if any, are not carried.
-        if (read.Outcome != AgentInteractionContextLoadOutcome.Loaded || read.Messages is null)
-        {
-            return new AgentInteractionContextMeasurement(
-                read.Outcome,
-                FullContextTokenCount: 0,
-                MessageCount: 0,
-                ContextWindowTokenLimit: 0,
-                ReservedOutputTokenCount: 0,
-                ProviderCapabilityVersion: 0,
-                request.ContextPolicyReference,
-                approvedBoundedBehavior);
-        }
-
-        // (2) Measure tokens against the selected provider and model.
-        ConversationContextTokenMeasurement tokens = await MeasureTokensAsync(read.Messages, request, ct).ConfigureAwait(false);
-
-        // (3) Token measurement unavailable → drive ModelBudgetUnavailable by zeroing the window (the policy blocks on a
-        // non-positive ContextWindowTokenLimit). The conversation text is now discarded.
-        if (tokens is not { IsAvailable: true, TokenCount: >= 0 })
-        {
-            return new AgentInteractionContextMeasurement(
-                AgentInteractionContextLoadOutcome.Loaded,
-                FullContextTokenCount: 0,
-                read.MessageCount,
-                ContextWindowTokenLimit: 0,
-                ReservedOutputTokenCount: 0,
-                ProviderCapabilityVersion: 0,
-                request.ContextPolicyReference,
-                approvedBoundedBehavior);
-        }
-
-        ModelBudget budget = await ReadModelBudgetAsync(request, ct).ConfigureAwait(false);
-
-        // (4) Loaded + measured: assemble the trusted measurement (token COUNT only, never raw text — AD-14).
-        return new AgentInteractionContextMeasurement(
-            AgentInteractionContextLoadOutcome.Loaded,
-            tokens.TokenCount,
-            read.MessageCount,
-            budget.ContextWindowTokenLimit,
-            budget.ReservedOutputTokenCount,
-            budget.ProviderCapabilityVersion,
+        (string? payload, int messageCount, AgentInteractionContextLoadOutcome outcome) = await GenerationContext.ReadPayloadAsync(
+            _contextReader, request.TenantId, request.SourceConversationId, request.CallerPartyId, request.ActorUserId, request.CorrelationId, ct)
+            .ConfigureAwait(false);
+        AgentInteractionContextMeasurement measurement = new(
+            outcome,
+            FullContextTokenCount: 0,
+            messageCount,
+            ContextWindowTokenLimit: 0,
+            ReservedOutputTokenCount: 0,
+            ProviderCapabilityVersion: 0,
             request.ContextPolicyReference,
-            approvedBoundedBehavior);
-    }
-
-    private async Task<ConversationContextReadResult> ReadContextAsync(AgentInteractionContextRequest request, CancellationToken ct)
-    {
-        try
+            ContextPolicyResolution.Resolve(request.ContextPolicyReference));
+        if (payload is null)
         {
-            // The Conversations authorized read keys on a security principal — pass ActorUserId as callerPrincipalId.
-            ConversationContextReadResult read = await _contextReader
-                .ReadAsync(request.TenantId, request.SourceConversationId, request.CallerPartyId, request.ActorUserId, request.CorrelationId, ct)
-                .ConfigureAwait(false);
-            if (read is not { Outcome: AgentInteractionContextLoadOutcome.Loaded })
+            return measurement;
+        }
+
+        ct.ThrowIfCancellationRequested();
+        GenerationCatalogRead catalog = await GenerationCatalogRead.ReadAsync(
+            _providerCatalogReader, request.TenantId, request.ProviderId, request.ModelId, request.ProviderCapabilityVersion, ct)
+            .ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
+        if (catalog.Entry is not { } entry)
+        {
+            return measurement;
+        }
+
+        ConversationContextTokenMeasurement tokens = await GenerationContext.MeasureAsync(_tokenMeasurer, payload, entry, ct).ConfigureAwait(false);
+        return tokens.IsAvailable
+            ? measurement with
             {
-                return read ?? ConversationContextReadResult.Unavailable;
+                FullContextTokenCount = tokens.TokenCount,
+                ContextWindowTokenLimit = entry.ContextWindowTokenLimit,
+                ReservedOutputTokenCount = entry.MaxOutputTokenLimit,
+                ProviderCapabilityVersion = entry.CapabilityVersion,
             }
-
-            if (!read.IsFresh)
-            {
-                return new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Stale, null, 0, false);
-            }
-
-            return read.Messages is { } messages && read.MessageCount == messages.Count
-                && !messages.Any(message => string.IsNullOrWhiteSpace(message?.Text))
-                ? read
-                : ConversationContextReadResult.Unavailable;
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // Fail closed (AD-12) — never propagate the raw exception (AD-14: no stack traces/payloads leak).
-            return ConversationContextReadResult.Unavailable;
-        }
-    }
-
-    private async Task<ConversationContextTokenMeasurement> MeasureTokensAsync(IReadOnlyList<ConversationContextMessage> messages, AgentInteractionContextRequest request, CancellationToken ct)
-    {
-        try
-        {
-            return await _tokenMeasurer.MeasureAsync(messages, request.ProviderId, request.ModelId, ct).ConfigureAwait(false);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return ConversationContextTokenMeasurement.NotAvailable;
-        }
-    }
-
-    // Reads the model budget from the reused provider catalog. Any failure / missing / disabled / not-text-capable /
-    // invalid-limits read returns a zeroed budget so the pure policy blocks with ModelBudgetUnavailable (fail closed).
-    private async Task<ModelBudget> ReadModelBudgetAsync(AgentInteractionContextRequest request, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(request.ProviderId) || string.IsNullOrWhiteSpace(request.ModelId))
-        {
-            return ModelBudget.Unavailable;
-        }
-
-        try
-        {
-            ProviderCatalogEntryReadResult result = await _providerCatalogReader
-                .GetEntryAsync(request.TenantId, request.ProviderId, request.ModelId, ct)
-                .ConfigureAwait(false);
-
-            return result?.Entry is { } entry
-                && string.Equals(entry.ProviderId, request.ProviderId, StringComparison.Ordinal)
-                && string.Equals(entry.ModelId, request.ModelId, StringComparison.Ordinal)
-                && request.ProviderCapabilityVersion > 0
-                && entry.CapabilityVersion >= request.ProviderCapabilityVersion
-                && ProviderSelectionVerdict.Evaluate(result) == ProviderSelectionValidationStatus.Valid
-                ? new ModelBudget(entry.ContextWindowTokenLimit, entry.MaxOutputTokenLimit, entry.CapabilityVersion)
-                : ModelBudget.Unavailable;
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            return ModelBudget.Unavailable;
-        }
+            : measurement;
     }
 
     // Copies the client-supplied extensions with the reserved trust keys removed; repopulates none (the context path
@@ -257,11 +169,5 @@ public sealed class AgentInteractionContextOrchestrator
         }
 
         return extensions.Count > 0 ? extensions : null;
-    }
-
-    // The safe model-budget read result. Zeroed (Unavailable) values drive the pure policy to ModelBudgetUnavailable.
-    private readonly record struct ModelBudget(int ContextWindowTokenLimit, int ReservedOutputTokenCount, int ProviderCapabilityVersion)
-    {
-        public static ModelBudget Unavailable { get; } = new(0, 0, 0);
     }
 }

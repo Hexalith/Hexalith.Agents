@@ -18,7 +18,7 @@ namespace Hexalith.Agents.Server.Ports;
 /// </remarks>
 public interface IConversationContextTokenMeasurer
 {
-    /// <summary>Measures the token count of the supplied visible timeline messages for the selected Provider/model (AC2).</summary>
+    /// <summary>Measures the visible timeline for callers that support a versionless count. Readiness uses exact payload measurement.</summary>
     /// <param name="messages">The loaded visible timeline messages (sensitive — measured in memory only; AD-14).</param>
     /// <param name="providerId">The selected stable provider identifier.</param>
     /// <param name="modelId">The selected stable model identifier.</param>

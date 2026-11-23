@@ -6,24 +6,34 @@ using Hexalith.Agents.Server.Ports;
 
 namespace Hexalith.Agents.Server.Application.AgentInteractions;
 
-/// <summary>Prepares and checks the transient Conversation payload shared by generation and regeneration.</summary>
+/// <summary>Prepares and measures the transient Conversation payload used for context readiness and generation.</summary>
 internal static class GenerationContext
 {
     /// <summary>Reads the authorized visible timeline and renders the provider payload when the timeline is usable.</summary>
-    internal static async Task<string?> ReadPayloadAsync(
-        IConversationContextReader reader, string tenantId, string conversationId, string actorUserId, string correlationId, CancellationToken ct)
+    internal static async Task<(string? Payload, int MessageCount, AgentInteractionContextLoadOutcome Outcome)> ReadPayloadAsync(
+        IConversationContextReader reader, string tenantId, string conversationId, string callerPartyId, string actorUserId, string correlationId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         try
         {
             // The authorized read keys on the actor security principal.
             ConversationContextReadResult read = await reader
-                .ReadAsync(tenantId, conversationId, string.Empty, actorUserId, correlationId, ct)
+                .ReadAsync(tenantId, conversationId, callerPartyId, actorUserId, correlationId, ct)
                 .ConfigureAwait(false);
             ct.ThrowIfCancellationRequested();
-            if (read is not { Outcome: AgentInteractionContextLoadOutcome.Loaded, IsFresh: true, Messages: { } messages })
+            if (read is not { Outcome: AgentInteractionContextLoadOutcome.Loaded })
             {
-                return null;
+                return (null, 0, read?.Outcome ?? AgentInteractionContextLoadOutcome.Unavailable);
+            }
+
+            if (!read.IsFresh)
+            {
+                return (null, 0, AgentInteractionContextLoadOutcome.Stale);
+            }
+
+            if (read.Messages is not { } messages)
+            {
+                return (null, 0, AgentInteractionContextLoadOutcome.Unavailable);
             }
 
             ConversationContextMessage[] timeline = [.. messages];
@@ -32,7 +42,7 @@ internal static class GenerationContext
                     || string.IsNullOrWhiteSpace(message.Text)
                     || message.CreatedAt == DateTimeOffset.MinValue))
             {
-                return null;
+                return (null, 0, AgentInteractionContextLoadOutcome.Unavailable);
             }
 
             var payload = new StringBuilder();
@@ -41,18 +51,27 @@ internal static class GenerationContext
                 payload.AppendLine(message.Text);
             }
 
-            return payload.ToString();
+            return (payload.ToString(), timeline.Length, AgentInteractionContextLoadOutcome.Loaded);
         }
         catch (Exception ex) when (ex is not OperationCanceledException
             || (ex is TaskCanceledException && !ct.IsCancellationRequested))
         {
             ct.ThrowIfCancellationRequested();
-            return null;
+            return (null, 0, AgentInteractionContextLoadOutcome.Unavailable);
         }
     }
 
     /// <summary>Checks that the exact payload fits after reserving the admitted model's output allowance.</summary>
     internal static async Task<bool> FitsAsync(
+        IConversationContextTokenMeasurer measurer, string payload, ProviderCatalogEntryView entry, CancellationToken ct)
+    {
+        ConversationContextTokenMeasurement measurement = await MeasureAsync(measurer, payload, entry, ct).ConfigureAwait(false);
+        return measurement.IsAvailable
+            && measurement.TokenCount <= entry.ContextWindowTokenLimit - entry.MaxOutputTokenLimit;
+    }
+
+    /// <summary>Measures the exact serialized payload against the admitted catalog entry.</summary>
+    internal static async Task<ConversationContextTokenMeasurement> MeasureAsync(
         IConversationContextTokenMeasurer measurer, string payload, ProviderCatalogEntryView entry, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -64,12 +83,14 @@ internal static class GenerationContext
             ct.ThrowIfCancellationRequested();
             return measurement is { IsAvailable: true, TokenCount: >= 0 }
                 && (payload.Length == 0 || measurement.TokenCount > 0)
-                && measurement.TokenCount <= entry.ContextWindowTokenLimit - entry.MaxOutputTokenLimit;
+                ? measurement
+                : ConversationContextTokenMeasurement.NotAvailable;
         }
-        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        catch (Exception ex) when (ex is not OperationCanceledException
+            || (ex is TaskCanceledException && !ct.IsCancellationRequested))
         {
             ct.ThrowIfCancellationRequested();
-            return false;
+            return ConversationContextTokenMeasurement.NotAvailable;
         }
     }
 }

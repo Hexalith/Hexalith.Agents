@@ -9,8 +9,9 @@ namespace Hexalith.Agents.Contracts.AgentInteraction.Commands;
 /// <para>
 /// The <see cref="Measurement"/> is <b>server-assembled from a trusted live Conversations read + token measurement +
 /// Provider-catalog budget read</b> by <c>AgentInteractionContextOrchestrator</c> (Story 2.3): the orchestration reads
-/// the authorized visible timeline through <c>IConversationClient.GetConversationAsync</c>, measures its token count,
-/// reads the model budget from the catalog, resolves the context policy, and dispatches this command. Any
+/// the authorized visible timeline through <c>IConversationClient.GetConversationAsync</c>, admits the current catalog
+/// entry, measures the rendered provider payload against that capability version, resolves the context policy, and
+/// dispatches this command. Any
 /// client-supplied measurement is stripped/overwritten by the orchestrator — a direct-gateway client cannot forge a
 /// fit (AD-3 round-trip).
 /// </para>

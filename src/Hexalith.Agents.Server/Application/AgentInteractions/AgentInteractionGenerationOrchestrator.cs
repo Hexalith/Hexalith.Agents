@@ -156,8 +156,8 @@ public sealed class AgentInteractionGenerationOrchestrator
         // (1) Re-read the Source Conversation content fresh — Story 2.3 measured tokens then DISCARDED the raw text; only
         // counts are on the context evidence, so 2.4 must reload the content to build the model input. Fail closed →
         // InvalidContext.
-        string? payload = await GenerationContext.ReadPayloadAsync(
-            _contextReader, request.TenantId, request.SourceConversationId, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
+        (string? payload, _, _) = await GenerationContext.ReadPayloadAsync(
+            _contextReader, request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
         if (payload is null)
         {
             return FailedResult(AgentGenerationOutcome.InvalidContext, request, attemptId);

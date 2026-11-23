@@ -166,7 +166,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     public async Task Token_measurement_unavailable_returns_context_blocked_model_budget_unavailable()
     {
         StubLoaded(tokenCount: 1_000);
-        _tokenMeasurer.MeasureAsync(Arg.Any<IReadOnlyList<ConversationContextMessage>>(), ProviderId, ModelId, Arg.Any<CancellationToken>())
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(ConversationContextTokenMeasurement.NotAvailable);
         CaptureDispatch();
 
@@ -181,11 +181,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     {
         // A snapshot that recorded no provider/model id cannot have a budget — the orchestrator must fail closed to a
         // zeroed budget WITHOUT calling the catalog (no needless cross-tenant read; AC2/AD-9).
-        IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SecretConversationText, _sampleCreatedAt)];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
-            .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
-        _tokenMeasurer.MeasureAsync(Arg.Any<IReadOnlyList<ConversationContextMessage>>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new ConversationContextTokenMeasurement(true, 1_000));
+        SetTimeline([new(SecretConversationText, _sampleCreatedAt)]);
         CaptureDispatch();
 
         AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(providerId: ""), CancellationToken.None);
@@ -209,8 +205,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         DispatchedMeasurement().LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
-        await _tokenMeasurer.DidNotReceive().MeasureAsync(
-            Arg.Any<IReadOnlyList<ConversationContextMessage>>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        AssertTokenizerWasNotCalled();
     }
 
     // ===== Fail closed on throw (AC1, AC3; AD-14) =====
@@ -236,7 +231,7 @@ public sealed class AgentInteractionContextOrchestratorTests
     public async Task A_token_measurer_that_throws_fails_closed_to_context_blocked()
     {
         StubLoaded(tokenCount: 1_000);
-        _tokenMeasurer.MeasureAsync(Arg.Any<IReadOnlyList<ConversationContextMessage>>(), ProviderId, ModelId, Arg.Any<CancellationToken>())
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, Arg.Any<int>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("tokenizer blew up"));
         CaptureDispatch();
 
@@ -415,7 +410,7 @@ public sealed class AgentInteractionContextOrchestratorTests
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         DispatchedMeasurement().LoadOutcome.ShouldBe(expected);
         DispatchedMeasurement().MessageCount.ShouldBe(0);
-        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasureAsync(default!, default!, default!, default);
+        AssertTokenizerWasNotCalled();
         await _providerCatalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
     }
 
@@ -433,7 +428,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         DispatchedMeasurement().LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
-        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasureAsync(default!, default!, default!, default);
+        AssertTokenizerWasNotCalled();
     }
 
     [Theory]
@@ -448,6 +443,8 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         DispatchedMeasurement().FullContextTokenCount.ShouldBe(0);
+        DispatchedMeasurement().ContextWindowTokenLimit.ShouldBe(0);
+        DispatchedMeasurement().ProviderCapabilityVersion.ShouldBe(0);
     }
 
     [Theory]
@@ -463,6 +460,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         DispatchedMeasurement().ProviderCapabilityVersion.ShouldBe(0);
+        AssertTokenizerWasNotCalled();
     }
 
     [Theory]
@@ -488,6 +486,7 @@ public sealed class AgentInteractionContextOrchestratorTests
 
         outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
         DispatchedMeasurement().ContextWindowTokenLimit.ShouldBe(0);
+        AssertTokenizerWasNotCalled();
     }
 
     [Theory]
@@ -521,11 +520,18 @@ public sealed class AgentInteractionContextOrchestratorTests
             state.Apply(requested);
             state.Apply(authorized);
             state.Apply(JsonSerializer.Deserialize<AgentInteractionContextReady>(JsonSerializer.Serialize(recorded))!);
-            state.ContextEvidence.ShouldNotBeNull().ProviderCapabilityVersion.ShouldBe(liveVersion);
+            AgentInteractionContextEvidence evidence = state.ContextEvidence.ShouldNotBeNull();
+            evidence.ProviderCapabilityVersion.ShouldBe(liveVersion);
+            evidence.FullContextTokenCount.ShouldBe(10);
+            evidence.MessageCount.ShouldBe(1);
+            _ = _tokenMeasurer.Received(1).MeasurePayloadAsync(
+                SecretConversationText + Environment.NewLine, ProviderId, ModelId, liveVersion, CancellationToken.None);
             state.Status.ShouldBe(AgentInteractionStatus.ContextReady);
         }
         else
         {
+            AssertTokenizerWasNotCalled();
+            command.Measurement.FullContextTokenCount.ShouldBe(0);
             state.Apply(result.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>());
             state.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
             state.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
@@ -555,6 +561,187 @@ public sealed class AgentInteractionContextOrchestratorTests
         state.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
     }
 
+    [Fact]
+    public async Task UnusableOutputAllowanceBlocksBeforeSendingContentToTokenizer()
+    {
+        StubLoaded(tokenCount: 10);
+        SetCatalogEntry(Entry(true) with { MaxOutputTokenLimit = ContextWindowTokenLimit });
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(0);
+        AssertTokenizerWasNotCalled();
+    }
+
+    [Fact]
+    public async Task MissingTimestampBlocksBeforeCatalogAndTokenizer()
+    {
+        SetTimeline([new(SecretConversationText, default)]);
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+
+        DispatchedMeasurement().LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
+        _ = _providerCatalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        AssertTokenizerWasNotCalled();
+    }
+
+    [Fact]
+    public async Task MeasuresTheSortedProviderPayloadAtTheAdmittedVersion()
+    {
+        SetTimeline([new("later", _sampleCreatedAt.AddMinutes(1)), new(SecretConversationText, _sampleCreatedAt)]);
+        SetCatalogEntry(Entry(true) with { CapabilityVersion = 3 });
+        string payload = $"{SecretConversationText}{Environment.NewLine}later{Environment.NewLine}";
+        _tokenMeasurer.MeasurePayloadAsync(payload, ProviderId, ModelId, 3, CancellationToken.None)
+            .Returns(new ConversationContextTokenMeasurement(true, 17));
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextReady);
+
+        Received.InOrder(() =>
+        {
+            _ = _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", CancellationToken.None);
+            _ = _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, CancellationToken.None);
+            _ = _tokenMeasurer.MeasurePayloadAsync(payload, ProviderId, ModelId, 3, CancellationToken.None);
+        });
+        _ = _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasureAsync(default!, default!, default!, default);
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(17);
+        DispatchedMeasurement().MessageCount.ShouldBe(2);
+        JsonSerializer.Serialize(DispatchedMeasurement()).ShouldNotContain(SecretConversationText);
+    }
+
+    [Fact]
+    public async Task ExactZeroTokensCanAdmitAnEmptyTimeline()
+    {
+        SetTimeline([]);
+        SetCatalogEntry(Entry(true));
+        _tokenMeasurer.MeasurePayloadAsync(string.Empty, ProviderId, ModelId, 1, CancellationToken.None)
+            .Returns(new ConversationContextTokenMeasurement(true, 0));
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextReady);
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(0);
+        DispatchedMeasurement().MessageCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task TimelineOnlyTokenizerCannotAuthorizeContextReadiness()
+    {
+        SetTimeline([new(SecretConversationText, _sampleCreatedAt)]);
+        SetCatalogEntry(Entry(true));
+        CaptureDispatch();
+        var orchestrator = new AgentInteractionContextOrchestrator(
+            _contextReader, new TimelineOnlyConversationContextTokenMeasurer(), _providerCatalogReader, _dispatcher);
+
+        (await orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(0);
+        DispatchedMeasurement().ProviderCapabilityVersion.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData("conversation")]
+    [InlineData("catalog")]
+    [InlineData("tokenizer")]
+    public async Task ADependencyReturningAfterCancellationCannotAdvanceReadiness(string boundary)
+    {
+        StubLoaded(tokenCount: 10);
+        using var cancellation = new CancellationTokenSource();
+        CancellationToken ct = cancellation.Token;
+        if (boundary == "conversation")
+        {
+            _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", ct)
+                .Returns(_ =>
+                {
+                    cancellation.Cancel();
+                    return new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, [], 0, true);
+                });
+        }
+        else if (boundary == "catalog")
+        {
+            _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, ct)
+                .Returns(_ =>
+                {
+                    cancellation.Cancel();
+                    return new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, Entry(true));
+                });
+        }
+        else
+        {
+            _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 1, ct)
+                .Returns(_ =>
+                {
+                    cancellation.Cancel();
+                    return new ConversationContextTokenMeasurement(true, 10);
+                });
+        }
+
+        await Should.ThrowAsync<OperationCanceledException>(() => Orchestrator.ExecuteAsync(Request(), ct));
+
+        _ = _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
+        if (boundary == "conversation")
+        {
+            _ = _providerCatalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        }
+
+        if (boundary != "tokenizer")
+        {
+            AssertTokenizerWasNotCalled();
+        }
+    }
+
+    [Fact]
+    public async Task CatalogTimeoutBlocksWithoutSendingConversationTextToTokenizer()
+    {
+        StubLoaded(tokenCount: 10);
+        _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, CancellationToken.None)
+            .ThrowsAsync(new TaskCanceledException("catalog timeout"));
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+
+        DispatchedMeasurement().ContextWindowTokenLimit.ShouldBe(0);
+        DispatchedMeasurement().ProviderCapabilityVersion.ShouldBe(0);
+        AssertTokenizerWasNotCalled();
+    }
+
+    [Fact]
+    public async Task AnExplicitTokenizerCancellationDoesNotDispatchAContextDecision()
+    {
+        StubLoaded(tokenCount: 10);
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 1, CancellationToken.None)
+            .ThrowsAsync(new OperationCanceledException());
+
+        await Should.ThrowAsync<OperationCanceledException>(() => Orchestrator.ExecuteAsync(Request(), CancellationToken.None));
+
+        _ = _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task NullExactMeasurementCannotSupplyABudget()
+    {
+        StubLoaded(tokenCount: 10);
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 1, CancellationToken.None)
+            .Returns(Task.FromResult<ConversationContextTokenMeasurement>(null!));
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(0);
+        DispatchedMeasurement().ContextWindowTokenLimit.ShouldBe(0);
+        DispatchedMeasurement().ProviderCapabilityVersion.ShouldBe(0);
+    }
+
+    private void AssertTokenizerWasNotCalled()
+    {
+        _ = _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasureAsync(default!, default!, default!, default);
+        _ = _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasurePayloadAsync(default!, default!, default!, default, default);
+    }
+
+    private void SetTimeline(IReadOnlyList<ConversationContextMessage> messages)
+        => _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
+
     private void SetCatalogEntry(ProviderCatalogEntryView entry)
         => _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
             .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, entry));
@@ -563,10 +750,8 @@ public sealed class AgentInteractionContextOrchestratorTests
 
     private void StubLoaded(int tokenCount)
     {
-        IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SecretConversationText, _sampleCreatedAt)];
-        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
-            .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
-        _tokenMeasurer.MeasureAsync(Arg.Any<IReadOnlyList<ConversationContextMessage>>(), ProviderId, ModelId, Arg.Any<CancellationToken>())
+        SetTimeline([new(SecretConversationText, _sampleCreatedAt)]);
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new ConversationContextTokenMeasurement(true, tokenCount));
         _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
             .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, Entry(supportsTextGeneration: true)));

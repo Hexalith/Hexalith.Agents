@@ -25,7 +25,8 @@ internal sealed record GenerationCatalogRead(AgentGenerationOutcome Outcome, Pro
         {
             result = await reader.GetEntryAsync(tenantId, providerId, modelId, ct).ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException
+            || (ex is TaskCanceledException && !ct.IsCancellationRequested))
         {
             return _unavailable;
         }

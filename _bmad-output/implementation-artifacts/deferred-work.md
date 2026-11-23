@@ -1039,3 +1039,11 @@ The original entries above are retained as historical evidence. The following fi
   evidence: Builds 717e5ab29569fc57b0f43415f1aee2fc93441859 exempts NU1901 and NU1902 in Props/Directory.Packages.props. BuildContractConformanceTests.OrdinaryReleaseShouldRejectAllAuditFindings fails both with the five patches and clean Agents baseline 492a0217dfa08f1dc57b5d24840a257c1bd30861, with identical policy-input hashes. No audit/test was weakened in that command patch.
   status: done 2026-11-22
   resolution: Agents `2d7a4cf` restored the approved shared audit policy, covered by `OrdinaryReleaseShouldEvaluateTheHighAndCriticalAuditPolicy`. Release audits all dependencies. NU1901 and NU1902 are reported as warnings, while NU1903, NU1904 and the checked audit errors remain fatal and unsuppressed. See `spec-five-deferred-lease-and-inspection-items.md` for current verification.
+
+- source_spec: "spec-five-deferred-exact-context-measurement-checks.md"
+  summary: Preserve the distinction between an omitted Conversations timeline and an explicitly empty timeline.
+  evidence: The Conversations detail contract normalizes null or omitted Messages to an empty list before the Agents adapter receives it. The adapter derives its count from that same list, so the existing scope and freshness checks cannot distinguish omission from a valid empty timeline. Verify the distinction through the owner wire contract.
+
+- source_spec: "spec-five-deferred-exact-context-measurement-checks.md"
+  summary: Qualify the Regeneration requester Party reference for context readers that enforce Party participation.
+  evidence: The regeneration read has passed an empty Party reference since before this change. The current Conversations adapter authorizes by ActorUserId and does not use the Party argument. A custom reader using the optional participation cross-check can refuse the empty value. Establish the requester's authoritative Party binding and verify an enrolled reader before changing that behavior.
