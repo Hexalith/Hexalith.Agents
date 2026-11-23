@@ -229,11 +229,12 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         CancellationToken ct)
     {
         // (1) Re-read the SAME Source Conversation content fresh (the proposal is linked to it; AD-6). Fail closed → InvalidContext.
-        (string? payload, _, _) = await GenerationContext.ReadPayloadAsync(
+        (string? payload, _, AgentInteractionContextLoadOutcome loadOutcome) = await GenerationContext.ReadPayloadAsync(
             _contextReader, request.TenantId, request.SourceConversationId, request.RequesterPartyId, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
         if (payload is null)
         {
-            return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId);
+            return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId,
+                attemptContext: GenerationContext.ReadBlocked(loadOutcome));
         }
 
         GenerationCatalogRead catalog = await GenerationCatalogRead.ReadAsync(
@@ -244,9 +245,12 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             return FailedResult(MapProviderOutcome(catalog.Outcome), request, verdict, attemptId, regeneratedVersionId);
         }
 
-        if (!await GenerationContext.FitsAsync(_tokenMeasurer, payload, entry, ct).ConfigureAwait(false))
+        AgentAttemptContextEvidence attemptContext = await GenerationContext
+            .EvaluateBudgetAsync(_tokenMeasurer, payload, entry, ct).ConfigureAwait(false);
+        if (attemptContext.Mode != AgentInteractionContextMode.Full)
         {
-            return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion);
+            return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion,
+                attemptContext: attemptContext);
         }
 
         // (3) Re-invoke the provider behind its adapter, honoring the timeout/retry budget. A thrown adapter → AdapterFailure
@@ -258,7 +262,8 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             AgentProposalRegenerationOutcome outcome = providerResult.Outcome == AgentGenerationOutcome.Succeeded
                 ? AgentProposalRegenerationOutcome.AdapterFailure // a "succeeded" result with no content is a degraded provider result
                 : MapProviderOutcome(providerResult.Outcome);
-            return FailedResult(outcome, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(outcome, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion,
+                providerResult.PromptTokenCount, providerResult.OutputTokenCount, attemptContext);
         }
 
         // (4) Content-safety gate — BEFORE any downstream artifact. Read the effective policy (not-available → PolicyFailure),
@@ -267,14 +272,16 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         AgentContentSafetyPolicyReadResult policy = await ReadPolicyAsync(request, ct).ConfigureAwait(false);
         if (!policy.IsAvailable || policy.Policy is null)
         {
-            return FailedResult(AgentProposalRegenerationOutcome.PolicyFailure, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentProposalRegenerationOutcome.PolicyFailure, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion,
+                providerResult.PromptTokenCount, providerResult.OutputTokenCount, attemptContext);
         }
 
         ContentSafetyVerdict safety = await EvaluateSafetyAsync(providerResult.GeneratedContent, policy.Policy, ct).ConfigureAwait(false);
         if (safety != ContentSafetyVerdict.Passed)
         {
             // Fail closed and carry NO content — the unsafe content never reaches the aggregate (AD-5, AD-14).
-            return FailedResult(AgentProposalRegenerationOutcome.ContentSafetyBlocked, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentProposalRegenerationOutcome.ContentSafetyBlocked, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion,
+                providerResult.PromptTokenCount, providerResult.OutputTokenCount, attemptContext);
         }
 
         // (5) Success — carry the regenerated content on the new immutable Regenerated version (its sole durable home is the
@@ -308,7 +315,10 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             request.ApproverPolicyVersion,
             request.ApproverPolicy?.DisclosureCategory ?? ApproverPolicyBasisDisclosure.Omitted,
             providerResult.PromptTokenCount,
-            providerResult.OutputTokenCount);
+            providerResult.OutputTokenCount)
+        {
+            AttemptContext = attemptContext,
+        };
     }
 
     private async Task<AgentGenerationProviderResult> InvokeProviderAsync(
@@ -397,7 +407,8 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         string regeneratedVersionId,
         int? admittedCapabilityVersion = null,
         int promptTokenCount = 0,
-        int outputTokenCount = 0)
+        int outputTokenCount = 0,
+        AgentAttemptContextEvidence? attemptContext = null)
         => new(
             outcome,
             attemptId,
@@ -414,7 +425,10 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             request.ApproverPolicyVersion,
             request.ApproverPolicy?.DisclosureCategory ?? ApproverPolicyBasisDisclosure.Omitted,
             promptTokenCount,
-            outputTokenCount);
+            outputTokenCount)
+        {
+            AttemptContext = attemptContext,
+        };
 
     // Copies the client-supplied extensions with the reserved trust keys removed; repopulates none (the regeneration path
     // carries no admin/verdict extension — the verdict rides the trusted command result, not an envelope extension). Returns

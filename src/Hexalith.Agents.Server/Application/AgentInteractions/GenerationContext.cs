@@ -62,14 +62,43 @@ internal static class GenerationContext
         }
     }
 
-    /// <summary>Checks that the exact payload fits after reserving the output allowance and safety margin.</summary>
-    internal static async Task<bool> FitsAsync(
+    /// <summary>Records an unsuccessful authorized read without any measurement or timeline data.</summary>
+    internal static AgentAttemptContextEvidence ReadBlocked(AgentInteractionContextLoadOutcome loadOutcome)
+        => new(loadOutcome, AgentInteractionContextMode.Blocked)
+        {
+            BlockReason = AgentInteractionContextPolicy.LoadBlockReason(loadOutcome),
+        };
+
+    /// <summary>Evaluates the exact payload against the admitted model budget and records the measured terms.</summary>
+    internal static async Task<AgentAttemptContextEvidence> EvaluateBudgetAsync(
         IConversationContextTokenMeasurer measurer, string payload, ProviderCatalogEntryView entry, CancellationToken ct)
     {
         ConversationContextTokenMeasurement measurement = await MeasureAsync(measurer, payload, entry, ct).ConfigureAwait(false);
-        int availableTokens = AgentInteractionContextPolicy.CalculateDefaultBudget(
-            entry.ContextWindowTokenLimit, entry.MaxOutputTokenLimit).AvailableTokens;
-        return measurement.IsAvailable && measurement.TokenCount <= availableTokens;
+        if (!measurement.IsAvailable)
+        {
+            return new AgentAttemptContextEvidence(AgentInteractionContextLoadOutcome.Loaded, AgentInteractionContextMode.Blocked)
+            {
+                BlockReason = AgentInteractionContextBlockReason.ModelBudgetUnavailable,
+            };
+        }
+
+        (int marginTokens, int availableTokens) = AgentInteractionContextPolicy.CalculateDefaultBudget(
+            entry.ContextWindowTokenLimit, entry.MaxOutputTokenLimit);
+        bool fits = measurement.TokenCount <= availableTokens;
+        return new AgentAttemptContextEvidence(
+            AgentInteractionContextLoadOutcome.Loaded,
+            fits ? AgentInteractionContextMode.Full : AgentInteractionContextMode.Blocked)
+        {
+            BlockReason = fits ? null : AgentInteractionContextBlockReason.ExceedsModelBudget,
+            Budget = new AgentAttemptContextBudgetEvidence(
+                measurement.TokenCount,
+                entry.CapabilityVersion,
+                entry.ContextWindowTokenLimit,
+                entry.MaxOutputTokenLimit,
+                AgentInteractionContextPolicy.DefaultSafetyMarginPercent,
+                marginTokens,
+                availableTokens),
+        };
     }
 
     /// <summary>Measures the exact serialized payload against the admitted catalog entry.</summary>

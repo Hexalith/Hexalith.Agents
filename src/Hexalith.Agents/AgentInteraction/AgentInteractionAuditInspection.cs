@@ -61,7 +61,10 @@ public static class AgentInteractionAuditInspection
             current.AgentInteractionId,
             current.Status,
             current.ContextEvidence,
-            current.ContextBlockReason));
+            current.ContextBlockReason)
+        {
+            GenerationAttemptContext = current.GenerationAttemptContext,
+        });
     }
 
     /// <summary>Gets the latest safe generation-attempt evidence, or <see langword="null"/> when unavailable.</summary>
@@ -150,7 +153,10 @@ public static class AgentInteractionAuditInspection
             evidence.PolicyBasisVerdict,
             evidence.DisclosureCategory,
             current.ProposalRegenerationFailureReason ?? AgentProposalRegenerationFailureReason.Unknown,
-            RegeneratedAt: null));
+            RegeneratedAt: null)
+        {
+            AttemptContext = evidence.AttemptContext,
+        });
     }
 
     /// <summary>Gets safe proposal-approval/posting evidence.</summary>

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction.Queries;
 
 /// <summary>
@@ -21,4 +23,9 @@ public record AgentInteractionContextEvidenceView(
     string AgentInteractionId,
     AgentInteractionStatus Status,
     AgentInteractionContextEvidence? Evidence,
-    AgentInteractionContextBlockReason? BlockReason);
+    AgentInteractionContextBlockReason? BlockReason)
+{
+    /// <summary>Gets the fresh context check from the latest initial generation attempt, when recorded.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public AgentAttemptContextEvidence? GenerationAttemptContext { get; init; }
+}

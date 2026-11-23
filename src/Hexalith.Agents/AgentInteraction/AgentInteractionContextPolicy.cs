@@ -21,7 +21,8 @@ namespace Hexalith.Agents.AgentInteraction;
 /// </remarks>
 internal static class AgentInteractionContextPolicy
 {
-    private const int DefaultSafetyMarginPercent = 10;
+    /// <summary>The default percentage of the context window reserved as a safety margin.</summary>
+    internal const int DefaultSafetyMarginPercent = 10;
 
     /// <summary>
     /// Evaluates the supplied measurement into the durable context outcome event (AC2, AC3, AC4). Within bounds →
@@ -59,6 +60,14 @@ internal static class AgentInteractionContextPolicy
         return (marginTokens, windowTokens - reservedOutputTokens - marginTokens);
     }
 
+    /// <summary>Maps an unsuccessful authorized Conversation read to a safe context block reason.</summary>
+    internal static AgentInteractionContextBlockReason LoadBlockReason(AgentInteractionContextLoadOutcome outcome) => outcome switch
+    {
+        AgentInteractionContextLoadOutcome.Stale => AgentInteractionContextBlockReason.ContextNotFresh,
+        AgentInteractionContextLoadOutcome.Unavailable => AgentInteractionContextBlockReason.ContextReadUnavailable,
+        _ => AgentInteractionContextBlockReason.ContextUnavailable,
+    };
+
     // The deterministic budget decision (AC2/AC3/AC4 — the "Context Budget Rules" table). Evaluated in order:
     // (1) load failure → block; (2) untrustworthy budget → block; (3..4) fits → full; (5) approved bounded fits →
     // bounded; (6) oversized with no approved bounded behavior → block (never a silent truncation).
@@ -69,13 +78,7 @@ internal static class AgentInteractionContextPolicy
         // (1) The Conversations read did not load authorized + fresh enough → block; numerics are zeroed (AC1/AC3).
         if (m.LoadOutcome != AgentInteractionContextLoadOutcome.Loaded)
         {
-            AgentInteractionContextBlockReason reason = m.LoadOutcome switch
-            {
-                AgentInteractionContextLoadOutcome.Stale => AgentInteractionContextBlockReason.ContextNotFresh,
-                AgentInteractionContextLoadOutcome.Unavailable => AgentInteractionContextBlockReason.ContextReadUnavailable,
-                _ => AgentInteractionContextBlockReason.ContextUnavailable,
-            };
-            return Blocked(reason, ZeroedEvidence(m));
+            return Blocked(LoadBlockReason(m.LoadOutcome), ZeroedEvidence(m));
         }
 
         // (2) The model budget could not be trusted → block (fail closed; AC2/AC3).

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction.Events;
 
 /// <summary>
@@ -17,4 +19,9 @@ namespace Hexalith.Agents.Contracts.AgentInteraction.Events;
 /// <param name="Version">The generated version (the approvable/postable unit; sole home of the generated content).</param>
 public record AgentOutputGenerated(
     string AgentInteractionId,
-    AgentGeneratedVersion Version) : IEventPayload;
+    AgentGeneratedVersion Version) : IEventPayload
+{
+    /// <summary>Gets safe evidence of the fresh attempt context check, when recorded.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public AgentAttemptContextEvidence? AttemptContext { get; init; }
+}

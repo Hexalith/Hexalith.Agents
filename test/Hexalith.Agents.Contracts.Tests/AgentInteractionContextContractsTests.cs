@@ -266,6 +266,8 @@ public sealed class AgentInteractionContextContractsTests
         CarriesOnlySafeContextMembers(typeof(AgentInteractionContextMeasurement));
         CarriesOnlySafeContextMembers(typeof(AgentInteractionContextEvidence));
         CarriesOnlySafeContextMembers(typeof(AgentInteractionContextEvidenceView));
+        CarriesOnlySafeContextMembers(typeof(AgentAttemptContextEvidence));
+        CarriesOnlySafeContextMembers(typeof(AgentAttemptContextBudgetEvidence));
         CarriesOnlySafeContextMembers(typeof(AgentInteractionContextReady));
         CarriesOnlySafeContextMembers(typeof(AgentInteractionContextBlocked));
         CarriesOnlySafeContextMembers(typeof(AgentInteractionBoundedContextBehavior));

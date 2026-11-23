@@ -72,6 +72,58 @@ public sealed class AgentInteractionAuditInspectionTests
             e => e.PromptTokenCount.ShouldBe(PromptTokenCount),
             e => e.OutputTokenCount.ShouldBe(OutputTokenCount));
         JsonSerializer.Serialize(evidence).ShouldNotContain(GeneratedContentText);
+        AgentInteractionAuditInspection.GetContextEvidence(state, isAuthorized: true).Evidence.ShouldNotBeNull()
+            .GenerationAttemptContext.ShouldBeNull();
+    }
+
+    [Fact]
+    public void LegacyGenerationAndRegenerationEventsReplayWithoutInventingContextEvidence()
+    {
+        AgentInteractionState generation = StateRequested();
+        generation.Apply(JsonSerializer.Deserialize<AgentOutputGenerationFailed>(
+            """
+            {"AgentInteractionId":"interaction","Decision":"GenerationFailed","Reason":"InvalidContext",
+             "Evidence":{"AttemptId":"attempt","ProviderId":"provider","ModelId":"model","ProviderCapabilityVersion":1,"PromptTokenCount":0,"OutputTokenCount":0}}
+            """)!);
+        generation.Status.ShouldBe(AgentInteractionStatus.GenerationFailed);
+        AgentInteractionAuditInspection.GetGenerationEvidence(generation, isAuthorized: true).ShouldNotBeNull().AttemptId.ShouldBe("attempt");
+        AgentInteractionAuditInspection.GetContextEvidence(generation, isAuthorized: true).Evidence.ShouldNotBeNull().GenerationAttemptContext.ShouldBeNull();
+
+        generation.Apply(JsonSerializer.Deserialize<AgentOutputGenerated>(
+            """
+            {"AgentInteractionId":"interaction","Version":{"VersionId":"version","AttemptId":"attempt","Kind":"Generated",
+             "GeneratedContent":"output","ProviderId":"provider","ModelId":"model","ProviderCapabilityVersion":1,"ContentSafetyPolicyVersion":1,
+             "PromptTokenCount":3,"OutputTokenCount":2}}
+            """)!);
+        generation.Status.ShouldBe(AgentInteractionStatus.Generated);
+        AgentInteractionAuditInspection.GetGenerationEvidence(generation, isAuthorized: true).ShouldNotBeNull().OutputTokenCount.ShouldBe(2);
+        AgentInteractionAuditInspection.GetContextEvidence(generation, isAuthorized: true).Evidence.ShouldNotBeNull().GenerationAttemptContext.ShouldBeNull();
+
+        AgentInteractionState regeneration = StateProposalCreated();
+        regeneration.Apply(JsonSerializer.Deserialize<ProposedAgentReplyRegenerationFailed>(
+            """
+            {"AgentInteractionId":"interaction","Reason":"InvalidContext","Evidence":{"ProposalId":"proposal","SourceConversationId":"conversation",
+             "RegeneratedVersionId":"regen-version","RegenerationAttemptId":"regen-attempt","RequesterPartyId":"party","ProviderId":"provider","ModelId":"model",
+             "ProviderCapabilityVersion":1,"ContentSafetyPolicyVersion":1,"ApproverPolicyVersion":1,"PolicyBasisVerdict":"Valid","DisclosureCategory":"OperatorOnly"}}
+            """)!);
+        regeneration.Status.ShouldBe(AgentInteractionStatus.ProposalRegenerationFailed);
+        var failed = AgentInteractionAuditInspection.GetProposalRegenerationEvidence(regeneration, isAuthorized: true).Evidence.ShouldNotBeNull();
+        failed.FailureReason.ShouldBe(AgentProposalRegenerationFailureReason.InvalidContext);
+        failed.AttemptContext.ShouldBeNull();
+
+        regeneration.Apply(JsonSerializer.Deserialize<ProposedAgentReplyRegenerated>(
+            """
+            {"AgentInteractionId":"interaction","RegeneratedVersion":{"VersionId":"regen-version","AttemptId":"regen-attempt","Kind":"Regenerated",
+             "GeneratedContent":"new-output","ProviderId":"provider","ModelId":"model","ProviderCapabilityVersion":1,"ContentSafetyPolicyVersion":1,
+             "PromptTokenCount":4,"OutputTokenCount":3},"Evidence":{"ProposalId":"proposal","SourceConversationId":"conversation",
+             "RegeneratedVersionId":"regen-version","RegenerationAttemptId":"regen-attempt","RequesterPartyId":"party","ProviderId":"provider","ModelId":"model",
+             "ProviderCapabilityVersion":1,"ContentSafetyPolicyVersion":1,"ApproverPolicyVersion":1,"PolicyBasisVerdict":"Valid","DisclosureCategory":"OperatorOnly"}}
+            """)!);
+        regeneration.Status.ShouldBe(AgentInteractionStatus.ProposalRegenerated);
+        var succeeded = AgentInteractionAuditInspection.GetProposalRegenerationEvidence(regeneration, isAuthorized: true).Evidence.ShouldNotBeNull();
+        succeeded.RegeneratedVersionId.ShouldBe("regen-version");
+        succeeded.FailureReason.ShouldBe(AgentProposalRegenerationFailureReason.Unknown);
+        succeeded.AttemptContext.ShouldBeNull();
     }
 
     [Fact]
@@ -156,6 +208,7 @@ public sealed class AgentInteractionAuditInspectionTests
 
         edit.Evidence.ShouldNotBeNull().EditedVersionId.ShouldBe(EditedVersionId);
         regeneration.Evidence.ShouldNotBeNull().RegeneratedVersionId.ShouldBe(RegeneratedVersionId);
+        regeneration.Evidence.AttemptContext.ShouldBeNull();
         approval.Evidence.ShouldNotBeNull().ShouldSatisfyAllConditions(
             a => a.ApprovedVersionId.ShouldBe(RegeneratedVersionId),
             a => a.MessageId.ShouldBe(PostedMessageId),

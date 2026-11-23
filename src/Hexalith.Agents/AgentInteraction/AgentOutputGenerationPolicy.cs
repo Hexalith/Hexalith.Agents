@@ -34,8 +34,14 @@ internal static class AgentOutputGenerationPolicy
     {
         GenerationDecision decision = Compute(result);
         return decision.Status == AgentInteractionStatus.Generated
-            ? DomainResult.Success([new AgentOutputGenerated(interactionId, decision.Version!)])
-            : DomainResult.Success([new AgentOutputGenerationFailed(interactionId, decision.Status, decision.Reason, decision.Evidence)]);
+            ? DomainResult.Success([new AgentOutputGenerated(interactionId, decision.Version!)
+            {
+                AttemptContext = result.AttemptContext,
+            }])
+            : DomainResult.Success([new AgentOutputGenerationFailed(interactionId, decision.Status, decision.Reason, decision.Evidence)
+            {
+                AttemptContext = result.AttemptContext,
+            }]);
     }
 
     /// <summary>

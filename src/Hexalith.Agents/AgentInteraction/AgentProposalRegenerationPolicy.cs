@@ -89,7 +89,10 @@ internal static class AgentProposalRegenerationPolicy
             r.ContentSafetyPolicyVersion,
             r.ApproverPolicyVersion,
             r.AuthorizationVerdict,
-            r.DisclosureCategory);
+            r.DisclosureCategory)
+        {
+            AttemptContext = r.AttemptContext,
+        };
 
     // Maps a non-success result to its safe failure reason. A non-Valid verdict dominates (NotAuthorized, defense in depth);
     // otherwise the provider-class outcome maps straight through, and a garbage outcome (incl. Regenerated with no version)

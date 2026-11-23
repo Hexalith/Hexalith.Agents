@@ -14,7 +14,12 @@ public sealed class GetAgentProposalRegenerationEvidenceQueryHandler(IAgentInter
 
     /// <inheritdoc />
     protected override object CreatePayload(AgentInteractionState? state, string correlationId, bool isFresh)
-        => AgentInteractionAuditInspection.GetProposalRegenerationEvidence(state, isAuthorized: true);
+    {
+        AgentProposalRegenerationEvidenceResult result = AgentInteractionAuditInspection.GetProposalRegenerationEvidence(state, isAuthorized: true);
+        return !isFresh && result.Evidence is { AttemptContext: not null } evidence
+            ? result with { Evidence = evidence with { AttemptContext = null } }
+            : result;
+    }
 
     /// <inheritdoc />
     protected override object CreateNotAuthorizedPayload(string correlationId)

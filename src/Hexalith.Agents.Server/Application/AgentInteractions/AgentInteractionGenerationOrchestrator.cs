@@ -156,11 +156,12 @@ public sealed class AgentInteractionGenerationOrchestrator
         // (1) Re-read the Source Conversation content fresh — Story 2.3 measured tokens then DISCARDED the raw text; only
         // counts are on the context evidence, so 2.4 must reload the content to build the model input. Fail closed →
         // InvalidContext.
-        (string? payload, _, _) = await GenerationContext.ReadPayloadAsync(
+        (string? payload, _, AgentInteractionContextLoadOutcome loadOutcome) = await GenerationContext.ReadPayloadAsync(
             _contextReader, request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
         if (payload is null)
         {
-            return FailedResult(AgentGenerationOutcome.InvalidContext, request, attemptId);
+            return FailedResult(AgentGenerationOutcome.InvalidContext, request, attemptId,
+                attemptContext: GenerationContext.ReadBlocked(loadOutcome));
         }
 
         GenerationCatalogRead catalog = await GenerationCatalogRead.ReadAsync(
@@ -171,9 +172,12 @@ public sealed class AgentInteractionGenerationOrchestrator
             return FailedResult(catalog.Outcome, request, attemptId);
         }
 
-        if (!await GenerationContext.FitsAsync(_tokenMeasurer, payload, entry, ct).ConfigureAwait(false))
+        AgentAttemptContextEvidence attemptContext = await GenerationContext
+            .EvaluateBudgetAsync(_tokenMeasurer, payload, entry, ct).ConfigureAwait(false);
+        if (attemptContext.Mode != AgentInteractionContextMode.Full)
         {
-            return FailedResult(AgentGenerationOutcome.InvalidContext, request, attemptId, entry.CapabilityVersion);
+            return FailedResult(AgentGenerationOutcome.InvalidContext, request, attemptId, entry.CapabilityVersion,
+                attemptContext: attemptContext);
         }
 
         // (3) Invoke the provider behind its adapter, honoring the timeout/retry budget. A thrown adapter → AdapterFailure
@@ -184,7 +188,8 @@ public sealed class AgentInteractionGenerationOrchestrator
             AgentGenerationOutcome outcome = providerResult.Outcome == AgentGenerationOutcome.Succeeded
                 ? AgentGenerationOutcome.GenerationError // a "succeeded" result with no content is a degraded provider result
                 : providerResult.Outcome;
-            return FailedResult(outcome, request, attemptId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(outcome, request, attemptId, entry.CapabilityVersion,
+                providerResult.PromptTokenCount, providerResult.OutputTokenCount, attemptContext);
         }
 
         // (4) Content-safety gate — BEFORE any downstream artifact (AC2). Read the effective policy (not-available →
@@ -193,14 +198,16 @@ public sealed class AgentInteractionGenerationOrchestrator
         AgentContentSafetyPolicyReadResult policy = await ReadPolicyAsync(request, ct).ConfigureAwait(false);
         if (!policy.IsAvailable || policy.Policy is null)
         {
-            return FailedResult(AgentGenerationOutcome.PolicyFailure, request, attemptId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentGenerationOutcome.PolicyFailure, request, attemptId, entry.CapabilityVersion,
+                providerResult.PromptTokenCount, providerResult.OutputTokenCount, attemptContext);
         }
 
         ContentSafetyVerdict verdict = await EvaluateSafetyAsync(providerResult.GeneratedContent, policy.Policy, ct).ConfigureAwait(false);
         if (verdict != ContentSafetyVerdict.Passed)
         {
             // Fail closed and carry NO content — the unsafe content never reaches the aggregate (AD-5, AD-14).
-            return FailedResult(AgentGenerationOutcome.ContentSafetyBlocked, request, attemptId, entry.CapabilityVersion, providerResult.PromptTokenCount, providerResult.OutputTokenCount);
+            return FailedResult(AgentGenerationOutcome.ContentSafetyBlocked, request, attemptId, entry.CapabilityVersion,
+                providerResult.PromptTokenCount, providerResult.OutputTokenCount, attemptContext);
         }
 
         // (5) Success — carry the generated content as the sole transport into the aggregate, whose success event becomes
@@ -214,7 +221,10 @@ public sealed class AgentInteractionGenerationOrchestrator
             policy.PolicyVersion,
             providerResult.GeneratedContent,
             providerResult.PromptTokenCount,
-            providerResult.OutputTokenCount);
+            providerResult.OutputTokenCount)
+        {
+            AttemptContext = attemptContext,
+        };
     }
 
     private async Task<AgentGenerationProviderResult> InvokeProviderAsync(
@@ -285,7 +295,8 @@ public sealed class AgentInteractionGenerationOrchestrator
         string attemptId,
         int? admittedCapabilityVersion = null,
         int promptTokenCount = 0,
-        int outputTokenCount = 0)
+        int outputTokenCount = 0,
+        AgentAttemptContextEvidence? attemptContext = null)
         => new(
             outcome,
             attemptId,
@@ -295,7 +306,10 @@ public sealed class AgentInteractionGenerationOrchestrator
             request.ContentSafetyPolicyVersion,
             GeneratedContent: null,
             promptTokenCount,
-            outputTokenCount);
+            outputTokenCount)
+        {
+            AttemptContext = attemptContext,
+        };
 
     // The deterministic attempt id derived purely from the interaction id (AD-13) — no Guid/random/time, so retries reuse it.
     private static string DeriveAttemptId(string agentInteractionId) => $"attempt-{agentInteractionId}";

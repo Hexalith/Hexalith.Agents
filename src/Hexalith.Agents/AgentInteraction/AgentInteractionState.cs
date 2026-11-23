@@ -66,6 +66,9 @@ public sealed partial class AgentInteractionState
     /// <summary>Gets or sets the safe attempt metadata recorded by the latest initial generation failure.</summary>
     public AgentGenerationAttemptEvidence? GenerationFailureEvidence { get; set; }
 
+    /// <summary>Gets or sets the fresh context evidence from the latest initial generation attempt.</summary>
+    public AgentAttemptContextEvidence? GenerationAttemptContext { get; set; }
+
     /// <summary>Gets or sets the safe posted-message evidence recorded when the posting decision was made (Audit Evidence; FR-24, AD-14; ids only, never content). <see langword="null"/> until a posting decision is recorded.</summary>
     public AgentPostedMessageEvidence? PostingEvidence { get; set; }
 
@@ -223,6 +226,7 @@ public sealed partial class AgentInteractionState
 
         Status = AgentInteractionStatus.Generated;
         GenerationFailureEvidence = null;
+        GenerationAttemptContext = e.AttemptContext;
         var versions = GeneratedVersions is null
             ? new List<AgentGeneratedVersion>()
             : new List<AgentGeneratedVersion>(GeneratedVersions);
@@ -243,6 +247,7 @@ public sealed partial class AgentInteractionState
         Status = e.Decision;
         GenerationFailureReason = e.Reason;
         GenerationFailureEvidence = e.Evidence;
+        GenerationAttemptContext = e.AttemptContext;
     }
 
     /// <summary>No-op replay handler — the not-generatable rejection carries no state change.</summary>
@@ -383,6 +388,7 @@ public sealed partial class AgentInteractionState
 
         Status = AgentInteractionStatus.ProposalRegenerated;
         ProposalState = ProposedAgentReplyState.Regenerated;
+        ProposalRegenerationFailureReason = null;
         ProposalRegenerationEvidence = e.Evidence;
         var versions = GeneratedVersions is null
             ? new List<AgentGeneratedVersion>()

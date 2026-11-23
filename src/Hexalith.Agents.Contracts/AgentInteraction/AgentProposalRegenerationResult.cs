@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 using Hexalith.Agents.Contracts.Agent;
 
 namespace Hexalith.Agents.Contracts.AgentInteraction;
@@ -56,4 +58,9 @@ public record AgentProposalRegenerationResult(
     int ApproverPolicyVersion,
     ApproverPolicyBasisDisclosure DisclosureCategory,
     int PromptTokenCount,
-    int OutputTokenCount);
+    int OutputTokenCount)
+{
+    /// <summary>Gets safe evidence of the fresh attempt context check, when recorded.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public AgentAttemptContextEvidence? AttemptContext { get; init; }
+}

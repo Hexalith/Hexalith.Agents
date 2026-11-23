@@ -120,6 +120,8 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         evidence.ProviderCapabilityVersion.ShouldBe(5);
         evidence.PromptTokenCount.ShouldBe(1_200);
         evidence.OutputTokenCount.ShouldBe(350);
+        AgentInteractionAuditInspection.GetContextEvidence(state, isAuthorized: true).Evidence.ShouldNotBeNull()
+            .GenerationAttemptContext.ShouldNotBeNull().Budget.ShouldNotBeNull().AvailableContextTokenBudget.ShouldBe(99_200);
         AgentInteractionAuditInspection.GetGenerationEvidence(state, isAuthorized: false).ShouldBeNull();
         DispatchedResult().GeneratedContent.ShouldBeNull();
 
@@ -520,6 +522,13 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         generated.Version.GeneratedContent.ShouldBe(GeneratedContentText);
         generated.Version.ProviderCapabilityVersion.ShouldBe(3);
         DispatchedResult().ProviderCapabilityVersion.ShouldBe(3);
+        state.Apply(JsonSerializer.Deserialize<AgentOutputGenerated>(JsonSerializer.Serialize(generated))!);
+        var context = AgentInteractionAuditInspection.GetContextEvidence(state, isAuthorized: true).Evidence.ShouldNotBeNull();
+        context.GenerationAttemptContext.ShouldNotBeNull().Budget.ShouldNotBeNull().AvailableContextTokenBudget.ShouldBe(2_000);
+        string audit = JsonSerializer.Serialize(context);
+        audit.ShouldNotContain(GeneratedContentText);
+        audit.ShouldNotContain(SourceConversationText);
+        AgentInteractionAuditInspection.GetContextEvidence(state, isAuthorized: false).Evidence.ShouldBeNull();
         await _generationProvider.Received(1).GenerateAsync(
             Arg.Is<AgentGenerationProviderRequest>(invocation => invocation.ProviderCapabilityVersion == 3
                 && invocation.RequestTimeoutMilliseconds == 600_000 && invocation.MaxRetries == 10
@@ -557,6 +566,9 @@ public sealed class AgentInteractionGenerationOrchestratorTests
 
         DispatchedResult().Outcome.ShouldBe(AgentGenerationOutcome.ProviderUnavailable);
         DispatchedResult().GeneratedContent.ShouldBeNull();
+        using JsonDocument payload = JsonDocument.Parse(LastDispatched().ShouldNotBeNull().Payload);
+        payload.RootElement.GetProperty("Result").TryGetProperty("AttemptContext", out _).ShouldBeFalse();
+        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasurePayloadAsync(default!, default!, default!, default, default);
         await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
     }
 
@@ -594,6 +606,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
 
     [Theory]
     [InlineData("missing-read")]
+    [InlineData("unauthorized")]
     [InlineData("stale")]
     [InlineData("missing-messages")]
     [InlineData("count-mismatch")]
@@ -609,6 +622,7 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         ConversationContextReadResult invalid = defect switch
         {
             "missing-read" => null!,
+            "unauthorized" => valid with { Outcome = AgentInteractionContextLoadOutcome.Unauthorized },
             "stale" => valid with { IsFresh = false },
             "missing-messages" => valid with { Messages = null },
             "count-mismatch" => valid with { MessageCount = 0 },
@@ -624,7 +638,27 @@ public sealed class AgentInteractionGenerationOrchestratorTests
 
         DispatchedResult().Outcome.ShouldBe(AgentGenerationOutcome.InvalidContext);
         DispatchedResult().GeneratedContent.ShouldBeNull();
-        Encoding.UTF8.GetString(LastDispatched()!.Payload).ShouldNotContain(SourceConversationText);
+        AgentAttemptContextEvidence context = DispatchedResult().AttemptContext.ShouldNotBeNull();
+        AgentInteractionContextLoadOutcome expectedOutcome = defect switch
+        {
+            "unauthorized" => AgentInteractionContextLoadOutcome.Unauthorized,
+            "stale" => AgentInteractionContextLoadOutcome.Stale,
+            _ => AgentInteractionContextLoadOutcome.Unavailable,
+        };
+        context.LoadOutcome.ShouldBe(expectedOutcome);
+        context.Mode.ShouldBe(AgentInteractionContextMode.Blocked);
+        context.BlockReason.ShouldBe(expectedOutcome switch
+        {
+            AgentInteractionContextLoadOutcome.Unauthorized => AgentInteractionContextBlockReason.ContextUnavailable,
+            AgentInteractionContextLoadOutcome.Stale => AgentInteractionContextBlockReason.ContextNotFresh,
+            _ => AgentInteractionContextBlockReason.ContextReadUnavailable,
+        });
+        context.Budget.ShouldBeNull();
+        ReplayContextRefusal().ShouldBe(context);
+        string dispatchedJson = Encoding.UTF8.GetString(LastDispatched()!.Payload);
+        dispatchedJson.ShouldNotContain(SourceConversationText);
+        using JsonDocument payload = JsonDocument.Parse(dispatchedJson);
+        payload.RootElement.GetProperty("Result").GetProperty("AttemptContext").TryGetProperty("Budget", out _).ShouldBeFalse();
         await _providerCatalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
         await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasurePayloadAsync(default!, default!, default!, default, default);
         await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
@@ -650,6 +684,22 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         DispatchedResult().ProviderCapabilityVersion.ShouldBe(4);
         DispatchedResult().PromptTokenCount.ShouldBe(0);
         DispatchedResult().OutputTokenCount.ShouldBe(0);
+        AgentAttemptContextEvidence context = DispatchedResult().AttemptContext.ShouldNotBeNull();
+        context.LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Loaded);
+        context.Mode.ShouldBe(AgentInteractionContextMode.Blocked);
+        if (count == 99_201)
+        {
+            context.BlockReason.ShouldBe(AgentInteractionContextBlockReason.ExceedsModelBudget);
+            context.Budget.ShouldBe(new AgentAttemptContextBudgetEvidence(
+                count, 4, ContextWindowTokenLimit, MaxOutputTokenLimit, 10, 12_800, 99_200));
+        }
+        else
+        {
+            context.BlockReason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
+            context.Budget.ShouldBeNull();
+        }
+
+        ReplayContextRefusal().ShouldBe(context);
         await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
     }
 
@@ -697,6 +747,12 @@ public sealed class AgentInteractionGenerationOrchestratorTests
         await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
 
         DispatchedResult().Outcome.ShouldBe(AgentGenerationOutcome.Succeeded);
+        AgentAttemptContextEvidence context = DispatchedResult().AttemptContext.ShouldNotBeNull();
+        context.LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Loaded);
+        context.Mode.ShouldBe(AgentInteractionContextMode.Full);
+        context.BlockReason.ShouldBeNull();
+        context.Budget.ShouldBe(new AgentAttemptContextBudgetEvidence(
+            emptyTimeline ? 0 : 220, 4, 801, 500, 10, 81, 220));
         await _tokenMeasurer.Received(1).MeasurePayloadAsync(payload, ProviderId, ModelId, 4, CancellationToken.None);
         await _generationProvider.Received(1).GenerateAsync(
             Arg.Is<AgentGenerationProviderRequest>(request => request.ContextPayload == payload && request.ProviderCapabilityVersion == 4 && request.MaxOutputTokenLimit == 500),
@@ -888,6 +944,18 @@ public sealed class AgentInteractionGenerationOrchestratorTests
 
     private void CaptureDispatch()
         => _dispatcher.DispatchAsync(Arg.Do<AgentCommandIntent>(e => _lastDispatched = e), Arg.Any<CancellationToken>());
+
+    private AgentAttemptContextEvidence? ReplayContextRefusal()
+    {
+        AgentCommandIntent dispatched = LastDispatched().ShouldNotBeNull();
+        var command = JsonSerializer.Deserialize<GenerateAgentOutput>(dispatched.Payload)!;
+        AgentInteractionState state = ContextReadyState();
+        DomainResult decision = AgentInteractionAggregate.Handle(command, state, dispatched.ToFixtureEnvelope());
+        var failure = decision.Events[0].ShouldBeOfType<AgentOutputGenerationFailed>();
+        state.Apply(JsonSerializer.Deserialize<AgentOutputGenerationFailed>(JsonSerializer.Serialize(failure))!);
+        state.Status.ShouldBe(AgentInteractionStatus.GenerationFailed);
+        return AgentInteractionAuditInspection.GetContextEvidence(state, isAuthorized: true).Evidence.ShouldNotBeNull().GenerationAttemptContext;
+    }
 
     private AgentCommandIntent? LastDispatched() => _lastDispatched;
 

@@ -183,6 +183,10 @@ public sealed class AuditQueryIsolationTests
     {
         AgentInteractionState state = State();
         state.ProposalEvidence = new("proposal", "poison-conversation", "version", 1, 1, null);
+        state.GenerationAttemptContext = new(AgentInteractionContextLoadOutcome.Unavailable, AgentInteractionContextMode.Blocked)
+        {
+            BlockReason = AgentInteractionContextBlockReason.ContextReadUnavailable,
+        };
         IAgentInteractionAuditStateReader reader = Reader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", state));
         var clock = new Story54TimeProvider();
         IAgentInteractionAuditAuthority authority = Substitute.For<IAgentInteractionAuditAuthority>();
@@ -193,7 +197,46 @@ public sealed class AuditQueryIsolationTests
 
         QueryResult result = await handler.ExecuteAsync(Envelope(handler.QueryType), CancellationToken.None);
 
-        result.GetPayload().GetProperty("status").GetString().ShouldBe(allowed ? "Success" : "NotAuthorized");
+        JsonElement payload = result.GetPayload();
+        payload.GetProperty("status").GetString().ShouldBe(allowed ? "Success" : "NotAuthorized");
+        if (allowed)
+        {
+            payload.GetProperty("evidence").GetProperty("generationAttemptContext").GetProperty("loadOutcome").GetString().ShouldBe("Unavailable");
+        }
+        else
+        {
+            payload.GetProperty("evidence").ValueKind.ShouldBe(JsonValueKind.Null);
+        }
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task AttemptContextRequiresFreshScopedAuditState(bool isFresh)
+    {
+        AgentInteractionState state = State();
+        var context = new AgentAttemptContextEvidence(AgentInteractionContextLoadOutcome.Loaded, AgentInteractionContextMode.Full)
+        {
+            Budget = new(123, 1, 1_000, 100, 10, 100, 800),
+        };
+        state.GenerationAttemptContext = context;
+        state.ProposalRegenerationEvidence = state.ProposalRegenerationEvidence.ShouldNotBeNull() with { AttemptContext = context };
+        IAgentInteractionAuditStateReader reader = Reader(AgentInteractionAuditStateReadResult.Available("tenant-1", "interaction-1", state, isFresh));
+        IAgentInteractionAuditAuthority authority = Authorized();
+        var contextHandler = new GetAgentInteractionContextEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority);
+        var regenerationHandler = new GetAgentProposalRegenerationEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority);
+        var operationsHandler = new GetAgentGenerationEvidenceQueryHandler(reader, new DeferredTenantAccessReader(), authority);
+
+        QueryResult scopedContext = await contextHandler.ExecuteAsync(Envelope(contextHandler.QueryType), CancellationToken.None);
+        QueryResult scopedRegeneration = await regenerationHandler.ExecuteAsync(Envelope(regenerationHandler.QueryType), CancellationToken.None);
+        QueryResult operations = await operationsHandler.ExecuteAsync(Envelope(operationsHandler.QueryType), CancellationToken.None);
+
+        scopedContext.GetPayload().GetProperty("evidence").TryGetProperty("generationAttemptContext", out _).ShouldBe(isFresh);
+        scopedRegeneration.GetPayload().GetProperty("evidence").TryGetProperty("attemptContext", out _).ShouldBe(isFresh);
+        string operationsJson = operations.GetPayload().GetRawText();
+        operationsJson.ShouldContain("poison-attempt");
+        operationsJson.ShouldNotContain("attemptContext", Case.Insensitive);
+        operationsJson.ShouldNotContain("fullContextTokenCount");
     }
 
     [Theory]

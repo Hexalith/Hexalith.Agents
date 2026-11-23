@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Hexalith.Agents.Contracts.AgentInteraction.Events;
 
 /// <summary>
@@ -26,4 +28,9 @@ public record AgentOutputGenerationFailed(
     string AgentInteractionId,
     AgentInteractionStatus Decision,
     AgentOutputGenerationFailureReason Reason,
-    AgentGenerationAttemptEvidence Evidence) : IEventPayload;
+    AgentGenerationAttemptEvidence Evidence) : IEventPayload
+{
+    /// <summary>Gets safe evidence of the fresh attempt context check, when recorded.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public AgentAttemptContextEvidence? AttemptContext { get; init; }
+}

@@ -1052,7 +1052,11 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `spec-five-deferred-context-budget-items.md`
   summary: Preserve the safe authorized-read outcome on fresh generation and regeneration attempts.
   evidence: Both invocation paths discard the typed load outcome and record `InvalidContext`. Attempt evidence can retain the safe load classification while preserving the operation's terminal status.
+  status: done 2026-11-23
+  resolution: `spec-five-deferred-attempt-context-evidence-items.md` — Both paths record the safe load classification and context block reason on the attempted outcome. The existing terminal statuses and scoped audit authorization apply. Denied, stale and unavailable reads replay without budget terms.
 
 - source_spec: `spec-five-deferred-context-budget-items.md`
   summary: Record the final evaluated context budget on the prepared generation or regeneration attempt.
   evidence: The fresh invocation check consumes the current catalog and timeline independently of readiness. It returns a fit verdict without carrying measured terms into durable attempt evidence, including when the current context is oversized.
+  status: done 2026-11-23
+  resolution: `spec-five-deferred-attempt-context-evidence-items.md` — Both paths record the actual measured budget terms on the durable attempt outcome, including measured zero, measured oversized refusals and failures after the context check. The scoped inspections display the evidence when the audit read is fresh. The pre-invocation checkpoint remains part of the Epic 4 runtime reconciliation.
