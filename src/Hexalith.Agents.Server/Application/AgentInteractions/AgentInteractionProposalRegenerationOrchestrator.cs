@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,6 +58,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
     ];
 
     private readonly IConversationContextReader _contextReader;
+    private readonly IConversationContextTokenMeasurer _tokenMeasurer;
     private readonly IProviderCatalogReader _providerCatalogReader;
     private readonly IAgentGenerationProvider _generationProvider;
     private readonly IAgentContentSafetyPolicyReader _policyReader;
@@ -83,8 +82,31 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         IContentSafetyEvaluator safetyEvaluator,
         IApproverPolicyResolver approverPolicyResolver,
         IAgentCommandDispatcher dispatcher)
+        : this(contextReader, providerCatalogReader, generationProvider, policyReader, safetyEvaluator, approverPolicyResolver, dispatcher, new DeferredConversationContextTokenMeasurer())
+    {
+    }
+
+    /// <summary>Initializes the regeneration orchestrator with an exact-payload tokenizer.</summary>
+    /// <param name="contextReader">The authorized Source Conversation reader.</param>
+    /// <param name="providerCatalogReader">The current provider-catalog reader.</param>
+    /// <param name="generationProvider">The provider-generation adapter.</param>
+    /// <param name="policyReader">The effective Content Safety Policy reader.</param>
+    /// <param name="safetyEvaluator">The output content-safety evaluator.</param>
+    /// <param name="approverPolicyResolver">The current approver-policy resolver.</param>
+    /// <param name="dispatcher">The trusted command dispatcher.</param>
+    /// <param name="tokenMeasurer">The exact provider input measurement port.</param>
+    public AgentInteractionProposalRegenerationOrchestrator(
+        IConversationContextReader contextReader,
+        IProviderCatalogReader providerCatalogReader,
+        IAgentGenerationProvider generationProvider,
+        IAgentContentSafetyPolicyReader policyReader,
+        IContentSafetyEvaluator safetyEvaluator,
+        IApproverPolicyResolver approverPolicyResolver,
+        IAgentCommandDispatcher dispatcher,
+        IConversationContextTokenMeasurer tokenMeasurer)
     {
         ArgumentNullException.ThrowIfNull(contextReader);
+        ArgumentNullException.ThrowIfNull(tokenMeasurer);
         ArgumentNullException.ThrowIfNull(providerCatalogReader);
         ArgumentNullException.ThrowIfNull(generationProvider);
         ArgumentNullException.ThrowIfNull(policyReader);
@@ -92,6 +114,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         ArgumentNullException.ThrowIfNull(approverPolicyResolver);
         ArgumentNullException.ThrowIfNull(dispatcher);
         _contextReader = contextReader;
+        _tokenMeasurer = tokenMeasurer;
         _providerCatalogReader = providerCatalogReader;
         _generationProvider = generationProvider;
         _policyReader = policyReader;
@@ -107,6 +130,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
     public async Task<AgentInteractionProposalRegenerationOutcomeResult> ExecuteAsync(AgentInteractionProposalRegenerationRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ct.ThrowIfCancellationRequested();
 
         // (1) AC4 — a terminal proposal can never invoke the provider. The trusted request carries the current proposal
         // sub-state; if it is not in the retryable set { Pending, Edited, Regenerated } we deny WITHOUT reading the
@@ -122,6 +146,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         // (2) Resolve regeneration-time approver authorization, fail closed (AD-12). A non-Valid verdict denies the
         // regeneration WITHOUT invoking the provider or dispatching — WHO may act is enforced before the model runs (FR-16).
         ApproverPolicyValidationStatus verdict = await ResolveAuthorizationAsync(request, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         if (verdict != ApproverPolicyValidationStatus.Valid)
         {
             return new AgentInteractionProposalRegenerationOutcomeResult(
@@ -202,23 +227,30 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         CancellationToken ct)
     {
         // (1) Re-read the SAME Source Conversation content fresh (the proposal is linked to it; AD-6). Fail closed → InvalidContext.
-        ConversationContextReadResult read = await ReadContextAsync(request, ct).ConfigureAwait(false);
-        if (read.Outcome != AgentInteractionContextLoadOutcome.Loaded || read.Messages is null)
+        string? payload = await GenerationContext.ReadPayloadAsync(
+            _contextReader, request.TenantId, request.SourceConversationId, request.ActorUserId, request.CorrelationId, ct).ConfigureAwait(false);
+        if (payload is null)
         {
             return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId);
         }
 
         GenerationCatalogRead catalog = await GenerationCatalogRead.ReadAsync(
             _providerCatalogReader, request.TenantId, request.ProviderId, request.ModelId, request.ProviderCapabilityVersion, ct).ConfigureAwait(false);
+        ct.ThrowIfCancellationRequested();
         if (catalog.Entry is not { } entry)
         {
             return FailedResult(MapProviderOutcome(catalog.Outcome), request, verdict, attemptId, regeneratedVersionId);
         }
 
+        if (!await GenerationContext.FitsAsync(_tokenMeasurer, payload, entry, ct).ConfigureAwait(false))
+        {
+            return FailedResult(AgentProposalRegenerationOutcome.InvalidContext, request, verdict, attemptId, regeneratedVersionId, entry.CapabilityVersion);
+        }
+
         // (3) Re-invoke the provider behind its adapter, honoring the timeout/retry budget. A thrown adapter → AdapterFailure
         // (no raw provider error leaks; AD-14). A non-success provider outcome maps through; a degraded success (no content)
         // fails closed to AdapterFailure (there is no GenerationError on the regeneration surface).
-        AgentGenerationProviderResult providerResult = await InvokeProviderAsync(entry, read.Messages, attemptId, ct).ConfigureAwait(false);
+        AgentGenerationProviderResult providerResult = await InvokeProviderAsync(entry, payload, attemptId, ct).ConfigureAwait(false);
         if (providerResult.Outcome != AgentGenerationOutcome.Succeeded || providerResult.GeneratedContent is null)
         {
             AgentProposalRegenerationOutcome outcome = providerResult.Outcome == AgentGenerationOutcome.Succeeded
@@ -277,26 +309,9 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             providerResult.OutputTokenCount);
     }
 
-    private async Task<ConversationContextReadResult> ReadContextAsync(AgentInteractionProposalRegenerationRequest request, CancellationToken ct)
-    {
-        try
-        {
-            // The regeneration re-read keys on the actor security principal; authorization was already settled at the gate
-            // (Story 2.2) and at the approver check above, so the auxiliary caller-party reference is not carried here.
-            return await _contextReader
-                .ReadAsync(request.TenantId, request.SourceConversationId, string.Empty, request.ActorUserId, request.CorrelationId, ct)
-                .ConfigureAwait(false);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // Fail closed (AD-12) — never propagate the raw exception (AD-14: no stack traces/payloads leak).
-            return ConversationContextReadResult.Unavailable;
-        }
-    }
-
     private async Task<AgentGenerationProviderResult> InvokeProviderAsync(
         ProviderCatalogEntryView entry,
-        IReadOnlyList<ConversationContextMessage> messages,
+        string payload,
         string attemptId,
         CancellationToken ct)
     {
@@ -306,11 +321,12 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
                 entry.ProviderId,
                 entry.ModelId,
                 entry.CapabilityVersion,
-                BuildContextPayload(messages),
+                payload,
                 entry.MaxOutputTokenLimit,
                 entry.TimeoutPolicy.RequestTimeoutMilliseconds,
                 entry.TimeoutPolicy.MaxRetries,
                 attemptId);
+            ct.ThrowIfCancellationRequested();
             return await _generationProvider.GenerateAsync(providerRequest, ct).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -353,19 +369,6 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         }
     }
 
-    // Assembles the model input from the re-read visible timeline (ordered for stability). Sensitive content held only in
-    // memory for the provider invocation — never persisted, put on a command/event/view, or logged (AD-14).
-    private static string BuildContextPayload(IReadOnlyList<ConversationContextMessage> messages)
-    {
-        var builder = new StringBuilder();
-        foreach (ConversationContextMessage message in messages.OrderBy(m => m.CreatedAt))
-        {
-            builder.AppendLine(message.Text);
-        }
-
-        return builder.ToString();
-    }
-
     // Maps a provider/generation outcome to the regeneration outcome. The provider surface (AgentGenerationOutcome) has a
     // GenerationError value the regeneration surface deliberately omits; it and any unknown sentinel fail closed to the
     // content-free adapter generic.
@@ -390,7 +393,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
         ApproverPolicyValidationStatus verdict,
         string attemptId,
         string regeneratedVersionId,
-        int? invokedCapabilityVersion = null,
+        int? admittedCapabilityVersion = null,
         int promptTokenCount = 0,
         int outputTokenCount = 0)
         => new(
@@ -404,7 +407,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestrator
             request.RequesterPartyId,
             request.ProviderId,
             request.ModelId,
-            invokedCapabilityVersion ?? Math.Max(0, request.ProviderCapabilityVersion),
+            admittedCapabilityVersion ?? Math.Max(0, request.ProviderCapabilityVersion),
             request.ContentSafetyPolicyVersion,
             request.ApproverPolicyVersion,
             request.ApproverPolicy?.DisclosureCategory ?? ApproverPolicyBasisDisclosure.Omitted,

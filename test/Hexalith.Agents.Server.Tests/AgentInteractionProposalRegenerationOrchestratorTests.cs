@@ -56,6 +56,7 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
     private static readonly DateTimeOffset _sampleCreatedAt = new(2026, 6, 24, 10, 0, 0, TimeSpan.Zero);
 
     private readonly IConversationContextReader _contextReader = Substitute.For<IConversationContextReader>();
+    private readonly IConversationContextTokenMeasurer _tokenMeasurer = Substitute.For<IConversationContextTokenMeasurer>();
     private readonly IProviderCatalogReader _providerCatalogReader = Substitute.For<IProviderCatalogReader>();
     private readonly IAgentGenerationProvider _generationProvider = Substitute.For<IAgentGenerationProvider>();
     private readonly IAgentContentSafetyPolicyReader _policyReader = Substitute.For<IAgentContentSafetyPolicyReader>();
@@ -72,7 +73,8 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         _policyReader,
         _safetyEvaluator,
         _resolver,
-        _dispatcher);
+        _dispatcher,
+        _tokenMeasurer);
 
     // ===== Happy path → ProposalRegenerated (AC1, AC2) =====
 
@@ -606,6 +608,213 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
             Arg.Is<AgentGenerationProviderRequest>(request => request.ProviderCapabilityVersion == 4), Arg.Any<CancellationToken>());
     }
 
+    [Theory]
+    [InlineData("missing-read")]
+    [InlineData("stale")]
+    [InlineData("missing-messages")]
+    [InlineData("count-mismatch")]
+    [InlineData("null-message")]
+    [InlineData("blank-message")]
+    [InlineData("invalid-timestamp")]
+    public async Task InvalidFreshReadStopsBeforeCatalogMeasurementOrInvocation(string defect)
+    {
+        StubHappy();
+        CaptureDispatch();
+        ConversationContextMessage[] messages = [new(SourceConversationText, _sampleCreatedAt)];
+        var valid = new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, 1, true);
+        ConversationContextReadResult invalid = defect switch
+        {
+            "missing-read" => null!,
+            "stale" => valid with { IsFresh = false },
+            "missing-messages" => valid with { Messages = null },
+            "count-mismatch" => valid with { MessageCount = 0 },
+            "null-message" => valid with { Messages = [null!] },
+            "blank-message" => valid with { Messages = [new("  ", _sampleCreatedAt)] },
+            "invalid-timestamp" => valid with { Messages = [new(SourceConversationText, default)] },
+            _ => throw new ArgumentOutOfRangeException(nameof(defect)),
+        };
+        _contextReader.ReadAsync(TenantId, SourceConversationId, string.Empty, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+            .Returns(invalid);
+
+        await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.InvalidContext);
+        DispatchedResult().RegeneratedVersion.ShouldBeNull();
+        Encoding.UTF8.GetString(LastDispatched()!.Payload).ShouldNotContain(SourceConversationText);
+        await _providerCatalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasurePayloadAsync(default!, default!, default!, default, default);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData(false, 1)]
+    [InlineData(true, -1)]
+    [InlineData(true, 0)]
+    [InlineData(true, ContextWindowTokenLimit - MaxOutputTokenLimit + 1)]
+    public async Task UnavailableInvalidOrOversizeMeasurementPreventsInvocation(bool isAvailable, int count)
+    {
+        StubHappy();
+        StubEnabledCatalog(capabilityVersion: 4);
+        CaptureDispatch();
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 4, Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextTokenMeasurement(isAvailable, count));
+
+        await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.InvalidContext);
+        DispatchedResult().RegeneratedVersion.ShouldBeNull();
+        DispatchedResult().ProviderCapabilityVersion.ShouldBe(4);
+        DispatchedResult().PromptTokenCount.ShouldBe(0);
+        DispatchedResult().OutputTokenCount.ShouldBe(0);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task TokenizerFaultRefusesWithoutLeakingDetailsOrCallingProvider()
+    {
+        StubHappy();
+        CaptureDispatch();
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 1, Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException(SourceConversationText));
+
+        await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.InvalidContext);
+        Encoding.UTF8.GetString(LastDispatched()!.Payload).ShouldNotContain(SourceConversationText);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ExactCapacitySendsTheMeasuredPayloadForTheAdmittedVersion(bool emptyTimeline)
+    {
+        StubHappy();
+        ProviderCatalogEntryView entry = Entry(ProviderModelStatus.Enabled, supportsTextGeneration: true) with
+        {
+            CapabilityVersion = 4,
+            ContextWindowTokenLimit = 800,
+            MaxOutputTokenLimit = 500,
+        };
+        _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
+            .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, entry));
+        CaptureDispatch();
+        ConversationContextMessage[] messages = emptyTimeline ? [] :
+        [
+            new("later", _sampleCreatedAt.AddMinutes(1)),
+            new(SourceConversationText, _sampleCreatedAt),
+        ];
+        _contextReader.ReadAsync(TenantId, SourceConversationId, string.Empty, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Length, true));
+        string payload = emptyTimeline ? string.Empty : $"{SourceConversationText}{Environment.NewLine}later{Environment.NewLine}";
+        _tokenMeasurer.MeasurePayloadAsync(payload, ProviderId, ModelId, 4, Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextTokenMeasurement(true, emptyTimeline ? 0 : 300));
+
+        await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.Regenerated);
+        await _tokenMeasurer.Received(1).MeasurePayloadAsync(payload, ProviderId, ModelId, 4, CancellationToken.None);
+        await _generationProvider.Received(1).GenerateAsync(
+            Arg.Is<AgentGenerationProviderRequest>(request => request.ContextPayload == payload && request.ProviderCapabilityVersion == 4 && request.MaxOutputTokenLimit == 500),
+            CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task ATokenizerReturningAfterCancellationCannotStartAnInvocation()
+    {
+        StubHappy();
+        using var cancellation = new CancellationTokenSource();
+        var measurement = new TaskCompletionSource<ConversationContextTokenMeasurement>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 1, cancellation.Token)
+            .Returns(measurement.Task);
+
+        Task request = Orchestrator.ExecuteAsync(Request(), cancellation.Token);
+        request.IsCompleted.ShouldBeFalse();
+        _ = _tokenMeasurer.Received(1).MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, 1, cancellation.Token);
+        await cancellation.CancelAsync();
+        measurement.SetResult(new ConversationContextTokenMeasurement(true, 1));
+
+        await Should.ThrowAsync<OperationCanceledException>(async () => await request);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+        await _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task NonCallerConversationTimeoutRefusesWithoutMeasuringOrInvoking()
+    {
+        StubHappy();
+        CaptureDispatch();
+        _contextReader.ReadAsync(TenantId, SourceConversationId, string.Empty, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+            .ThrowsAsync(new TaskCanceledException(SourceConversationText));
+
+        await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.InvalidContext);
+        Encoding.UTF8.GetString(LastDispatched()!.Payload).ShouldNotContain(SourceConversationText);
+        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasurePayloadAsync(default!, default!, default!, default, default);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task ARejectedCatalogReadReturningAfterCancellationCannotDispatch()
+    {
+        StubHappy();
+        using var cancellation = new CancellationTokenSource();
+        _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, cancellation.Token)
+            .Returns(_ =>
+            {
+                cancellation.Cancel();
+                return new ProviderCatalogEntryReadResult(
+                    ProviderCatalogInspectionStatus.Success, Entry(ProviderModelStatus.Disabled, supportsTextGeneration: true));
+            });
+
+        await Should.ThrowAsync<OperationCanceledException>(async () => await Orchestrator.ExecuteAsync(Request(), cancellation.Token));
+
+        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasurePayloadAsync(default!, default!, default!, default, default);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+        await _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task ATokenizerOfferingOnlyTimelineCountsCannotAuthorizeInvocation()
+    {
+        StubHappy();
+        CaptureDispatch();
+        var orchestrator = new AgentInteractionProposalRegenerationOrchestrator(
+            _contextReader,
+            _providerCatalogReader,
+            _generationProvider,
+            _policyReader,
+            _safetyEvaluator,
+            _resolver,
+            _dispatcher,
+            new TimelineOnlyConversationContextTokenMeasurer());
+
+        await orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        DispatchedResult().Outcome.ShouldBe(AgentProposalRegenerationOutcome.InvalidContext);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+    }
+
+    [Fact]
+    public async Task AnApproverDenialReturningAfterCancellationCannotStartAContextRead()
+    {
+        StubHappy();
+        using var cancellation = new CancellationTokenSource();
+        _resolver.ResolveForActorAsync(TenantId, Arg.Any<AgentApproverPolicy>(), Arg.Any<ApproverResolutionContext>(), cancellation.Token)
+            .Returns(_ =>
+            {
+                cancellation.Cancel();
+                return new ApproverPolicyResolutionResult([]);
+            });
+
+        await Should.ThrowAsync<OperationCanceledException>(async () => await Orchestrator.ExecuteAsync(Request(), cancellation.Token));
+
+        await _contextReader.DidNotReceiveWithAnyArgs().ReadAsync(default!, default!, default!, default!, default!, default);
+        await _generationProvider.DidNotReceiveWithAnyArgs().GenerateAsync(default!, default);
+        await _dispatcher.DidNotReceiveWithAnyArgs().DispatchAsync(default!, default);
+    }
+
     // ===== Helpers =====
 
     private void StubHappy()
@@ -631,6 +840,8 @@ public sealed class AgentInteractionProposalRegenerationOrchestratorTests
         IReadOnlyList<ConversationContextMessage> messages = [new ConversationContextMessage(SourceConversationText, _sampleCreatedAt)];
         _contextReader.ReadAsync(TenantId, SourceConversationId, Arg.Any<string>(), ActorUserId, "corr-1", Arg.Any<CancellationToken>())
             .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, messages.Count, true));
+        _tokenMeasurer.MeasurePayloadAsync(Arg.Any<string>(), ProviderId, ModelId, Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextTokenMeasurement(true, 1));
     }
 
     private void StubEnabledCatalog(int capabilityVersion = 1)

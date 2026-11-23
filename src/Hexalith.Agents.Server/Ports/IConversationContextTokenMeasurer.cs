@@ -25,4 +25,15 @@ public interface IConversationContextTokenMeasurer
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The safe token measurement (availability + measured count).</returns>
     Task<ConversationContextTokenMeasurement> MeasureAsync(IReadOnlyList<ConversationContextMessage> messages, string providerId, string modelId, CancellationToken ct);
+
+    /// <summary>Measures the exact serialized provider context using a tokenizer compatible with the admitted capability.</summary>
+    /// <param name="contextPayload">The sensitive provider input, measured only in memory.</param>
+    /// <param name="providerId">The admitted provider identifier.</param>
+    /// <param name="modelId">The admitted model identifier.</param>
+    /// <param name="capabilityVersion">The current admitted capability version.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A trustworthy exact count, or unavailable when exact measurement cannot be established.</returns>
+    Task<ConversationContextTokenMeasurement> MeasurePayloadAsync(
+        string contextPayload, string providerId, string modelId, int capabilityVersion, CancellationToken ct)
+        => Task.FromResult(ConversationContextTokenMeasurement.NotAvailable);
 }
