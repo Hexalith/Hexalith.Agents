@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Hexalith.Agents.Contracts.Agent;
 using Hexalith.Agents.Contracts.AgentInteraction;
 using Hexalith.Agents.Contracts.AgentInteraction.Commands;
 using Hexalith.Agents.Contracts.ProviderCatalog;
+using Hexalith.Agents.Server.Application.Agents;
 using Hexalith.Agents.Server.Ports;
 
 using Hexalith.EventStore.Contracts.Commands;
@@ -30,8 +32,8 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 /// on the command/result, never persisted, never logged. <b>Trust model:</b> any client-supplied measurement is
 /// discarded (the request carries none) and reserved trust extension keys are stripped from the client extensions.
 /// <b>Fail closed (FR-21):</b> any reader/measurer/catalog that throws or returns not-available drives a
-/// <c>ContextBlocked</c> decision. The returned status is computed by the shared <see cref="AgentInteractionContextPolicy"/>
-/// so it cannot drift from the aggregate's recorded decision.
+/// <c>ContextBlocked</c> decision. The returned status predicts the outcome using the supplied snapshot. The
+/// aggregate independently evaluates its persisted snapshot when processing the command.
 /// </remarks>
 public sealed class AgentInteractionContextOrchestrator
 {
@@ -103,10 +105,10 @@ public sealed class AgentInteractionContextOrchestrator
             request.ActorUserId,
             BuildTrustedExtensions(request.ClientSuppliedExtensions));
 
-        // Dispatch (live binding deferred), then return the safe outcome — status via the SHARED policy so the
-        // orchestrator's reported status cannot drift from the aggregate's recorded decision (AD-3).
+        // Submission precedes the aggregate decision. This local evaluation uses the caller's snapshot.
         await _dispatcher.DispatchAsync(envelope, ct).ConfigureAwait(false);
-        return new AgentInteractionContextOutcomeResult(request.AgentInteractionId, AgentInteractionContextPolicy.Decide(measurement));
+        return new AgentInteractionContextOutcomeResult(request.AgentInteractionId,
+            AgentInteractionContextPolicy.Decide(measurement, request.ProviderCapabilityVersion));
     }
 
     // Assembles the server-trusted measurement: read content → (if loaded) measure tokens + read budget → resolve
@@ -121,11 +123,8 @@ public sealed class AgentInteractionContextOrchestrator
         // policy maps it to ContextBlocked). The raw messages, if any, are not carried.
         if (read.Outcome != AgentInteractionContextLoadOutcome.Loaded || read.Messages is null)
         {
-            AgentInteractionContextLoadOutcome loadOutcome = read.Outcome == AgentInteractionContextLoadOutcome.Loaded
-                ? AgentInteractionContextLoadOutcome.Unavailable // loaded but no messages payload is a degraded read
-                : read.Outcome;
             return new AgentInteractionContextMeasurement(
-                loadOutcome,
+                read.Outcome,
                 FullContextTokenCount: 0,
                 MessageCount: 0,
                 ContextWindowTokenLimit: 0,
@@ -135,13 +134,12 @@ public sealed class AgentInteractionContextOrchestrator
                 approvedBoundedBehavior);
         }
 
-        // (2) Measure tokens (fail-closed → NotAvailable) and read the budget (fail-closed → zeroed).
+        // (2) Measure tokens against the selected provider and model.
         ConversationContextTokenMeasurement tokens = await MeasureTokensAsync(read.Messages, request, ct).ConfigureAwait(false);
-        ModelBudget budget = await ReadModelBudgetAsync(request, ct).ConfigureAwait(false);
 
         // (3) Token measurement unavailable → drive ModelBudgetUnavailable by zeroing the window (the policy blocks on a
         // non-positive ContextWindowTokenLimit). The conversation text is now discarded.
-        if (!tokens.IsAvailable)
+        if (tokens is not { IsAvailable: true, TokenCount: >= 0 })
         {
             return new AgentInteractionContextMeasurement(
                 AgentInteractionContextLoadOutcome.Loaded,
@@ -153,6 +151,8 @@ public sealed class AgentInteractionContextOrchestrator
                 request.ContextPolicyReference,
                 approvedBoundedBehavior);
         }
+
+        ModelBudget budget = await ReadModelBudgetAsync(request, ct).ConfigureAwait(false);
 
         // (4) Loaded + measured: assemble the trusted measurement (token COUNT only, never raw text — AD-14).
         return new AgentInteractionContextMeasurement(
@@ -171,9 +171,23 @@ public sealed class AgentInteractionContextOrchestrator
         try
         {
             // The Conversations authorized read keys on a security principal — pass ActorUserId as callerPrincipalId.
-            return await _contextReader
+            ConversationContextReadResult read = await _contextReader
                 .ReadAsync(request.TenantId, request.SourceConversationId, request.CallerPartyId, request.ActorUserId, request.CorrelationId, ct)
                 .ConfigureAwait(false);
+            if (read is not { Outcome: AgentInteractionContextLoadOutcome.Loaded })
+            {
+                return read ?? ConversationContextReadResult.Unavailable;
+            }
+
+            if (!read.IsFresh)
+            {
+                return new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Stale, null, 0, false);
+            }
+
+            return read.Messages is { } messages && read.MessageCount == messages.Count
+                && !messages.Any(message => string.IsNullOrWhiteSpace(message?.Text))
+                ? read
+                : ConversationContextReadResult.Unavailable;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -209,7 +223,12 @@ public sealed class AgentInteractionContextOrchestrator
                 .GetEntryAsync(request.TenantId, request.ProviderId, request.ModelId, ct)
                 .ConfigureAwait(false);
 
-            return result is { Status: ProviderCatalogInspectionStatus.Success, Entry: { SupportsTextGeneration: true } entry }
+            return result?.Entry is { } entry
+                && string.Equals(entry.ProviderId, request.ProviderId, StringComparison.Ordinal)
+                && string.Equals(entry.ModelId, request.ModelId, StringComparison.Ordinal)
+                && request.ProviderCapabilityVersion > 0
+                && entry.CapabilityVersion >= request.ProviderCapabilityVersion
+                && ProviderSelectionVerdict.Evaluate(result) == ProviderSelectionValidationStatus.Valid
                 ? new ModelBudget(entry.ContextWindowTokenLimit, entry.MaxOutputTokenLimit, entry.CapabilityVersion)
                 : ModelBudget.Unavailable;
         }

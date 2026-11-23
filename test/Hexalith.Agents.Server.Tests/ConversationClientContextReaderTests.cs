@@ -80,6 +80,26 @@ public sealed class ConversationClientContextReaderTests
     }
 
     [Fact]
+    public async Task MembershipOnlyDetailCannotSupplyTheFullTimeline()
+    {
+        var bounded = ConversationDetailResult.Visible(SchemaVersion.Current, Details(FreshFreshness()), "ok")
+            with { ReadPurpose = GetConversationQuery.NativeMembershipPurpose };
+        StubGetConversation(ConversationClientResult<ConversationDetailResult>.Success(bounded, HttpStatusCode.OK));
+
+        (await Read()).ShouldBe(ConversationContextReadResult.Unavailable);
+    }
+
+    [Fact]
+    public async Task ContradictoryFreshnessReasonCannotSupplyContext()
+    {
+        var contradictory = new ConversationDetailResult(SchemaVersion.Current, ProjectionTrustState.Current,
+            ProjectionFreshnessReasonCode.Rebuilding, Details(FreshFreshness(), Message("private", _eventTimestamp)), "wait");
+        StubGetConversation(ConversationClientResult<ConversationDetailResult>.Success(contradictory, HttpStatusCode.OK));
+
+        (await Read()).ShouldBe(ConversationContextReadResult.Unavailable);
+    }
+
+    [Fact]
     public async Task Hidden_maps_to_unauthorized()
     {
         StubGetConversation(ConversationClientResult<ConversationDetailResult>.Success(

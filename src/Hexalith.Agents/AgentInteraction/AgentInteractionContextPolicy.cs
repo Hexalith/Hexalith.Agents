@@ -28,10 +28,11 @@ internal static class AgentInteractionContextPolicy
     /// </summary>
     /// <param name="interactionId">The deterministic interaction id (the aggregate id) to stamp on the emitted event.</param>
     /// <param name="measurement">The server-assembled context measurement.</param>
+    /// <param name="capabilityFloor">The minimum capability version from the interaction snapshot.</param>
     /// <returns>A success domain result carrying exactly one outcome event.</returns>
-    internal static DomainResult Evaluate(string interactionId, AgentInteractionContextMeasurement measurement)
+    internal static DomainResult Evaluate(string interactionId, AgentInteractionContextMeasurement measurement, int capabilityFloor)
     {
-        ContextDecision decision = Compute(measurement);
+        ContextDecision decision = Compute(measurement, capabilityFloor);
         return decision.Status == AgentInteractionStatus.ContextReady
             ? DomainResult.Success([new AgentInteractionContextReady(interactionId, decision.Evidence)])
             : DomainResult.Success([new AgentInteractionContextBlocked(interactionId, decision.Reason, decision.Evidence)]);
@@ -44,14 +45,15 @@ internal static class AgentInteractionContextPolicy
     /// drift from the aggregate's recorded decision.
     /// </summary>
     /// <param name="measurement">The server-assembled context measurement.</param>
+    /// <param name="capabilityFloor">The minimum capability version from the interaction snapshot.</param>
     /// <returns>The decided terminal context status.</returns>
-    internal static AgentInteractionStatus Decide(AgentInteractionContextMeasurement measurement)
-        => Compute(measurement).Status;
+    internal static AgentInteractionStatus Decide(AgentInteractionContextMeasurement measurement, int capabilityFloor)
+        => Compute(measurement, capabilityFloor).Status;
 
     // The deterministic budget decision (AC2/AC3/AC4 — the "Context Budget Rules" table). Evaluated in order:
     // (1) load failure → block; (2) untrustworthy budget → block; (3..4) fits → full; (5) approved bounded fits →
     // bounded; (6) oversized with no approved bounded behavior → block (never a silent truncation).
-    private static ContextDecision Compute(AgentInteractionContextMeasurement m)
+    private static ContextDecision Compute(AgentInteractionContextMeasurement m, int capabilityFloor)
     {
         ArgumentNullException.ThrowIfNull(m);
 
@@ -65,12 +67,23 @@ internal static class AgentInteractionContextPolicy
         }
 
         // (2) The model budget could not be trusted → block (fail closed; AC2/AC3).
-        if (m.ContextWindowTokenLimit <= 0
-            || m.ReservedOutputTokenCount < 0
-            || m.ReservedOutputTokenCount >= m.ContextWindowTokenLimit
-            || m.ProviderCapabilityVersion <= 0)
+        if (m.FullContextTokenCount < 0 || m.MessageCount < 0 || (m.FullContextTokenCount == 0 && m.MessageCount > 0))
         {
-            return Blocked(AgentInteractionContextBlockReason.ModelBudgetUnavailable, MeasuredEvidence(m, AgentInteractionContextMode.Unknown, 0));
+            return Blocked(AgentInteractionContextBlockReason.ModelBudgetUnavailable, ZeroedEvidence(m));
+        }
+
+        if (m.ContextWindowTokenLimit <= 0
+            || m.ReservedOutputTokenCount <= 0
+            || m.ReservedOutputTokenCount >= m.ContextWindowTokenLimit
+            || capabilityFloor <= 0
+            || m.ProviderCapabilityVersion < capabilityFloor)
+        {
+            AgentInteractionContextEvidence evidence = ZeroedEvidence(m) with
+            {
+                FullContextTokenCount = m.FullContextTokenCount,
+                MessageCount = m.MessageCount,
+            };
+            return Blocked(AgentInteractionContextBlockReason.ModelBudgetUnavailable, evidence);
         }
 
         // (3) The space available for context after reserving the configured output tokens (AC2).

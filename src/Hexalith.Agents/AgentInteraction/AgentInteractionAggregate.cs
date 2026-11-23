@@ -175,7 +175,7 @@ public partial class AgentInteractionAggregate : EventStoreAggregate<AgentIntera
 
             // Pure evaluation (AD-3): emit the context-ready/blocked outcome only. The measurement arrives pre-assembled
             // from trusted server reads (the context orchestration); the aggregate's sole job is the budget → decision math.
-            return AgentInteractionContextPolicy.Evaluate(interactionId, command.Measurement);
+            return AgentInteractionContextPolicy.Evaluate(interactionId, command.Measurement, requested.Snapshot?.ProviderCapabilityVersion ?? 0);
         }
 
         return DomainResult.Rejection([

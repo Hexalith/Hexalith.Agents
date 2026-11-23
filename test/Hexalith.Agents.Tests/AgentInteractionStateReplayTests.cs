@@ -173,7 +173,7 @@ public sealed class AgentInteractionStateReplayTests
     public void Apply_context_ready_transitions_status_and_records_safe_evidence()
     {
         AgentInteractionState state = StateAuthorized();
-        AgentInteractionContextReady ready = AgentInteractionContextPolicy.Evaluate(InteractionId, FullFitsMeasurement())
+        AgentInteractionContextReady ready = AgentInteractionContextPolicy.Evaluate(InteractionId, FullFitsMeasurement(), ProviderCapabilityVersion)
             .Events[0].ShouldBeOfType<AgentInteractionContextReady>();
 
         state.Apply(ready);
@@ -188,7 +188,7 @@ public sealed class AgentInteractionStateReplayTests
     public void Apply_context_blocked_records_the_decision_and_block_reason()
     {
         AgentInteractionState state = StateAuthorized();
-        AgentInteractionContextBlocked blocked = AgentInteractionContextPolicy.Evaluate(InteractionId, OversizedMeasurement())
+        AgentInteractionContextBlocked blocked = AgentInteractionContextPolicy.Evaluate(InteractionId, OversizedMeasurement(), ProviderCapabilityVersion)
             .Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
 
         state.Apply(blocked);
@@ -269,7 +269,7 @@ public sealed class AgentInteractionStateReplayTests
             var state = new AgentInteractionState();
             state.Apply(RequestedEvent(ValidRequest()));
             state.Apply(new AgentInteractionAuthorized(InteractionId));
-            state.Apply(AgentInteractionContextPolicy.Evaluate(InteractionId, OversizedMeasurement())
+            state.Apply(AgentInteractionContextPolicy.Evaluate(InteractionId, OversizedMeasurement(), ProviderCapabilityVersion)
                 .Events[0].ShouldBeOfType<AgentInteractionContextBlocked>());
             return state;
         }

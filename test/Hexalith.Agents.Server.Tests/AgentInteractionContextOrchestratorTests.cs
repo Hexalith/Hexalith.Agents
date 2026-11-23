@@ -2,6 +2,7 @@ namespace Hexalith.Agents.Server.Tests;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -397,6 +398,166 @@ public sealed class AgentInteractionContextOrchestratorTests
         var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(captured!.Payload)!;
         command.Measurement.LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
     }
+
+    [Theory]
+    [InlineData(false, 1, AgentInteractionContextLoadOutcome.Stale)]
+    [InlineData(true, 0, AgentInteractionContextLoadOutcome.Unavailable)]
+    [InlineData(true, 2, AgentInteractionContextLoadOutcome.Unavailable)]
+    public async Task InconsistentTimelineBlocksBeforeMeasurement(bool fresh, int reportedCount, AgentInteractionContextLoadOutcome expected)
+    {
+        IReadOnlyList<ConversationContextMessage> messages = [new(SecretConversationText, _sampleCreatedAt)];
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, reportedCount, fresh));
+        CaptureDispatch();
+
+        AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        DispatchedMeasurement().LoadOutcome.ShouldBe(expected);
+        DispatchedMeasurement().MessageCount.ShouldBe(0);
+        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasureAsync(default!, default!, default!, default);
+        await _providerCatalogReader.DidNotReceiveWithAnyArgs().GetEntryAsync(default!, default!, default!, default);
+    }
+
+    [Theory]
+    [InlineData(true, null)]
+    [InlineData(false, null)]
+    [InlineData(false, "")]
+    [InlineData(false, "   ")]
+    public async Task MissingMessageTextBlocksBeforeMeasurement(bool missingMessage, string? text)
+    {
+        ConversationContextMessage[] messages = [missingMessage ? null! : new(text!, _sampleCreatedAt)];
+        _contextReader.ReadAsync(TenantId, SourceConversationId, CallerPartyId, ActorUserId, "corr-1", Arg.Any<CancellationToken>())
+            .Returns(new ConversationContextReadResult(AgentInteractionContextLoadOutcome.Loaded, messages, 1, true));
+        CaptureDispatch();
+
+        (await Orchestrator.ExecuteAsync(Request(), CancellationToken.None)).Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        DispatchedMeasurement().LoadOutcome.ShouldBe(AgentInteractionContextLoadOutcome.Unavailable);
+        await _tokenMeasurer.DidNotReceiveWithAnyArgs().MeasureAsync(default!, default!, default!, default);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(0)]
+    public async Task InvalidTokenMeasurementCannotProduceAReadyContextForANonemptyTimeline(int tokens)
+    {
+        StubLoaded(tokenCount: tokens);
+        CaptureDispatch();
+
+        AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        DispatchedMeasurement().FullContextTokenCount.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData("OpenAI", ModelId)]
+    [InlineData(ProviderId, "GPT-4o")]
+    public async Task CatalogBudgetMustIdentifyTheRequestedProviderAndModel(string provider, string model)
+    {
+        StubLoaded(tokenCount: 10);
+        SetCatalogEntry(Entry(true) with { ProviderId = provider, ModelId = model });
+        CaptureDispatch();
+
+        AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        DispatchedMeasurement().ProviderCapabilityVersion.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData(ProviderModelStatus.Disabled, ProviderConfigurationState.Configured, true, true)]
+    [InlineData(ProviderModelStatus.Enabled, ProviderConfigurationState.NotConfigured, true, true)]
+    [InlineData(ProviderModelStatus.Enabled, ProviderConfigurationState.Configured, false, true)]
+    [InlineData(ProviderModelStatus.Enabled, ProviderConfigurationState.Configured, true, false)]
+    public async Task InspectableButIneligibleCatalogEntriesCannotSupplyABudget(
+        ProviderModelStatus lifecycle, ProviderConfigurationState configuration, bool selectable, bool priced)
+    {
+        StubLoaded(tokenCount: 10);
+        ProviderCatalogEntryView entry = Entry(true);
+        SetCatalogEntry(entry with
+        {
+            Status = lifecycle,
+            ConfigurationState = configuration,
+            IsSelectableForNewActiveUse = selectable,
+            Pricing = priced ? entry.Pricing : null,
+        });
+        CaptureDispatch();
+
+        AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+
+        outcome.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        DispatchedMeasurement().ContextWindowTokenLimit.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData(0, 2, false)]
+    [InlineData(2, 1, false)]
+    [InlineData(2, 2, true)]
+    [InlineData(2, 3, true)]
+    public async Task SnapshotFloorGovernsAdmissionAndReplay(int snapshotVersion, int liveVersion, bool ready)
+    {
+        StubLoaded(tokenCount: 10);
+        SetCatalogEntry(Entry(true) with { CapabilityVersion = liveVersion });
+        CaptureDispatch();
+
+        AgentInteractionContextOutcomeResult outcome = await Orchestrator.ExecuteAsync(
+            Request() with { ProviderCapabilityVersion = snapshotVersion }, CancellationToken.None);
+
+        AgentCommandIntent dispatch = LastDispatched().ShouldNotBeNull();
+        var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(dispatch.Payload)!;
+        var state = new AgentInteractionState();
+        var requested = new InteractionRequested(AgentInteractionId, "hexa", CallerPartyId, SourceConversationId,
+            SampleSnapshot() with { ProviderCapabilityVersion = snapshotVersion }, "prompt", "idem");
+        var authorized = new AgentInteractionAuthorized(AgentInteractionId);
+        state.Apply(requested);
+        state.Apply(authorized);
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatch.ToFixtureEnvelope());
+
+        if (ready)
+        {
+            AgentInteractionContextReady recorded = result.Events.Single().ShouldBeOfType<AgentInteractionContextReady>();
+            state = new AgentInteractionState();
+            state.Apply(requested);
+            state.Apply(authorized);
+            state.Apply(JsonSerializer.Deserialize<AgentInteractionContextReady>(JsonSerializer.Serialize(recorded))!);
+            state.ContextEvidence.ShouldNotBeNull().ProviderCapabilityVersion.ShouldBe(liveVersion);
+            state.Status.ShouldBe(AgentInteractionStatus.ContextReady);
+        }
+        else
+        {
+            state.Apply(result.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>());
+            state.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
+            state.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        }
+
+        outcome.Status.ShouldBe(state.Status);
+    }
+
+    [Fact]
+    public async Task PersistedFloorOverridesAnOlderRequestSnapshot()
+    {
+        StubLoaded(tokenCount: 10);
+        CaptureDispatch();
+        AgentInteractionContextOutcomeResult submitted = await Orchestrator.ExecuteAsync(Request(), CancellationToken.None);
+        submitted.Status.ShouldBe(AgentInteractionStatus.ContextReady);
+
+        AgentCommandIntent dispatch = LastDispatched().ShouldNotBeNull();
+        var command = JsonSerializer.Deserialize<BuildAgentInteractionContext>(dispatch.Payload)!;
+        var state = new AgentInteractionState();
+        state.Apply(new InteractionRequested(AgentInteractionId, "hexa", CallerPartyId, SourceConversationId,
+            SampleSnapshot() with { ProviderCapabilityVersion = 2 }, "prompt", "idem"));
+        state.Apply(new AgentInteractionAuthorized(AgentInteractionId));
+
+        DomainResult result = AgentInteractionAggregate.Handle(command, state, dispatch.ToFixtureEnvelope());
+        state.Apply(result.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>());
+        state.Status.ShouldBe(AgentInteractionStatus.ContextBlocked);
+        state.ContextBlockReason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
+    }
+
+    private void SetCatalogEntry(ProviderCatalogEntryView entry)
+        => _providerCatalogReader.GetEntryAsync(TenantId, ProviderId, ModelId, Arg.Any<CancellationToken>())
+            .Returns(new ProviderCatalogEntryReadResult(ProviderCatalogInspectionStatus.Success, entry));
 
     // ===== Helpers =====
 

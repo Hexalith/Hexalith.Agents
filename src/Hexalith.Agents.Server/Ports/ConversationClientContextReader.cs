@@ -89,7 +89,9 @@ public sealed class ConversationClientContextReader : IConversationContextReader
 
         // Details present but not trust-bearing (stale/degraded freshness) → cannot be loaded fresh enough (AC3).
         if (details.TenantId != query.TenantId || details.ConversationId != query.ConversationId
-            || detail.FreshnessState != details.Freshness.FreshnessState)
+            || detail.ReadPurpose is not null
+            || detail.FreshnessState != details.Freshness.FreshnessState
+            || detail.ReasonCode != details.Freshness.ReasonCode)
         {
             return ConversationContextReadResult.Unavailable;
         }

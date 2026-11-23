@@ -21,7 +21,7 @@ namespace Hexalith.Agents.Server.Application.AgentInteractions;
 /// <param name="CallerPartyId">The snapshot-recorded caller Party reference (opaque — available for participation cross-checks; AD-7).</param>
 /// <param name="ProviderId">The snapshot-recorded provider reference (drives the token measurement + budget read; AD-9).</param>
 /// <param name="ModelId">The snapshot-recorded model reference (drives the token measurement + budget read; AD-9).</param>
-/// <param name="ProviderCapabilityVersion">The snapshot-recorded provider capability version (carried for symmetry/audit; the live budget uses the catalog's current capability version; AD-4, AD-10).</param>
+/// <param name="ProviderCapabilityVersion">The snapshot-recorded provider capability version (minimum accepted live version for this provider/model; AD-4, AD-10).</param>
 /// <param name="ContextPolicyReference">The snapshot-recorded Conversation Context Policy reference (resolved to an approved bounded behavior, if any, and recorded in evidence; FR-9).</param>
 /// <param name="ActorUserId">The authenticated caller (the command-envelope user and the Conversations authorized-read principal).</param>
 /// <param name="ClientCorrelationId">An optional opaque client correlation reference for the caller's own tracing.</param>
@@ -43,13 +43,13 @@ public sealed record AgentInteractionContextRequest(
 
 /// <summary>
 /// Server-internal outcome of the Conversation context-building orchestration (Story 2.3; AC1–AC4). It carries ONLY the
-/// safe interaction id and the decided <see cref="AgentInteractionStatus"/> — never an EventStore stream name, provider
+/// safe interaction id and the locally evaluated <see cref="AgentInteractionStatus"/> — never an EventStore stream name, provider
 /// SDK detail, raw error text, raw Conversation content, or any evidence payload (AD-14). The status is computed by the
-/// shared <c>AgentInteractionContextPolicy</c> from the same measurement the command dispatched, so the reported status
-/// cannot drift from the aggregate's recorded decision (AD-3).
+/// shared <c>AgentInteractionContextPolicy</c> from the dispatched measurement and the supplied snapshot. This
+/// provisional status can differ from the aggregate decision when the persisted snapshot has a higher floor.
 /// </summary>
 /// <param name="AgentInteractionId">The deterministic interaction id the context build evaluated.</param>
-/// <param name="Status">The decided context status — <see cref="AgentInteractionStatus.ContextReady"/> or <see cref="AgentInteractionStatus.ContextBlocked"/>.</param>
+/// <param name="Status">The provisional context status — <see cref="AgentInteractionStatus.ContextReady"/> or <see cref="AgentInteractionStatus.ContextBlocked"/>.</param>
 public sealed record AgentInteractionContextOutcomeResult(
     string AgentInteractionId,
     AgentInteractionStatus Status);

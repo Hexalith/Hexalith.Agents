@@ -146,6 +146,7 @@ public sealed class AgentInteractionContextAggregateTests
     [Theory]
     [InlineData(0, ReservedOutputTokenCount, ProviderCapabilityVersion)]   // non-positive window
     [InlineData(ContextWindowTokenLimit, -1, ProviderCapabilityVersion)]    // negative reserved
+    [InlineData(ContextWindowTokenLimit, 0, ProviderCapabilityVersion)]     // no output allowance
     [InlineData(100, 100, ProviderCapabilityVersion)]                       // reserved >= window
     [InlineData(ContextWindowTokenLimit, ReservedOutputTokenCount, 0)]      // non-positive capability version
     public void Invalid_or_zero_budget_blocks_with_model_budget_unavailable(int windowLimit, int reservedOut, int capabilityVersion)
@@ -163,6 +164,42 @@ public sealed class AgentInteractionContextAggregateTests
         AgentInteractionContextBlocked blocked = result.Events[0].ShouldBeOfType<AgentInteractionContextBlocked>();
         blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
         result.Events.OfType<AgentInteractionContextReady>().ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData(-1, 1)]
+    [InlineData(1, -1)]
+    [InlineData(0, 1)]
+    public void InvalidMeasurementCountsBlockTheAggregateDecision(int tokens, int messages)
+    {
+        AgentInteractionContextMeasurement measurement = FullFitsMeasurement() with { FullContextTokenCount = tokens, MessageCount = messages };
+        DomainResult result = Context(measurement, StateAuthorized());
+
+        result.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>().Reason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
+    }
+
+    [Theory]
+    [InlineData(2, 1)]
+    [InlineData(0, 1)]
+    public void ContextCommandCannotUndercutThePersistedSnapshotFloor(int floor, int observed)
+    {
+        AgentInteractionState state = StateAuthorized();
+        state.Snapshot = state.Snapshot! with { ProviderCapabilityVersion = floor };
+        DomainResult result = Context(FullFitsMeasurement() with { ProviderCapabilityVersion = observed }, state);
+
+        AgentInteractionContextBlocked blocked = result.Events.Single().ShouldBeOfType<AgentInteractionContextBlocked>();
+        blocked.Reason.ShouldBe(AgentInteractionContextBlockReason.ModelBudgetUnavailable);
+        blocked.Evidence.ProviderCapabilityVersion.ShouldBe(0);
+        blocked.Evidence.ContextWindowTokenLimit.ShouldBe(0);
+        blocked.Evidence.ReservedOutputTokenCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public void EmptyTimelineCanFitWithZeroMeasuredTokens()
+    {
+        DomainResult result = Context(Measurement(fullContextTokenCount: 0, messageCount: 0), StateAuthorized());
+
+        result.Events.Single().ShouldBeOfType<AgentInteractionContextReady>().Evidence.UsedContextTokenCount.ShouldBe(0);
     }
 
     // ===== Budget boundaries: the exact "fits" edge (AC2 vs AC3) =====
@@ -373,7 +410,7 @@ public sealed class AgentInteractionContextAggregateTests
 
     private static void AssertDecideMatches(AgentInteractionContextMeasurement measurement, AgentInteractionStatus expected)
     {
-        AgentInteractionContextPolicy.Decide(measurement).ShouldBe(expected);
+        AgentInteractionContextPolicy.Decide(measurement, ProviderCapabilityVersion).ShouldBe(expected);
         DomainResult result = Context(measurement, StateAuthorized());
         AgentInteractionStatus recorded = result.Events[0] switch
         {
