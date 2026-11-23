@@ -2460,6 +2460,8 @@ An Approver can discover, revise, regenerate, resolve, and post exactly one prop
 
 **Dependency topology:** 7.1 creates the independently usable pending proposal and discovery surfaces; 7.2 adds immutable editing; 7.3 regenerates under current gates; 7.4 approves/posts one selected version; 7.5 resolves without posting; 7.6 owns deterministic expiry and races; 7.7 reconciles detail/queue behavior with the complete ten-state transition source and `PostingFailed` recovery. Each transition depends only on already available proposal state and earlier runtime foundations.
 
+Use the [proposal lifecycle convention](architecture/architecture-agents-2026-06-23-2/PROPOSAL-LIFECYCLE.md) for action eligibility, version history and the boundary between hosted controls and command handling.
+
 ### Story 7.1: Create And Discover A Pending Proposal
 
 As an Approver,

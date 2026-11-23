@@ -95,6 +95,36 @@ public sealed class AgentInteractionProposalEditAggregateTests
         JsonSerializer.Serialize(failed).ShouldNotContain(EditedContentText);
     }
 
+    [Theory]
+    [InlineData(AgentInteractionStatus.ProposalEditFailed)]
+    [InlineData(AgentInteractionStatus.ProposalRegenerationFailed)]
+    public void AuthorizedEditRetriesAfterRecordedFailure(AgentInteractionStatus failure)
+    {
+        AgentInteractionState state = StateProposalCreated();
+        if (failure == AgentInteractionStatus.ProposalEditFailed)
+        {
+            var firstAttempt = EditResult(AgentProposalEditOutcome.AdapterFailure, editedVersionId: "failed-edit-version");
+            ApplyAll(state, Edit(firstAttempt, state));
+            Edit(firstAttempt, state).IsNoOp.ShouldBeTrue();
+            state.GeneratedVersions!.Count.ShouldBe(1);
+        }
+        else
+        {
+            var command = RegenerateCommand(ProviderTimeoutRegenerationResult());
+            ApplyAll(state, AgentInteractionAggregate.Handle(command, state, Envelope(command)));
+        }
+
+        state.Status.ShouldBe(failure);
+        state.ProposalState.ShouldBe(ProposedAgentReplyState.Pending);
+
+        DomainResult retry = Edit(EditedProposalResult(), state);
+        retry.Events.Single().ShouldBeOfType<ProposedAgentReplyEdited>();
+        ApplyAll(state, retry);
+        state.ProposalState.ShouldBe(ProposedAgentReplyState.Edited);
+        state.GeneratedVersions!.Select(version => version.VersionId).ShouldBe([PostedVersionId, EditedVersionId]);
+        Edit(EditedProposalResult(), state).IsNoOp.ShouldBeTrue();
+    }
+
     // ===== Not editable: never requested / no pending proposal (AC2; AD-12) =====
 
     [Fact]

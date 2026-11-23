@@ -173,11 +173,11 @@ action_items:
   - epic: 4
     action: "Write down the load-bearing patterns (carries Epic 2 AI#3): the orchestrator->single-command->twin-policy and the 1.7/4.4 record-and-gate patterns as a referenced convention note rather than per-story Dev Notes."
     owner: "Paige (Tech Writer) + Winston (Architect)"
-    status: open  # Tracked by Stories 5.1, 5.5, and 6.1 using IMPLEMENTATION-CONVENTIONS.md.
+    status: done  # Command-step and record-and-gate examples are in IMPLEMENTATION-CONVENTIONS.md.
   - epic: 1
     action: "Record the Epic 1 static-vs-live readiness contract: which facts come from durable Agent state, which blockers require live dependency verdicts, and which UI states must render as not evaluated until live read models are bound."
     owner: "Paige (Tech Writer) + Winston (Architect)"
-    status: open  # Reassigned to Stories 5.2-5.5 and 8.7.
+    status: done  # IMPLEMENTATION-CONVENTIONS.md documents stored facts, current activation and audit evidence, and unevaluated UI states.
   - epic: 1
     action: "Decide the module placement path for Hexalith.Agents: keep it as a workspace folder, promote it to its own submodule/repository, or document the current folder layout as the V1 production layout."
     owner: "Winston (Architect)"
@@ -189,11 +189,11 @@ action_items:
   - epic: 3
     action: "Publish a standalone proposal lifecycle convention covering orchestrator-to-command-to-twin-policy, proposal sub-state eligibility, terminal-state behavior, and hosted action-control boundaries."
     owner: "Winston (Architect) + Paige (Tech Writer)"
-    status: open  # Reassigned to Stories 6.1 and 7.1-7.6.
+    status: done  # Epic 7 references PROPOSAL-LIFECYCLE.md for action eligibility and hosted controls.
   - epic: 3
     action: "Close the edit-failed retryability trap: update edit eligibility to follow proposal sub-state after recorded failures, or document the accepted behavior with tests."
     owner: "Amelia (Developer) + Winston (Architect)"
-    status: open  # Reassigned to Story 7.2.
+    status: done  # The edit aggregate follows proposal sub-state after a recorded edit or regeneration failure. Story 7.2 retains the live action-intent work.
   - epic: 3
     action: "Decide and record proposal expiry and active-notification policy (OQ-3 and OQ-4), including what in-product visibility only means for launch readiness."
     owner: "John (PM) + Winston (Architect)"

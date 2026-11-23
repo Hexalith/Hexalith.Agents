@@ -388,21 +388,10 @@ public partial class AgentInteractionAggregate : EventStoreAggregate<AgentIntera
                 return DomainResult.NoOp();
             }
 
-            // Precondition (AC2): there must be a pending proposal to edit. The proposal exists once creation succeeded
-            // (ProposalCreated), after a prior edit (ProposalEdited), or after an authorized regeneration (ProposalRegenerated —
-            // Story 3.4), AND its sub-state must be in the editable set { Pending, Edited, Regenerated }. Editing a regenerated
-            // proposal is the symmetric counterpart to regenerating an edited one — both remain pending approval, so neither
-            // operation locks out the other before approval (FR-14). A terminal proposal (approved/rejected/abandoned/expired/
-            // posted — Stories 3.5/3.6) or an interaction with no pending proposal is ProposalNotPending → reject, no new
-            // version. This is the structural enforcement of AC2: a terminal proposal can never be edited because it can no
-            // longer post.
-            bool proposalExists = requested.Status is AgentInteractionStatus.ProposalCreated
-                or AgentInteractionStatus.ProposalEdited
-                or AgentInteractionStatus.ProposalRegenerated;
-            bool editable = requested.ProposalState is ProposedAgentReplyState.Pending
+            // A failed attempt preserves the proposal sub-state and its version history.
+            if (requested.ProposalState is not (ProposedAgentReplyState.Pending
                 or ProposedAgentReplyState.Edited
-                or ProposedAgentReplyState.Regenerated;
-            if (!proposalExists || !editable)
+                or ProposedAgentReplyState.Regenerated))
             {
                 return DomainResult.Rejection([
                     new ProposedAgentReplyNotEditableRejection(interactionId, AgentProposedReplyNotEditableReason.ProposalNotPending),
@@ -412,7 +401,17 @@ public partial class AgentInteractionAggregate : EventStoreAggregate<AgentIntera
             // Pure evaluation (AD-3): emit the edited/failed outcome only. The result arrives pre-assembled from the trusted
             // edit orchestration (authorization resolved + version id derived); the aggregate's sole job is the outcome →
             // event/status math.
-            return AgentProposalEditPolicy.Evaluate(interactionId, command.Result);
+            DomainResult decision = AgentProposalEditPolicy.Evaluate(interactionId, command.Result);
+            // A repeated negative decision has no version in GeneratedVersions. Its safe evidence
+            // identifies the last recorded edit attempt, including its source and policy basis.
+            if (decision.Events[0] is ProposedAgentReplyEditFailed failed
+                && requested.ProposalEditFailureReason == failed.Reason
+                && requested.ProposalEditEvidence == failed.Evidence)
+            {
+                return DomainResult.NoOp();
+            }
+
+            return decision;
         }
 
         return DomainResult.Rejection([

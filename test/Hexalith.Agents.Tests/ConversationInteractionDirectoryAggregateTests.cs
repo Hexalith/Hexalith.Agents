@@ -3,6 +3,7 @@ using Hexalith.Agents.Contracts.ConversationAgentState.Commands;
 using Hexalith.Agents.Contracts.ConversationAgentState.Events;
 using Hexalith.Agents.Contracts.ConversationAgentState;
 using Hexalith.Agents.ConversationAgentState;
+using Hexalith.EventStore.Contracts.Commands;
 using Shouldly;
 
 namespace Hexalith.Agents.Tests;
@@ -39,6 +40,61 @@ public sealed class ConversationInteractionDirectoryAggregateTests
         ConversationAgentStateAggregate.Handle(c with { InteractionCreationRevision = 2 }, s, ConversationDirectoryTestData.Envelope()).IsRejection.ShouldBeTrue();
         s.Permits.Count.ShouldBe(1); s.Acknowledgements.Count.ShouldBe(1);
     }
+    [Fact]
+    public async Task TwoWorkflowInstancesContendingForOneDirectoryRetainIndependentLeases()
+    {
+        var first = ConversationDirectoryTestData.Permit();
+        var second = ConversationDirectoryTestData.Permit("client-b");
+        var directory = new ConversationAgentStateState();
+        var aggregate = new ConversationAgentStateAggregate();
+
+        static CommandEnvelope Envelope<T>(T command, string messageId) where T : notnull
+            => ConversationDirectoryTestData.Envelope() with
+            {
+                MessageId = messageId,
+                CommandType = typeof(T).Name,
+                Payload = JsonSerializer.SerializeToUtf8Bytes(command),
+            };
+
+        async Task Append(CommandEnvelope command)
+        {
+            var result = await aggregate.ProcessAsync(command, directory);
+            result.IsSuccess.ShouldBeTrue();
+            ConversationDirectoryTestData.Apply(directory, result);
+        }
+
+        await Append(Envelope(new RegisterInteractionPermit(first, directory.Revision), "permit-a"));
+        await Append(Envelope(new RegisterInteractionPermit(second, directory.Revision), "permit-b"));
+
+        // Both workflows read the same directory revision before either reservation arrives.
+        long observed = directory.Revision;
+        var firstLease = ConversationDirectoryTestData.Lease(permit: first);
+        var secondLease = ConversationDirectoryTestData.Lease(permit: second);
+        var contender = new AcquireConversationEffectLease(secondLease, observed);
+        await Append(Envelope(new AcquireConversationEffectLease(firstLease, observed), "acquire-a"));
+        var stale = await aggregate.ProcessAsync(Envelope(contender, "acquire-b"), directory);
+        stale.Events.Single().ShouldBeOfType<ConversationDirectoryRejected>().Reason
+            .ShouldBe(ConversationDirectoryRejectionReason.StaleRevision);
+        ConversationDirectoryTestData.Apply(directory, stale);
+        directory.Leases.Keys.ShouldBe([firstLease.LeaseId]);
+        directory.Revision.ShouldBe(observed + 1);
+
+        var refreshed = Envelope(contender with { ExpectedRevision = directory.Revision }, "acquire-b-refreshed");
+        await Append(refreshed);
+        (await aggregate.ProcessAsync(refreshed, directory)).IsNoOp.ShouldBeTrue();
+
+        var commit = new CommitConversationEffect(secondLease.LeaseId, second.AgentInteractionId, second.AgentInteractionId, directory.Revision);
+        await Append(Envelope(commit, "commit-b"));
+        directory.PermitHighWater.ShouldBe(2);
+        directory.Leases.Count.ShouldBe(2);
+        directory.Leases[firstLease.LeaseId].ShouldBe(firstLease);
+        directory.Leases[secondLease.LeaseId].ShouldBe(secondLease with
+        {
+            Status = ConversationEffectLeaseStatus.CommittedToEffect,
+            CommitRevision = observed + 3,
+        });
+    }
+
     [Theory]
     [InlineData("unknown-mode")]
     [InlineData("undefined-mode")]

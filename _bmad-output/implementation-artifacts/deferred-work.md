@@ -963,6 +963,7 @@ The original entries above are retained as historical evidence. The following fi
   summary: The per-conversation directory state keeps every permit, each with its full protected Request, plus every acknowledgement and lease. Nothing is pruned, and no test covers two workflows contending on one directory.
   evidence: Review BH (round 2), `ConversationAgentStateState.cs:23-27`. Pruning Request after acknowledgement needs digest-based retry comparison. Decision 2026-11-01: prune state with the Story 8.3 deletion and retention work.
   status: open
+  local_evidence: 2026-11-23 — `TwoWorkflowInstancesContendingForOneDirectoryRetainIndependentLeases` interleaves two workflow reservations at one observed directory revision. The stale contender retries successfully and commits its own lease. The first lease stays reserved. Protected request retention and pruning remain open under Story 8.3.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-complete-conversations-internal-catalog.md`
   summary: The current default Platform source regression graph cannot restore its Tenants dependencies under the selected central package versions.

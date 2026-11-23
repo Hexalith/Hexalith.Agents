@@ -73,6 +73,30 @@ Twin-policies are domain implementation details and MUST remain `internal`. The 
 - [`AgentInteractionProposalEditOrchestrator`](../../../../src/Hexalith.Agents.Server/Application/AgentInteractions/AgentInteractionProposalEditOrchestrator.cs) demonstrates an impure fail-closed orchestrator, a no-dispatch authorization exit, one trusted command, and `Decide` after dispatch.
 - [`AgentProposalEditPolicy`](../../../../src/Hexalith.Agents/AgentInteraction/AgentProposalEditPolicy.cs) demonstrates a single-event twin-policy whose `Evaluate` and `Decide` share one private `Compute`.
 
+For proposal actions, use the [proposal lifecycle convention](PROPOSAL-LIFECYCLE.md).
+
+## Record configuration and enforce it at use
+
+A configuration command validates and normalizes its input. An equal value returns the existing version. A changed value emits an event that advances the policy or readiness version and the Agent configuration version. Replaying a configuration event preserves the Agent lifecycle. The later activation or enablement command evaluates the applicable blockers against the rehydrated state and trusted evidence for that operation.
+
+| Recorded by | Enforced by | Example |
+| --- | --- | --- |
+| `ConfigureAgentContentSafetyPolicy` | `ActivateAgent` | An Agent with no active content safety policy receives `MissingContentSafetyPolicy`. Recording a valid policy clears this blocker. Other activation checks still apply. |
+| `RecordAgentLaunchReadiness` | `EnableProductionLikeGeneration` | Enablement checks recorded metrics, mode-specific latency targets, cost posture, context and content safety policies, plus current audit governance. It returns the applicable blockers before granting enablement, including on an already-enabled Agent. |
+
+When changing either pair, replay the recording event into a fresh state and exercise the consuming command. Cover equivalent input, a missing or disallowed value and a valid decision. For external evidence, exercise the consuming command with the evidence absent. [Agent aggregate](../../../../src/Hexalith.Agents/Agent/AgentAggregate.cs)
+
+## Stored setup facts and live readiness
+
+| Question | Evidence for the answer |
+| --- | --- |
+| What setup is recorded? | Agent state supplies display name, instruction validity, linked Party ID, selected provider/model, response mode, configured approver sources, and content safety policy. The setup projection carries a configuration version. |
+| Can this Agent activate now? | In addition to the state checks, activation needs a current valid provider verdict for the selection. Confirmation mode also needs a configured approver policy that currently resolves. Missing verdicts block a transition to Active. With the expected configuration version, an already-active Agent returns `AlreadyApplied` before these checks. A stale version is rejected first. |
+| Can production-like generation be enabled? | The launch-readiness policy combines the recorded setup and launch values with the trusted audit-governance verdict. An absent verdict produces `UnresolvedAuditGovernance`. |
+| What should an administrator see? | A state-only inspection reports the blockers it can compute. The approver page displays “Availability not yet evaluated” for sources without an evaluated basis. Setup writes awaiting projection keep their pending state until the corresponding receipt and projection confirm the change. An unavailable or unauthorized read withholds setup details. The setup page displays a projected `Active` value as lifecycle information. Current callability requires current runtime evidence. |
+
+Use the activation and enablement commands to decide whether a transition can proceed. An empty static blocker list describes only the facts examined by that read. [State inspection](../../../../src/Hexalith.Agents/Agent/AgentInspection.cs) · [Launch-readiness inspection](../../../../src/Hexalith.Agents/Agent/AgentLaunchReadinessInspection.cs) · [Approver source presentation](../../../../src/Hexalith.Agents.UI/Components/Pages/ApproverPolicy.razor) · [Setup page](../../../../src/Hexalith.Agents.UI/Components/Pages/AgentConfiguration.razor)
+
 ## Adoption Checklist
 
 - Identify the single durable step decision and its server-trusted result.

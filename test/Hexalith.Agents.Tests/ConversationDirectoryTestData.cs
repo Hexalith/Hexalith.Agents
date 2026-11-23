@@ -17,12 +17,12 @@ namespace Hexalith.Agents.Tests;
 /// <summary>Explicit no-content fixture; it supplies no live migration or protection attestation.</summary>
 internal static class ConversationDirectoryTestData
 {
-    /// <summary>Gets the original permit.</summary>
-    internal static InteractionPermit Permit()
+    /// <summary>Builds a permit for the given client request in the shared conversation.</summary>
+    internal static InteractionPermit Permit(string clientKey = "client-a")
     {
         const string tenant = "tenant-a"; const string conversation = "conversation-a";
-        string id = ConversationAgentStateIdentity.Interaction(tenant, "hexa", conversation, "person-a", "client-a");
-        return new(tenant, conversation, id, "hexa", "person-a", "client-a", ConversationAgentStateIdentity.Permit(tenant, id),
+        string id = ConversationAgentStateIdentity.Interaction(tenant, "hexa", conversation, "person-a", clientKey);
+        return new(tenant, conversation, id, "hexa", "person-a", clientKey, ConversationAgentStateIdentity.Permit(tenant, id),
             ConversationAgentStateIdentity.CreationOutbox(tenant, id), new string('a', 64), new(1, 1, AgentResponseMode.Automatic, 1, "provider-a", "model-a", 1, 1, "full-conversation-v1"),
             new(tenant, "fixture-installation", "fixture-epoch", 0, "fixture-revocation", "fixture-enforcement"),
             new(new(tenant, id, "fixture-interaction-dek"), JsonSerializer.SerializeToElement(new { FixtureSealed = "request" })), "fixture-digest-v1");
@@ -41,9 +41,9 @@ internal static class ConversationDirectoryTestData
         return state;
     }
     /// <summary>Gets the exact reserved lease.</summary>
-    internal static ConversationEffectLease Lease(ConversationEffectKind kind = ConversationEffectKind.WorkflowStart)
+    internal static ConversationEffectLease Lease(ConversationEffectKind kind = ConversationEffectKind.WorkflowStart, InteractionPermit? permit = null)
     {
-        var p = Permit(); string operationId = AgentsSecurityIdentity.Derive("fixture-operation", kind.ToString());
+        var p = permit ?? Permit(); string operationId = AgentsSecurityIdentity.Derive("fixture-operation", kind.ToString());
         return new(ConversationAgentStateIdentity.Lease(p.TenantId, p.ConversationId, p.AgentInteractionId, kind, "fixture", operationId), p.AgentInteractionId, kind, "fixture", operationId,
             p.AgentInteractionId, p.DirectoryEpoch.EpochId, ConversationEffectLeaseStatus.Reserved, 0, 0, false);
     }
