@@ -946,7 +946,8 @@ The original entries above are retained as historical evidence. The following fi
 - source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
   summary: `ProviderInvocationNotAuthorized` records no typed AD-13 reason (OutputStatusAuthorityOpen/Missing/Malformed/Unavailable). Outside Closing, `CancelNoInvocation` is emitted without the allocator lookup that AD-13 requires.
   evidence: Review AA (round 2), `AutomaticInteractionStepOrchestrator.cs:169` and `AutomaticInteractionPolicy.cs:44-49`. Story 6.8 owns missing fail-closed runtime contract members; Story 6.5 owns the capacity allocator.
-  status: open
+  status: done 2026-11-23 for the local workflow
+  resolution: `spec-five-deferred-provider-refusal-items.md` records typed authority refusals and exact Closing evidence. Capacity cancellation requires the allocator's no-invocation record for the same admission. Recovery resumes the lookup from the durable refusal and verifies historical cancellations before using them for settlement. The installed decision catalog and allocator still require owner qualification under Stories 6.8 and 6.5.
 - source_spec: `_bmad-output/implementation-artifacts/spec-6-1-start-and-recover-an-automatic-interaction.md`
   summary: A Failed, Terminated or Canceled interaction workflow instance has no resume or terminalize path. The scheduler always throws `InteractionWorkflowRecoveryRequired`, and the committed leases stay unsettled.
   evidence: Review AA/BH (round 2), `DaprInteractionWorkflowScheduler.cs:28`. AD-18 requires recovery to resume or terminalize the existing instance. Decision 2026-11-01: keep the explicit RecoveryRequired from BH-6 and design terminal recovery under AD-23 once live Dapr (Level 4) is available.

@@ -37,12 +37,16 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
             || creation.Permit.TenantId != input.TenantId || creation.Permit.ConversationId != input.ConversationId || creation.Permit.AgentInteractionId != input.AgentInteractionId
             || input.RequestReference.EventRevision != creation.Revision) { throw new InvalidOperationException("InvalidAuthoritativeInteraction"); }
         string directoryId = ConversationAgentStateIdentity.Directory(input.TenantId, input.ConversationId);
+        if (interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.ProviderInvocationNotAuthorized)
+            && !interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.PreProviderCapacityDispositionDecided))
+        {
+            await RecordNoInvocationAsync().ConfigureAwait(false);
+            return await RefreshAsync().ConfigureAwait(false);
+        }
         if (interaction.AutomaticFacts.TryGetValue(AutomaticInteractionStep.CapacityAdmissionRecorded, out var capacity)
             && capacity.Outcome != AutomaticInteractionOutcome.Allowed && !interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.BudgetDispositionDecided))
         {
-            var noInvocation = await effects.ExecuteAsync(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, interaction, null, ct).ConfigureAwait(false);
-            if (noInvocation.Outcome != AutomaticInteractionOutcome.CancelNoInvocation) { throw new InvalidOperationException("AuthoritativeNoInvocationEvidenceRequired"); }
-            await RecordAsync(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, noInvocation, null).ConfigureAwait(false);
+            await RecordNoInvocationAsync().ConfigureAwait(false);
             return await RefreshAsync().ConfigureAwait(false);
         }
         bool terminal = IsTerminal(interaction);
@@ -56,14 +60,14 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
             AutomaticInteractionFact? result = LeaseResult(interaction, lease);
             if (lease.Status == ConversationEffectLeaseStatus.CommittedToEffect && result is not null)
             {
-                if (lease.Kind == ConversationEffectKind.ProviderInvocation || terminal) { await effects.SettleAsync(interaction, ct).ConfigureAwait(false); }
+                if (lease.Kind == ConversationEffectKind.ProviderInvocation || terminal) { await SettleEffectsAsync().ConfigureAwait(false); }
                 await SendDirectoryAsync(new SettleConversationEffectLease(lease.LeaseId, input.AgentInteractionId, input.AgentInteractionId, lease.CommitRevision, result.Revision, directory.Revision), lease.LeaseId).ConfigureAwait(false);
                 return await RefreshAsync().ConfigureAwait(false);
             }
         }
         if (terminal)
         {
-            await effects.SettleAsync(interaction, ct).ConfigureAwait(false);
+            await SettleEffectsAsync().ConfigureAwait(false);
             WorkflowExecutionStatus status = (interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.StartSuppressedByDeletion) || interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.ConversationPostingSuppressedByDeletion)) ? WorkflowExecutionStatus.Suppressed
                 : interaction.Status == AgentInteractionStatus.Posted || interaction.Snapshot?.ResponseMode == AgentResponseMode.Confirmation && interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.GeneratedVersionRecorded)
                     ? WorkflowExecutionStatus.Completed : WorkflowExecutionStatus.Failed;
@@ -97,11 +101,12 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
             }
             if (accepted && !authorized)
             {
-                AutomaticInteractionEffectResult cancellation = await effects.ExecuteAsync(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, interaction, null, ct).ConfigureAwait(false);
-                if (cancellation.Outcome != AutomaticInteractionOutcome.CancelNoInvocation) { throw new NotSupportedException("AuthoritativeNoInvocationEvidenceRequired"); }
                 if (winningLease?.Kind == ConversationEffectKind.ProviderInvocation)
-                { await RecordAsync(AutomaticInteractionStep.ProviderInvocationNotAuthorized, new(AutomaticInteractionOutcome.Blocked), winningLease).ConfigureAwait(false); }
-                else { await RecordAsync(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, cancellation, null).ConfigureAwait(false); }
+                {
+                    await RecordAsync(AutomaticInteractionStep.ProviderInvocationNotAuthorized, new(AutomaticInteractionOutcome.Blocked), winningLease).ConfigureAwait(false);
+                    return await RefreshAsync().ConfigureAwait(false);
+                }
+                await RecordNoInvocationAsync().ConfigureAwait(false);
                 return await RefreshAsync().ConfigureAwait(false);
             }
             if (next == AutomaticInteractionStep.GeneratedVersionRecorded && winningLease is null)
@@ -189,8 +194,15 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
         else if (next is AutomaticInteractionStep.OpenInteractionLeaseAuthorized or AutomaticInteractionStep.BudgetReservationAuthorized or AutomaticInteractionStep.CapacityAdmissionAuthorized)
         { outcome = new(AutomaticInteractionOutcome.Authorized); }
         else { outcome = await effects.ExecuteAsync(next, interaction, phaseLease, ct).ConfigureAwait(false); }
-        if (next == AutomaticInteractionStep.ProviderInvocationAuthorized && (outcome.Outcome != AutomaticInteractionOutcome.Authorized || outcome.Authority?.IsEffective() != true))
-        { next = AutomaticInteractionStep.ProviderInvocationNotAuthorized; outcome = new(AutomaticInteractionOutcome.Blocked, outcome.DependencyRecordId); }
+        if (next == AutomaticInteractionStep.ProviderInvocationAuthorized)
+        {
+            ProviderOutputAuthorityRefusal refusal = ClassifyAuthorityRefusal(outcome);
+            if (refusal != ProviderOutputAuthorityRefusal.Unknown)
+            {
+                next = AutomaticInteractionStep.ProviderInvocationNotAuthorized;
+                outcome = new(AutomaticInteractionOutcome.Blocked, outcome.DependencyRecordId) { OutputAuthorityRefusal = refusal };
+            }
+        }
         else if (next == AutomaticInteractionStep.RateAdmissionAuthorized && outcome.Outcome != AutomaticInteractionOutcome.Authorized)
         { next = AutomaticInteractionStep.InteractionPreAcceptanceFailed; outcome = new(AutomaticInteractionOutcome.Blocked, outcome.DependencyRecordId); }
         await RecordAsync(next, outcome, phaseLease).ConfigureAwait(false);
@@ -225,12 +237,50 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
                 return found;
             }).ConfigureAwait(false);
         }
+        async Task RecordNoInvocationAsync()
+        {
+            var disposition = await LookupNoInvocationAsync().ConfigureAwait(false);
+            await RecordAsync(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, disposition, null).ConfigureAwait(false);
+        }
+        async Task SettleEffectsAsync()
+        {
+            // Retained cancellation events predate allocator evidence. Confirm no invocation before using one for settlement.
+            if (interaction.AutomaticFacts.TryGetValue(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, out var disposition)
+                && (disposition.CapacityAdmissionId != creation.AdmissionId || string.IsNullOrWhiteSpace(disposition.DependencyRecordId)))
+            {
+                var evidence = await LookupNoInvocationAsync().ConfigureAwait(false);
+                await effects.SettleAsync(interaction, evidence, ct).ConfigureAwait(false);
+                return;
+            }
+            await effects.SettleAsync(interaction, ct).ConfigureAwait(false);
+        }
+        async Task<AutomaticInteractionEffectResult> LookupNoInvocationAsync()
+        {
+            var lookup = await effects.ExecuteAsync(AutomaticInteractionStep.PreProviderCapacityDispositionDecided, interaction, null, ct).ConfigureAwait(false);
+            ct.ThrowIfCancellationRequested();
+            if (lookup.Outcome != AutomaticInteractionOutcome.CancelNoInvocation || lookup.CapacityAdmissionId != creation.AdmissionId
+                || string.IsNullOrWhiteSpace(lookup.DependencyRecordId))
+            {
+                throw new InvalidOperationException("AuthoritativeNoInvocationEvidenceRequired");
+            }
+
+            return new AutomaticInteractionEffectResult(lookup.Outcome, lookup.DependencyRecordId)
+            {
+                CapacityAdmissionId = lookup.CapacityAdmissionId,
+            };
+        }
         async Task RecordAsync(AutomaticInteractionStep step, AutomaticInteractionEffectResult outcome, ConversationEffectLease? lease)
         {
+            bool closingSuppression = step == AutomaticInteractionStep.ConversationPostingSuppressedByDeletion
+                || step == AutomaticInteractionStep.ProviderInvocationNotAuthorized && outcome.OutputAuthorityRefusal == ProviderOutputAuthorityRefusal.Unknown;
             var fact = new AutomaticInteractionFact(step, Operation(step), outcome.Outcome, interaction.AutomaticRevision + 1,
                 lease?.LeaseId, lease?.CommitRevision ?? 0, outcome.DependencyRecordId, outcome.Authority, outcome.Output, outcome.ContentDigest, outcome.DigestKeyVersion, outcome.FailureKind,
-                DeletionRequestId: step == AutomaticInteractionStep.ConversationPostingSuppressedByDeletion ? directory.DeletionRequestId : null,
-                DirectoryClosingRevision: step == AutomaticInteractionStep.ConversationPostingSuppressedByDeletion ? directory.DeletionClosingRevision : 0);
+                DeletionRequestId: closingSuppression ? directory.DeletionRequestId : null,
+                DirectoryClosingRevision: closingSuppression ? directory.DeletionClosingRevision : 0)
+            {
+                OutputAuthorityRefusal = outcome.OutputAuthorityRefusal == ProviderOutputAuthorityRefusal.Unknown ? null : outcome.OutputAuthorityRefusal,
+                CapacityAdmissionId = outcome.CapacityAdmissionId,
+            };
             await InteractionCommandDispatch.SendAsync(dispatcher, input.TenantId, "agent-interaction", input.AgentInteractionId, fact.OperationId,
                 new RecordAutomaticInteractionStep(input.TenantId, input.AgentInteractionId, fact, interaction.AutomaticRevision), ct).ConfigureAwait(false);
             string expected = JsonSerializer.Serialize(fact with { Revision = 0 });
@@ -262,6 +312,33 @@ public sealed class AutomaticInteractionStepOrchestrator(IConversationAgentState
             Outcome = interaction.AutomaticFacts.Count > 0 ? AutomaticInteractionPolicy.Decide(interaction.AutomaticFacts.Values.MaxBy(f => f.Revision)!) : AutomaticInteractionOutcome.Unknown,
         });
     }
+    private static ProviderOutputAuthorityRefusal ClassifyAuthorityRefusal(AutomaticInteractionEffectResult result)
+    {
+        if (result.Output is not null || result.ContentDigest is not null || result.DigestKeyVersion is not null
+            || result.FailureKind != AutomaticInteractionFailureKind.Unknown || result.CapacityAdmissionId is not null
+            || !Enum.IsDefined(result.OutputAuthorityRefusal)
+            || (result.OutputAuthorityRefusal == ProviderOutputAuthorityRefusal.Open && string.IsNullOrWhiteSpace(result.DependencyRecordId)))
+        {
+            return ProviderOutputAuthorityRefusal.Malformed;
+        }
+
+        if (result.Outcome == AutomaticInteractionOutcome.Authorized)
+        {
+            return result.Authority?.IsEffective() == true && result.OutputAuthorityRefusal == ProviderOutputAuthorityRefusal.Unknown
+                ? ProviderOutputAuthorityRefusal.Unknown
+                : ProviderOutputAuthorityRefusal.Malformed;
+        }
+
+        if (result.Authority is not null || result.Outcome is not (AutomaticInteractionOutcome.Blocked or AutomaticInteractionOutcome.DependencyNotAvailable or AutomaticInteractionOutcome.Failed))
+        {
+            return ProviderOutputAuthorityRefusal.Malformed;
+        }
+
+        return result.OutputAuthorityRefusal == ProviderOutputAuthorityRefusal.Unknown
+            ? ProviderOutputAuthorityRefusal.Unavailable
+            : result.OutputAuthorityRefusal;
+    }
+
     private static bool IsTerminal(AgentInteractionState interaction) => interaction.AutomaticFacts.Keys.Any(step => step is AutomaticInteractionStep.StartSuppressedByDeletion
         or AutomaticInteractionStep.InteractionPreAcceptanceFailed or AutomaticInteractionStep.ProviderInvocationNotAuthorized or AutomaticInteractionStep.GenerationFailed or AutomaticInteractionStep.ConversationPostingRecorded
         or AutomaticInteractionStep.PreProviderCapacityDispositionDecided or AutomaticInteractionStep.ConversationPostingSuppressedByDeletion) || interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.AgentCallAccepted) && interaction.AutomaticFacts.Values.Any(f => f.Outcome is AutomaticInteractionOutcome.Blocked or AutomaticInteractionOutcome.DependencyNotAvailable or AutomaticInteractionOutcome.Failed) || interaction.Snapshot?.ResponseMode == AgentResponseMode.Confirmation && interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.GeneratedVersionRecorded);

@@ -14,7 +14,7 @@ public sealed record ProviderOutputAuthority(long DecisionRevision, string Contr
 {
     /// <summary>Checks the exact effective authority shape without inventing a decision or status mapping.</summary>
     public bool IsEffective() => DecisionRevision > 0 && CatalogActivationRevision > 0 && IsDigest(ContractDigest) && IsDigest(ObservationId)
-        && FailureStatus != AgentInteractionStatus.Unknown && Enum.IsDefined(FailureStatus)
+        && FailureStatus is AgentInteractionStatus.GenerationFailed or AgentInteractionStatus.SafetyFailed
         && !string.IsNullOrWhiteSpace(ReasonId) && !string.IsNullOrWhiteSpace(MetricId) && !string.IsNullOrWhiteSpace(OpenLeaseDispositionId);
     private static bool IsDigest(string value) => value is { Length: 64 } && value.All(char.IsAsciiHexDigit);
 }

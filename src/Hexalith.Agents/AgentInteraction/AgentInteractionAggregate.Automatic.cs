@@ -38,7 +38,7 @@ public partial class AgentInteractionAggregate
             attemptId, ConversationAgentStateIdentity.Reservation(attemptId), ConversationAgentStateIdentity.Admission(attemptId), versionId,
             ConversationAgentStateIdentity.Message(p.AgentInteractionId, versionId), 1)]);
     }
-    /// <summary>Records at most one trusted durable phase decision and its inseparable Provider dispositions.</summary>
+    /// <summary>Records one trusted durable phase decision and its required Budget disposition.</summary>
     public static DomainResult Handle(RecordAutomaticInteractionStep command, AgentInteractionState? state, CommandEnvelope envelope)
     {
         ArgumentNullException.ThrowIfNull(command); ArgumentNullException.ThrowIfNull(envelope);
@@ -53,8 +53,17 @@ public partial class AgentInteractionAggregate
             return JsonSerializer.Serialize(existing with { Revision = 0 }) == JsonSerializer.Serialize(f with { Revision = 0 }) ? DomainResult.NoOp() : AutomaticReject(AutomaticInteractionRejectionReason.DivergentDuplicate);
         }
         if (command.ExpectedRevision != state.AutomaticRevision || f.Revision != state.AutomaticRevision + 1) { return AutomaticReject(AutomaticInteractionRejectionReason.StaleRevision); }
-        if (AutomaticTerminal(state)) { return AutomaticReject(AutomaticInteractionRejectionReason.Terminal); }
+        bool completingProviderRefusal = f.Step == AutomaticInteractionStep.PreProviderCapacityDispositionDecided
+            && state.AutomaticFacts.ContainsKey(AutomaticInteractionStep.ProviderInvocationNotAuthorized);
+        if (AutomaticTerminal(state) && !completingProviderRefusal) { return AutomaticReject(AutomaticInteractionRejectionReason.Terminal); }
         if (!AutomaticPrecondition(f.Step, state)) { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidPhase); }
+        if (f.Step == AutomaticInteractionStep.PreProviderCapacityDispositionDecided)
+        {
+            if (f.CapacityAdmissionId != creation.AdmissionId || string.IsNullOrWhiteSpace(f.DependencyRecordId)
+                || f.LeaseId is not null || f.LeaseCommitRevision != 0)
+            { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidPhase); }
+        }
+        else if (f.CapacityAdmissionId is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidPhase); }
         ConversationEffectKind kind = LeaseKind(f.Step);
         AutomaticInteractionStep leaseStep = LeaseOperationStep(f.Step);
         if (f.Step == AutomaticInteractionStep.GenerationFailed && f.LeaseId == ConversationAgentStateIdentity.Lease(command.TenantId, creation.Permit.ConversationId, command.AgentInteractionId,
@@ -70,7 +79,19 @@ public partial class AgentInteractionAggregate
                 || f.LeaseId is not null && f.LeaseId != postingLease)
             { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidPhase); }
         }
+        else if (f.Step == AutomaticInteractionStep.ProviderInvocationNotAuthorized)
+        {
+            bool validRefusal = f.OutputAuthorityRefusal is { } reason
+                ? reason != ProviderOutputAuthorityRefusal.Unknown && Enum.IsDefined(reason)
+                    && f.DeletionRequestId is null && f.DirectoryClosingRevision == 0
+                    && (reason != ProviderOutputAuthorityRefusal.Open || !string.IsNullOrWhiteSpace(f.DependencyRecordId))
+                : AutomaticDigest(f.DeletionRequestId!) && f.DirectoryClosingRevision > 0
+                    && f.Outcome == AutomaticInteractionOutcome.Blocked && f.DependencyRecordId is null;
+            if (!validRefusal) { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidAuthority); }
+        }
         else if (f.DeletionRequestId is not null || f.DirectoryClosingRevision != 0) { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidPhase); }
+        if (f.Step != AutomaticInteractionStep.ProviderInvocationNotAuthorized && f.OutputAuthorityRefusal is not null)
+        { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidAuthority); }
         if (f.Step == AutomaticInteractionStep.ProviderInvocationAuthorized && f.OutputAuthority?.IsEffective() != true) { return AutomaticReject(AutomaticInteractionRejectionReason.InvalidAuthority); }
         if (!Enum.IsDefined(f.FailureKind) || f.Step != AutomaticInteractionStep.GenerationFailed && f.FailureKind != AutomaticInteractionFailureKind.Unknown
             || f.Step == AutomaticInteractionStep.GenerationFailed && f.Outcome == AutomaticInteractionOutcome.Failed && f.FailureKind == AutomaticInteractionFailureKind.Unknown)
@@ -82,7 +103,7 @@ public partial class AgentInteractionAggregate
                 || target.AgentInteractionId != command.AgentInteractionId || target.TargetProtectionKeyAlias != creation.Permit.Request.Target.TargetProtectionKeyAlias || !AutomaticDigest(f.ContentDigest!) || string.IsNullOrWhiteSpace(f.DigestKeyVersion)) { return AutomaticReject(AutomaticInteractionRejectionReason.ProtectedContentRequired); }
         }
         else if (f.Output is not null || f.ContentDigest is not null || f.DigestKeyVersion is not null) { return AutomaticReject(AutomaticInteractionRejectionReason.ProtectedContentRequired); }
-        return DomainResult.Success(AutomaticInteractionPolicy.Evaluate(f));
+        return DomainResult.Success(AutomaticInteractionPolicy.Evaluate(f, state.AutomaticFacts.ContainsKey(AutomaticInteractionStep.BudgetDispositionDecided)));
     }
     /// <summary>Gets the exact directory lease kind for a leased target phase.</summary>
     internal static ConversationEffectKind LeaseKind(AutomaticInteractionStep step) => step switch

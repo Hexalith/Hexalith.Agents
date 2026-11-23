@@ -12,9 +12,9 @@ public sealed class InitialOutputSafetyUsesPhasePinnedStatusTests
     public async Task SafetyFailureUsesOnlyTheExactProductSelectedStatusAndRetainsNoContent(AutomaticInteractionFailureKind kind)
     {
         var fixture = new AutomaticInteractionReplayFixture(); fixture.Effects.FailAt = AutomaticInteractionStep.GeneratedVersionRecorded; fixture.Effects.FailureKind = kind;
-        fixture.Effects.AuthorityOverride = new(7, new string('b', 64), AgentInteractionStatus.Denied, "product-reason", "product-metric", "product-open", 3, new string('c', 64));
+        fixture.Effects.AuthorityOverride = new(7, new string('b', 64), AgentInteractionStatus.SafetyFailed, "product-reason", "product-metric", "product-open", 3, new string('c', 64));
         await fixture.StartAsync(); await fixture.CompleteAsync(); fixture.Restart();
-        fixture.Interaction!.Status.ShouldBe(AgentInteractionStatus.Denied);
+        fixture.Interaction!.Status.ShouldBe(AgentInteractionStatus.SafetyFailed);
         fixture.Interaction.AutomaticFacts[AutomaticInteractionStep.GenerationFailed].FailureKind.ShouldBe(kind);
         fixture.Interaction.AutomaticFacts[AutomaticInteractionStep.ProviderInvocationAuthorized].OutputAuthority!.DecisionRevision.ShouldBe(7);
         fixture.Interaction.AutomaticFacts.Values.ShouldAllBe(f => f.Output == null); fixture.Effects.Posts.ShouldBeEmpty();

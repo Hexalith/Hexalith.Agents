@@ -6,11 +6,8 @@ namespace Hexalith.Agents.AgentInteraction;
 /// <summary>One pure mapping for durable phase events and the safe orchestration result.</summary>
 internal static class AutomaticInteractionPolicy
 {
-    /// <summary>Maps one accepted phase and its atomic Provider dispositions.</summary>
-    internal static IReadOnlyList<IEventPayload> Evaluate(AutomaticInteractionFact fact) => Compute(fact).Events;
-    /// <summary>Reports the same accepted phase outcome.</summary>
-    internal static AutomaticInteractionOutcome Decide(AutomaticInteractionFact fact) => Compute(fact).Outcome;
-    private static (IReadOnlyList<IEventPayload> Events, AutomaticInteractionOutcome Outcome) Compute(AutomaticInteractionFact fact)
+    /// <summary>Maps one accepted phase and records its Budget disposition when needed.</summary>
+    internal static IReadOnlyList<IEventPayload> Evaluate(AutomaticInteractionFact fact, bool budgetDispositionRecorded)
     {
         IEventPayload item = fact.Step switch
         {
@@ -44,14 +41,24 @@ internal static class AutomaticInteractionPolicy
         if (fact.Step is AutomaticInteractionStep.ProviderInvocationAuthorized or AutomaticInteractionStep.ProviderInvocationNotAuthorized)
         {
             bool invoked = fact.Step == AutomaticInteractionStep.ProviderInvocationAuthorized;
-            events.Add(new BudgetDispositionDecided(fact with { Step = AutomaticInteractionStep.BudgetDispositionDecided, Outcome = invoked ? AutomaticInteractionOutcome.InvocationSettlement : AutomaticInteractionOutcome.NotInvoked, Revision = fact.Revision + 1 }));
-            if (!invoked) { events.Add(new PreProviderCapacityDispositionDecided(fact with { Step = AutomaticInteractionStep.PreProviderCapacityDispositionDecided, Outcome = AutomaticInteractionOutcome.CancelNoInvocation, Revision = fact.Revision + 2 })); }
+            events.Add(new BudgetDispositionDecided(fact with
+            {
+                Step = AutomaticInteractionStep.BudgetDispositionDecided,
+                Outcome = invoked ? AutomaticInteractionOutcome.InvocationSettlement : AutomaticInteractionOutcome.NotInvoked,
+                Revision = fact.Revision + 1,
+                OutputAuthorityRefusal = null,
+                DeletionRequestId = null,
+                DirectoryClosingRevision = 0,
+            }));
         }
-        if (fact.Step is AutomaticInteractionStep.PreProviderCapacityDispositionDecided or AutomaticInteractionStep.InteractionPreAcceptanceFailed)
+        if (!budgetDispositionRecorded && fact.Step is (AutomaticInteractionStep.PreProviderCapacityDispositionDecided or AutomaticInteractionStep.InteractionPreAcceptanceFailed))
         {
             events.Add(new BudgetDispositionDecided(fact with { Step = AutomaticInteractionStep.BudgetDispositionDecided,
-                Outcome = AutomaticInteractionOutcome.NotInvoked, Revision = fact.Revision + 1 }));
+                Outcome = AutomaticInteractionOutcome.NotInvoked, Revision = fact.Revision + 1, CapacityAdmissionId = null }));
         }
-        return (events, fact.Outcome);
+        return events;
     }
+
+    /// <summary>Reports the accepted phase outcome.</summary>
+    internal static AutomaticInteractionOutcome Decide(AutomaticInteractionFact fact) => fact.Outcome;
 }

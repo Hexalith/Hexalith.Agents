@@ -10,4 +10,11 @@ namespace Hexalith.Agents.Server.Ports;
 /// <param name="ContentDigest">The ContentDigest binding.</param>
 /// <param name="DigestKeyVersion">The DigestKeyVersion binding.</param>
 /// <param name="FailureKind">The safe failure classification; output safety uses the recorded authority mapping.</param>
-public sealed record AutomaticInteractionEffectResult(AutomaticInteractionOutcome Outcome, string? DependencyRecordId = null, ProviderOutputAuthority? Authority = null, ProtectedContent? Output = null, string? ContentDigest = null, string? DigestKeyVersion = null, AutomaticInteractionFailureKind FailureKind = AutomaticInteractionFailureKind.Unknown);
+public sealed record AutomaticInteractionEffectResult(AutomaticInteractionOutcome Outcome, string? DependencyRecordId = null, ProviderOutputAuthority? Authority = null, ProtectedContent? Output = null, string? ContentDigest = null, string? DigestKeyVersion = null, AutomaticInteractionFailureKind FailureKind = AutomaticInteractionFailureKind.Unknown)
+{
+    /// <summary>Gets the safe decision-owner classification when Provider authority is refused.</summary>
+    public ProviderOutputAuthorityRefusal OutputAuthorityRefusal { get; init; }
+
+    /// <summary>Gets the admission selected by an allocator no-invocation lookup.</summary>
+    public string? CapacityAdmissionId { get; init; }
+}

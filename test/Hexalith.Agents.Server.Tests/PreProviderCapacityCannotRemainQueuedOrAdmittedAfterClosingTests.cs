@@ -47,7 +47,7 @@ public sealed class PreProviderCapacityCannotRemainQueuedOrAdmittedAfterClosingT
         while (!fixture.Interaction!.AutomaticFacts.ContainsKey(AutomaticInteractionStep.AgentCallAccepted))
         { await fixture.Steps().ExecuteAsync(fixture.Input, CancellationToken.None); }
         await fixture.CloseAsync(); fixture.Effects.FailAt = AutomaticInteractionStep.PreProviderCapacityDispositionDecided;
-        var error = await Should.ThrowAsync<NotSupportedException>(() => fixture.CompleteAsync());
+        var error = await Should.ThrowAsync<InvalidOperationException>(() => fixture.CompleteAsync());
         error.Message.ShouldBe("AuthoritativeNoInvocationEvidenceRequired");
         fixture.Interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.PreProviderCapacityDispositionDecided).ShouldBeFalse();
     }

@@ -19,6 +19,14 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
     internal bool AuthorityAvailable { get; set; } = true;
     /// <summary>Gets or sets a malformed authority test fixture.</summary>
     internal ProviderOutputAuthority? AuthorityOverride { get; set; }
+    /// <summary>Gets or sets a complete authority result for malformed-envelope controls.</summary>
+    internal AutomaticInteractionEffectResult? AuthorityResultOverride { get; set; }
+    /// <summary>Gets or sets the safe classification of an unavailable authority.</summary>
+    internal ProviderOutputAuthorityRefusal AuthorityRefusal { get; set; } = ProviderOutputAuthorityRefusal.Missing;
+    /// <summary>Gets or sets whether the allocator lookup supplies a no-invocation reference.</summary>
+    internal bool NoInvocationReferenceAvailable { get; set; } = true;
+    /// <summary>Gets or sets a foreign admission for allocator evidence tests.</summary>
+    internal string? CapacityAdmissionOverride { get; set; }
     /// <summary>Gets or sets an exact protected generation result for envelope-preservation controls.</summary>
     internal AutomaticInteractionEffectResult? GenerationResultOverride { get; set; }
     /// <summary>Gets the executed effect order.</summary>
@@ -33,6 +41,8 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
     internal HashSet<string> Preparations { get; } = [];
     /// <summary>Gets exactly settled identities.</summary>
     internal HashSet<string> Settlements { get; } = [];
+    /// <summary>Gets the evidence supplied to settle historical capacity.</summary>
+    internal AutomaticInteractionEffectResult? HistoricalSettlementEvidence { get; private set; }
     /// <inheritdoc />
     public Task<AutomaticInteractionEffectResult> ExecuteAsync(AutomaticInteractionStep step, AgentInteractionState interaction, ConversationEffectLease? committedLease, CancellationToken ct)
     {
@@ -51,9 +61,13 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
         if (step == AutomaticInteractionStep.ConversationMembershipRecorded) { Memberships.Add(creation.Permit.AgentInteractionId); }
         if (step == AutomaticInteractionStep.ProviderInvocationAuthorized)
         {
-            return Task.FromResult(AuthorityAvailable
+            return Task.FromResult(AuthorityResultOverride ?? (AuthorityAvailable
                 ? new AutomaticInteractionEffectResult(AutomaticInteractionOutcome.Authorized, Authority: AuthorityOverride ?? new(1, new string('b', 64), AgentInteractionStatus.GenerationFailed, "product-reason", "product-metric", "product-open-disposition", 1, new string('c', 64)))
-                : new AutomaticInteractionEffectResult(AutomaticInteractionOutcome.DependencyNotAvailable, "OD-INITIAL-OUTPUT-SAFETY-STATUS-1"));
+                : new AutomaticInteractionEffectResult(AutomaticInteractionOutcome.DependencyNotAvailable,
+                    AuthorityRefusal == ProviderOutputAuthorityRefusal.Open ? "fixture-open-decision-observation" : "OD-INITIAL-OUTPUT-SAFETY-STATUS-1")
+                {
+                    OutputAuthorityRefusal = AuthorityRefusal,
+                }));
         }
         if (step == AutomaticInteractionStep.GeneratedVersionRecorded)
         {
@@ -64,7 +78,14 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
         if (step == AutomaticInteractionStep.ConversationPostingRecorded)
         { Posts.Add(creation.MessageId); outcome = AutomaticInteractionOutcome.Posted; }
         if (step == AutomaticInteractionStep.PreProviderCapacityDispositionDecided)
-        { interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.ProviderInvocationAuthorized).ShouldBeFalse(); outcome = AutomaticInteractionOutcome.CancelNoInvocation; }
+        {
+            interaction.AutomaticFacts.ContainsKey(AutomaticInteractionStep.ProviderInvocationAuthorized).ShouldBeFalse();
+            return Task.FromResult(new AutomaticInteractionEffectResult(AutomaticInteractionOutcome.CancelNoInvocation,
+                NoInvocationReferenceAvailable ? "fixture-allocator-no-invocation-record" : null)
+            {
+                CapacityAdmissionId = CapacityAdmissionOverride ?? creation.AdmissionId,
+            });
+        }
         return Task.FromResult(new AutomaticInteractionEffectResult(outcome));
     }
     /// <inheritdoc />
@@ -74,5 +95,13 @@ internal sealed class AllowAllAutomaticInteractionEffects : IAutomaticInteractio
         if (Preparations.Contains(AgentsSecurityIdentity.Derive("fixture-preparation", interaction.PermittedCreation!.AttemptId, AutomaticInteractionStep.BudgetReservationRecorded.ToString())))
         { interaction.AutomaticFacts.ShouldContainKey(AutomaticInteractionStep.BudgetDispositionDecided); }
         Settlements.UnionWith(Preparations); Preparations.Clear(); return Task.CompletedTask;
+    }
+    /// <inheritdoc />
+    public Task SettleAsync(AgentInteractionState interaction, AutomaticInteractionEffectResult noInvocationEvidence, CancellationToken ct)
+    {
+        noInvocationEvidence.CapacityAdmissionId.ShouldBe(interaction.PermittedCreation!.AdmissionId);
+        noInvocationEvidence.DependencyRecordId.ShouldBe("fixture-allocator-no-invocation-record");
+        HistoricalSettlementEvidence = noInvocationEvidence;
+        return SettleAsync(interaction, ct);
     }
 }
