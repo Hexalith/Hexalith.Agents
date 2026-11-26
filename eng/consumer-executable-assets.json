@@ -90,14 +90,14 @@
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
-        "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
+        "sha256": "a726c8341e9823f8ee7faed15f3fc3c7b58d83dc90d0b06e7f3c2739e3fd908b"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
-        "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
+        "sha256": "d939d5ac38d2cddc51e51de274e4bae18b8ce13409848a8aa5d4c8ab211a32d7"
       },
       {
         "kind": "analyzer",
@@ -139,14 +139,14 @@
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
-        "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
+        "sha256": "a726c8341e9823f8ee7faed15f3fc3c7b58d83dc90d0b06e7f3c2739e3fd908b"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
-        "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
+        "sha256": "d939d5ac38d2cddc51e51de274e4bae18b8ce13409848a8aa5d4c8ab211a32d7"
       },
       {
         "kind": "assembly",
@@ -446,14 +446,14 @@
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
-        "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
+        "sha256": "a726c8341e9823f8ee7faed15f3fc3c7b58d83dc90d0b06e7f3c2739e3fd908b"
       },
       {
         "kind": "analyzer",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
-        "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
+        "sha256": "d939d5ac38d2cddc51e51de274e4bae18b8ce13409848a8aa5d4c8ab211a32d7"
       },
       {
         "kind": "analyzer",
@@ -509,14 +509,14 @@
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
-        "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80"
+        "sha256": "a726c8341e9823f8ee7faed15f3fc3c7b58d83dc90d0b06e7f3c2739e3fd908b"
       },
       {
         "kind": "assembly",
         "package": "Microsoft.Extensions.Telemetry.Abstractions",
         "version": "$catalog",
         "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
-        "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55"
+        "sha256": "d939d5ac38d2cddc51e51de274e4bae18b8ce13409848a8aa5d4c8ab211a32d7"
       },
       {
         "kind": "assembly",
@@ -770,14 +770,14 @@
       "kind": "analyzer",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
-      "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80",
+      "sha256": "a726c8341e9823f8ee7faed15f3fc3c7b58d83dc90d0b06e7f3c2739e3fd908b",
       "version": "$catalog"
     },
     {
       "kind": "analyzer",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
-      "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55",
+      "sha256": "d939d5ac38d2cddc51e51de274e4bae18b8ce13409848a8aa5d4c8ab211a32d7",
       "version": "$catalog"
     },
     {
@@ -833,14 +833,14 @@
       "kind": "assembly",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Logging.dll",
-      "sha256": "78509308d18c813a3b1a1cfd2b2fa76e0799a478f31a00f9e946274e02801e80",
+      "sha256": "a726c8341e9823f8ee7faed15f3fc3c7b58d83dc90d0b06e7f3c2739e3fd908b",
       "version": "$catalog"
     },
     {
       "kind": "assembly",
       "package": "Microsoft.Extensions.Telemetry.Abstractions",
       "path": "analyzers/dotnet/cs/Microsoft.Gen.Metrics.dll",
-      "sha256": "440f1e7c010308cfffe99161b583e00bc88b6a11412a5b60b75a6d08ae4e5e55",
+      "sha256": "d939d5ac38d2cddc51e51de274e4bae18b8ce13409848a8aa5d4c8ab211a32d7",
       "version": "$catalog"
     },
     {
