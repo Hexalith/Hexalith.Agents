@@ -28,8 +28,17 @@ if (-not $InDisposableWorkspace) {
     if ($PreparationOnly) { $arguments += '-PreparationOnly' }
     $workspaceTemp = & mktemp -d
     try {
-        & env "TMPDIR=$workspaceTemp" "TMP=$workspaceTemp" "TEMP=$workspaceTemp" pwsh @arguments
-        $result = $LASTEXITCODE
+        $child = [Diagnostics.ProcessStartInfo]::new('pwsh')
+        foreach ($argument in $arguments) { $child.ArgumentList.Add($argument) }
+        foreach ($variable in 'TMPDIR', 'TMP', 'TEMP') { $child.Environment[$variable] = $workspaceTemp }
+        $process = [Diagnostics.Process]::Start($child)
+        try {
+            $process.WaitForExit()
+            $result = $process.ExitCode
+        }
+        finally {
+            $process.Dispose()
+        }
     }
     finally {
         Remove-Item -LiteralPath $workspaceTemp -Recurse -Force

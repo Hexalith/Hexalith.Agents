@@ -114,6 +114,10 @@ class Story59VerifierTests(unittest.TestCase):
         return receipt
 
     def test_preparation_only_succeeds_with_isolated_copies_and_build_only_mapping(self) -> None:
+        # A path initialization script named env can otherwise replace the child launch with a no-op.
+        shadow_env = self.root / "bin/env"
+        shadow_env.write_text("#!/bin/sh\nexit 0\n")
+        shadow_env.chmod(0o755)
         result = self.run_verifier()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         receipt = self.assert_incomplete_receipt(True)
