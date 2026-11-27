@@ -325,7 +325,9 @@ resolution: `spec-five-deferred-package-integrity-items.md` retains nuspec inclu
 - source_spec: `_bmad-output/implementation-artifacts/spec-implement-agents-ci-cd.md`
   summary: Determine whether another credential holder can race the NuGet absence proof for the six Agents package IDs and whether an atomic reservation mechanism exists.
   evidence: The absence probe and first push are necessarily separate operations; the risk becomes concrete only if another principal can publish the same IDs/version in that interval, which requires an authority inventory or NuGet reservation evidence to settle.
-  status: open
+  status: done 2026-11-27
+  resolution: The November 22 authenticated readback recorded nine active wildcard policies for other repositories covering all six Agents package IDs. A matching publisher could claim an ID and version first. NuGet documents no atomic reservation for all six versions. The current publisher compares public payloads before GitHub finalization. CiCd DW-44 tracks remediation of the overlapping scopes.
+  evidence_record: [NuGet publication race investigation](spec-deferred-nuget-publication-race.md)
 
 ## Deferred from: code review of spec-5-2-configure-hexa-through-live-eventstore-operations-2.md (2026-09-19)
 
