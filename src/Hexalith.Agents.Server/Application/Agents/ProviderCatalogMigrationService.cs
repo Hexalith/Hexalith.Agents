@@ -33,6 +33,8 @@ public sealed class ProviderCatalogMigrationService(
         | ProviderModelCapabilityFlags.Vision
         | ProviderModelCapabilityFlags.StructuredOutput;
 
+    private const int VerificationAttempts = 80;
+
     private readonly TimeProvider _clock = clock ?? TimeProvider.System;
     private readonly IEventStoreGatewayClient? _gateway = gateway;
 
@@ -43,11 +45,24 @@ public sealed class ProviderCatalogMigrationService(
     {
         ArgumentNullException.ThrowIfNull(legacyTenantIds);
         AgentAdministrationContext actor = await contextProvider.GetContextAsync(true, cancellationToken).ConfigureAwait(false);
-        if (!actor.IsPlatformOperator || string.IsNullOrWhiteSpace(actor.ActorUserId))
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!actor.IsPlatformOperator || string.IsNullOrWhiteSpace(actor.ActorUserId) || !actor.HasCurrentAuthority)
         {
             return new("NotAuthorized", 0, 0);
         }
 
+        return await MigrateCoreAsync(actor, legacyTenantIds, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<ProviderCatalogMigrationResult> MigrateCoreAsync(
+        AgentAdministrationContext actor,
+        IReadOnlyCollection<string> legacyTenantIds,
+        CancellationToken cancellationToken)
+    {
+        int platformCount = 0;
+        int tenantCount = 0;
+        try
+        {
         string[] tenantIds = [.. legacyTenantIds.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)];
         if (tenantIds.Length == 0 || tenantIds.Any(string.IsNullOrWhiteSpace)
             || tenantIds.Contains(ProviderCatalogIdentity.PlatformTenantId, StringComparer.Ordinal))
@@ -60,6 +75,7 @@ public sealed class ProviderCatalogMigrationService(
         {
             ordered[index] = (await readModels.GetAsync<ProviderCatalogReadModel>(options.Value.StateStoreName,
                 ProviderCatalogReadModelAddresses.Detail(tenantIds[index]), cancellationToken).ConfigureAwait(false)).Value!;
+            EnsureCurrent(actor, cancellationToken);
             if (ordered[index] is null)
             {
                 return new("InvalidLegacyInventory", 0, 0);
@@ -78,8 +94,10 @@ public sealed class ProviderCatalogMigrationService(
         {
             if (!await IsLegacyProjectionCurrentAsync(tenantIds[index], ordered[index], cancellationToken).ConfigureAwait(false))
             {
+                EnsureCurrent(actor, cancellationToken);
                 return new("AuthoritativePending", 0, 0);
             }
+            EnsureCurrent(actor, cancellationToken);
         }
         Dictionary<string, long> sourceCheckpoints = tenantIds.Select((tenantId, index) =>
                 new KeyValuePair<string, long>(tenantId, LegacyCheckpoint(tenantId, ordered[index])))
@@ -109,10 +127,12 @@ public sealed class ProviderCatalogMigrationService(
         }
 
         ProviderCatalogReadModel? platform = await ReadPlatformAsync(cancellationToken).ConfigureAwait(false);
+        EnsureCurrent(actor, cancellationToken);
         Dictionary<string, TenantProviderEnablementReadModel?> tenantTargets = new(StringComparer.Ordinal);
         foreach (string tenantId in tenantIds)
         {
             tenantTargets[tenantId] = await ReadTenantAsync(tenantId, cancellationToken).ConfigureAwait(false);
+            EnsureCurrent(actor, cancellationToken);
         }
         Dictionary<string, long> platformCheckpoints = new(StringComparer.Ordinal);
         Dictionary<string, long> tenantCheckpoints = tenantIds.ToDictionary(
@@ -131,8 +151,10 @@ public sealed class ProviderCatalogMigrationService(
                 ProviderCatalogAggregate.Domain, aggregateId,
                 platformCheckpoints[aggregateId], cancellationToken).ConfigureAwait(false))
             {
+                EnsureCurrent(actor, cancellationToken);
                 return new("AuthoritativePending", 0, 0);
             }
+            EnsureCurrent(actor, cancellationToken);
         }
 
         foreach (string tenantId in tenantIds)
@@ -140,8 +162,10 @@ public sealed class ProviderCatalogMigrationService(
             if (!await IsTargetCurrentAsync(tenantId, TenantProviderEnablementAggregate.Domain, tenantId,
                 tenantTargets[tenantId]?.LastSequenceNumber ?? 0, cancellationToken).ConfigureAwait(false))
             {
+                EnsureCurrent(actor, cancellationToken);
                 return new("AuthoritativePending", 0, 0);
             }
+            EnsureCurrent(actor, cancellationToken);
         }
 
         // Resolve all existing-target conflicts before the first dispatch. A partial migration never overwrites
@@ -169,8 +193,6 @@ public sealed class ProviderCatalogMigrationService(
             }
         }
 
-        int platformCount = 0;
-        int tenantCount = 0;
         foreach (var group in groups)
         {
             ProviderCatalogEntryView entry = group.First().entry;
@@ -193,24 +215,29 @@ public sealed class ProviderCatalogMigrationService(
             {
                 ProviderCatalogAdministrationRequest request = Request(actor, ProviderCatalogIdentity.PlatformTenantId);
                 AgentAdministrationOutcome outcome = await catalog.CreateAsync(request, create, cancellationToken).ConfigureAwait(false);
-                if (!outcome.Authorized || !outcome.Dispatched)
+                if (!outcome.Authorized)
+                {
+                    return LostAuthority(platformCount, tenantCount);
+                }
+                if (!outcome.Dispatched)
                 {
                     return new("DispatchFailed", platformCount, tenantCount);
                 }
 
                 platformCount++;
-                string commandResult = await WaitForCommandAsync(request, outcome, cancellationToken).ConfigureAwait(false);
+                string commandResult = await WaitForCommandAsync(request, outcome, actor.Authority, cancellationToken).ConfigureAwait(false);
                 if (commandResult != "Completed")
                 {
                     return new(commandResult, platformCount, tenantCount);
                 }
                 if (!await WaitForPlatformAsync(entry, provenance, platformEnabled,
-                    request.MessageId, cancellationToken).ConfigureAwait(false))
+                    request.MessageId, actor.Authority, cancellationToken).ConfigureAwait(false))
                 {
                     return new("AuthoritativePending", platformCount, tenantCount);
                 }
 
                 platform = await ReadPlatformAsync(cancellationToken).ConfigureAwait(false);
+                EnsureCurrent(actor, cancellationToken);
                 platformCheckpoints[ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId)] =
                     platform?.StreamSequences.GetValueOrDefault(ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId)) ?? 0;
             }
@@ -221,24 +248,29 @@ public sealed class ProviderCatalogMigrationService(
                     request,
                     new EnableProviderModelEntry(entry.ProviderId, entry.ModelId,
                         Find(platform, entry)?.LifecycleRevision), cancellationToken).ConfigureAwait(false);
-                if (!outcome.Authorized || !outcome.Dispatched)
+                if (!outcome.Authorized)
+                {
+                    return LostAuthority(platformCount, tenantCount);
+                }
+                if (!outcome.Dispatched)
                 {
                     return new("DispatchFailed", platformCount, tenantCount);
                 }
 
                 platformCount++;
-                string commandResult = await WaitForCommandAsync(request, outcome, cancellationToken).ConfigureAwait(false);
+                string commandResult = await WaitForCommandAsync(request, outcome, actor.Authority, cancellationToken).ConfigureAwait(false);
                 if (commandResult != "Completed")
                 {
                     return new(commandResult, platformCount, tenantCount);
                 }
                 if (!await WaitForPlatformAsync(entry, provenance, enabled: true,
-                    request.MessageId, cancellationToken).ConfigureAwait(false))
+                    request.MessageId, actor.Authority, cancellationToken).ConfigureAwait(false))
                 {
                     return new("AuthoritativePending", platformCount, tenantCount);
                 }
 
                 platform = await ReadPlatformAsync(cancellationToken).ConfigureAwait(false);
+                EnsureCurrent(actor, cancellationToken);
                 platformCheckpoints[ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId)] =
                     platform?.StreamSequences.GetValueOrDefault(ProviderCatalogIdentity.EntryId(entry.ProviderId, entry.ModelId)) ?? 0;
             }
@@ -257,24 +289,29 @@ public sealed class ProviderCatalogMigrationService(
                     TenantProvenance(model));
                 ProviderCatalogAdministrationRequest request = Request(actor, model.TenantId);
                 AgentAdministrationOutcome outcome = await catalog.SetTenantEnablementAsync(request, enablement, cancellationToken).ConfigureAwait(false);
-                if (!outcome.Authorized || !outcome.Dispatched)
+                if (!outcome.Authorized)
+                {
+                    return LostAuthority(platformCount, tenantCount);
+                }
+                if (!outcome.Dispatched)
                 {
                     return new("DispatchFailed", platformCount, tenantCount);
                 }
 
                 tenantCount++;
-                string commandResult = await WaitForCommandAsync(request, outcome, cancellationToken).ConfigureAwait(false);
+                string commandResult = await WaitForCommandAsync(request, outcome, actor.Authority, cancellationToken).ConfigureAwait(false);
                 if (commandResult != "Completed")
                 {
                     return new(commandResult, platformCount, tenantCount);
                 }
                 if (!await WaitForTenantAsync(model.TenantId, tenantEntry, TenantProvenance(model),
-                    request.MessageId, cancellationToken).ConfigureAwait(false))
+                    request.MessageId, actor.Authority, cancellationToken).ConfigureAwait(false))
                 {
                     return new("AuthoritativePending", platformCount, tenantCount);
                 }
 
                 tenantTargets[model.TenantId] = await ReadTenantAsync(model.TenantId, cancellationToken).ConfigureAwait(false);
+                EnsureCurrent(actor, cancellationToken);
                 tenantCheckpoints[model.TenantId] = tenantTargets[model.TenantId]?.LastSequenceNumber ?? 0;
             }
         }
@@ -282,16 +319,20 @@ public sealed class ProviderCatalogMigrationService(
         // A target checked early in a multi-entry run may have changed while later targets were dispatched.
         // Re-read every target before reporting a fully confirmed migration.
         ProviderCatalogReadModel? finalPlatform = await ReadPlatformAsync(cancellationToken).ConfigureAwait(false);
+        EnsureCurrent(actor, cancellationToken);
         Dictionary<string, TenantProviderEnablementReadModel?> finalTenants = new(StringComparer.Ordinal);
         foreach (string tenantId in tenantIds)
         {
             finalTenants[tenantId] = await ReadTenantAsync(tenantId, cancellationToken).ConfigureAwait(false);
+            EnsureCurrent(actor, cancellationToken);
             if ((finalTenants[tenantId]?.LastSequenceNumber ?? 0) != tenantCheckpoints[tenantId]
                 || !await IsTargetCurrentAsync(tenantId, TenantProviderEnablementAggregate.Domain, tenantId,
                     tenantCheckpoints[tenantId], cancellationToken).ConfigureAwait(false))
             {
+                EnsureCurrent(actor, cancellationToken);
                 return new("AuthoritativePending", platformCount, tenantCount);
             }
+            EnsureCurrent(actor, cancellationToken);
         }
 
         foreach (var group in groups)
@@ -304,8 +345,10 @@ public sealed class ProviderCatalogMigrationService(
                 platformCheckpoints[aggregateId],
                 cancellationToken).ConfigureAwait(false))
             {
+                EnsureCurrent(actor, cancellationToken);
                 return new("AuthoritativePending", platformCount, tenantCount);
             }
+            EnsureCurrent(actor, cancellationToken);
 
             ProviderCatalogEntryView? target = Find(finalPlatform, source);
             if (target is null || !PlatformMetadataMatches(target, source, PlatformProvenance(source))
@@ -331,16 +374,36 @@ public sealed class ProviderCatalogMigrationService(
             if (!await IsLegacyCheckpointCurrentAsync(tenantId, sourceCheckpoints[tenantId], cancellationToken)
                 .ConfigureAwait(false))
             {
+                EnsureCurrent(actor, cancellationToken);
                 return new("AuthoritativePending", platformCount, tenantCount);
             }
+            EnsureCurrent(actor, cancellationToken);
         }
 
         return new(platformCount == 0 && tenantCount == 0 ? "NoOp" : "ProjectionConfirmed", platformCount, tenantCount);
+        }
+        catch (AgentCommandAuthorityExpiredException)
+        {
+            return LostAuthority(platformCount, tenantCount);
+        }
+    }
+
+    private static ProviderCatalogMigrationResult LostAuthority(int platformCount, int tenantCount)
+        => new(platformCount == 0 && tenantCount == 0 ? "NotAuthorized" : "AuthoritativePending",
+            platformCount, tenantCount);
+
+    private static void EnsureCurrent(AgentAdministrationContext actor, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        actor.Authority?.ThrowIfNotCurrent();
     }
 
     private ProviderCatalogAdministrationRequest Request(AgentAdministrationContext actor, string tenantId)
         => new(identities.NewMessageId(), identities.NewCorrelationId(), tenantId, actor.ActorUserId,
-            IsProviderAdmin: false, IsPlatformOperator: true);
+            IsProviderAdmin: false, IsPlatformOperator: true)
+        {
+            Authority = actor.Authority,
+        };
 
     private Task<ProviderCatalogReadModel?> ReadPlatformAsync(CancellationToken ct)
         => ReadAsync<ProviderCatalogReadModel>(ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId), ct);
@@ -375,7 +438,7 @@ public sealed class ProviderCatalogMigrationService(
     }
 
     private async Task<string> WaitForCommandAsync(ProviderCatalogAdministrationRequest request,
-        AgentAdministrationOutcome outcome, CancellationToken ct)
+        AgentAdministrationOutcome outcome, AgentAuthorityValidity? authority, CancellationToken ct)
     {
         if (_gateway is null || outcome.Receipt is not { } receipt
             || !string.Equals(receipt.MessageId, request.MessageId, StringComparison.Ordinal)
@@ -385,6 +448,7 @@ public sealed class ProviderCatalogMigrationService(
         }
 
         DateTimeOffset deadline = _clock.GetUtcNow().AddSeconds(8);
+        int attempts = 0;
         do
         {
             CommandStatusQueryResponse? status;
@@ -392,10 +456,14 @@ public sealed class ProviderCatalogMigrationService(
             {
                 status = await _gateway.GetCommandStatusAsync(request.MessageId, ct).ConfigureAwait(false);
             }
-            catch (Exception exception) when (exception is not OperationCanceledException)
+            catch (Exception exception) when (exception is not OperationCanceledException
+                and not AgentCommandAuthorityExpiredException)
             {
+                authority?.ThrowIfNotCurrent();
                 return "UnableToVerify";
             }
+
+            authority?.ThrowIfNotCurrent();
 
             if (status is not null)
             {
@@ -434,9 +502,15 @@ public sealed class ProviderCatalogMigrationService(
                 }
             }
 
+            if (++attempts >= VerificationAttempts)
+            {
+                break;
+            }
+
             await Task.Delay(TimeSpan.FromMilliseconds(100), _clock, ct).ConfigureAwait(false);
         }
         while (_clock.GetUtcNow() < deadline);
+        authority?.ThrowIfNotCurrent();
         return "AuthoritativePending";
     }
 
@@ -488,12 +562,14 @@ public sealed class ProviderCatalogMigrationService(
         => (await readModels.GetAsync<T>(options.Value.StateStoreName, key, ct).ConfigureAwait(false)).Value;
 
     private async Task<bool> WaitForPlatformAsync(ProviderCatalogEntryView source, string provenance,
-        bool enabled, string messageId, CancellationToken ct)
+        bool enabled, string messageId, AgentAuthorityValidity? authority, CancellationToken ct)
     {
         DateTimeOffset deadline = _clock.GetUtcNow().AddSeconds(8);
+        int attempts = 0;
         do
         {
             ProviderCatalogReadModel? model = await ReadPlatformAsync(ct).ConfigureAwait(false);
+            authority?.ThrowIfNotCurrent();
             ProviderCatalogEntryView? target = Find(model, source);
             string entryId = ProviderCatalogIdentity.EntryId(source.ProviderId, source.ModelId);
             if (target is not null && PlatformMatches(target, source, provenance, enabled)
@@ -502,28 +578,42 @@ public sealed class ProviderCatalogMigrationService(
                 return true;
             }
 
+            if (++attempts >= VerificationAttempts)
+            {
+                break;
+            }
+
             await Task.Delay(TimeSpan.FromMilliseconds(100), _clock, ct).ConfigureAwait(false);
         }
         while (_clock.GetUtcNow() < deadline);
+        authority?.ThrowIfNotCurrent();
         return false;
     }
 
     private async Task<bool> WaitForTenantAsync(string tenantId, ProviderCatalogEntryView source,
-        string provenance, string messageId, CancellationToken ct)
+        string provenance, string messageId, AgentAuthorityValidity? authority, CancellationToken ct)
     {
         DateTimeOffset deadline = _clock.GetUtcNow().AddSeconds(8);
+        int attempts = 0;
         do
         {
             TenantProviderEnablementReadModel? model = await ReadTenantAsync(tenantId, ct).ConfigureAwait(false);
+            authority?.ThrowIfNotCurrent();
             TenantProviderEntryState? target = Find(model, source);
             if (target is not null && model!.ProjectedCommandMessageIds.Contains(messageId, StringComparer.Ordinal))
             {
                 return TenantMatches(target, source, provenance);
             }
 
+            if (++attempts >= VerificationAttempts)
+            {
+                break;
+            }
+
             await Task.Delay(TimeSpan.FromMilliseconds(100), _clock, ct).ConfigureAwait(false);
         }
         while (_clock.GetUtcNow() < deadline);
+        authority?.ThrowIfNotCurrent();
         return false;
     }
 
