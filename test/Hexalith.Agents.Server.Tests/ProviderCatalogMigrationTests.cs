@@ -15,6 +15,7 @@ using Hexalith.Agents.TenantProviderEnablement;
 using Hexalith.EventStore.Contracts.Commands;
 using Hexalith.EventStore.Contracts.Streams;
 using Hexalith.EventStore.Client.Gateway;
+using Hexalith.EventStore.Client.Projections;
 using Hexalith.EventStore.Contracts.Projections;
 
 using Microsoft.AspNetCore.Builder;
@@ -573,67 +574,376 @@ public sealed class ProviderCatalogMigrationTests
         _sent.ShouldBeEmpty();
     }
 
-    private ProviderCatalogMigrationService Service(bool isPlatformOperator = true)
+    [Fact]
+    public async Task Migration_rejects_expired_platform_operator_authority_before_any_read_or_dispatch()
     {
+        SeedLegacy("tenant-a", Entry());
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(10));
+        clock.Now = clock.Now.AddSeconds(10);
+        IReadModelStore store = Substitute.For<IReadModelStore>();
+        IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
+        ProviderCatalogMigrationService migration = Service(authority: authority, clock: clock, readModels: store, gatewayOverride: gateway);
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("NotAuthorized", 0, 0));
+        await store.DidNotReceive().GetAsync<ProviderCatalogReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await gateway.DidNotReceive().ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>());
+        _sent.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Migration_forwards_exact_authority_bound_on_every_dispatched_command()
+    {
+        SeedLegacy("tenant-a", Entry());
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(30));
+        ProviderCatalogMigrationService migration = Service(authority: authority, clock: clock);
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("ProjectionConfirmed", 1, 1));
+        _sent.Count.ShouldBe(2);
+        foreach (AgentCommandIntent intent in _sent)
+        {
+            ReferenceEquals(intent.Authority, authority).ShouldBeTrue();
+        }
+    }
+
+    [Theory]
+    [InlineData("legacy-read", "expiry")]
+    [InlineData("legacy-read", "rollback")]
+    [InlineData("legacy-head", "expiry")]
+    [InlineData("legacy-head-error", "expiry")]
+    [InlineData("platform-read", "expiry")]
+    [InlineData("tenant-read", "rollback")]
+    [InlineData("target-head", "expiry")]
+    [InlineData("target-head-missing", "expiry")]
+    [InlineData("target-head-error", "rollback")]
+    public async Task Migration_stops_preflight_on_authority_expiry_or_rollback(string stage, string mode)
+    {
+        SeedLegacy("tenant-a", Entry());
+        SeedLegacy("tenant-b", Entry());
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(10));
+        void ExpireOrRollback() => clock.Now = clock.Now.AddSeconds(mode == "expiry" ? 10 : -1);
+        bool triggered = false;
+        int legacyReadCalls = 0;
+        int legacyHeadCalls = 0;
+        int targetHeadCalls = 0;
+        IReadModelStore store = Substitute.For<IReadModelStore>();
+        store.GetAsync<ProviderCatalogReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(async call =>
+            {
+                string key = call.ArgAt<string>(1);
+                ReadModelEntry<ProviderCatalogReadModel> value = await _store.GetAsync<ProviderCatalogReadModel>(
+                    call.ArgAt<string>(0), key, call.ArgAt<CancellationToken>(2)).ConfigureAwait(false);
+                if (stage == "legacy-read" && !triggered && key == ProviderCatalogReadModelAddresses.Detail("tenant-a"))
+                {
+                    triggered = true;
+                    legacyReadCalls++;
+                    ExpireOrRollback();
+                }
+                else if (key == ProviderCatalogReadModelAddresses.Detail("tenant-a") || key == ProviderCatalogReadModelAddresses.Detail("tenant-b"))
+                {
+                    legacyReadCalls++;
+                }
+                else if (stage == "platform-read" && !triggered && key == ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId))
+                {
+                    triggered = true;
+                    ExpireOrRollback();
+                }
+                return value;
+            });
+        store.GetAsync<TenantProviderEnablementReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(async call =>
+            {
+                string key = call.ArgAt<string>(1);
+                ReadModelEntry<TenantProviderEnablementReadModel> value = await _store.GetAsync<TenantProviderEnablementReadModel>(
+                    call.ArgAt<string>(0), key, call.ArgAt<CancellationToken>(2)).ConfigureAwait(false);
+                if (stage == "tenant-read" && !triggered && key == TenantProviderEnablementReadModelAddresses.Detail("tenant-a"))
+                {
+                    triggered = true;
+                    ExpireOrRollback();
+                }
+                return value;
+            });
         IEventStoreGatewayClient gateway = Substitute.For<IEventStoreGatewayClient>();
         gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
                 StreamReadRequest request = call.Arg<StreamReadRequest>();
-                if (_missingTargetReason is not null
-                    && !(request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant)
-                    && !_targetHeads.ContainsKey(TargetKey(request.Tenant, request.Domain,
-                        request.AggregateId ?? string.Empty)))
+                bool isLegacy = request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant;
+                if (isLegacy)
                 {
-                    throw new EventStoreGatewayException(404, "Not Found", reasonCode: _missingTargetReason);
+                    legacyHeadCalls++;
+                    if (stage is "legacy-head" or "legacy-head-error" && !triggered)
+                    {
+                        triggered = true;
+                        ExpireOrRollback();
+                        if (stage == "legacy-head-error")
+                        {
+                            throw new EventStoreGatewayException(503, "Service Unavailable");
+                        }
+                    }
+                    long head = _legacyHeads.GetValueOrDefault(request.Tenant);
+                    return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
+                        new StreamReadMetadata(request.FromSequence, null, null, head, 0, false, null));
                 }
-                long head = request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant
-                    ? _legacyHeads.GetValueOrDefault(request.Tenant)
-                    : _targetHeads.GetValueOrDefault(TargetKey(request.Tenant, request.Domain, request.AggregateId ?? string.Empty));
-                return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
-                    new StreamReadMetadata(request.FromSequence, null, null, head, 0, false, null));
-            });
-        gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
-            {
-                AgentCommandIntent? command = _sent.FirstOrDefault(item => item.MessageId == call.Arg<string>());
-                bool rejected = command is not null && _rejectedMessages.Contains(command.MessageId);
-                CommandStatus commandStatus = _forcedStatus ?? (rejected ? CommandStatus.Rejected : CommandStatus.Completed);
-                return command is null ? null : new CommandStatusQueryResponse(command.CorrelationId,
-                    commandStatus.ToString(), (int)commandStatus,
-                    RejectionEventType: rejected ? "InvalidProviderModelMetadataRejection" : null,
-                    MessageId: command.MessageId)
+
+                targetHeadCalls++;
+                if (stage is "target-head" or "target-head-missing" or "target-head-error" && !triggered)
                 {
-                    TenantId = command.TenantId,
-                    EventCount = rejected ? null : 1,
-                };
+                    triggered = true;
+                    ExpireOrRollback();
+                    if (stage == "target-head-missing")
+                    {
+                        throw new EventStoreGatewayException(404, "Not Found", reasonCode: StreamReplayReasonCodes.MissingStream);
+                    }
+                    if (stage == "target-head-error")
+                    {
+                        throw new EventStoreGatewayException(503, "Service Unavailable");
+                    }
+                }
+                long targetHead = _targetHeads.GetValueOrDefault(TargetKey(request.Tenant, request.Domain, request.AggregateId ?? string.Empty));
+                return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
+                    new StreamReadMetadata(request.FromSequence, null, null, targetHead, 0, false, null));
             });
+
+        ProviderCatalogMigrationService migration = Service(authority: authority, clock: clock, readModels: store, gatewayOverride: gateway);
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a", "tenant-b"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("NotAuthorized", 0, 0));
+        _sent.ShouldBeEmpty();
+        if (stage == "legacy-read")
+        {
+            legacyReadCalls.ShouldBe(1);
+            legacyHeadCalls.ShouldBe(0);
+        }
+        else if (stage is "legacy-head" or "legacy-head-error")
+        {
+            legacyHeadCalls.ShouldBe(1);
+            targetHeadCalls.ShouldBe(0);
+        }
+        else if (stage is "target-head" or "target-head-missing" or "target-head-error")
+        {
+            targetHeadCalls.ShouldBe(1);
+        }
+    }
+
+    [Fact]
+    public async Task Migration_stops_before_second_command_when_authority_expires_after_first_projection()
+    {
+        SeedLegacy("tenant-a", Entry());
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(10));
+        bool expiredAfterPlatformRefresh = false;
+        IReadModelStore store = Substitute.For<IReadModelStore>();
+        int platformReads = 0;
+        store.GetAsync<ProviderCatalogReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(async call =>
+            {
+                string key = call.ArgAt<string>(1);
+                ReadModelEntry<ProviderCatalogReadModel> value = await _store.GetAsync<ProviderCatalogReadModel>(
+                    call.ArgAt<string>(0), key, call.ArgAt<CancellationToken>(2)).ConfigureAwait(false);
+                if (key == ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId))
+                {
+                    platformReads++;
+                    if (platformReads == 3 && !expiredAfterPlatformRefresh)
+                    {
+                        expiredAfterPlatformRefresh = true;
+                        clock.Now = clock.Now.AddSeconds(10);
+                    }
+                }
+                return value;
+            });
+        store.GetAsync<TenantProviderEnablementReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => _store.GetAsync<TenantProviderEnablementReadModel>(
+                call.ArgAt<string>(0), call.ArgAt<string>(1), call.ArgAt<CancellationToken>(2)));
+
+        ProviderCatalogMigrationService migration = Service(authority: authority, clock: clock, readModels: store);
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("AuthoritativePending", 1, 0));
+        _sent.ShouldHaveSingleItem().CommandType.ShouldBe(nameof(CreateProviderModelEntry));
+    }
+
+    [Fact]
+    public async Task Migration_returns_not_authorized_when_dispatcher_refuses_expired_authority_during_admission()
+    {
+        SeedLegacy("tenant-a", Entry());
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(10));
         IAgentCommandDispatcher dispatcher = Substitute.For<IAgentCommandDispatcher>();
         dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>())
-            .Returns(call =>
+            .Returns<Task<SubmitCommandResponse>>(_ => throw new AgentCommandAuthorityExpiredException());
+        ProviderCatalogMigrationService migration = Service(authority: authority, clock: clock, dispatcherOverride: dispatcher);
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("NotAuthorized", 0, 0));
+        _sent.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Migration_preserves_submitted_count_as_pending_when_authority_expires_during_command_status_wait()
+    {
+        SeedLegacy("tenant-a", Entry());
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(10));
+        ProviderCatalogMigrationService migration = Service(
+            authority: authority,
+            clock: clock,
+            onCommandStatusRead: () => clock.Now = clock.Now.AddSeconds(10));
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("AuthoritativePending", 1, 0));
+        _sent.ShouldHaveSingleItem().CommandType.ShouldBe(nameof(CreateProviderModelEntry));
+    }
+
+    [Fact]
+    public async Task Migration_refuses_noop_confirmation_when_authority_expires_during_final_verification()
+    {
+        SeedLegacy("tenant-a", Entry());
+        (await Service().MigrateAsync(["tenant-a"])).Status.ShouldBe("ProjectionConfirmed");
+        int priorSent = _sent.Count;
+        var clock = new Story54TimeProvider();
+        var authority = new AgentAuthorityValidity(clock, clock.Now, clock.Now.AddSeconds(10));
+        int platformReads = 0;
+        IReadModelStore store = Substitute.For<IReadModelStore>();
+        store.GetAsync<ProviderCatalogReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(async call =>
             {
-                AgentCommandIntent envelope = call.Arg<AgentCommandIntent>();
-                _sent.Add(envelope);
-                if (_rejectNextCommand)
+                string key = call.ArgAt<string>(1);
+                ReadModelEntry<ProviderCatalogReadModel> value = await _store.GetAsync<ProviderCatalogReadModel>(
+                    call.ArgAt<string>(0), key, call.ArgAt<CancellationToken>(2)).ConfigureAwait(false);
+                if (key == ProviderCatalogReadModelAddresses.Detail(ProviderCatalogIdentity.PlatformTenantId))
                 {
-                    _rejectNextCommand = false;
-                    _rejectedMessages.Add(envelope.MessageId);
-                    // Another writer projects the same target while this exact command is rejected.
-                    Persist(envelope.WithFixtureMessageId("unrelated-writer"));
+                    platformReads++;
+                    if (platformReads == 2)
+                    {
+                        clock.Now = clock.Now.AddSeconds(10);
+                    }
                 }
-                else
-                {
-                    Persist(envelope);
-                }
-                return Task.FromResult(new SubmitCommandResponse(envelope.CorrelationId, null, envelope.MessageId));
+                return value;
             });
+        store.GetAsync<TenantProviderEnablementReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(call => _store.GetAsync<TenantProviderEnablementReadModel>(
+                call.ArgAt<string>(0), call.ArgAt<string>(1), call.ArgAt<CancellationToken>(2)));
+
+        ProviderCatalogMigrationService migration = Service(authority: authority, clock: clock, readModels: store);
+
+        ProviderCatalogMigrationResult result = await migration.MigrateAsync(["tenant-a"]);
+
+        result.ShouldBe(new ProviderCatalogMigrationResult("NotAuthorized", 0, 0));
+        _sent.Count.ShouldBe(priorSent);
+    }
+
+    [Fact]
+    public async Task Migration_stops_when_cancellation_occurs_during_authority_resolution()
+    {
+        SeedLegacy("tenant-a", Entry());
+        using var cts = new CancellationTokenSource();
         IAgentAdministrationContextProvider context = Substitute.For<IAgentAdministrationContextProvider>();
-        context.GetContext().Returns(new AgentAdministrationContext(
-            "tenant-a", "operator", IsAgentsAdmin: false, IsPlatformOperator: isPlatformOperator));
-        context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
+        context.GetContextAsync(true, Arg.Any<CancellationToken>()).Returns(_ =>
+        {
+            cts.Cancel();
+            return ValueTask.FromResult(new AgentAdministrationContext("tenant-a", "operator", false, true));
+        });
+        IReadModelStore store = Substitute.For<IReadModelStore>();
+        ProviderCatalogMigrationService migration = Service(contextOverride: context, readModels: store);
+
+        await Should.ThrowAsync<OperationCanceledException>(() => migration.MigrateAsync(["tenant-a"], cts.Token));
+        await store.DidNotReceive().GetAsync<ProviderCatalogReadModel>(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        _sent.ShouldBeEmpty();
+    }
+
+    private ProviderCatalogMigrationService Service(
+        bool isPlatformOperator = true,
+        AgentAuthorityValidity? authority = null,
+        TimeProvider? clock = null,
+        IReadModelStore? readModels = null,
+        IEventStoreGatewayClient? gatewayOverride = null,
+        IAgentCommandDispatcher? dispatcherOverride = null,
+        IAgentAdministrationContextProvider? contextOverride = null,
+        Action? onCommandStatusRead = null)
+    {
+        IEventStoreGatewayClient gateway = gatewayOverride ?? Substitute.For<IEventStoreGatewayClient>();
+        if (gatewayOverride is null)
+        {
+            gateway.ReadStreamAsync(Arg.Any<StreamReadRequest>(), Arg.Any<CancellationToken>())
+                .Returns(call =>
+                {
+                    StreamReadRequest request = call.Arg<StreamReadRequest>();
+                    if (_missingTargetReason is not null
+                        && !(request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant)
+                        && !_targetHeads.ContainsKey(TargetKey(request.Tenant, request.Domain,
+                            request.AggregateId ?? string.Empty)))
+                    {
+                        throw new EventStoreGatewayException(404, "Not Found", reasonCode: _missingTargetReason);
+                    }
+                    long head = request.Domain == ProviderCatalogAggregate.Domain && request.AggregateId == request.Tenant
+                        ? _legacyHeads.GetValueOrDefault(request.Tenant)
+                        : _targetHeads.GetValueOrDefault(TargetKey(request.Tenant, request.Domain, request.AggregateId ?? string.Empty));
+                    return new StreamReadPage(request.Tenant, request.Domain, request.AggregateId, [],
+                        new StreamReadMetadata(request.FromSequence, null, null, head, 0, false, null));
+                });
+            gateway.GetCommandStatusAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(call =>
+                {
+                    onCommandStatusRead?.Invoke();
+                    AgentCommandIntent? command = _sent.FirstOrDefault(item => item.MessageId == call.Arg<string>());
+                    bool rejected = command is not null && _rejectedMessages.Contains(command.MessageId);
+                    CommandStatus commandStatus = _forcedStatus ?? (rejected ? CommandStatus.Rejected : CommandStatus.Completed);
+                    return command is null ? null : new CommandStatusQueryResponse(command.CorrelationId,
+                        commandStatus.ToString(), (int)commandStatus,
+                        RejectionEventType: rejected ? "InvalidProviderModelMetadataRejection" : null,
+                        MessageId: command.MessageId)
+                    {
+                        TenantId = command.TenantId,
+                        EventCount = rejected ? null : 1,
+                    };
+                });
+        }
+        IAgentCommandDispatcher dispatcher = dispatcherOverride ?? Substitute.For<IAgentCommandDispatcher>();
+        if (dispatcherOverride is null)
+        {
+            dispatcher.DispatchAsync(Arg.Any<AgentCommandIntent>(), Arg.Any<CancellationToken>())
+                .Returns(call =>
+                {
+                    AgentCommandIntent envelope = call.Arg<AgentCommandIntent>();
+                    _sent.Add(envelope);
+                    if (_rejectNextCommand)
+                    {
+                        _rejectNextCommand = false;
+                        _rejectedMessages.Add(envelope.MessageId);
+                        // Another writer projects the same target while this exact command is rejected.
+                        Persist(envelope.WithFixtureMessageId("unrelated-writer"));
+                    }
+                    else
+                    {
+                        Persist(envelope);
+                    }
+                    return Task.FromResult(new SubmitCommandResponse(envelope.CorrelationId, null, envelope.MessageId));
+                });
+        }
+        IAgentAdministrationContextProvider context = contextOverride ?? Substitute.For<IAgentAdministrationContextProvider>();
+        if (contextOverride is null)
+        {
+            context.GetContext().Returns(new AgentAdministrationContext(
+                "tenant-a", "operator", IsAgentsAdmin: false, IsPlatformOperator: isPlatformOperator)
+            {
+                Authority = authority,
+            });
+            context.GetContextAsync(Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(_ => context.GetContext());
+        }
         return new(new ProviderCatalogAdministrationOrchestrator(dispatcher), context,
-            new AgentCommandIdentityFactory(), _store,
-            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }), gateway: gateway);
+            new AgentCommandIdentityFactory(), readModels ?? _store,
+            Options.Create(new ProviderCatalogReadModelOptions { StateStoreName = StoreName }), clock: clock, gateway: gateway);
     }
 
     private void Persist(AgentCommandIntent envelope)
